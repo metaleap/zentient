@@ -6,6 +6,7 @@ import (
     "strings"
 
     "github.com/metaleap/go-util-fs"
+    "github.com/metaleap/go-util-misc"
 
     "github.com/metaleap/zentient/z"
 )
@@ -21,12 +22,7 @@ var (
 func main () {
     var err error
     if vsProjDir,err = os.Getwd() ; err != nil { return }
-    if len(os.Args) != 2 { return }
-
-    vn := filepath.VolumeName(vsProjDir)
-    subdir := strings.Replace(vsProjDir, vn, ufs.SanitizeFsName(vn), -1)
-    dataDir = filepath.Join(os.Args[1], subdir)
-    if err = ufs.EnsureDirExists(dataDir) ; err != nil { return }
+    if err = ensureDataDir() ; err != nil { return }
 
     stdout := bufio.NewWriterSize(os.Stdout, bufferCapacity)
     stdin := bufio.NewScanner(os.Stdin)
@@ -39,7 +35,29 @@ func main () {
     }
 }
 
+
+func ensureDataDir() error {
+    var basedir, subdir string
+    const sep = string(os.PathSeparator)
+    if len(os.Args) > 1 && len(os.Args[1])>0 {
+        if editordatadir , index := os.Args[1] , strings.Index(os.Args[1], sep + "Code" + sep) ; index > 0 {
+            basedir = editordatadir[0 : index]
+        }
+    }
+    if len(basedir) == 0 || !ufs.DirExists(basedir) {
+        basedir = ugo.UserDataDirPath()
+    }
+    if volname := filepath.VolumeName(vsProjDir) ; len(volname) > 0 {
+        subdir = strings.Replace(vsProjDir, volname, ufs.SanitizeFsName(volname), -1)
+    } else {
+        subdir = vsProjDir
+    }
+    dataDir = filepath.Join(basedir, "zentient", subdir)
+    return ufs.EnsureDirExists(dataDir)
+}
+
+
 func handleRequest (queryln string) (resultln string) {
-    resultln = vsProjDir + "::" + z.CMD_FILE_OPEN + "---not yet dudes! "
+    resultln = dataDir + "::" + os.Args[0] + "::" + z.CMD_FILE_OPEN + queryln
     return
 }
