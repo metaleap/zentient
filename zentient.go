@@ -1,22 +1,27 @@
 package main
-
 import (
     "bufio"
-    "fmt"
     "os"
-    "strings"
 )
 
+const bufferCapacity = 1024*1024*4
+
+var vsProjDir string
+
 func main () {
+    var err error
+    if vsProjDir,err = os.Getwd() ; err != nil { return }
 
+    stdout := bufio.NewWriterSize(os.Stdout, bufferCapacity)
+    stdin := bufio.NewScanner(os.Stdin)
+    stdin.Buffer(make([]byte, 1024*1024, bufferCapacity), bufferCapacity)
+    for stdin.Scan() {
+        if _,err = stdout.WriteString(handleRequest(stdin.Text()) + "\r\n") ; err != nil { break }
+        if err = stdout.Flush() ; err != nil { break }
+    }
+}
 
-    scanner := bufio.NewScanner(os.Stdin)
-    scanner.Buffer([]byte{}, 1024*1024*128)
-    for scanner.Scan() {
-        txt := scanner.Text()
-        fmt.Println(strings.ToUpper(txt) + strings.ToLower(txt))
-    }
-    if err := scanner.Err() ; err != nil {
-        print(err)
-    }
+func handleRequest (queryln string) (resultln string) {
+    resultln = vsProjDir + "---not yet dudes! "
+    return
 }
