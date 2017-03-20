@@ -1,6 +1,7 @@
 package main
 import (
     "bufio"
+    "encoding/json"
     "os"
     "path/filepath"
     "strings"
@@ -9,55 +10,62 @@ import (
     "github.com/metaleap/go-util-misc"
 
     "github.com/metaleap/zentient/z"
+    "github.com/metaleap/zentient/go"
+    "github.com/metaleap/zentient/hs"
 )
 
 const bufferCapacity = 1024*1024*4
 
-var (
-    vsProjDir   string
-    dataDir     string
-)
-
 
 func main () {
     var err error
-    if vsProjDir,err = os.Getwd() ; err != nil { return }
-    if err = ensureDataDir() ; err != nil { return }
 
-    stdout := bufio.NewWriterSize(os.Stdout, bufferCapacity)
+    if z.ProjDir,err = os.Getwd() ; err != nil { return }
+    if err = ensureDataDirs() ; err != nil { return }
+    z.Zengines = map[string]z.Zengine { "hs": zhs.Zengine, "go": zgo.Zengine }
+
     stdin := bufio.NewScanner(os.Stdin)
     stdin.Buffer(make([]byte, 1024*1024, bufferCapacity), bufferCapacity)
+    stdout := bufio.NewWriterSize(os.Stdout, bufferCapacity)
+    z.Out = json.NewEncoder(stdout)
+    z.Out.SetEscapeHTML(false)
+    z.Out.SetIndent("","")
+
     for stdin.Scan() {
-        if response := handleRequest(stdin.Text()) ; len(response) > 0 {
-            if _,err = stdout.WriteString(response + "\r\n") ; err != nil { break }
-            if err = stdout.Flush() ; err != nil { break }
+        if err = z.HandleRequest(stdin.Text()) ; err == nil {
+            err = stdout.Flush()
+        }
+        if err != nil {
+            z.Out.Encode(err.Error())
+            err = stdout.Flush()
+            break
         }
     }
 }
 
 
-func ensureDataDir() error {
+func ensureDataDirs() error {
     var basedir, subdir string
-    const sep = string(os.PathSeparator)
+
+    //  coming from VScode?
     if len(os.Args) > 1 && len(os.Args[1])>0 {
+        const sep = string(os.PathSeparator)
         if editordatadir , index := os.Args[1] , strings.Index(os.Args[1], sep + "Code" + sep) ; index > 0 {
             basedir = editordatadir[0 : index]
         }
     }
+    //  otherwise..
     if len(basedir) == 0 || !ufs.DirExists(basedir) {
         basedir = ugo.UserDataDirPath()
     }
-    if volname := filepath.VolumeName(vsProjDir) ; len(volname) > 0 {
-        subdir = strings.Replace(vsProjDir, volname, ufs.SanitizeFsName(volname), -1)
+
+    z.DataDir = filepath.Join(basedir, "zentient")
+    //  cache for this session is in datadir/user/proj/dir
+    if volname := filepath.VolumeName(z.ProjDir) ; len(volname) > 0 {
+        subdir = strings.Replace(z.ProjDir, volname, ufs.SanitizeFsName(volname), -1)
     } else {
-        subdir = vsProjDir
+        subdir = z.ProjDir
     }
-    dataDir = filepath.Join(basedir, "zentient", subdir)
-    return ufs.EnsureDirExists(dataDir)
-}
-
-
-func handleRequest (queryln string) (resultln string) {
-    resultln = dataDir + "::" + os.Args[0] + "::" + z.CMD_FILE_OPEN + queryln
-    return
+    z.DataProjDir = filepath.Join(z.DataDir, subdir)
+    return ufs.EnsureDirExists(z.DataProjDir) //  this also creates dataDir
 }
