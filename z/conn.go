@@ -4,7 +4,7 @@ import (
 )
 
 const (
-    MSG_ZEN_STATE   = "ZS:"
+    MSG_ZEN_STATUS  = "ZS:"
     MSG_ZEN_LANGS   = "ZL:"
 
     MSG_FILE_OPEN   = "FO:"
@@ -31,13 +31,11 @@ func out (v interface{}) error {
 func HandleRequest (queryln string) (e error) {
     switch msg := queryln[:3]  ;  msg {
 
-    case MSG_ZEN_STATE:
-        e=out("zen status summary")
-
+    case MSG_ZEN_STATUS:
+        e=out(jsonStatus())
 
     case MSG_ZEN_LANGS:
-        e=out(jsonableZengines())
-
+        e=out(jsonZengines())
 
     case MSG_FILE_OPEN:
 
