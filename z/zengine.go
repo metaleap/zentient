@@ -1,9 +1,10 @@
 package z
 import (
+    "github.com/metaleap/go-util-slice"
 )
 
 
-type ProjInfo struct {
+type RootInfo struct {
     SrcDir      string
     CacheDir    string
     ConfigDir   string
@@ -13,17 +14,32 @@ type ProjInfo struct {
 type Zengine interface {
     Ids () []string
     Jsonish () interface{}
+
+    Base () *ZengineBase
+
     OnFileActive (*File)
+    OnFileClose (*File)
     OnFileOpen (*File)
     OnFileWrite (*File)
 }
 
 
+type ZengineBase struct {
+    Projs []*Proj
+}
+
+
 var (
-    Proj        = &ProjInfo{}
+    Root        = &RootInfo{}
     AllFiles    = map[string]*File {}
+    OpenFiles   = []string {}
     Zengines    = map[string]Zengine {}
 )
+
+
+func InitZBase (base *ZengineBase) {
+    base.Projs = []*Proj {}
+}
 
 
 func fromZidMsg (msgargs string) (z Zengine, argstr string) {
@@ -34,22 +50,25 @@ func fromZidMsg (msgargs string) (z Zengine, argstr string) {
     return
 }
 
-func OnFileActive (file* File) {
+func onFileActive (file* File) {
     file.Z.OnFileActive(file)
 }
 
-func OnFileClose (file* File) {
-    file.Z.OnFileClose(file)
+func onFileClose (z Zengine, relpath string) {
+    OpenFiles = uslice.StrWithout(OpenFiles, false, relpath)
+    file := AllFiles[relpath]
+    z.OnFileClose(file)
 }
 
 func onFileOpen (z Zengine, relpath string) {
+    uslice.StrAppendUnique(&OpenFiles, relpath)
     file := AllFiles[relpath]
     if file == nil {
         file = NewFile(z, relpath)
         AllFiles[relpath] = file
         z.OnFileOpen(file)
     }
-    OnFileActive(file)
+    onFileActive(file)
 }
 
 func onFileWrite (z Zengine, relpath string) {

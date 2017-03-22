@@ -13,11 +13,12 @@ func jsonErrMsg (msg string) interface{} {
 
 func jsonStatus () interface{} {
     resp := map[string]interface{} {}
-    resp["Proj"] = Proj
+    resp["Root"] = Root
     resp["Zengines"] = jsonZengines()
     for zid, zengine := range Zengines {
         resp["Zengines["+zid+"]"] = zengine.Jsonish()
     }
+    resp["OpenFiles"] = OpenFiles
     resp["AllFiles"] = AllFiles
     return resp
 }

@@ -5,17 +5,20 @@ import (
 
 
 type zgo struct {
+    z.ZengineBase
 }
 
 var (
-    zengine *zgo
+    µ *zgo
 )
 
 
-func New (proj *z.ProjInfo) z.Zengine {
-    zengine = &zgo{}
-    return zengine
+func New (root *z.RootInfo) z.Zengine {
+    µ = &zgo{}
+    z.InitZBase(&µ.ZengineBase)
+    return µ
 }
+
 
 
 
@@ -23,14 +26,25 @@ func (_ zgo) Ids () []string {
     return []string { "go", "Go" }
 }
 
-func (me* zgo) Jsonish () interface{} {
-    return me
+func (self* zgo) Jsonish () interface{} {
+    return self
 }
+
+
+func (self* zgo) Base () *z.ZengineBase {
+    return &self.ZengineBase
+}
+
+
+
 
 func (_ zgo) OnFileActive (file *z.File) {
 }
 
 func (_ zgo) OnFileOpen (file *z.File) {
+}
+
+func (_ zgo) OnFileClose (file *z.File) {
 }
 
 func (_ zgo) OnFileWrite (file *z.File) {

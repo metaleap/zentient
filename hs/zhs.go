@@ -5,17 +5,20 @@ import (
 
 
 type zhs struct {
+    z.ZengineBase
 }
 
 var (
-    zengine *zhs
+    µ *zhs
 )
 
 
-func New (proj *z.ProjInfo) z.Zengine {
-    zengine = &zhs{}
-    return zengine
+func New (root *z.RootInfo) z.Zengine {
+    µ = &zhs{}
+    z.InitZBase(&µ.ZengineBase)
+    return µ
 }
+
 
 
 
@@ -23,14 +26,25 @@ func (_ zhs) Ids () []string {
     return []string { "haskell", "Haskell" }
 }
 
-func (me* zhs) Jsonish () interface{} {
-    return me
+func (self* zhs) Jsonish () interface{} {
+    return self
 }
+
+
+func (self* zhs) Base () *z.ZengineBase {
+    return &self.ZengineBase
+}
+
+
+
 
 func (_ zhs) OnFileActive (file *z.File) {
 }
 
 func (_ zhs) OnFileOpen (file *z.File) {
+}
+
+func (_ zhs) OnFileClose (file *z.File) {
 }
 
 func (_ zhs) OnFileWrite (file *z.File) {
