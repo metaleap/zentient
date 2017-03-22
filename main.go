@@ -75,5 +75,5 @@ func ensureDataDirs () error {
         subdir = z.Root.SrcDir
     }
     z.Root.CacheDir = filepath.Join(z.Root.ConfigDir, subdir)
-    return ufs.EnsureDirExists(z.Root.CacheDir) //  this also creates dataDir
+    return ufs.EnsureDirExists(z.Root.CacheDir) //  this also creates ConfigDir
 }
