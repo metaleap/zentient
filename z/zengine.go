@@ -38,6 +38,10 @@ func OnFileActive (file* File) {
     file.Z.OnFileActive(file)
 }
 
+func OnFileClose (file* File) {
+    file.Z.OnFileClose(file)
+}
+
 func onFileOpen (z Zengine, relpath string) {
     file := AllFiles[relpath]
     if file == nil {

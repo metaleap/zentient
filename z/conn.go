@@ -10,6 +10,7 @@ const (
     MSG_ZEN_LANGS   = "ZL:"
 
     MSG_FILE_OPEN   = "FO:"
+    MSG_FILE_CLOSE  = "FC:"
     MSG_FILE_WRITE  = "FW:"
 )
 
@@ -44,6 +45,8 @@ func HandleRequest (queryln string) (e error) {
         //  no error reporting to client either, for now. with some luck, it can all stay that way
         case MSG_FILE_OPEN:
             if z, relpath := fromZidMsg(msgargs) ; z != nil {  onFileOpen(z, relpath)  }
+        case MSG_FILE_CLOSE:
+            if z, relpath := fromZidMsg(msgargs) ; z != nil {  onFileClose(z, relpath)  }
         case MSG_FILE_WRITE:
             if z, relpath := fromZidMsg(msgargs) ; z != nil {  onFileWrite(z, relpath)  }
 
