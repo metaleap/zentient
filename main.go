@@ -31,7 +31,9 @@ func main () {
     z.Out.SetEscapeHTML(false)
     z.Out.SetIndent("","")
 
-    z.Zengines = map[string]z.Zengine { "hs": zhs.New(z.Root), "go": zgo.New(z.Root) }
+    z.Zengines = map[string]z.Zengine {}
+    regZ("hs", zhs.New(z.Root))
+    regZ("go", zgo.New(z.Root))
 
     for stdin.Scan() {
         if err = z.HandleRequest(stdin.Text()) ; err == nil {
@@ -46,7 +48,12 @@ func main () {
 }
 
 
-func ensureDataDirs() error {
+func regZ (zid string, µ z.Zengine) {
+    if µ != nil  {  z.Zengines[zid] = µ  }
+}
+
+
+func ensureDataDirs () error {
     var basedir, subdir string
 
     //  coming from VScode?
