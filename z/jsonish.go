@@ -13,21 +13,20 @@ func jsonErrMsg (msg string) interface{} {
 
 func jsonStatus () interface{} {
     resp := map[string]interface{} {}
-    resp["dirs"] = map[string]string { "proj": ProjDir, "data": DataDir, "dataproj": DataProjDir }
-    resp["zengines"] = jsonZengines()
-    resp["files"] = jsonFiles()
+    resp["Proj"] = Proj
+    resp["Zengines"] = jsonZengines()
+    for zid, zengine := range Zengines {
+        resp["Zengines["+zid+"]"] = zengine.Jsonish()
+    }
+    resp["AllFiles"] = AllFiles
     return resp
-}
-
-func jsonFiles () interface{} {
-    return AllFiles
 }
 
 
 func jsonZengines () interface{} {
-    list := map[string][]string {}
-    for id, zengine := range Zengines {
-        list[id] = zengine.Ids()
+    list := map[string][]string {} // ouch =)
+    for zid, zengine := range Zengines {
+        list[zid] = zengine.Ids()
     }
     return list
 }

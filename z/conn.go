@@ -17,9 +17,6 @@ const (
 // globals set from main-app on init. 'bad style', but ok for this personal pet project
 var (
     Out         *json.Encoder
-    ProjDir     string
-    DataDir     string
-    DataProjDir string
 )
 
 

@@ -2,8 +2,17 @@ package z
 import (
 )
 
+
+type ProjInfo struct {
+    SrcDir      string
+    CacheDir    string
+    ConfigDir   string
+}
+
+
 type Zengine interface {
     Ids () []string
+    Jsonish () interface{}
     OnFileActive (*File)
     OnFileOpen (*File)
     OnFileWrite (*File)
@@ -11,8 +20,9 @@ type Zengine interface {
 
 
 var (
-    AllFiles = map[string]*File {}
-    Zengines = map[string]Zengine {}
+    Proj        = &ProjInfo{}
+    AllFiles    = map[string]*File {}
+    Zengines    = map[string]Zengine {}
 )
 
 
