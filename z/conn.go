@@ -41,6 +41,8 @@ func HandleRequest (queryln string) (e error) {
             e=out(jsonZengines())
         case MSG_ZEN_STATUS:
             e=out(jsonStatus())
+        case MSG_CAP_FMT:
+            e=out( map[string][]string{ "go": []string{"gofmt"}, "hs": []string{} } )
 
 
         //  LAST: CASES THAT RECEIVE NO RESPONSE
