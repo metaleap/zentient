@@ -1,42 +1,45 @@
 package zhs
 import (
-    "github.com/metaleap/zentient/z"
+	"github.com/metaleap/zentient/z"
 )
 
 
 type zhs struct {
-    z.ZengineBase
+	z.ZengineBase
 }
 
 var (
-    µ *zhs
+	µ *zhs
 )
 
 
 func New (root *z.RootInfo) z.Zengine {
-    µ = &zhs{}
-    z.InitZBase(&µ.ZengineBase)
-    return µ
+	µ = &zhs{}
+	z.InitZBase(&µ.ZengineBase)
+	return µ
 }
 
 
 
 
 func (_ zhs) Ids () []string {
-    return []string { "haskell", "Haskell" }
+	return []string { "haskell", "Haskell" }
 }
 
 func (self* zhs) Jsonish () interface{} {
-    return self
+	return self
 }
 
 
 func (self* zhs) Base () *z.ZengineBase {
-    return &self.ZengineBase
+	return &self.ZengineBase
 }
 
 
 
+func (_ zhs) Caps (string) []string {
+	return []string {}
+}
 
 func (_ zhs) OnFileActive (file *z.File) {
 }
