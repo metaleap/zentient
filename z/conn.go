@@ -32,8 +32,30 @@ func out (v interface{}) error {
 	return Out.Encode(v)
 }
 
+func HandleJsonRpc (req map[string]map[string]interface{}, resp map[string]interface{}) (e error) {
+	for msgid,_ := range req {
+		for zid,_ := range req[msgid] {
+			if µ := Zengines[zid] ; µ != nil {
+			} else {
+			}
+		}
+	}
+	return
+}
 
 func HandleRequest (queryln string) (e error) {
+	if queryln[0] == '{' && queryln[len(queryln) - 1] == '}' {
+		req := map[string]map[string]interface{} {}
+		resp := map[string]interface{} {}
+		if e = json.Unmarshal([]byte(queryln), &req) ; e == nil {
+			e = HandleJsonRpc(req, resp)
+		}
+		if (e != nil) {
+			resp["!"] = e.Error()
+		}
+		e = out(resp)
+		return
+	}
 	var str string
 	msgid,msgargs := ustr.BreakAt(queryln, 3)
 	switch msgid {
