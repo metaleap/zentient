@@ -12,6 +12,8 @@ const (
 
 	MSG_CAP_FMT		= "CF:"
 
+	MSG_DO_FMT		= "DF:"
+
 	MSG_FILE_OPEN	= "FO:"
 	MSG_FILE_CLOSE	= "FC:"
 	MSG_FILE_WRITE	= "FW:"
@@ -32,6 +34,7 @@ func out (v interface{}) error {
 
 
 func HandleRequest (queryln string) (e error) {
+	var str string
 	msgid,msgargs := ustr.BreakAt(queryln, 3)
 	switch msgid {
 		//  each case is ideally just a single func-call out, rpc-like
@@ -39,9 +42,9 @@ func HandleRequest (queryln string) (e error) {
 
 		//  FIRST: CASES THAT EXPECT A RESPONSE
 		case MSG_ZEN_LANGS:
-			e=out(jsonZengines())
+			e = out(jsonZengines())
 		case MSG_ZEN_STATUS:
-			e=out(jsonStatus())
+			e = out(jsonStatus())
 		case MSG_CAP_FMT:
 			zids := strings.Split(msgargs, ",")
 			resp := map[string][]string {}
@@ -50,7 +53,14 @@ func HandleRequest (queryln string) (e error) {
 					resp[zid] = µ.Caps("fmt")
 				}
 			}
-			e=out(resp)
+			e = out(resp)
+		case MSG_DO_FMT:
+			zid,injson := ustr.BreakOn(msgargs, ":")
+			resp := map[string]string {}
+			if e = json.Unmarshal([]byte(injson), &str)  ;  e == nil {
+				if µ := Zengines[zid]  ;  µ != nil {  resp[zid] = µ.DoFmt(str)  }
+				e = out(resp)
+			}
 
 
 		//  LAST: CASES THAT RECEIVE NO RESPONSE
@@ -64,7 +74,7 @@ func HandleRequest (queryln string) (e error) {
 
 		//  NOTHING MATCHED? A BUG IN CLIENT, throw at client
 		default:
-			e=out(jsonErrMsg("Unknown MSG-ID `" + msgid + "` --- for diagnostics, msg-args were: " + msgargs))
+			e = out(jsonErrMsg("Unknown MSG-ID `" + msgid + "` --- for diagnostics, msg-args were: " + msgargs))
 	}
 	return
 }

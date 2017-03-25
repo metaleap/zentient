@@ -1,5 +1,7 @@
 package zgo
 import (
+	"strings"
+
 	"github.com/metaleap/zentient/z"
 
 	"github.com/metaleap/go-devgo"
@@ -26,34 +28,38 @@ func New (root *z.RootInfo) z.Zengine {
 
 
 
-func (_ zgo) Ids () []string {
+func (_ *zgo) Ids () []string {
 	return []string { "go", "Go" }
 }
 
-func (self* zgo) Jsonish () interface{} {
+func (self *zgo) Jsonish () interface{} {
 	return self
 }
 
 
-func (self* zgo) Base () *z.ZengineBase {
+func (self *zgo) Base () *z.ZengineBase {
 	return &self.ZengineBase
 }
 
 
-func (_ zgo) Caps (string) []string {
+func (_ *zgo) Caps (string) []string {
 	caps := []string {}
 	if devgo.GoFmt { caps = append(caps, "gofmt") }
 	return caps
 }
 
-func (_ zgo) OnFileActive (file *z.File) {
+func (_ *zgo) DoFmt (src string) string {
+	return strings.ToUpper(src)
 }
 
-func (_ zgo) OnFileOpen (file *z.File) {
+func (_ *zgo) OnFileActive (file *z.File) {
 }
 
-func (_ zgo) OnFileClose (file *z.File) {
+func (_ *zgo) OnFileOpen (file *z.File) {
 }
 
-func (_ zgo) OnFileWrite (file *z.File) {
+func (_ *zgo) OnFileClose (file *z.File) {
+}
+
+func (_ *zgo) OnFileWrite (file *z.File) {
 }

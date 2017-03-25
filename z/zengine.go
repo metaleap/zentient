@@ -18,6 +18,7 @@ type Zengine interface {
 	Base () *ZengineBase
 
 	Caps (string) []string
+	DoFmt (string) string
 	OnFileActive (*File)
 	OnFileClose (*File)
 	OnFileOpen (*File)
