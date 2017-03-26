@@ -44,40 +44,33 @@ func InitZBase (base *ZengineBase) {
 }
 
 
-func fromZidMsg (msgargs string) (z Zengine, argstr string) {
-	zid := msgargs[:2]
-	if z = Zengines[zid] ; z != nil {
-		argstr = msgargs[3:]
-	}
-	return
-}
 
 func onFileActive (file* File) {
 	file.Z.OnFileActive(file)
 }
 
-func onFileClose (z Zengine, relpath string) {
+func onFileClose (µ Zengine, relpath string) {
 	OpenFiles = uslice.StrWithout(OpenFiles, false, relpath)
 	file := AllFiles[relpath]
-	z.OnFileClose(file)
+	µ.OnFileClose(file)
 }
 
-func onFileOpen (z Zengine, relpath string) {
+func onFileOpen (µ Zengine, relpath string) {
 	uslice.StrAppendUnique(&OpenFiles, relpath)
 	file := AllFiles[relpath]
 	if file == nil {
-		file = NewFile(z, relpath)
+		file = NewFile(µ, relpath)
 		AllFiles[relpath] = file
-		z.OnFileOpen(file)
+		µ.OnFileOpen(file)
 	}
 	onFileActive(file)
 }
 
-func onFileWrite (z Zengine, relpath string) {
+func onFileWrite (µ Zengine, relpath string) {
 	file := AllFiles[relpath]
 	if (file == nil) {
-		onFileOpen(z, relpath)
+		onFileOpen(µ, relpath)
 		file = AllFiles[relpath]
 	}
-	z.OnFileWrite(file)
+	µ.OnFileWrite(file)
 }

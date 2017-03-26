@@ -1,7 +1,6 @@
 package z
 import (
 	"encoding/json"
-	"strings"
 
 	"github.com/metaleap/go-util-str"
 )
@@ -32,35 +31,22 @@ func out (v interface{}) error {
 	return Out.Encode(v)
 }
 
-func HandleJsonRpc (req map[string]map[string]interface{}, resp map[string]interface{}) (e error) {
-	for msgid,_ := range req {
-		for zid,_ := range req[msgid] {
-			if µ := Zengines[zid] ; µ != nil {
-			} else {
-			}
-		}
-	}
-	return
-}
 
 func HandleRequest (queryln string) (e error) {
-	if queryln[0] == '{' && queryln[len(queryln) - 1] == '}' {
-		req := map[string]map[string]interface{} {}
-		resp := map[string]interface{} {}
-		if e = json.Unmarshal([]byte(queryln), &req) ; e == nil {
-			e = HandleJsonRpc(req, resp)
-		}
-		if (e != nil) {
-			resp["!"] = e.Error()
-		}
-		e = out(resp)
-		return
+	var instr string
+	var inany interface{}
+
+	msgid,msgrest := ustr.BreakAt(queryln, 3)
+	msgzids,msgargs := ustr.BreakOn(msgrest, ":")
+	zids := ustr.Split(msgzids, ",")
+	if len(msgargs) > 0 {
+		json.Unmarshal([]byte(msgargs), &inany)
+		instr,_ = inany.(string)
 	}
-	var str string
-	msgid,msgargs := ustr.BreakAt(queryln, 3)
 	switch msgid {
 		//  each case is ideally just a single func-call out, rpc-like
 		//  anything else in a case then is only to furnish proper func args from msg-argstr
+
 
 		//  FIRST: CASES THAT EXPECT A RESPONSE
 		case MSG_ZEN_LANGS:
@@ -68,31 +54,30 @@ func HandleRequest (queryln string) (e error) {
 		case MSG_ZEN_STATUS:
 			e = out(jsonStatus())
 		case MSG_CAP_FMT:
-			zids := strings.Split(msgargs, ",")
 			resp := map[string][]string {}
-			for _, zid := range zids {
-				if µ := Zengines[zid] ; µ != nil {
-					resp[zid] = µ.Caps("fmt")
-				}
-			}
+			for _, zid := range zids { if µ := Zengines[zid] ; µ != nil {
+				resp[zid] = µ.Caps("fmt")  }  }
 			e = out(resp)
 		case MSG_DO_FMT:
-			zid,injson := ustr.BreakOn(msgargs, ":")
 			resp := map[string]string {}
-			if e = json.Unmarshal([]byte(injson), &str)  ;  e == nil {
-				if µ := Zengines[zid]  ;  µ != nil {  resp[zid] = µ.DoFmt(str)  }
-				e = out(resp)
+			if zid := zids[0]  ;  len(instr) > 0 {
+				resp[zid] = Zengines[zid].DoFmt(instr)
 			}
+			e = out(resp)
 
 
 		//  LAST: CASES THAT RECEIVE NO RESPONSE
 		//  no error reporting to client either, for now. with some luck, it can all stay that way
 		case MSG_FILE_OPEN:
-			if z, relpath := fromZidMsg(msgargs) ; z != nil {  onFileOpen(z, relpath)  }
+			relpath := msgargs
+			onFileOpen(Zengines[zids[0]], relpath)
 		case MSG_FILE_CLOSE:
-			if z, relpath := fromZidMsg(msgargs) ; z != nil {  onFileClose(z, relpath)  }
+			relpath := msgargs
+			onFileClose(Zengines[zids[0]], relpath)
 		case MSG_FILE_WRITE:
-			if z, relpath := fromZidMsg(msgargs) ; z != nil {  onFileWrite(z, relpath)  }
+			relpath := msgargs
+			onFileWrite(Zengines[zids[0]], relpath)
+
 
 		//  NOTHING MATCHED? A BUG IN CLIENT, throw at client
 		default:
