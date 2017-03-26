@@ -39,7 +39,7 @@ func HandleRequest (queryln string) (e error) {
 	msgid,msgrest := ustr.BreakAt(queryln, 3)
 	msgzids,msgargs := ustr.BreakOn(msgrest, ":")
 	zids := ustr.Split(msgzids, ",")
-	if len(msgargs) > 0 {
+	if len(msgargs)>0 && (msgargs[0]=='"' || msgargs[0]=='{' || msgargs[0]=='[' || msgargs[0]=='(' || msgargs[0]=='\'') {
 		json.Unmarshal([]byte(msgargs), &inany)
 		instr,_ = inany.(string)
 	}
@@ -59,7 +59,7 @@ func HandleRequest (queryln string) (e error) {
 				resp[zid] = µ.Caps("fmt")  }  }
 			e = out(resp)
 		case MSG_DO_FMT:
-			resp := map[string]string {}
+			resp := map[string]interface{} {}
 			if zid := zids[0]  ;  len(instr) > 0 {
 				resp[zid] = Zengines[zid].DoFmt(instr)
 			}

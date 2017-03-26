@@ -1,10 +1,10 @@
 package zgo
 import (
-	"strings"
-
 	"github.com/metaleap/zentient/z"
 
 	"github.com/metaleap/go-devgo"
+	"github.com/metaleap/go-util-misc"
+	"github.com/metaleap/go-util-str"
 )
 
 
@@ -48,8 +48,13 @@ func (_ *zgo) Caps (string) []string {
 	return caps
 }
 
-func (_ *zgo) DoFmt (src string) string {
-	return strings.ToUpper(src)
+func (_ *zgo) DoFmt (src string) *z.FmtResp {
+	var warns string
+	resp := &z.FmtResp{}
+	resp.Result, warns, resp.Error = ugo.CmdExecStdin(src, "", "gofmt", "-e", "-s")
+
+	resp.Warnings = ustr.Split(warns, "\n")
+	return resp
 }
 
 func (_ *zgo) OnFileActive (file *z.File) {

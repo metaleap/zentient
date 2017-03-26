@@ -41,8 +41,8 @@ func (_ *zhs) Caps (string) []string {
 	return []string {}
 }
 
-func (_ *zhs) DoFmt (src string) string {
-	return src
+func (_ *zhs) DoFmt (src string) *z.FmtResp {
+	return nil
 }
 
 func (_ *zhs) OnFileActive (file *z.File) {

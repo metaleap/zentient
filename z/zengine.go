@@ -5,9 +5,15 @@ import (
 
 
 type RootInfo struct {
-	SrcDir      string
-	CacheDir    string
-	ConfigDir   string
+	SrcDir		string
+	CacheDir	string
+	ConfigDir	string
+}
+
+type FmtResp struct {
+	Result		string
+	Warnings	[]string
+	Error		error
 }
 
 
@@ -18,7 +24,7 @@ type Zengine interface {
 	Base () *ZengineBase
 
 	Caps (string) []string
-	DoFmt (string) string
+	DoFmt (string) *FmtResp
 	OnFileActive (*File)
 	OnFileClose (*File)
 	OnFileOpen (*File)
@@ -32,10 +38,10 @@ type ZengineBase struct {
 
 
 var (
-	Root        = &RootInfo{}
-	AllFiles    = map[string]*File {}
-	OpenFiles   = []string {}
-	Zengines    = map[string]Zengine {}
+	Root		= &RootInfo{}
+	AllFiles	= map[string]*File {}
+	OpenFiles	= []string {}
+	Zengines	= map[string]Zengine {}
 )
 
 
