@@ -1,6 +1,7 @@
 package z
 import (
 	"encoding/json"
+	"errors"
 
 	"github.com/metaleap/go-util-str"
 )
@@ -54,16 +55,25 @@ func HandleRequest (queryln string) (e error) {
 		case MSG_ZEN_STATUS:
 			e = out(jsonStatus())
 		case MSG_CAP_FMT:
-			resp := map[string][]string {}
+			resp := map[string][]*RespCap {}
 			for _, zid := range zids { if µ := Zengines[zid] ; µ != nil {
 				resp[zid] = µ.Caps("fmt")  }  }
 			e = out(resp)
 		case MSG_DO_FMT:
 			resp := map[string]interface{} {}
-			if zid := zids[0]  ;  len(instr) > 0 {
-				resp[zid] = Zengines[zid].DoFmt(instr)
+			zid := zids[0]
+			var r *RespFmt
+			r,e = Zengines[zid].DoFmt(instr)
+			if r==nil {
+				if (e == nil) { e = errors.New("NOPENAH") }
+			} else if (e == nil) {
+				resp[zid] = r
 			}
-			e = out(resp)
+			if (e != nil) {
+				e = out(e.Error())
+			} else {
+				e = out(resp)
+			}
 
 
 		//  LAST: CASES THAT RECEIVE NO RESPONSE

@@ -1,6 +1,8 @@
 package zhs
 import (
 	"github.com/metaleap/zentient/z"
+
+	"github.com/metaleap/go-devhs"
 )
 
 
@@ -14,6 +16,8 @@ var (
 
 
 func New (root *z.RootInfo) z.Zengine {
+	if !devhs.HasHsDevEnv() { return nil }
+
 	µ = &zhs{}
 	z.InitZBase(&µ.ZengineBase)
 	return µ
@@ -37,12 +41,12 @@ func (self *zhs) Base () *z.ZengineBase {
 
 
 
-func (_ *zhs) Caps (string) []string {
-	return []string {}
+func (_ *zhs) Caps (string) []*z.RespCap {
+	return []*z.RespCap {}
 }
 
-func (_ *zhs) DoFmt (src string) *z.FmtResp {
-	return nil
+func (_ *zhs) DoFmt (src string) (resp *z.RespFmt, err error) {
+	return
 }
 
 func (_ *zhs) OnFileActive (file *z.File) {

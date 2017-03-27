@@ -10,10 +10,15 @@ type RootInfo struct {
 	ConfigDir	string
 }
 
-type FmtResp struct {
+type RespCap struct {
+	Name		string
+	Available	bool
+	InstHint	string
+}
+
+type RespFmt struct {
 	Result		string
 	Warnings	[]string
-	Error		error
 }
 
 
@@ -23,8 +28,8 @@ type Zengine interface {
 
 	Base () *ZengineBase
 
-	Caps (string) []string
-	DoFmt (string) *FmtResp
+	Caps (string) []*RespCap
+	DoFmt (string) (*RespFmt, error)
 	OnFileActive (*File)
 	OnFileClose (*File)
 	OnFileOpen (*File)

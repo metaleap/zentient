@@ -42,19 +42,21 @@ func (self *zgo) Base () *z.ZengineBase {
 }
 
 
-func (_ *zgo) Caps (string) []string {
-	caps := []string {}
-	if devgo.GoFmt { caps = append(caps, "gofmt") }
+func (_ *zgo) Caps (string) []*z.RespCap {
+	caps := []*z.RespCap {}
+
+	caps = append(caps, &z.RespCap { Name: "gofmt", Available: true, InstHint: "check your Go installation" })
+
 	return caps
 }
 
-func (_ *zgo) DoFmt (src string) *z.FmtResp {
+func (_ *zgo) DoFmt (src string) (resp *z.RespFmt, err error) {
 	var warns string
-	resp := &z.FmtResp{}
-	resp.Result, warns, resp.Error = ugo.CmdExecStdin(src, "", "gofmt", "-e", "-s")
-
+	resp = &z.RespFmt{}
+	resp.Result, warns, err = ugo.CmdExecStdin(src, "", "gomt", "-e", "-s")
 	resp.Warnings = ustr.Split(warns, "\n")
-	return resp
+	// resp = nil
+	return
 }
 
 func (_ *zgo) OnFileActive (file *z.File) {
