@@ -50,12 +50,11 @@ func (_ *zgo) Caps (string) []*z.RespCap {
 	return caps
 }
 
-func (_ *zgo) DoFmt (src string) (resp *z.RespFmt, err error) {
+func (_ *zgo) DoFmt (src string, tabsize int) (resp *z.RespFmt, err error) {
 	var warns string
 	resp = &z.RespFmt{}
 	resp.Result, warns, err = ugo.CmdExecStdin(src, "", "gofmt", "-e", "-s")
 	resp.Warnings = ustr.Split(warns, "\n")
-	// resp = nil
 	return
 }
 

@@ -35,6 +35,7 @@ func out (v interface{}) error {
 func HandleRequest (queryln string) (e error) {
 	var instr string
 	var inany interface{}
+	var inobj map[string]interface{}
 
 	msgid,msgrest := ustr.BreakAt(queryln, 3)
 	msgzids,msgargs := ustr.BreakOn(msgrest, ":")
@@ -42,6 +43,7 @@ func HandleRequest (queryln string) (e error) {
 	if len(msgargs)>0 && (msgargs[0]=='"' || msgargs[0]=='{' || msgargs[0]=='[' || msgargs[0]=='(' || msgargs[0]=='\'') {
 		json.Unmarshal([]byte(msgargs), &inany)
 		instr,_ = inany.(string)
+		inobj,_ = inany.(map[string]interface{})
 	}
 	switch msgid {
 		//  each case is ideally just a single func-call out, rpc-like
@@ -59,10 +61,12 @@ func HandleRequest (queryln string) (e error) {
 				resp[zid] = µ.Caps("fmt")  }  }
 			e = out(resp)
 		case MSG_DO_FMT:
+			var r *RespFmt
 			resp := map[string]interface{} {}
 			zid := zids[0]
-			var r *RespFmt
-			r,e = Zengines[zid].DoFmt(instr)
+			instr,_ = inobj["s"].(string)
+			tabsize,_ := inobj["t"].(int)
+			r,e = Zengines[zid].DoFmt(instr, tabsize)
 			if r!=nil && e==nil {
 				resp[zid] = r
 			}

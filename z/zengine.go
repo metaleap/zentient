@@ -29,7 +29,7 @@ type Zengine interface {
 	Base () *ZengineBase
 
 	Caps (string) []*RespCap
-	DoFmt (string) (*RespFmt, error)
+	DoFmt (string, int) (*RespFmt, error)
 	OnFileActive (*File)
 	OnFileClose (*File)
 	OnFileOpen (*File)
