@@ -42,7 +42,11 @@ func (self *zhs) Base () *z.ZengineBase {
 
 
 func (_ *zhs) Caps (string) []*z.RespCap {
-	return []*z.RespCap {}
+	caps := []*z.RespCap {}
+
+	caps = append(caps, &z.RespCap { Name: "hindent", Available: devhs.Has_hindent, InstHint: "`stack install hindent`" })
+
+	return caps
 }
 
 func (_ *zhs) DoFmt (src string) (resp *z.RespFmt, err error) {

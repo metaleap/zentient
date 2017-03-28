@@ -45,7 +45,7 @@ func (self *zgo) Base () *z.ZengineBase {
 func (_ *zgo) Caps (string) []*z.RespCap {
 	caps := []*z.RespCap {}
 
-	caps = append(caps, &z.RespCap { Name: "gofmt", Available: true, InstHint: "check your Go installation" })
+	caps = append(caps, &z.RespCap { Name: "gofmt", Available: devgo.Has_gofmt, InstHint: "check your Go installation" })
 
 	return caps
 }
@@ -53,7 +53,7 @@ func (_ *zgo) Caps (string) []*z.RespCap {
 func (_ *zgo) DoFmt (src string) (resp *z.RespFmt, err error) {
 	var warns string
 	resp = &z.RespFmt{}
-	resp.Result, warns, err = ugo.CmdExecStdin(src, "", "gomt", "-e", "-s")
+	resp.Result, warns, err = ugo.CmdExecStdin(src, "", "gofmt", "-e", "-s")
 	resp.Warnings = ustr.Split(warns, "\n")
 	// resp = nil
 	return

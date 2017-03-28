@@ -14,7 +14,7 @@ import (
 	"github.com/metaleap/zentient/hs"
 )
 
-const bufferCapacity = 1024*1024*4
+const bufferCapacity = 1024*1024*32
 
 
 func main () {
@@ -25,7 +25,7 @@ func main () {
 
 	//  get the IO stuff ready
 	stdin := bufio.NewScanner(os.Stdin)
-	stdin.Buffer(make([]byte, 1024*1024, bufferCapacity), bufferCapacity)
+	stdin.Buffer(make([]byte, 1024*1024*32, bufferCapacity), bufferCapacity)
 	stdout := bufio.NewWriterSize(os.Stdout, bufferCapacity)
 	z.Out = json.NewEncoder(stdout)
 	z.Out.SetEscapeHTML(false)

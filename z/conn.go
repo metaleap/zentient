@@ -1,7 +1,6 @@
 package z
 import (
 	"encoding/json"
-	"errors"
 
 	"github.com/metaleap/go-util-str"
 )
@@ -64,9 +63,7 @@ func HandleRequest (queryln string) (e error) {
 			zid := zids[0]
 			var r *RespFmt
 			r,e = Zengines[zid].DoFmt(instr)
-			if r==nil {
-				if (e == nil) { e = errors.New("NOPENAH") }
-			} else if (e == nil) {
+			if r!=nil && e==nil {
 				resp[zid] = r
 			}
 			if (e != nil) {
