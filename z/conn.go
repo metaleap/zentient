@@ -66,7 +66,8 @@ func HandleRequest (queryln string) (e error) {
 			zid := zids[0]
 			instr,_ = inobj["s"].(string)
 			tabsize,_ := inobj["t"].(int)
-			r,e = Zengines[zid].DoFmt(instr, tabsize)
+			cmd,_ := inobj["c"].(string)
+			r,e = Zengines[zid].DoFmt(instr, cmd, tabsize)
 			if r!=nil && e==nil {
 				resp[zid] = r
 			}
