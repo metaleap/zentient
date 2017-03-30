@@ -45,12 +45,17 @@ func (self *zhs) Base () *z.ZengineBase {
 
 
 
-func (_ *zhs) Caps (string) []*z.RespCap {
+func (_ *zhs) Caps (cap string) []*z.RespCap {
 	caps := []*z.RespCap {}
 
-	caps = append(caps, &z.RespCap { Name: "stylish-haskell", Available: devhs.Has_stylish_haskell, InstHint: "`stack install stylish-haskell`" })
-	caps = append(caps, &z.RespCap { Name: "hindent", Available: devhs.Has_hindent, InstHint: "`stack install hindent`" })
-	caps = append(caps, &z.RespCap { Name: "brittany", Available: devhs.Has_brittany, InstHint: "`github.com/lspitzner/brittany`" })
+	switch cap {
+	case "fmt":
+		caps = append(caps, &z.RespCap { Name: "stylish-haskell", Available: devhs.Has_stylish_haskell, InstHint: "`stack install stylish-haskell`" })
+		caps = append(caps, &z.RespCap { Name: "hindent", Available: devhs.Has_hindent, InstHint: "`stack install hindent`" })
+		caps = append(caps, &z.RespCap { Name: "brittany", Available: devhs.Has_brittany, InstHint: "`github.com/lspitzner/brittany`" })
+	case "lint":
+		caps = append(caps, &z.RespCap { Name: "hlint", Available: devhs.Has_hlint, InstHint: "`stack install hlint`" })
+	}
 
 	return caps
 }

@@ -42,10 +42,16 @@ func (self *zgo) Base () *z.ZengineBase {
 }
 
 
-func (_ *zgo) Caps (string) []*z.RespCap {
+func (_ *zgo) Caps (cap string) []*z.RespCap {
 	caps := []*z.RespCap {}
 
-	caps = append(caps, &z.RespCap { Name: "gofmt", Available: devgo.Has_gofmt, InstHint: "check your Go installation" })
+	switch cap {
+	case "fmt":
+		caps = append(caps, &z.RespCap { Name: "gofmt", Available: devgo.Has_gofmt, InstHint: "check your Go installation" })
+	case "lint":
+		caps = append(caps, &z.RespCap { Name: "go vet", Available: devgo.HasGoDevEnv(), InstHint: "check your Go installation" })
+		caps = append(caps, &z.RespCap { Name: "golint", Available: devgo.Has_golint, InstHint: "`go get -u github.com/golang/lint/golint`" })
+	}
 
 	return caps
 }

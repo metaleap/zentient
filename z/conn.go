@@ -9,7 +9,7 @@ const (
 	MSG_ZEN_STATUS	= "ZS:"
 	MSG_ZEN_LANGS	= "ZL:"
 
-	MSG_CAP_FMT		= "CF:"
+	MSG_CAPS		= "CA:"
 
 	MSG_DO_FMT		= "DF:"
 
@@ -40,7 +40,7 @@ func HandleRequest (queryln string) (e error) {
 	msgid,msgrest := ustr.BreakAt(queryln, 3)
 	msgzids,msgargs := ustr.BreakOn(msgrest, ":")
 	zids := ustr.Split(msgzids, ",")
-	if len(msgargs)>0 && (msgargs[0]=='"' || msgargs[0]=='{' || msgargs[0]=='[' || msgargs[0]=='(' || msgargs[0]=='\'') {
+	if len(msgargs)>1 && (msgargs[0]=='"' || msgargs[0]=='{' || msgargs[0]=='[' || msgargs[0]=='(' || msgargs[0]=='\'') {
 		json.Unmarshal([]byte(msgargs), &inany)
 		instr,_ = inany.(string)
 		inobj,_ = inany.(map[string]interface{})
@@ -55,10 +55,10 @@ func HandleRequest (queryln string) (e error) {
 			e = out(jsonZengines())
 		case MSG_ZEN_STATUS:
 			e = out(jsonStatus())
-		case MSG_CAP_FMT:
+		case MSG_CAPS:
 			resp := map[string][]*RespCap {}
 			for _, zid := range zids { if µ := Zengines[zid] ; µ != nil {
-				resp[zid] = µ.Caps("fmt")  }  }
+				resp[zid] = µ.Caps(msgargs)  }  }
 			e = out(resp)
 		case MSG_DO_FMT:
 			var r *RespFmt
