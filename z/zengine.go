@@ -55,6 +55,15 @@ func InitZBase (base *ZengineBase) {
 }
 
 
+func doFmt (zid string, reqsrc string, reqcmd string, reqtabsize int) (resp map[string]*RespFmt, err error) {
+	if µ := Zengines[zid] ; µ != nil && len(reqsrc)>0 {
+		var rfmt *RespFmt
+		if rfmt,err = µ.DoFmt(reqsrc, reqcmd, reqtabsize) ; rfmt!=nil && err==nil {
+			resp = map[string]*RespFmt { zid: rfmt }
+		}
+	}
+	return
+}
 
 func onFileActive (file* File) {
 	file.Z.OnFileActive(file)

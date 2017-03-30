@@ -2,6 +2,7 @@ package z
 import (
 	"encoding/json"
 
+	"github.com/metaleap/go-util-misc"
 	"github.com/metaleap/go-util-str"
 )
 
@@ -33,7 +34,7 @@ func out (v interface{}) error {
 
 
 func HandleRequest (queryln string) (e error) {
-	var instr string
+	// var instr string
 	var inany interface{}
 	var inobj map[string]interface{}
 
@@ -42,7 +43,7 @@ func HandleRequest (queryln string) (e error) {
 	zids := ustr.Split(msgzids, ",")
 	if len(msgargs)>1 && (msgargs[0]=='"' || msgargs[0]=='{' || msgargs[0]=='[' || msgargs[0]=='(' || msgargs[0]=='\'') {
 		json.Unmarshal([]byte(msgargs), &inany)
-		instr,_ = inany.(string)
+		// instr,_ = inany.(string)
 		inobj,_ = inany.(map[string]interface{})
 	}
 	switch msgid {
@@ -61,34 +62,18 @@ func HandleRequest (queryln string) (e error) {
 				resp[zid] = µ.Caps(msgargs)  }  }
 			e = out(resp)
 		case MSG_DO_FMT:
-			var r *RespFmt
-			resp := map[string]interface{} {}
-			zid := zids[0]
-			instr,_ = inobj["s"].(string)
-			tabsize,_ := inobj["t"].(int)
-			cmd,_ := inobj["c"].(string)
-			r,e = Zengines[zid].DoFmt(instr, cmd, tabsize)
-			if r!=nil && e==nil {
-				resp[zid] = r
-			}
-			if (e != nil) {
-				e = out(e.Error())
-			} else {
-				e = out(resp)
-			}
+			if resp,err := doFmt(zids[0], ugo.S(inobj["s"]), ugo.S(inobj["c"]), int(ugo.F(inobj["t"])))  ;  (err != nil) {
+				e = out(err.Error())  } else {  e = out(resp)  }
 
 
 		//  LAST: CASES THAT RECEIVE NO RESPONSE
 		//  no error reporting to client either, for now. with some luck, it can all stay that way
 		case MSG_FILE_OPEN:
-			relpath := msgargs
-			onFileOpen(Zengines[zids[0]], relpath)
+			onFileOpen(Zengines[zids[0]], msgargs)
 		case MSG_FILE_CLOSE:
-			relpath := msgargs
-			onFileClose(Zengines[zids[0]], relpath)
+			onFileClose(Zengines[zids[0]], msgargs)
 		case MSG_FILE_WRITE:
-			relpath := msgargs
-			onFileWrite(Zengines[zids[0]], relpath)
+			onFileWrite(Zengines[zids[0]], msgargs)
 
 
 		//  NOTHING MATCHED? A BUG IN CLIENT, throw at client
