@@ -15,20 +15,11 @@ func (self *Base) Init () {
 }
 
 
-
-type Fmt struct {
-	N string	//	display name
-	C string	//	actual cmd name
-	A []string	//	args
-	I bool		//	installed?
-	f func()	//	tmp field used in DoFmt below
-}
-
-func (self *Base) DoFmt (src string, custcmd string, cmds ...Fmt) (resp *RespFmt, err error) {
+func (self *Base) DoFmt (src string, custcmd string, cmds ...CmdInfo) (resp *RespFmt, err error) {
 	var (	cmdoutstderr string
 			c = -1
 			run = false
-			c2f = func(c Fmt) func() { return func() {
+			c2f = func(c CmdInfo) func() { return func() {
 					resp.Result, cmdoutstderr, err = ugo.CmdExecStdin(src, "", c.C, c.A...)  } }
 		)
 	resp = &RespFmt{}
@@ -39,7 +30,7 @@ func (self *Base) DoFmt (src string, custcmd string, cmds ...Fmt) (resp *RespFmt
 	if run = (c>=0) ; run {
 		cmds[c].f()
 	} else if run = (len(custcmd)>0) ; run {
-		c2f(Fmt{ N: custcmd, C: custcmd, I: true, A: []string{} })()
+		c2f(CmdInfo{ N: custcmd, C: custcmd, I: true, A: []string{} })()
 	} else {
 		for i, cmd := range cmds {
 			if run = cmd.I ; run {  cmds[i].f()  ;  break  }

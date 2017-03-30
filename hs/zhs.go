@@ -34,26 +34,26 @@ func (_ *zhs) Ids () []string {
 
 
 
-func (_ *zhs) Caps (cap string) (caps []*z.RespCap) {
+func (_ *zhs) Caps (cap string) (caps []*z.CmdInfo) {
 	switch cap {
 	case "fmt":
-		caps = []*z.RespCap	{	&z.RespCap { Name: "stylish-haskell", Available: devhs.Has_stylish_haskell, InstHint: "`stack install stylish-haskell`" },
-								&z.RespCap { Name: "hindent", Available: devhs.Has_hindent, InstHint: "`stack install hindent`" },
-								&z.RespCap { Name: "brittany", Available: devhs.Has_brittany, InstHint: "`github.com/lspitzner/brittany`" },
+		caps = []*z.CmdInfo	{	&z.CmdInfo { N: "stylish-haskell", I: devhs.Has_stylish_haskell, H: "`stack install stylish-haskell`" },
+								&z.CmdInfo { N: "hindent", I: devhs.Has_hindent, H: "`stack install hindent`" },
+								&z.CmdInfo { N: "brittany", I: devhs.Has_brittany, H: "`github.com/lspitzner/brittany`" },
 							}
 	case "lint":
-		caps = []*z.RespCap	{	&z.RespCap { Name: "hlint", Available: devhs.Has_hlint, InstHint: "`stack install hlint`" },
+		caps = []*z.CmdInfo	{	&z.CmdInfo { N: "hlint", I: devhs.Has_hlint, H: "`stack install hlint`" },
 							}
 	}
 	return caps
 }
 
-func (self *zhs) DoFmt (src string, cmd string, tabsize int) (resp *z.RespFmt, err error) {
+func (self *zhs) DoFmt (src string, custcmd string, tabsize int) (resp *z.RespFmt, err error) {
 	ts := fmt.Sprint(tabsize)
-	return self.Base.DoFmt(src, cmd,
-		z.Fmt { I: devhs.Has_stylish_haskell,	C: "stylish-haskell",	A: []string{} },
-		z.Fmt { I: devhs.Has_hindent,			C: "hindent",			A: []string{"--no-force-newline", "--indent-size", ts} },
-		z.Fmt { I: devhs.Has_brittany,			C: "brittany",			A: []string{"--indent", ts} },
+	return self.Base.DoFmt(src, custcmd,
+		z.CmdInfo { I: devhs.Has_stylish_haskell,	C: "stylish-haskell",	A: []string{} },
+		z.CmdInfo { I: devhs.Has_hindent,			C: "hindent",			A: []string{"--no-force-newline", "--indent-size", ts} },
+		z.CmdInfo { I: devhs.Has_brittany,			C: "brittany",			A: []string{"--indent", ts} },
 		)
 }
 

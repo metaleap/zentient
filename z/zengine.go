@@ -4,16 +4,21 @@ import (
 )
 
 
+type CmdInfo struct {
+	C string	//	actual cmd name
+	A []string	//	args
+
+	N	string	//	display name
+	I	bool	//	installed?
+	H	string	//	install hint
+
+	f func()	//	tmp field used in Base.DoFmt()
+}
+
 type RootInfo struct {
 	SrcDir		string
 	CacheDir	string
 	ConfigDir	string
-}
-
-type RespCap struct {
-	Name		string
-	Available	bool
-	InstHint	string
 }
 
 type RespFmt struct {
@@ -25,7 +30,7 @@ type RespFmt struct {
 type Zengine interface {
 	Ids () []string
 
-	Caps (string) []*RespCap
+	Caps (string) []*CmdInfo
 	DoFmt (string, string, int) (*RespFmt, error)
 	OnFileActive (*File)
 	OnFileClose (*File)

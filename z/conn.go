@@ -57,7 +57,7 @@ func HandleRequest (queryln string) (e error) {
 		case MSG_ZEN_STATUS:
 			e = out(jsonStatus())
 		case MSG_CAPS:
-			resp := map[string][]*RespCap {}
+			resp := map[string][]*CmdInfo {}
 			for _, zid := range zids { if µ := Zengines[zid] ; µ != nil {
 				resp[zid] = µ.Caps(msgargs)  }  }
 			e = out(resp)
