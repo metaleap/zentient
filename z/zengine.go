@@ -50,8 +50,8 @@ var (
 )
 
 
-func InitZBase (base *ZengineBase) {
-	base.Projs = []*Proj {}
+func (self *ZengineBase) Init () {
+	self.Projs = []*Proj {}
 }
 
 

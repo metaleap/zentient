@@ -21,7 +21,7 @@ func New (root *z.RootInfo) z.Zengine {
 	if !devgo.HasGoDevEnv() { return nil }
 
 	µ = &zgo{}
-	z.InitZBase(&µ.ZengineBase)
+	µ.ZengineBase.Init()
 	return µ
 }
 
@@ -42,17 +42,16 @@ func (self *zgo) Base () *z.ZengineBase {
 }
 
 
-func (_ *zgo) Caps (cap string) []*z.RespCap {
-	caps := []*z.RespCap {}
-
+func (_ *zgo) Caps (cap string) (caps []*z.RespCap) {
 	switch cap {
 	case "fmt":
-		caps = append(caps, &z.RespCap { Name: "gofmt", Available: devgo.Has_gofmt, InstHint: "check your Go installation" })
+		caps = []*z.RespCap	{	&z.RespCap { Name: "gofmt", Available: devgo.Has_gofmt, InstHint: "check your Go installation" },
+							}
 	case "lint":
-		caps = append(caps, &z.RespCap { Name: "go vet", Available: devgo.HasGoDevEnv(), InstHint: "check your Go installation" })
-		caps = append(caps, &z.RespCap { Name: "golint", Available: devgo.Has_golint, InstHint: "`go get -u github.com/golang/lint/golint`" })
+		caps = []*z.RespCap	{	&z.RespCap { Name: "go vet", Available: devgo.HasGoDevEnv(), InstHint: "check your Go installation" },
+								&z.RespCap { Name: "golint", Available: devgo.Has_golint, InstHint: "`go get -u github.com/golang/lint/golint`" },
+							}
 	}
-
 	return caps
 }
 
