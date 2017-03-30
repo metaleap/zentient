@@ -5,13 +5,11 @@ import (
 	"github.com/metaleap/zentient/z"
 
 	"github.com/metaleap/go-devhs"
-	"github.com/metaleap/go-util-misc"
-	"github.com/metaleap/go-util-str"
 )
 
 
 type zhs struct {
-	z.ZengineBase
+	z.Base
 }
 
 var (
@@ -23,7 +21,7 @@ func New (root *z.RootInfo) z.Zengine {
 	if !devhs.HasHsDevEnv() { return nil }
 
 	µ = &zhs{}
-	µ.ZengineBase.Init()
+	µ.Base.Init()
 	return µ
 }
 
@@ -32,15 +30,6 @@ func New (root *z.RootInfo) z.Zengine {
 
 func (_ *zhs) Ids () []string {
 	return []string { "haskell", "Haskell" }
-}
-
-func (self *zhs) Jsonish () interface{} {
-	return self
-}
-
-
-func (self *zhs) Base () *z.ZengineBase {
-	return &self.ZengineBase
 }
 
 
@@ -59,38 +48,13 @@ func (_ *zhs) Caps (cap string) (caps []*z.RespCap) {
 	return caps
 }
 
-func (_ *zhs) DoFmt (src string, cmd string, tabsize int) (resp *z.RespFmt, err error) {
-	var warns string
-	var warnlns = true
-	resp = &z.RespFmt{}
-	do_stylish	:= func() { resp.Result, warns, err = ugo.CmdExecStdin(src, "", "stylish-haskell") }
-	do_hindent	:= func() { resp.Result, warns, err = ugo.CmdExecStdin(src, "", "hindent", "--no-force-newline", "--indent-size", fmt.Sprint(tabsize)) }
-	do_brittany	:= func() { resp.Result, warns, err = ugo.CmdExecStdin(src, "", "brittany", "--indent", fmt.Sprint(tabsize)) }
-	do_custom	:= func() { resp.Result, warns, err = ugo.CmdExecStdin(src, "", cmd) }
-	switch cmd {
-	case "stylish-haskell":
-		do_stylish()
-	case "hindent":
-		do_hindent()
-	case "brittany":
-		do_brittany()
-	default:
-		if len(cmd)>0 {
-			do_custom()
-		} else if devhs.Has_stylish_haskell {
-			do_stylish()
-		} else if devhs.Has_hindent {
-			do_hindent()
-		} else if devhs.Has_brittany {
-			do_brittany()
-		} else {
-			resp = nil
-		}
-	}
-	if resp!=nil {
-		if warnlns { resp.Warnings = ustr.Split(warns, "\n") } else { resp.Warnings = []string { warns } }
-	}
-	return
+func (self *zhs) DoFmt (src string, cmd string, tabsize int) (resp *z.RespFmt, err error) {
+	ts := fmt.Sprint(tabsize)
+	return self.Base.DoFmt(src, cmd,
+		z.Fmt { I: devhs.Has_stylish_haskell,	C: "stylish-haskell",	A: []string{} },
+		z.Fmt { I: devhs.Has_hindent,			C: "hindent",			A: []string{"--no-force-newline", "--indent-size", ts} },
+		z.Fmt { I: devhs.Has_brittany,			C: "brittany",			A: []string{"--indent", ts} },
+		)
 }
 
 func (_ *zhs) OnFileActive (file *z.File) {

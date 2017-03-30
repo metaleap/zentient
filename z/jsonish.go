@@ -16,7 +16,7 @@ func jsonStatus () interface{} {
 	resp["Root"] = Root
 	resp["Zengines"] = jsonZengines()
 	for zid, zengine := range Zengines {
-		resp["Zengines["+zid+"]"] = zengine.Jsonish()
+		resp["Zengines["+zid+"]"] = zengine
 	}
 	resp["OpenFiles"] = OpenFiles
 	resp["AllFiles"] = AllFiles

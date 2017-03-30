@@ -24,9 +24,6 @@ type RespFmt struct {
 
 type Zengine interface {
 	Ids () []string
-	Jsonish () interface{}
-
-	Base () *ZengineBase
 
 	Caps (string) []*RespCap
 	DoFmt (string, string, int) (*RespFmt, error)
@@ -37,10 +34,6 @@ type Zengine interface {
 }
 
 
-type ZengineBase struct {
-	Projs []*Proj
-}
-
 
 var (
 	Root		= &RootInfo{}
@@ -49,10 +42,6 @@ var (
 	Zengines	= map[string]Zengine {}
 )
 
-
-func (self *ZengineBase) Init () {
-	self.Projs = []*Proj {}
-}
 
 
 func doFmt (zid string, reqsrc string, reqcmd string, reqtabsize int) (resp map[string]*RespFmt, err error) {

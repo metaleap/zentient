@@ -3,13 +3,11 @@ import (
 	"github.com/metaleap/zentient/z"
 
 	"github.com/metaleap/go-devgo"
-	"github.com/metaleap/go-util-misc"
-	"github.com/metaleap/go-util-str"
 )
 
 
 type zgo struct {
-	z.ZengineBase
+	z.Base
 }
 
 var (
@@ -21,7 +19,7 @@ func New (root *z.RootInfo) z.Zengine {
 	if !devgo.HasGoDevEnv() { return nil }
 
 	µ = &zgo{}
-	µ.ZengineBase.Init()
+	µ.Base.Init()
 	return µ
 }
 
@@ -30,15 +28,6 @@ func New (root *z.RootInfo) z.Zengine {
 
 func (_ *zgo) Ids () []string {
 	return []string { "go", "Go" }
-}
-
-func (self *zgo) Jsonish () interface{} {
-	return self
-}
-
-
-func (self *zgo) Base () *z.ZengineBase {
-	return &self.ZengineBase
 }
 
 
@@ -55,20 +44,8 @@ func (_ *zgo) Caps (cap string) (caps []*z.RespCap) {
 	return caps
 }
 
-func (_ *zgo) DoFmt (src string, cmd string, tabsize int) (resp *z.RespFmt, err error) {
-	var warns string
-	resp = &z.RespFmt{}
-	if (len(cmd)>0) {
-		resp.Result, warns, err = ugo.CmdExecStdin(src, "", cmd)
-	} else if (devgo.Has_gofmt) {
-		resp.Result, warns, err = ugo.CmdExecStdin(src, "", "gofmt", "-e", "-s")
-	} else {
-		resp = nil
-	}
-	if (resp != nil) {
-		resp.Warnings = ustr.Split(warns, "\n")
-	}
-	return
+func (self *zgo) DoFmt (src string, cmd string, tabsize int) (*z.RespFmt, error) {
+	return self.Base.DoFmt(src, cmd, z.Fmt{	N: "gofmt", I: devgo.Has_gofmt, C: "gofmt", A: []string{"-e", "-s"} })
 }
 
 func (_ *zgo) OnFileActive (file *z.File) {
