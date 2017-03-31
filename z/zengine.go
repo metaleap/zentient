@@ -10,7 +10,7 @@ type Context struct {
 	ConfigDir	string
 }
 
-type CmdInfo struct {
+type RespCmd struct {
 	Name	string		//	actual cmd name
 	Args	[]string	//	args
 
@@ -30,7 +30,7 @@ type RespFmt struct {
 type Zengine interface {
 	Ids () []string
 
-	Caps (string) []*CmdInfo
+	Caps (string) []*RespCmd
 	DoFmt (string, string, int) (*RespFmt, error)
 	OnFileActive (*File)
 	OnFileClose (*File)

@@ -34,15 +34,15 @@ func (_ *zhs) Ids () []string {
 
 
 
-func (_ *zhs) Caps (cap string) (caps []*z.CmdInfo) {
+func (_ *zhs) Caps (cap string) (caps []*z.RespCmd) {
 	switch cap {
 	case "fmt":
-		caps = []*z.CmdInfo	{	&z.CmdInfo { Title: "stylish-haskell",	Exists: devhs.Has_stylish_haskell,	Hint: "`stack install stylish-haskell`" },
-								&z.CmdInfo { Title: "hindent",			Exists: devhs.Has_hindent,			Hint: "`stack install hindent`" },
-								&z.CmdInfo { Title: "brittany",			Exists: devhs.Has_brittany,			Hint: "`github.com/lspitzner/brittany`" },
+		caps = []*z.RespCmd	{	&z.RespCmd { Title: "stylish-haskell",	Exists: devhs.Has_stylish_haskell,	Hint: "`stack install stylish-haskell`" },
+								&z.RespCmd { Title: "hindent",			Exists: devhs.Has_hindent,			Hint: "`stack install hindent`" },
+								&z.RespCmd { Title: "brittany",			Exists: devhs.Has_brittany,			Hint: "`github.com/lspitzner/brittany`" },
 							}
 	case "lint":
-		caps = []*z.CmdInfo	{	&z.CmdInfo { Title: "hlint",			Exists: devhs.Has_hlint,			Hint: "`stack install hlint`" },
+		caps = []*z.RespCmd	{	&z.RespCmd { Title: "hlint",			Exists: devhs.Has_hlint,			Hint: "`stack install hlint`" },
 							}
 	}
 	return caps
@@ -51,9 +51,9 @@ func (_ *zhs) Caps (cap string) (caps []*z.CmdInfo) {
 func (self *zhs) DoFmt (src string, custcmd string, tabsize int) (resp *z.RespFmt, err error) {
 	ts := fmt.Sprint(tabsize)
 	return self.Base.DoFmt(src, custcmd,
-		z.CmdInfo { Exists: devhs.Has_stylish_haskell,	Name: "stylish-haskell",	Args: []string{} },
-		z.CmdInfo { Exists: devhs.Has_hindent,			Name: "hindent",			Args: []string{"--no-force-newline", "--indent-size", ts} },
-		z.CmdInfo { Exists: devhs.Has_brittany,			Name: "brittany",			Args: []string{"--indent", ts} },
+		z.RespCmd { Exists: devhs.Has_stylish_haskell,	Name: "stylish-haskell",	Args: []string{} },
+		z.RespCmd { Exists: devhs.Has_hindent,			Name: "hindent",			Args: []string{"--no-force-newline", "--indent-size", ts} },
+		z.RespCmd { Exists: devhs.Has_brittany,			Name: "brittany",			Args: []string{"--indent", ts} },
 		)
 }
 
