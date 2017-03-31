@@ -51,11 +51,19 @@ func HandleRequest (queryln string) (e error) {
 		//  anything else in a case then is only to furnish proper func args from msg-argstr
 
 
-		//  FIRST: CASES THAT EXPECT A RESPONSE
 		case MSG_ZEN_LANGS:
 			e = out(jsonZengines())
 		case MSG_ZEN_STATUS:
 			e = out(jsonStatus())
+		case MSG_FILE_WRITE:
+			onFileWrite(Zengines[zids[0]], msgargs)
+			e = out(nil)
+		case MSG_FILE_OPEN:
+			onFileOpen(Zengines[zids[0]], msgargs)
+			e = out(nil)
+		case MSG_FILE_CLOSE:
+			onFileClose(Zengines[zids[0]], msgargs)
+			e = out(nil)
 		case MSG_CAPS:
 			resp := map[string][]*CmdInfo {}
 			for _, zid := range zids { if µ := Zengines[zid] ; µ != nil {
@@ -66,17 +74,7 @@ func HandleRequest (queryln string) (e error) {
 				e = out(err.Error())  } else {  e = out(resp)  }
 
 
-		//  LAST: CASES THAT RECEIVE NO RESPONSE
-		//  no error reporting to client either, for now. with some luck, it can all stay that way
-		case MSG_FILE_OPEN:
-			onFileOpen(Zengines[zids[0]], msgargs)
-		case MSG_FILE_CLOSE:
-			onFileClose(Zengines[zids[0]], msgargs)
-		case MSG_FILE_WRITE:
-			onFileWrite(Zengines[zids[0]], msgargs)
-
-
-		//  NOTHING MATCHED? A BUG IN CLIENT, throw at client
+		//  nothing matched? a bug in client, throw at client
 		default:
 			e = out(jsonErrMsg("Unknown MSG-ID `" + msgid + "` --- for diagnostics, msg-args were: " + msgargs))
 	}
