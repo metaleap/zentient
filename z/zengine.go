@@ -5,14 +5,14 @@ import (
 
 
 type CmdInfo struct {
-	C string	//	actual cmd name
-	A []string	//	args
+	C	string		//	actual cmd name
+	A	[]string	//	args
 
-	N	string	//	display name
-	I	bool	//	installed?
-	H	string	//	install hint
+	N	string		//	display name, eg: N = "go vet" when C = "go" with A = ["vet"]  ;  if empty fall back to C
+	I	bool		//	installed?
+	H	string		//	install hint
 
-	f func()	//	tmp field used in Base.DoFmt()
+	f	func()		//	tmp field used in Base.DoFmt()
 }
 
 type RootInfo struct {
