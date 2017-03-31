@@ -59,7 +59,11 @@ func (self *zgo) DoFmt (src string, custcmd string, tabsize uint8) (*z.RespFmt, 
 func (_ *zgo) OnFileActive (file *z.File) {
 }
 
-func (_ *zgo) OnFileOpen (file *z.File) {
+func (self *zgo) OnFileOpen (file *z.File) {
+	self.Base.Diags[file.RelPath] = []*z.RespDiag {
+		&z.RespDiag { Code: "W", Msg: "Mock warning for " + file.RelPath, PosLn: 2, PosCol: 1, Sev: z.DIAG_WARN, Cat: "devgo" },
+		&z.RespDiag { Code: "I", Msg: "Mock info for " + file.RelPath, PosLn: 9, PosCol: 11, Sev: z.DIAG_INFO, Cat: "devgo" },
+	}
 }
 
 func (_ *zgo) OnFileClose (file *z.File) {
