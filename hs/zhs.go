@@ -17,7 +17,7 @@ var (
 )
 
 
-func New (root *z.RootInfo) z.Zengine {
+func Init (ctx *z.Context) z.Zengine {
 	if !devhs.HasHsDevEnv() { return nil }
 
 	µ = &zhs{}

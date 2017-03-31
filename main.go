@@ -20,7 +20,7 @@ const bufferCapacity = 1024*1024*4
 func main () {
 	var err error
 
-	if z.Root.SrcDir,err = os.Getwd() ; err != nil { return }
+	if z.Ctx.SrcDir,err = os.Getwd() ; err != nil { return }
 	if err = ensureDataDirs() ; err != nil { return }
 
 	//  get the IO stuff ready
@@ -32,8 +32,8 @@ func main () {
 	z.Out.SetIndent("","")
 
 	z.Zengines = map[string]z.Zengine {}
-	regZ("go", zgo.New(z.Root))
-	regZ("hs", zhs.New(z.Root))
+	regZ("go", zgo.Init(z.Ctx))
+	regZ("hs", zhs.Init(z.Ctx))
 
 	for stdin.Scan() {
 		if err = z.HandleRequest(stdin.Text()) ; err == nil {
@@ -68,12 +68,12 @@ func ensureDataDirs () error {
 		basedir = ugo.UserDataDirPath()
 	}
 
-	z.Root.ConfigDir = filepath.Join(basedir, "zentient")
-	if volname := filepath.VolumeName(z.Root.SrcDir) ; len(volname) > 0 {
-		subdir = strings.Replace(z.Root.SrcDir, volname, ufs.SanitizeFsName(volname), -1)
+	z.Ctx.ConfigDir = filepath.Join(basedir, "zentient")
+	if volname := filepath.VolumeName(z.Ctx.SrcDir) ; len(volname) > 0 {
+		subdir = strings.Replace(z.Ctx.SrcDir, volname, ufs.SanitizeFsName(volname), -1)
 	} else {
-		subdir = z.Root.SrcDir
+		subdir = z.Ctx.SrcDir
 	}
-	z.Root.CacheDir = filepath.Join(z.Root.ConfigDir, subdir)
-	return ufs.EnsureDirExists(z.Root.CacheDir) //  this also creates ConfigDir
+	z.Ctx.CacheDir = filepath.Join(z.Ctx.ConfigDir, subdir)
+	return ufs.EnsureDirExists(z.Ctx.CacheDir) //  this also creates ConfigDir
 }

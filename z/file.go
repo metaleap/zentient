@@ -15,6 +15,6 @@ func NewFile (z Zengine, relpath string) *File {
 	var f File
 	f.Z = z
 	f.RelPath = relpath
-	f.FullPath = filepath.Join(Root.SrcDir, relpath)
+	f.FullPath = filepath.Join(Ctx.SrcDir, relpath)
 	return &f
 }

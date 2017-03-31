@@ -14,7 +14,7 @@ func jsonErrMsg (msg string) interface{} {
 
 func jsonStatus () interface{} {
 	resp := map[string]interface{} {}
-	resp["Root"] = Root
+	resp["Ctx"] = Ctx
 	resp["Zengines"] = jsonZengines()
 	for zid, zengine := range Zengines {
 		resp["Zengines["+zid+"]"] = zengine

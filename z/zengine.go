@@ -4,6 +4,12 @@ import (
 )
 
 
+type Context struct {
+	SrcDir		string
+	CacheDir	string
+	ConfigDir	string
+}
+
 type CmdInfo struct {
 	C	string		//	actual cmd name
 	A	[]string	//	args
@@ -13,12 +19,6 @@ type CmdInfo struct {
 	H	string		//	install hint
 
 	f	func()		//	tmp field used in Base.DoFmt()
-}
-
-type RootInfo struct {
-	SrcDir		string
-	CacheDir	string
-	ConfigDir	string
 }
 
 type RespFmt struct {
@@ -41,7 +41,7 @@ type Zengine interface {
 
 
 var (
-	Root		= &RootInfo{}
+	Ctx			= &Context{}
 	AllFiles	= map[string]*File {}
 	OpenFiles	= []string {}
 	Zengines	= map[string]Zengine {}

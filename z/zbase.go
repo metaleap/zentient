@@ -5,12 +5,15 @@ import (
 )
 
 type Base struct {
-	TmpStuff interface{}
+	DbgMsgs []string
+	DbgObjs []interface{}
 }
 
 
 
 func (self *Base) Init () {
+	self.DbgMsgs = []string {}
+	self.DbgObjs = []interface{} {}
 }
 
 
