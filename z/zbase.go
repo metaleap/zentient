@@ -5,13 +5,12 @@ import (
 )
 
 type Base struct {
-	Projs []*Proj
+	TmpStuff interface{}
 }
 
 
 
 func (self *Base) Init () {
-	self.Projs = []*Proj {}
 }
 
 
