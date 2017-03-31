@@ -11,12 +11,12 @@ type Context struct {
 }
 
 type CmdInfo struct {
-	C	string		//	actual cmd name
-	A	[]string	//	args
+	Name	string		//	actual cmd name
+	Args	[]string	//	args
 
-	N	string		//	display name, eg: N = "go vet" when C = "go" with A = ["vet"]  ;  if empty fall back to C
-	I	bool		//	installed?
-	H	string		//	install hint
+	Title	string		//	display name, eg: N = "go vet" when C = "go" with A = ["vet"]  ;  if empty fall back to C
+	Exists	bool		//	installed?
+	Hint	string		//	install hint
 
 	f	func()		//	tmp field used in Base.DoFmt()
 }

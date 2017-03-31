@@ -38,18 +38,18 @@ func (_ *zgo) Ids () []string {
 func (_ *zgo) Caps (cap string) (caps []*z.CmdInfo) {
 	switch cap {
 	case "fmt":
-		caps = []*z.CmdInfo	{	&z.CmdInfo { N: "gofmt", I: devgo.Has_gofmt, H: "check your Go installation" },
+		caps = []*z.CmdInfo	{	&z.CmdInfo { Title: "gofmt",	Exists: devgo.Has_gofmt,		Hint: "check your Go installation" },
 							}
 	case "lint":
-		caps = []*z.CmdInfo	{	&z.CmdInfo { N: "go vet", I: devgo.HasGoDevEnv(), H: "check your Go installation" },
-								&z.CmdInfo { N: "golint", I: devgo.Has_golint, H: "`go get -u github.com/golang/lint/golint`" },
+		caps = []*z.CmdInfo	{	&z.CmdInfo { Title: "go vet",	Exists: devgo.HasGoDevEnv(),	Hint: "check your Go installation" },
+								&z.CmdInfo { Title: "golint",	Exists: devgo.Has_golint,		Hint: "`go get -u github.com/golang/lint/golint`" },
 							}
 	}
 	return caps
 }
 
 func (self *zgo) DoFmt (src string, custcmd string, tabsize int) (*z.RespFmt, error) {
-	return self.Base.DoFmt(src, custcmd, z.CmdInfo { I: devgo.Has_gofmt, C: "gofmt", A: []string{"-e", "-s"} })
+	return self.Base.DoFmt(src, custcmd, z.CmdInfo { Exists: devgo.Has_gofmt, Name: "gofmt", Args: []string{"-e", "-s"} })
 }
 
 func (_ *zgo) OnFileActive (file *z.File) {
