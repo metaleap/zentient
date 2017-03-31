@@ -49,7 +49,10 @@ func main () {
 
 
 func regZ (zid string, µ z.Zengine) {
-	if µ != nil  {  z.Zengines[zid] = µ  }
+	if µ != nil  {
+		z.Zengines[zid] = µ
+		z.AllDiags[zid] = µ.B().Diags
+	}
 }
 
 

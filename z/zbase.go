@@ -5,6 +5,8 @@ import (
 )
 
 type Base struct {
+	Diags map[string][]*RespDiag
+
 	DbgMsgs []string
 	DbgObjs []interface{}
 }
@@ -12,6 +14,8 @@ type Base struct {
 
 
 func (self *Base) Init () {
+	self.Diags = map[string][]*RespDiag {}
+
 	self.DbgMsgs = []string {}
 	self.DbgObjs = []interface{} {}
 }

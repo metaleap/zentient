@@ -28,8 +28,12 @@ func Init (ctx *z.Context) z.Zengine {
 
 
 
-func (_ *zhs) Ids () []string {
+func (_ *zhs) EdLangIDs () []string {
 	return []string { "haskell", "Haskell" }
+}
+
+func (self *zhs) B () *z.Base {
+	return &self.Base
 }
 
 
@@ -48,7 +52,7 @@ func (_ *zhs) Caps (cap string) (caps []*z.RespCmd) {
 	return caps
 }
 
-func (self *zhs) DoFmt (src string, custcmd string, tabsize int) (resp *z.RespFmt, err error) {
+func (self *zhs) DoFmt (src string, custcmd string, tabsize uint8) (resp *z.RespFmt, err error) {
 	ts := fmt.Sprint(tabsize)
 	return self.Base.DoFmt(src, custcmd,
 		z.RespCmd { Exists: devhs.Has_stylish_haskell,	Name: "stylish-haskell",	Args: []string{} },

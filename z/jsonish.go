@@ -3,6 +3,39 @@ import (
 )
 
 
+type RespCmd struct {
+	Name	string		//	actual cmd name
+	Args	[]string	//	args
+
+	Title	string		//	display name, eg: N = "go vet" when C = "go" with A = ["vet"]  ;  if empty fall back to C
+	Exists	bool		//	installed?
+	Hint	string		//	install hint
+
+	f	func()		//	tmp field used in Base.DoFmt()
+}
+
+type RespDiag struct {
+	Code	string
+	Msg		string
+	PosLn	uint32
+	PosCol	uint32
+	Sev		uint8
+	Cat		string
+}
+
+type RespFmt struct {
+	Result		string
+	Warnings	[]string
+}
+
+
+const (
+	DIAG_ERR	uint8 = 0
+	DIAG_WARN	uint8 = 1
+	DIAG_INFO	uint8 = 2
+	DIAG_HINT	uint8 = 3
+)
+
 
 // the ONLY jsonish func to return a string-encoded-as-JSON-value
 // thereby establishing convention/protocol for clients:
@@ -15,12 +48,13 @@ func jsonErrMsg (msg string) interface{} {
 func jsonStatus () interface{} {
 	resp := map[string]interface{} {}
 	resp["Ctx"] = Ctx
+	resp["OpenFiles"] = OpenFiles
+	resp["AllFiles"] = AllFiles
+	resp["AllDiags"] = AllDiags
 	resp["Zengines"] = jsonZengines()
 	for zid, zengine := range Zengines {
 		resp["Zengines["+zid+"]"] = zengine
 	}
-	resp["OpenFiles"] = OpenFiles
-	resp["AllFiles"] = AllFiles
 	return resp
 }
 
@@ -28,7 +62,7 @@ func jsonStatus () interface{} {
 func jsonZengines () interface{} {
 	list := map[string][]string {} // ouch =)
 	for zid, zengine := range Zengines {
-		list[zid] = zengine.Ids()
+		list[zid] = zengine.EdLangIDs()
 	}
 	return list
 }

@@ -70,7 +70,7 @@ func HandleRequest (queryln string) (e error) {
 				resp[zid] = µ.Caps(msgargs)  }  }
 			e = out(resp)
 		case MSG_DO_FMT:
-			if resp,err := doFmt(zids[0], ugo.S(inobj["s"]), ugo.S(inobj["c"]), int(ugo.F(inobj["t"])))  ;  (err != nil) {
+			if resp,err := doFmt(zids[0], ugo.S(inobj["s"]), ugo.S(inobj["c"]), uint8(ugo.F(inobj["t"])))  ;  (err != nil) {
 				e = out(err.Error())  } else {  e = out(resp)  }
 
 

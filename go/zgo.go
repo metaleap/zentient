@@ -30,8 +30,12 @@ func Init (ctx *z.Context) z.Zengine {
 }
 
 
-func (_ *zgo) Ids () []string {
+func (_ *zgo) EdLangIDs () []string {
 	return []string { "go", "Go" }
+}
+
+func (self *zgo) B () *z.Base {
+	return &self.Base
 }
 
 
@@ -48,7 +52,7 @@ func (_ *zgo) Caps (cap string) (caps []*z.RespCmd) {
 	return caps
 }
 
-func (self *zgo) DoFmt (src string, custcmd string, tabsize int) (*z.RespFmt, error) {
+func (self *zgo) DoFmt (src string, custcmd string, tabsize uint8) (*z.RespFmt, error) {
 	return self.Base.DoFmt(src, custcmd, z.RespCmd { Exists: devgo.Has_gofmt, Name: "gofmt", Args: []string{"-e", "-s"} })
 }
 

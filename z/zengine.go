@@ -10,28 +10,13 @@ type Context struct {
 	ConfigDir	string
 }
 
-type RespCmd struct {
-	Name	string		//	actual cmd name
-	Args	[]string	//	args
-
-	Title	string		//	display name, eg: N = "go vet" when C = "go" with A = ["vet"]  ;  if empty fall back to C
-	Exists	bool		//	installed?
-	Hint	string		//	install hint
-
-	f	func()		//	tmp field used in Base.DoFmt()
-}
-
-type RespFmt struct {
-	Result		string
-	Warnings	[]string
-}
-
 
 type Zengine interface {
-	Ids () []string
+	EdLangIDs () []string
+	B () *Base
 
 	Caps (string) []*RespCmd
-	DoFmt (string, string, int) (*RespFmt, error)
+	DoFmt (string, string, uint8) (*RespFmt, error)
 	OnFileActive (*File)
 	OnFileClose (*File)
 	OnFileOpen (*File)
@@ -39,9 +24,9 @@ type Zengine interface {
 }
 
 
-
 var (
 	Ctx			= &Context{}
+	AllDiags	= map[string]map[string][]*RespDiag {}
 	AllFiles	= map[string]*File {}
 	OpenFiles	= []string {}
 	Zengines	= map[string]Zengine {}
@@ -49,7 +34,7 @@ var (
 
 
 
-func doFmt (zid string, reqsrc string, reqcmd string, reqtabsize int) (resp map[string]*RespFmt, err error) {
+func doFmt (zid string, reqsrc string, reqcmd string, reqtabsize uint8) (resp map[string]*RespFmt, err error) {
 	if µ := Zengines[zid] ; µ != nil && len(reqsrc)>0 {
 		var rfmt *RespFmt
 		if rfmt,err = µ.DoFmt(reqsrc, reqcmd, reqtabsize) ; rfmt!=nil && err==nil {
