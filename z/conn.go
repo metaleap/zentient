@@ -63,7 +63,7 @@ func HandleRequest (queryln string) (e error) {
 			e = out(nil)
 		case MSG_FILE_CLOSE:
 			onFileClose(Zengines[zids[0]], msgargs)
-			e = out(nil)
+			e = out("nil")
 		case MSG_CAPS:
 			resp := map[string][]*CmdInfo {}
 			for _, zid := range zids { if µ := Zengines[zid] ; µ != nil {
