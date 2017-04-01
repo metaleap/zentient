@@ -22,10 +22,7 @@ func Init (ctx *z.Context) z.Zengine {
 	}
 	µ = &zgo{}
 	µ.Base.Init()
-	go devgo.RefreshPkgs(func(errs []error) {
-		µ.Base.DbgObjs = append(µ.Base.DbgObjs, devgo.PkgsByDir, devgo.PkgsByImP)
-		for _,err:= range errs { µ.Base.DbgMsgs = append(µ.Base.DbgMsgs, err.Error()) }
-	})
+	go µ.refreshDiags(nil, nil, nil)
 	return µ
 }
 
@@ -56,18 +53,18 @@ func (self *zgo) DoFmt (src string, custcmd string, tabsize uint8) (*z.RespFmt, 
 	return self.Base.DoFmt(src, custcmd, z.RespCmd { Exists: devgo.Has_gofmt, Name: "gofmt", Args: []string{"-e", "-s"} })
 }
 
-func (_ *zgo) OnFileActive (file *z.File) {
+func (self *zgo) OnFileActive (file *z.File) {
+	self.refreshDiags(nil, file, nil)
 }
 
 func (self *zgo) OnFileOpen (file *z.File) {
-	self.Base.Diags[file.RelPath] = []*z.RespDiag {
-		&z.RespDiag { Code: "W", Msg: "Mock warning for " + file.RelPath, PosLn: 2, PosCol: 1, Sev: z.DIAG_WARN, Cat: "devgo" },
-		&z.RespDiag { Code: "I", Msg: "Mock info for " + file.RelPath, PosLn: 9, PosCol: 11, Sev: z.DIAG_INFO, Cat: "devgo" },
-	}
+	self.refreshDiags(nil, file, nil)
 }
 
-func (_ *zgo) OnFileClose (file *z.File) {
+func (self *zgo) OnFileClose (file *z.File) {
+	self.refreshDiags(nil, nil, file)
 }
 
-func (_ *zgo) OnFileWrite (file *z.File) {
+func (self *zgo) OnFileWrite (file *z.File) {
+	self.refreshDiags(file, nil, nil)
 }

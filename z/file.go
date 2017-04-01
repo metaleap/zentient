@@ -7,13 +7,13 @@ import (
 type File struct {
 	RelPath		string
 	FullPath	string
-	Z			Zengine
+	µ			Zengine
 }
 
 
 func NewFile (z Zengine, relpath string) *File {
 	var f File
-	f.Z = z
+	f.µ = z
 	f.RelPath = relpath
 	f.FullPath = filepath.Join(Ctx.SrcDir, relpath)
 	return &f

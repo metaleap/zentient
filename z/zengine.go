@@ -26,12 +26,20 @@ type Zengine interface {
 
 var (
 	Ctx			= &Context{}
-	AllDiags	= map[string]map[string][]*RespDiag {}
 	AllFiles	= map[string]*File {}
 	OpenFiles	= []string {}
 	Zengines	= map[string]Zengine {}
+
+	allDiags	= map[string]map[string][]*RespDiag {}
 )
 
+
+func AllDiags () map[string]map[string][]*RespDiag {
+	for zid,µ := range Zengines {
+		allDiags[zid] = µ.B().Diags
+	}
+	return allDiags
+}
 
 
 func doFmt (zid string, reqsrc string, reqcmd string, reqtabsize uint8) (resp map[string]*RespFmt, err error) {
@@ -45,7 +53,7 @@ func doFmt (zid string, reqsrc string, reqcmd string, reqtabsize uint8) (resp ma
 }
 
 func onFileActive (file* File) {
-	file.Z.OnFileActive(file)
+	file.µ.OnFileActive(file)
 }
 
 func onFileClose (µ Zengine, relpath string) {
