@@ -22,7 +22,7 @@ type Zengine interface {
 	OnFileClose (*File)
 	OnFileOpen (*File)
 	OnFileWrite (*File)
-	RefreshDiags(string, []string)
+	RefreshDiags(string, []string) map[string][]*RespDiag
 }
 
 
@@ -94,7 +94,7 @@ func each (fn func (Zengine) func()) (funcs []func()) {
 
 func refreshAllDiags (rebuildfilerelpath string) {
 	funcs := each(func(µ Zengine) func() { return func() {
-		µ.B().refreshDiags(µ, rebuildfilerelpath)
+		µ.B().Diags = µ.B().refreshDiags(µ, rebuildfilerelpath)
 	} })
 	ugo.WaitOn(funcs...)
 }

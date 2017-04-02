@@ -6,8 +6,8 @@ import (
 )
 
 
-func (self *zhs) RefreshDiags (rebuildfilerelpath string, openfiles []string) {
-	diags := self.Base.Diags
+func (self *zhs) RefreshDiags (rebuildfilerelpath string, openfiles []string) (diags map[string][]*z.RespDiag) {
+	diags = self.Base.Diags
 	isrebuild := len(rebuildfilerelpath)>0
 
 	for relfilepath,filediags := range diags {
@@ -48,5 +48,5 @@ func (self *zhs) RefreshDiags (rebuildfilerelpath string, openfiles []string) {
 		// 	}
 		// }
 	}
-	self.Base.Diags = diags
+	return
 }
