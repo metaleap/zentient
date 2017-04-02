@@ -22,7 +22,6 @@ func Init (ctx *z.Context) z.Zengine {
 	}
 	µ = &zgo{}
 	µ.Base.Init()
-	// go µ.refreshDiags(nil, nil, nil)
 	return µ
 }
 

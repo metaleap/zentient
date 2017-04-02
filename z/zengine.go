@@ -96,5 +96,5 @@ func refreshAllDiags (rebuildfilerelpath string) {
 	funcs := each(func(µ Zengine) func() { return func() {
 		µ.B().refreshDiags(µ, rebuildfilerelpath)
 	} })
-	ugo.Wait(funcs...)
+	ugo.WaitOn(funcs...)
 }
