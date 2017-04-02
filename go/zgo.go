@@ -22,6 +22,7 @@ func Init (ctx *z.Context) z.Zengine {
 	}
 	µ = &zgo{}
 	µ.Base.Init()
+	go devgo.RefreshPkgs()
 	return µ
 }
 
