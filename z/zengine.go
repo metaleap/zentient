@@ -1,5 +1,6 @@
 package z
 import (
+	"github.com/metaleap/go-util-misc"
 	"github.com/metaleap/go-util-slice"
 )
 
@@ -21,6 +22,7 @@ type Zengine interface {
 	OnFileClose (*File)
 	OnFileOpen (*File)
 	OnFileWrite (*File)
+	RefreshDiags(string, []string)
 }
 
 
@@ -54,12 +56,14 @@ func doFmt (zid string, reqsrc string, reqcmd string, reqtabsize uint8) (resp ma
 
 func onFileActive (file* File) {
 	file.µ.OnFileActive(file)
+	refreshAllDiags("")
 }
 
 func onFileClose (µ Zengine, relpath string) {
 	OpenFiles = uslice.StrWithout(OpenFiles, false, relpath)
 	file := AllFiles[relpath]
 	µ.OnFileClose(file)
+	refreshAllDiags("")
 }
 
 func onFileOpen (µ Zengine, relpath string) {
@@ -80,4 +84,17 @@ func onFileWrite (µ Zengine, relpath string) {
 		file = AllFiles[relpath]
 	}
 	µ.OnFileWrite(file)
+	refreshAllDiags(relpath)
+}
+
+func each (fn func (Zengine) func()) (funcs []func()) {
+	for _,µ := range Zengines {  funcs = append(funcs, fn(µ))  }
+	return
+}
+
+func refreshAllDiags (rebuildfilerelpath string) {
+	funcs := each(func(µ Zengine) func() { return func() {
+		µ.B().refreshDiags(µ, rebuildfilerelpath)
+	} })
+	ugo.Wait(funcs...)
 }

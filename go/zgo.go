@@ -22,7 +22,7 @@ func Init (ctx *z.Context) z.Zengine {
 	}
 	µ = &zgo{}
 	µ.Base.Init()
-	go µ.refreshDiags(nil, nil, nil)
+	// go µ.refreshDiags(nil, nil, nil)
 	return µ
 }
 
@@ -56,17 +56,13 @@ func (self *zgo) DoFmt (src string, custcmd string, tabsize uint8) (*z.RespFmt, 
 }
 
 func (self *zgo) OnFileActive (file *z.File) {
-	self.refreshDiags(nil, file, nil)
 }
 
 func (self *zgo) OnFileOpen (file *z.File) {
-	self.refreshDiags(nil, file, nil)
 }
 
 func (self *zgo) OnFileClose (file *z.File) {
-	self.refreshDiags(nil, nil, file)
 }
 
 func (self *zgo) OnFileWrite (file *z.File) {
-	self.refreshDiags(file, nil, nil)
 }

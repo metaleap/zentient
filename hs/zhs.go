@@ -73,3 +73,7 @@ func (_ *zhs) OnFileClose (file *z.File) {
 
 func (_ *zhs) OnFileWrite (file *z.File) {
 }
+
+func (self *zhs) RefreshDiags (rebuildfilerelpath string, openfiles []string) {
+
+}

@@ -6,6 +6,20 @@ import (
 )
 
 
+func (self *zgo) RefreshDiags (rebuildfilerelpath string, openfiles []string) {
+	diags := map[string][]*z.RespDiag {}
+	if len(rebuildfilerelpath)>0 {
+		diags[rebuildfilerelpath] = append(diags[rebuildfilerelpath],
+			&z.RespDiag { Cat: "devgo-mock", Msg: "rebuildfile:" + rebuildfilerelpath, PosLn: 9, PosCol: 2, Sev: z.DIAG_ERR })
+	}
+	for _,filerelpath := range openfiles {
+		diags[filerelpath] = append(diags[filerelpath],
+			&z.RespDiag { Cat: "devgo-mock", Msg: "isopenfile:" + filerelpath, PosLn: 19, PosCol: 1, Sev: z.DIAG_WARN })
+	}
+	self.Base.Diags = diags
+}
+
+
 func (self *zgo) refreshDiags(rebuildfile *z.File, lintfile *z.File, unlintfile *z.File) {
 	errs := devgo.RefreshPkgs()
 	if len(errs)>0 {}

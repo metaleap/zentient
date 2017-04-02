@@ -1,6 +1,7 @@
 package z
 import (
 	"github.com/metaleap/go-util-misc"
+	"github.com/metaleap/go-util-slice"
 	"github.com/metaleap/go-util-str"
 )
 
@@ -48,4 +49,11 @@ func (self *Base) DoFmt (src string, custcmd string, cmds ...RespCmd) (resp *Res
 		resp = nil
 	}
 	return
+}
+
+func (self *Base) refreshDiags (µ Zengine, rebuildfilerelpath string) {
+	µ.RefreshDiags(rebuildfilerelpath, uslice.StrFilter(OpenFiles, func(relpath string) bool {
+		file := AllFiles[relpath]
+		return file!=nil && file.µ == µ
+	}))
 }
