@@ -52,8 +52,10 @@ func (self *Base) DoFmt (src string, custcmd string, cmds ...RespCmd) (resp *Res
 }
 
 func (self *Base) refreshDiags (µ Zengine, rebuildfilerelpath string) {
-	µ.RefreshDiags(rebuildfilerelpath, uslice.StrFilter(OpenFiles, func(relpath string) bool {
+	openfiles := uslice.StrFilter(OpenFiles, func(relpath string) bool {
 		file := AllFiles[relpath]
-		return file!=nil && file.µ == µ
-	}))
+		return file!=nil && file.µ!=nil && file.µ == µ
+	})
+	if !uslice.StrHas(openfiles, rebuildfilerelpath) {  rebuildfilerelpath = ""  }
+	µ.RefreshDiags(rebuildfilerelpath, openfiles)
 }
