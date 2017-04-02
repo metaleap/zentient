@@ -57,6 +57,24 @@ func (self *Base) refreshDiags (µ Zengine, rebuildfilerelpath string) (diags ma
 		return file!=nil && file.µ!=nil && file.µ == µ
 	})
 	if !uslice.StrHas(openfiles, rebuildfilerelpath) {  rebuildfilerelpath = ""  }
-	diags = µ.RefreshDiags(rebuildfilerelpath, openfiles)
+	diags = µ.B().Diags
+	for relfilepath,filediags := range diags {
+		filediagsnu := []*RespDiag {}
+		if relfilepath!=rebuildfilerelpath { for _,fd := range filediags {
+			if fd.Sev==DIAG_ERR || fd.Sev==DIAG_WARN { filediagsnu = append(filediagsnu, fd) } } }
+		diags[relfilepath] = filediagsnu
+	}
+	var funcs []func()
+	for _,filerelpath := range openfiles {
+		linter := func (frp string) func() { return func() {  diags[frp] = append (diags[frp], µ.Lint(frp)...) } }
+		funcs = append(funcs, linter(filerelpath))
+	}
+	isrebuild := len(rebuildfilerelpath)>0
+	if isrebuild {
+		funcs = append(funcs, func() {
+			diags[rebuildfilerelpath] = append(diags[rebuildfilerelpath], µ.BuildFrom(rebuildfilerelpath)...) })
+	}
+
+	ugo.WaitOn(funcs...)
 	return
 }

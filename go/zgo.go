@@ -20,10 +20,11 @@ func Init (ctx *z.Context) z.Zengine {
 	if !devgo.HasGoDevEnv() {
 		return nil
 	}
-	µ = &zgo{}
-	µ.Base.Init()
-	go devgo.RefreshPkgs()
-	return µ
+	self := &zgo{}
+	self.Base.Init()
+	go self.refreshPkgDiags("")
+	µ = self
+	return self
 }
 
 
@@ -65,4 +66,5 @@ func (self *zgo) OnFileClose (file *z.File) {
 }
 
 func (self *zgo) OnFileWrite (file *z.File) {
+	go self.refreshPkgDiags(file.RelPath)
 }

@@ -18,11 +18,12 @@ type Zengine interface {
 
 	Caps (string) []*RespCmd
 	DoFmt (string, string, uint8) (*RespFmt, error)
+	Lint (string) []*RespDiag
 	OnFileActive (*File)
 	OnFileClose (*File)
 	OnFileOpen (*File)
 	OnFileWrite (*File)
-	RefreshDiags(string, []string) map[string][]*RespDiag
+	BuildFrom (string) []*RespDiag
 }
 
 
@@ -79,12 +80,14 @@ func onFileOpen (µ Zengine, relpath string) {
 
 func onFileWrite (µ Zengine, relpath string) {
 	file := AllFiles[relpath]
-	if (file == nil) {
+	if file==nil {
 		onFileOpen(µ, relpath)
 		file = AllFiles[relpath]
 	}
-	µ.OnFileWrite(file)
-	refreshAllDiags(relpath)
+	if file!=nil {
+		µ.OnFileWrite(file)
+		refreshAllDiags(relpath)
+	}
 }
 
 func each (fn func (Zengine) func()) (funcs []func()) {
