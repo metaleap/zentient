@@ -6,9 +6,12 @@ import (
 )
 
 
-func (self *zgo) Lint (filerelpath string) (diags []*z.RespDiag) {
-	diags = append(diags, &z.RespDiag { Cat: "devgo-mock", Msg: "isopenfile:" + filerelpath, PosLn: 19, PosCol: 1, Sev: z.DIAG_HINT })
-	diags = append(diags, &z.RespDiag { Cat: "devgo-mock", Msg: "isfileopen:" + filerelpath, PosLn: 17, PosCol: 3, Sev: z.DIAG_INFO })
+func (self *zgo) Lint (filerelpaths []string) (filediags map[string][]*z.RespDiag) {
+	filediags = map[string][]*z.RespDiag {}
+	for _,filerelpath := range filerelpaths {
+		filediags[filerelpath] = append(filediags[filerelpath], &z.RespDiag { Cat: "devgo-mock", Msg: "isopenfile:" + filerelpath, PosLn: 19, PosCol: 1, Sev: z.DIAG_HINT })
+		filediags[filerelpath] = append(filediags[filerelpath], &z.RespDiag { Cat: "devgo-mock", Msg: "isfileopen:" + filerelpath, PosLn: 17, PosCol: 3, Sev: z.DIAG_INFO })
+	}
 	return
 }
 

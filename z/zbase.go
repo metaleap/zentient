@@ -54,7 +54,7 @@ func (self *Base) DoFmt (src string, custcmd string, cmds ...RespCmd) (resp *Res
 func (self *Base) refreshDiags (µ Zengine, rebuildfilerelpath string) (diags map[string][]*RespDiag) {
 	openfiles := uslice.StrFilter(OpenFiles, func(relpath string) bool {
 		file := AllFiles[relpath]
-		return file!=nil && file.µ!=nil && file.µ == µ
+		return file!=nil && file.µ == µ
 	})
 	if !uslice.StrHas(openfiles, rebuildfilerelpath) {  rebuildfilerelpath = ""  }
 	diags = µ.B().Diags
@@ -64,17 +64,20 @@ func (self *Base) refreshDiags (µ Zengine, rebuildfilerelpath string) (diags ma
 			if fd.Sev==DIAG_ERR || fd.Sev==DIAG_WARN { filediagsnu = append(filediagsnu, fd) } } }
 		diags[relfilepath] = filediagsnu
 	}
-	var funcs []func()
-	for _,filerelpath := range openfiles {
-		linter := func (frp string) func() { return func() {  diags[frp] = append (diags[frp], µ.Lint(frp)...) } }
-		funcs = append(funcs, linter(filerelpath))
-	}
 	isrebuild := len(rebuildfilerelpath)>0
-	if isrebuild {
-		funcs = append(funcs, func() {
-			diags[rebuildfilerelpath] = append(diags[rebuildfilerelpath], µ.BuildFrom(rebuildfilerelpath)...) })
+	dolint := func() {
+		for relfilepath,filediags := range µ.Lint(openfiles) {
+			diags[relfilepath] = append(diags[relfilepath], filediags...)
+		}
 	}
-
-	ugo.WaitOn(funcs...)
+	if isrebuild {
+		ugo.WaitOn(dolint, func() { diags[rebuildfilerelpath] = append(diags[rebuildfilerelpath], µ.BuildFrom(rebuildfilerelpath)...) })
+	} else {
+		dolint()
+	}
+	// funcs = []func() {  func() { diags[frp] = append (diags[frp], µ.Lint(frp)...) }  }
+	// makelintfunc := func (frp string) func() {
+	// 	return func() {  diags[frp] = append (diags[frp], µ.Lint(frp)...) } }
+	// for _,filerelpath := range openfiles { funcs = append(funcs, makelintfunc(filerelpath)) }
 	return
 }

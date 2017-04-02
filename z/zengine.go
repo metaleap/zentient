@@ -18,7 +18,7 @@ type Zengine interface {
 
 	Caps (string) []*RespCmd
 	DoFmt (string, string, uint8) (*RespFmt, error)
-	Lint (string) []*RespDiag
+	Lint ([]string) map[string][]*RespDiag
 	OnFileActive (*File)
 	OnFileClose (*File)
 	OnFileOpen (*File)

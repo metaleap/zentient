@@ -12,17 +12,13 @@ type zhs struct {
 	z.Base
 }
 
-var (
-	µ *zhs
-)
-
 
 func Init (ctx *z.Context) z.Zengine {
 	if !devhs.HasHsDevEnv() { return nil }
 
-	µ = &zhs{}
-	µ.Base.Init()
-	return µ
+	self := &zhs{}
+	self.Base.Init()
+	return self
 }
 
 

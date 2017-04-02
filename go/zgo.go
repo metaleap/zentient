@@ -11,11 +11,6 @@ type zgo struct {
 }
 
 
-var (
-	µ *zgo
-)
-
-
 func Init (ctx *z.Context) z.Zengine {
 	if !devgo.HasGoDevEnv() {
 		return nil
@@ -23,7 +18,6 @@ func Init (ctx *z.Context) z.Zengine {
 	self := &zgo{}
 	self.Base.Init()
 	go self.refreshPkgDiags("")
-	µ = self
 	return self
 }
 
