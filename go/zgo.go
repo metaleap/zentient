@@ -11,13 +11,13 @@ type zgo struct {
 }
 
 
-func Init (ctx *z.Context) z.Zengine {
+func Init () z.Zengine {
 	if !devgo.HasGoDevEnv() {
 		return nil
 	}
 	self := &zgo{}
 	self.Base.Init()
-	go self.refreshPkgDiags("")
+	self.refreshPkgDiags("")
 	return self
 }
 

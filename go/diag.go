@@ -1,5 +1,7 @@
 package zgo
 import (
+	"path/filepath"
+
 	"github.com/metaleap/go-devgo"
 
 	"github.com/metaleap/zentient/z"
@@ -8,10 +10,18 @@ import (
 
 func (self *zgo) Lint (filerelpaths []string) (filediags map[string][]*z.RespDiag) {
 	filediags = map[string][]*z.RespDiag {}
-	for _,filerelpath := range filerelpaths {
-		filediags[filerelpath] = append(filediags[filerelpath], &z.RespDiag { Cat: "devgo-mock", Msg: "isopenfile:" + filerelpath, PosLn: 19, PosCol: 1, Sev: z.DIAG_HINT })
-		filediags[filerelpath] = append(filediags[filerelpath], &z.RespDiag { Cat: "devgo-mock", Msg: "isfileopen:" + filerelpath, PosLn: 17, PosCol: 3, Sev: z.DIAG_INFO })
+	pkgfiles := map[*devgo.Pkg][]string {}
+	for _,frp := range filerelpaths {
+		if pkg := devgo.PkgsByDir[filepath.Dir(filepath.Join(z.Ctx.SrcDir, frp))] ; pkg!=nil {
+			pkgfiles[pkg] = append(pkgfiles[pkg], frp)
+		}
 	}
+	for fp,frps := range pkgfiles {
+		for _,frp := range frps {
+			filediags[frp] = append(filediags[frp], &z.RespDiag { Cat: "devgo-mock", Msg: "pkg " + fp.ImportPath + " has:" + frp, PosLn: 19, PosCol: 1, Sev: z.DIAG_INFO })
+		}
+	}
+
 	return
 }
 

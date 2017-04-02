@@ -64,20 +64,14 @@ func (self *Base) refreshDiags (µ Zengine, rebuildfilerelpath string) (diags ma
 			if fd.Sev==DIAG_ERR || fd.Sev==DIAG_WARN { filediagsnu = append(filediagsnu, fd) } } }
 		diags[relfilepath] = filediagsnu
 	}
-	isrebuild := len(rebuildfilerelpath)>0
-	dolint := func() {
+	funcs := []func() { func() {
 		for relfilepath,filediags := range µ.Lint(openfiles) {
 			diags[relfilepath] = append(diags[relfilepath], filediags...)
 		}
+	} }
+	if isrebuild := len(rebuildfilerelpath)>0 ; isrebuild {
+		funcs = append(funcs, func() { diags[rebuildfilerelpath] = append(diags[rebuildfilerelpath], µ.BuildFrom(rebuildfilerelpath)...) })
 	}
-	if isrebuild {
-		ugo.WaitOn(dolint, func() { diags[rebuildfilerelpath] = append(diags[rebuildfilerelpath], µ.BuildFrom(rebuildfilerelpath)...) })
-	} else {
-		dolint()
-	}
-	// funcs = []func() {  func() { diags[frp] = append (diags[frp], µ.Lint(frp)...) }  }
-	// makelintfunc := func (frp string) func() {
-	// 	return func() {  diags[frp] = append (diags[frp], µ.Lint(frp)...) } }
-	// for _,filerelpath := range openfiles { funcs = append(funcs, makelintfunc(filerelpath)) }
+	ugo.WaitOn(funcs...)
 	return
 }

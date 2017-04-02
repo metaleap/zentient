@@ -32,8 +32,10 @@ func main () {
 	z.Out.SetIndent("","")
 
 	z.Zengines = map[string]z.Zengine {}
-	regZ("go", zgo.Init(z.Ctx))
-	regZ("hs", zhs.Init(z.Ctx))
+	ugo.WaitOn(
+		func() { regZ("go", zgo.Init()) },
+		func() { regZ("hs", zhs.Init()) },
+	)
 
 	for stdin.Scan() {
 		if err = z.HandleRequest(stdin.Text()) ; err == nil {

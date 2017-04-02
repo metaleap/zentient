@@ -13,7 +13,7 @@ type zhs struct {
 }
 
 
-func Init (ctx *z.Context) z.Zengine {
+func Init () z.Zengine {
 	if !devhs.HasHsDevEnv() { return nil }
 
 	self := &zhs{}
