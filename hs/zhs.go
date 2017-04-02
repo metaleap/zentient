@@ -45,8 +45,9 @@ func (_ *zhs) Caps (cap string) (caps []*z.RespCmd) {
 								&z.RespCmd { Title: "hindent",			Exists: devhs.Has_hindent,			Hint: "`stack install hindent`" },
 								&z.RespCmd { Title: "brittany",			Exists: devhs.Has_brittany,			Hint: "`github.com/lspitzner/brittany`" },
 							}
-	case "lint":
-		caps = []*z.RespCmd	{	&z.RespCmd { Title: "hlint",			Exists: devhs.Has_hlint,			Hint: "`stack install hlint`" },
+	case "diag":
+		caps = []*z.RespCmd	{	&z.RespCmd { Title: "stack install",	Exists: devhs.HasHsDevEnv(),	Hint: "check your Stack installation" },
+								&z.RespCmd { Title: "hlint",			Exists: devhs.Has_hlint,		Hint: "`stack install hlint`" },
 							}
 	}
 	return caps

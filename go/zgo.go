@@ -41,9 +41,11 @@ func (_ *zgo) Caps (cap string) (caps []*z.RespCmd) {
 	case "fmt":
 		caps = []*z.RespCmd	{	&z.RespCmd { Title: "gofmt",	Exists: devgo.Has_gofmt,		Hint: "check your Go installation" },
 							}
-	case "lint":
-		caps = []*z.RespCmd	{	&z.RespCmd { Title: "go vet",	Exists: devgo.HasGoDevEnv(),	Hint: "check your Go installation" },
-								&z.RespCmd { Title: "golint",	Exists: devgo.Has_golint,		Hint: "`go get -u github.com/golang/lint/golint`" },
+	case "diag":
+		caps = []*z.RespCmd	{	&z.RespCmd { Title: "go install",	Exists: devgo.HasGoDevEnv(),	Hint: "check your Go installation" },
+								&z.RespCmd { Title: "go list",		Exists: devgo.HasGoDevEnv(),	Hint: "check your Go installation" },
+								&z.RespCmd { Title: "go vet",		Exists: devgo.HasGoDevEnv(),	Hint: "check your Go installation" },
+								&z.RespCmd { Title: "golint",		Exists: devgo.Has_golint,		Hint: "`go get -u github.com/golang/lint/golint`" },
 							}
 	}
 	return caps
