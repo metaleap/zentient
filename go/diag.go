@@ -1,28 +1,52 @@
 package zgo
 import (
 	"path/filepath"
+	"sync"
 
 	"github.com/metaleap/go-devgo"
+	"github.com/metaleap/go-util-misc"
 
 	"github.com/metaleap/zentient/z"
 )
 
 
-func (self *zgo) Lint (filerelpaths []string) (filediags map[string][]*z.RespDiag) {
-	filediags = map[string][]*z.RespDiag {}
-	pkgfiles := map[*devgo.Pkg][]string {}
-	for _,frp := range filerelpaths {
-		if pkg := devgo.PkgsByDir[filepath.Dir(filepath.Join(z.Ctx.SrcDir, frp))] ; pkg!=nil {
-			pkgfiles[pkg] = append(pkgfiles[pkg], frp)
+func newGoLint (pkgimppath string, filenames []string, cont func(map[string][]*z.RespDiag)) func() {
+	return func() {
+		filediags := map[string][]*z.RespDiag {}
+		for _,frp := range filenames {
+			tmp := filediags[frp]
+			tmp = append(tmp, &z.RespDiag { Cat: "devgo-mock", Msg: "pkg " + pkgimppath + " has: " + frp, PosLn: 19, PosCol: 1, Sev: z.DIAG_INFO })
+			filediags[frp] = tmp
 		}
+		cont(filediags)
 	}
-	for fp,frps := range pkgfiles {
-		for _,frp := range frps {
-			filediags[frp] = append(filediags[frp], &z.RespDiag { Cat: "devgo-mock", Msg: "pkg " + fp.ImportPath + " has:" + frp, PosLn: 19, PosCol: 1, Sev: z.DIAG_INFO })
-		}
-	}
+}
 
-	return
+
+func (self *zgo) Lint (filerelpaths []string) map[string][]*z.RespDiag {
+	pkgfiles := map[*devgo.Pkg][]string {}
+	if devgo.PkgsByDir!=nil {
+		for _,frp := range filerelpaths {
+			if pkg := devgo.PkgsByDir[filepath.Dir(filepath.Join(z.Ctx.SrcDir, frp))] ; pkg!=nil {
+				pkgfiles[pkg] = append(pkgfiles[pkg], frp)
+			}
+		}
+	}
+	var mutex sync.Mutex
+	alldiags := map[string][]*z.RespDiag {}
+	funcs := []func() {}
+	for fpkg,frps := range pkgfiles {
+		funcs = append(funcs, newGoLint(fpkg.ImportPath, frps, func(linterdiags map[string][]*z.RespDiag) {
+			mutex.Lock()
+			for frp,filediags := range linterdiags {
+				alldiags[frp] = append(alldiags[frp], filediags...)
+			}
+			mutex.Unlock()
+		}))
+	}
+	ugo.WaitOn(funcs...)
+
+	return alldiags
 }
 
 func (self *zgo) BuildFrom (filerelpath string) (diags []*z.RespDiag) {
@@ -32,18 +56,18 @@ func (self *zgo) BuildFrom (filerelpath string) (diags []*z.RespDiag) {
 }
 
 
-func (self *zgo) refreshPkgDiags (rebuildfilerelpath string) {
-	/*errs :=*/ devgo.RefreshPkgs()
-	// self.Base.DbgObjs = append(self.Base.DbgObjs, devgo.PkgsByDir)
-	// for _,err := range errs { self.Base.DbgMsgs = append(self.Base.DbgMsgs, err.Error()) }
-	// pd := map[string][]*z.RespDiag {}
-	// for _,pkg := range devgo.PkgsErrs {
-	// 	for _,pkgerr := range pkg.Errs {
-	// 		if len(pkgerr.RelPath)>0 && pkgerr.RelPath!=rebuildfilerelpath {
-	// 			pd[pkgerr.RelPath] = append(pd[pkgerr.RelPath],
-	// 				&z.RespDiag { Cat: "go list all", Msg: pkgerr.Msg, PosLn: pkgerr.PosLn, PosCol: pkgerr.PosCol, Sev: z.DIAG_ERR })
-	// 		}
-	// 	}
-	// }
-	// pkgdiags = pd
-}
+// func (self *zgo) refreshPkgDiags (rebuildfilerelpath string) {
+// 	errs := devgo.RefreshPkgs()
+// 	self.Base.DbgObjs = append(self.Base.DbgObjs, devgo.PkgsByDir)
+// 	for _,err := range errs { self.Base.DbgMsgs = append(self.Base.DbgMsgs, err.Error()) }
+// 	pd := map[string][]*z.RespDiag {}
+// 	for _,pkg := range devgo.PkgsErrs {
+// 		for _,pkgerr := range pkg.Errs {
+// 			if len(pkgerr.RelPath)>0 && pkgerr.RelPath!=rebuildfilerelpath {
+// 				pd[pkgerr.RelPath] = append(pd[pkgerr.RelPath],
+// 					&z.RespDiag { Cat: "go list all", Msg: pkgerr.Msg, PosLn: pkgerr.PosLn, PosCol: pkgerr.PosCol, Sev: z.DIAG_ERR })
+// 			}
+// 		}
+// 	}
+// 	pkgdiags = pd
+// }

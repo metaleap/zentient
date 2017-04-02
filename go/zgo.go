@@ -17,7 +17,7 @@ func Init () z.Zengine {
 	}
 	self := &zgo{}
 	self.Base.Init()
-	self.refreshPkgDiags("")
+	go devgo.RefreshPkgs()
 	return self
 }
 
@@ -60,5 +60,5 @@ func (self *zgo) OnFileClose (file *z.File) {
 }
 
 func (self *zgo) OnFileWrite (file *z.File) {
-	go self.refreshPkgDiags(file.RelPath)
+	go devgo.RefreshPkgs()
 }
