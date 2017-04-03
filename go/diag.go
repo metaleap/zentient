@@ -5,6 +5,7 @@ import (
 
 	"github.com/metaleap/go-devgo"
 	"github.com/metaleap/go-util-misc"
+	"github.com/metaleap/go-util-str"
 
 	"github.com/metaleap/zentient/z"
 )
@@ -13,9 +14,23 @@ import (
 func newGoLint (pkgimppath string, filenames []string, cont func(map[string][]*z.RespDiag)) func() {
 	return func() {
 		filediags := map[string][]*z.RespDiag {}
-		for _,srcref := range devgo.CmdExecOnSrc(true, false, "golint", filenames...) {
+		for _,srcref := range devgo.CmdExecOnSrc(true, false, nil, "golint", filenames...) {
 			filediags[srcref.FilePath] = append(filediags[srcref.FilePath],
 				&z.RespDiag { Cat: "golint", Msg: srcref.Msg, PosLn: srcref.PosLn, PosCol: srcref.PosCol, Sev: z.DIAG_INFO })
+		}
+		cont(filediags)
+	}
+}
+
+	var govetcheckln = ustr.NotPrefixed("vet: ") // no need to recreate this lambda every time
+func newGoVet (pkgimppath string, filenames []string, cont func(map[string][]*z.RespDiag)) func() {
+	return func() {
+		filediags := map[string][]*z.RespDiag {}
+		cmdargs := []string { "tool", "vet", "-shadow=true", "-shadowstrict", "-all" }
+		cmdargs = append(cmdargs, filenames...)
+		for _,srcref := range devgo.CmdExecOnSrc(true, true, govetcheckln, "go", cmdargs...) {
+			filediags[srcref.FilePath] = append(filediags[srcref.FilePath],
+				&z.RespDiag { Cat: "go vet", Msg: srcref.Msg, PosLn: srcref.PosLn, PosCol: srcref.PosCol, Sev: z.DIAG_INFO })
 		}
 		cont(filediags)
 	}
@@ -39,7 +54,8 @@ func (self *zgo) Lint (filerelpaths []string) (alldiags map[string][]*z.RespDiag
 	}
 	funcs := []func() {}
 	for fpkg,frps := range pkgfiles {
-		if (devgo.Has_golint) { funcs = append(funcs, newGoLint(fpkg.ImportPath, frps, onlinted)) }
+		if devgo.HasGoDevEnv() { funcs = append(funcs, newGoVet(fpkg.ImportPath, frps, onlinted)) }
+		if devgo.Has_golint { funcs = append(funcs, newGoLint(fpkg.ImportPath, frps, onlinted)) }
 	}
 	ugo.WaitOn(funcs...)
 
