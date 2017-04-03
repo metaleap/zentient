@@ -58,9 +58,6 @@ func (self *zhs) DoFmt (src string, custcmd string, tabsize uint8) (resp *z.Resp
 		)
 }
 
-func (_ *zhs) OnFileActive (file *z.File) {
-}
-
 func (_ *zhs) OnFileOpen (file *z.File) {
 }
 

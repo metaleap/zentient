@@ -53,9 +53,6 @@ func (self *zgo) DoFmt (src string, custcmd string, tabsize uint8) (*z.RespFmt, 
 	return self.Base.DoFmt(src, custcmd, z.RespCmd { Exists: devgo.Has_gofmt, Name: "gofmt", Args: []string{"-e", "-s"} })
 }
 
-func (self *zgo) OnFileActive (file *z.File) {
-}
-
 func (self *zgo) OnFileOpen (file *z.File) {
 }
 

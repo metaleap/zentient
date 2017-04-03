@@ -36,6 +36,8 @@ const (
 	DIAG_HINT	uint8 = 3
 )
 
+var allcurdiags = map[string]map[string][]*RespDiag {}
+
 
 // the ONLY jsonish func to return a string-encoded-as-JSON-value
 // thereby establishing convention/protocol for clients:
@@ -50,7 +52,6 @@ func jsonStatus () interface{} {
 	resp["Ctx"] = Ctx
 	resp["OpenFiles"] = OpenFiles
 	resp["AllFiles"] = AllFiles
-	resp["AllDiags"] = AllDiags()
 	resp["Zengines"] = jsonZengines()
 	for zid, zengine := range Zengines {
 		resp["Zengines["+zid+"]"] = zengine

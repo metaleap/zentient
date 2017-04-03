@@ -8,19 +8,29 @@ import (
 )
 
 type Base struct {
-	Diags map[string][]*RespDiag
+	alldiags map[string][]*RespDiag
+	curdiags map[string][]*RespDiag
 
 	DbgMsgs []string
 	DbgObjs []interface{}
+
+	zid string
 }
 
 
 
 func (self *Base) Init () {
-	self.Diags = map[string][]*RespDiag {}
+	self.curdiags = map[string][]*RespDiag {}
+	self.alldiags = map[string][]*RespDiag {}
 
 	self.DbgMsgs = []string {}
 	self.DbgObjs = []interface{} {}
+}
+
+
+func (self *Base) zId () string {
+	if len(self.zid)==0 { for zid,µ := range Zengines { if µ.B()==self { self.zid = zid ; break } } }
+	return self.zid
 }
 
 
@@ -53,32 +63,54 @@ func (self *Base) DoFmt (src string, custcmd string, cmds ...RespCmd) (resp *Res
 	return
 }
 
-func (self *Base) refreshDiags (µ Zengine, rebuildfilerelpath string) (diags map[string][]*RespDiag) {
+func (self *Base) refreshDiags (µ Zengine, closedfilerelpath string, openedfilerelpath string, writtenfilerelpath string) {
+	var mutex sync.Mutex
+	lintfiles := []string {}
+	funcs := []func() {}
+	freshdiags := map[string][]*RespDiag {}
 	openfiles := uslice.StrFiltered(OpenFiles, func(relpath string) bool {
 		file := AllFiles[relpath]
 		return file!=nil && file.µ == µ
 	})
-	if !uslice.StrHas(openfiles, rebuildfilerelpath) {  rebuildfilerelpath = ""  }
-	diags = µ.B().Diags
-	for relfilepath,filediags := range diags {
-		filediagsnu := []*RespDiag {}
-		if relfilepath!=rebuildfilerelpath { for _,fd := range filediags {
-			if fd.Sev==DIAG_ERR || fd.Sev==DIAG_WARN { filediagsnu = append(filediagsnu, fd) } } }
-		diags[relfilepath] = filediagsnu
+
+	if len(closedfilerelpath)>0 {
+		delete(self.curdiags, closedfilerelpath)
 	}
-	var mutex sync.Mutex
-	funcs := []func() { func() {
-		alldiags := µ.Lint(openfiles)
-		mutex.Lock()  ;  defer mutex.Unlock()
-		for relfilepath,filediags := range alldiags { diags[relfilepath] = append(diags[relfilepath], filediags...) }
-	} }
-	if isrebuild := len(rebuildfilerelpath)>0 ; isrebuild {
+	if len(openedfilerelpath)>0 {
+		if _,cached := self.alldiags[openedfilerelpath] ; !cached {
+			lintfiles = append(lintfiles, openedfilerelpath)
+		}
+	}
+	if len(writtenfilerelpath)>0 {
+		self.curdiags = map[string][]*RespDiag {}
+		self.alldiags = map[string][]*RespDiag {}
+		lintfiles = openfiles
 		funcs = append(funcs, func() {
-			alldiags := µ.BuildFrom(rebuildfilerelpath)
+			diagsfrombuild := µ.BuildFrom(writtenfilerelpath)
 			mutex.Lock()  ;  defer mutex.Unlock()
-			for relfilepath,filediags := range alldiags { diags[relfilepath] = append(diags[relfilepath], filediags...) }
+			for relfilepath,filediags := range diagsfrombuild { freshdiags[relfilepath] = append(freshdiags[relfilepath], filediags...) }
+		})
+	} else { // edge-case: there may be openfiles without existing diags if they were opened before diagnostics were ready to run: attempt to catch up now
+		for _,relfilepath := range openfiles {
+			if _,cached := self.alldiags[relfilepath] ; (!cached) && !uslice.StrHas(lintfiles, relfilepath) {
+				lintfiles = append(lintfiles, relfilepath)
+			}
+		}
+	}
+	if len(lintfiles)>0 {
+		funcs = append(funcs, func() {
+			diagsfromlint := µ.Lint(lintfiles)
+			mutex.Lock()  ;  defer mutex.Unlock()
+			for relfilepath,filediags := range diagsfromlint { freshdiags[relfilepath] = append(freshdiags[relfilepath], filediags...) }
 		})
 	}
 	ugo.WaitOn(funcs...)
-	return
+
+	for relfilepath,filediags := range freshdiags {
+		self.alldiags[relfilepath] = filediags
+	}
+	for _,relfilepath := range openfiles {
+		self.curdiags[relfilepath] = self.alldiags[relfilepath]
+	}
+	allcurdiags[self.zId()] = self.curdiags
 }
