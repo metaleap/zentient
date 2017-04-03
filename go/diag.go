@@ -13,40 +13,37 @@ import (
 func newGoLint (pkgimppath string, filenames []string, cont func(map[string][]*z.RespDiag)) func() {
 	return func() {
 		filediags := map[string][]*z.RespDiag {}
-		for _,frp := range filenames {
-			tmp := filediags[frp]
-			tmp = append(tmp, &z.RespDiag { Cat: "devgo-mock", Msg: "pkg " + pkgimppath + " has: " + frp, PosLn: 19, PosCol: 1, Sev: z.DIAG_INFO })
-			filediags[frp] = tmp
+		for _,srcref := range devgo.CmdExecOnSrc(true, false, "golint", filenames...) {
+			filediags[srcref.FilePath] = append(filediags[srcref.FilePath],
+				&z.RespDiag { Cat: "golint", Msg: srcref.Msg, PosLn: srcref.PosLn, PosCol: srcref.PosCol, Sev: z.DIAG_INFO })
 		}
 		cont(filediags)
 	}
 }
 
 
-func (self *zgo) Lint (filerelpaths []string) map[string][]*z.RespDiag {
+func (self *zgo) Lint (filerelpaths []string) (alldiags map[string][]*z.RespDiag) {
+	alldiags = map[string][]*z.RespDiag {}
+	if devgo.PkgsByDir==nil { return }
+
 	pkgfiles := map[*devgo.Pkg][]string {}
-	if devgo.PkgsByDir!=nil {
-		for _,frp := range filerelpaths {
-			if pkg := devgo.PkgsByDir[filepath.Dir(filepath.Join(z.Ctx.SrcDir, frp))] ; pkg!=nil {
-				pkgfiles[pkg] = append(pkgfiles[pkg], frp)
-			}
+	for _,frp := range filerelpaths {
+		if pkg := devgo.PkgsByDir[filepath.Dir(filepath.Join(z.Ctx.SrcDir, frp))] ; pkg!=nil {
+			pkgfiles[pkg] = append(pkgfiles[pkg], frp)
 		}
 	}
 	var mutex sync.Mutex
-	alldiags := map[string][]*z.RespDiag {}
+	onlinted := func(linterdiags map[string][]*z.RespDiag) {
+		mutex.Lock()  ;  defer mutex.Unlock()
+		for frp,filediags := range linterdiags { alldiags[frp] = append(alldiags[frp], filediags...) }
+	}
 	funcs := []func() {}
 	for fpkg,frps := range pkgfiles {
-		funcs = append(funcs, newGoLint(fpkg.ImportPath, frps, func(linterdiags map[string][]*z.RespDiag) {
-			mutex.Lock()
-			for frp,filediags := range linterdiags {
-				alldiags[frp] = append(alldiags[frp], filediags...)
-			}
-			mutex.Unlock()
-		}))
+		if (devgo.Has_golint) { funcs = append(funcs, newGoLint(fpkg.ImportPath, frps, onlinted)) }
 	}
 	ugo.WaitOn(funcs...)
 
-	return alldiags
+	return
 }
 
 func (self *zgo) BuildFrom (filerelpath string) (diags []*z.RespDiag) {

@@ -63,7 +63,7 @@ func onFileActive (file* File) {
 func onFileClose (µ Zengine, relpath string) {
 	OpenFiles = uslice.StrWithout(OpenFiles, false, relpath)
 	file := AllFiles[relpath]
-	if file!=nil && µ!=nil { µ.OnFileClose(file) }
+	µ.OnFileClose(file)
 	refreshAllDiags("")
 }
 
