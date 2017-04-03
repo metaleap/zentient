@@ -10,24 +10,44 @@ import (
 	"github.com/metaleap/zentient/z"
 )
 
+
+func lnrelify (ln string) string {
+	if strings.HasPrefix(ln, z.Ctx.SrcDir) {
+		if ln = ln[len(z.Ctx.SrcDir):] ; ln[0]=='\\' || ln[0]=='/' { ln = ln[1:] }
+		return ln
+	}
+	return ""
+}
+
+
 func newGoCheck (chk string, pkgimppath string, filerelpaths []string, cont func(map[string][]*z.RespDiag)) func() {
-	lngocheck := func (pkgimppath string) func(string)string {
+	reline := func (pkgimppath string) func(string)string {
 		return func (ln string) string {
-			if strings.HasPrefix(ln, pkgimppath + ": ") {
-				if ln = ln[len(pkgimppath)+2:] ; strings.HasPrefix(ln, z.Ctx.SrcDir) { if ln = ln[len(z.Ctx.SrcDir):] ; ln[0]=='\\' || ln[0]=='/' {  ln = ln[1:]  } }
-				return ln
-			}
+			if strings.HasPrefix(ln, pkgimppath + ": ") { return lnrelify(ln[len(pkgimppath)+2:]) }
 			return ""
 		}
 	}
 	return func() {
 		cmdname := chk + "check"
 		filediags := map[string][]*z.RespDiag {}
-		for _,srcref := range devgo.CmdExecOnSrc(true, true, lngocheck(pkgimppath), cmdname, pkgimppath) {
+		for _,srcref := range devgo.CmdExecOnSrc(true, true, reline(pkgimppath), cmdname, pkgimppath) {
 			if strings.HasPrefix(srcref.Msg, pkgimppath+".") { srcref.Msg = srcref.Msg[len(pkgimppath)+1:] }
 			if chk!="align" { srcref.Msg = "(unused & unexported) " + srcref.Msg }
 			filediags[srcref.FilePath] = append(filediags[srcref.FilePath],
 				&z.RespDiag { Cat: cmdname, Msg: srcref.Msg, PosLn: srcref.PosLn, PosCol: srcref.PosCol, Sev: z.DIAG_INFO })
+		}
+		cont(filediags)
+	}
+}
+
+func newIneffAssign (pkgdirpath string, filerelpaths []string, cont func(map[string][]*z.RespDiag)) func() {
+	return func() {
+		filediags := map[string][]*z.RespDiag {}
+		for _,filerelpath := range filerelpaths {
+			for _,srcref := range devgo.CmdExecOnSrc(true, false, lnrelify, "ineffassign", filerelpath) {
+				filediags[srcref.FilePath] = append(filediags[srcref.FilePath],
+					&z.RespDiag { Cat: "ineffassign", Msg: srcref.Msg, PosLn: srcref.PosLn, PosCol: srcref.PosCol, Sev: z.DIAG_INFO })
+			}
 		}
 		cont(filediags)
 	}
@@ -45,12 +65,12 @@ func newGoLint (pkgimppath string, filerelpaths []string, cont func(map[string][
 }
 
 func newGoVet (pkgimppath string, filerelpaths []string, cont func(map[string][]*z.RespDiag)) func() {
-	lngovet := func (ln string) string {  if strings.HasPrefix(ln, "vet: ") { return "" } else { return ln }  }
+	reline := func (ln string) string {  if strings.HasPrefix(ln, "vet: ") { return "" } else { return ln }  }
 	return func() {
 		filediags := map[string][]*z.RespDiag {}
 		cmdargs := []string { "tool", "vet", "-shadow=true", "-shadowstrict", "-all" }
 		cmdargs = append(cmdargs, filerelpaths...)
-		for _,srcref := range devgo.CmdExecOnSrc(true, true, lngovet, "go", cmdargs...) {
+		for _,srcref := range devgo.CmdExecOnSrc(true, true, reline, "go", cmdargs...) {
 			filediags[srcref.FilePath] = append(filediags[srcref.FilePath],
 				&z.RespDiag { Cat: "go vet", Msg: srcref.Msg, PosLn: srcref.PosLn, PosCol: srcref.PosCol, Sev: z.DIAG_WARN })
 		}
@@ -76,11 +96,12 @@ func (self *zgo) Lint (filerelpaths []string) (freshdiags map[string][]*z.RespDi
 	}
 	funcs := []func() {}
 	for fpkg,frps := range pkgfiles {
-		if devgo.HasGoDevEnv()		{ funcs = append(funcs, newGoVet(fpkg.ImportPath, frps, onlints)) }
-		if devgo.Has_golint			{ funcs = append(funcs, newGoLint(fpkg.ImportPath, frps, onlints)) }
 		if devgo.Has_checkalign		{ funcs = append(funcs, newGoCheck("align", fpkg.ImportPath, frps, onlints)) }
 		if devgo.Has_checkstruct	{ funcs = append(funcs, newGoCheck("struct", fpkg.ImportPath, frps, onlints)) }
 		if devgo.Has_checkvar		{ funcs = append(funcs, newGoCheck("var", fpkg.ImportPath, frps, onlints)) }
+		if devgo.Has_ineffassign	{ funcs = append(funcs, newIneffAssign(fpkg.Dir, frps, onlints)) }
+		if devgo.HasGoDevEnv()		{ funcs = append(funcs, newGoVet(fpkg.ImportPath, frps, onlints)) }
+		if devgo.Has_golint			{ funcs = append(funcs, newGoLint(fpkg.ImportPath, frps, onlints)) }
 	}
 	ugo.WaitOn(funcs...)
 	return
@@ -92,20 +113,3 @@ func (self *zgo) BuildFrom (filerelpath string) (freshdiags map[string][]*z.Resp
 	freshdiags[filerelpath] = append(freshdiags[filerelpath], &z.RespDiag { Cat: "devgo-mock", Msg: "filerebuild:" + filerelpath, PosLn: 18, PosCol: 4, Sev: z.DIAG_WARN })
 	return
 }
-
-
-// func (self *zgo) refreshPkgDiags (rebuildfilerelpath string) {
-// 	errs := devgo.RefreshPkgs()
-// 	self.Base.DbgObjs = append(self.Base.DbgObjs, devgo.PkgsByDir)
-// 	for _,err := range errs { self.Base.DbgMsgs = append(self.Base.DbgMsgs, err.Error()) }
-// 	pd := map[string][]*z.RespDiag {}
-// 	for _,pkg := range devgo.PkgsErrs {
-// 		for _,pkgerr := range pkg.Errs {
-// 			if len(pkgerr.RelPath)>0 && pkgerr.RelPath!=rebuildfilerelpath {
-// 				pd[pkgerr.RelPath] = append(pd[pkgerr.RelPath],
-// 					&z.RespDiag { Cat: "go list all", Msg: pkgerr.Msg, PosLn: pkgerr.PosLn, PosCol: pkgerr.PosCol, Sev: z.DIAG_ERR })
-// 			}
-// 		}
-// 	}
-// 	pkgdiags = pd
-// }
