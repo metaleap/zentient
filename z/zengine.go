@@ -23,7 +23,7 @@ type Zengine interface {
 	OnFileClose (*File)
 	OnFileOpen (*File)
 	OnFileWrite (*File)
-	BuildFrom (string) []*RespDiag
+	BuildFrom (string) map[string][]*RespDiag
 }
 
 

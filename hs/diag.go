@@ -14,8 +14,9 @@ func (self *zhs) Lint (filerelpaths []string) (filediags map[string][]*z.RespDia
 }
 
 
-func (self *zhs) BuildFrom (filerelpath string) (diags []*z.RespDiag) {
-	diags = append(diags, &z.RespDiag { Cat: "devhs-mock", Msg: "rebuildfile:" + filerelpath, PosLn: 9, PosCol: 2, Sev: z.DIAG_ERR })
-	diags = append(diags, &z.RespDiag { Cat: "devhs-mock", Msg: "filerebuild:" + filerelpath, PosLn: 18, PosCol: 4, Sev: z.DIAG_WARN })
+func (self *zhs) BuildFrom (filerelpath string) (alldiags map[string][]*z.RespDiag) {
+	alldiags = map[string][]*z.RespDiag {}
+	alldiags[filerelpath] = append(alldiags[filerelpath], &z.RespDiag { Cat: "devhs-mock", Msg: "rebuildfile:" + filerelpath, PosLn: 9, PosCol: 2, Sev: z.DIAG_ERR })
+	alldiags[filerelpath] = append(alldiags[filerelpath], &z.RespDiag { Cat: "devhs-mock", Msg: "filerebuild:" + filerelpath, PosLn: 18, PosCol: 4, Sev: z.DIAG_WARN })
 	return
 }

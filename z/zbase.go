@@ -1,5 +1,7 @@
 package z
 import (
+	"sync"
+
 	"github.com/metaleap/go-util-misc"
 	"github.com/metaleap/go-util-slice"
 	"github.com/metaleap/go-util-str"
@@ -64,13 +66,18 @@ func (self *Base) refreshDiags (µ Zengine, rebuildfilerelpath string) (diags ma
 			if fd.Sev==DIAG_ERR || fd.Sev==DIAG_WARN { filediagsnu = append(filediagsnu, fd) } } }
 		diags[relfilepath] = filediagsnu
 	}
+	var mutex sync.Mutex
 	funcs := []func() { func() {
-		for relfilepath,filediags := range µ.Lint(openfiles) {
-			diags[relfilepath] = append(diags[relfilepath], filediags...)
-		}
+		alldiags := µ.Lint(openfiles)
+		mutex.Lock()  ;  defer mutex.Unlock()
+		for relfilepath,filediags := range alldiags { diags[relfilepath] = append(diags[relfilepath], filediags...) }
 	} }
 	if isrebuild := len(rebuildfilerelpath)>0 ; isrebuild {
-		funcs = append(funcs, func() { diags[rebuildfilerelpath] = append(diags[rebuildfilerelpath], µ.BuildFrom(rebuildfilerelpath)...) })
+		funcs = append(funcs, func() {
+			alldiags := µ.BuildFrom(rebuildfilerelpath)
+			mutex.Lock()  ;  defer mutex.Unlock()
+			for relfilepath,filediags := range alldiags { diags[relfilepath] = append(diags[relfilepath], filediags...) }
+		})
 	}
 	ugo.WaitOn(funcs...)
 	return
