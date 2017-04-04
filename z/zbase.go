@@ -64,9 +64,32 @@ func (self *Base) DoFmt (src string, custcmd string, cmds ...RespCmd) (resp *Res
 	return
 }
 
+
+func (self *Base) Lint (linters []func(func(map[string][]*RespDiag)), linterslate []func(func(map[string][]*RespDiag)), ondelayedlintersdone func(map[string][]*RespDiag)) (freshdiags map[string][]*RespDiag) {
+	var mutex sync.Mutex  ;  var mutexlate sync.Mutex
+	freshdiags = map[string][]*RespDiag {}  ;  latediags := map[string][]*RespDiag {}
+	onlinterdone := func(linterdiags map[string][]*RespDiag) {
+		mutex.Lock()  ;  defer mutex.Unlock()
+		for frp,filediags := range linterdiags { freshdiags[frp] = append(freshdiags[frp], filediags...) }
+	}
+	onlinterdonelate := func(linterdiags map[string][]*RespDiag) {
+		mutexlate.Lock()  ;  defer mutexlate.Unlock()
+		for frp,filediags := range linterdiags { latediags[frp] = append(latediags[frp], filediags...) }
+	}
+	funcs := []func() {}
+	for _,linter := range linters { fn:=linter  ;  funcs = append(funcs, func() { fn(onlinterdone) } ) }
+	latefuncs := []func() {}
+	for _,linterlate := range linterslate { fn := linterlate  ;  latefuncs = append(latefuncs, func() { fn(onlinterdonelate) }) }
+	runlatefuncs := func () { ugo.WaitOn(latefuncs...)  ;  ondelayedlintersdone(latediags) }
+	go runlatefuncs()
+	ugo.WaitOn(funcs...)
+	return
+}
+
+
 func (self *Base) RefreshDiags (µ Zengine, closedfilerelpath string, openedfilerelpath string, writtenfilerelpath string) {
 	ondelayedlintersdone := func(diags map[string][]*RespDiag) {
-		if diags!=nil { self.latediags = diags }
+		self.latediags = diags
 	}
 
 	var mutex sync.Mutex

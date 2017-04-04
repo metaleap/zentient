@@ -2,11 +2,9 @@ package zgo
 import (
 	"path/filepath"
 	"strings"
-	"sync"
 
 	"github.com/metaleap/go-devgo"
 	"github.com/metaleap/go-util-fs"
-	"github.com/metaleap/go-util-misc"
 	"github.com/metaleap/go-util-str"
 
 	"github.com/metaleap/zentient/z"
@@ -22,14 +20,14 @@ func lnrelify (ln string) string {
 }
 
 
-func newGoCheck (chk string, pkgimppath string, cont func(map[string][]*z.RespDiag)) func() {
+func linterGoCheck (chk string, pkgimppath string) func(func(map[string][]*z.RespDiag)) {
 	reline := func (pkgimppath string) func(string)string {
 		return func (ln string) string {
 			if strings.HasPrefix(ln, pkgimppath + ": ") { return lnrelify(ln[len(pkgimppath)+2:]) }
 			return ""
 		}
 	}
-	return func() {
+	return func(cont func(map[string][]*z.RespDiag)) {
 		cmdname := chk + "check"
 		filediags := map[string][]*z.RespDiag {}
 		for _,srcref := range devgo.CmdExecOnSrc(true, true, true, reline(pkgimppath), cmdname, pkgimppath) {
@@ -42,9 +40,9 @@ func newGoCheck (chk string, pkgimppath string, cont func(map[string][]*z.RespDi
 	}
 }
 
-func newIneffAssign (filerelpaths []string, cont func(map[string][]*z.RespDiag)) func() {
+func linterIneffAssign (filerelpaths []string) func(func(map[string][]*z.RespDiag)) {
 	reline := lnrelify
-	return func() {
+	return func(cont func(map[string][]*z.RespDiag)) {
 		filediags := map[string][]*z.RespDiag {}
 		for _,filerelpath := range filerelpaths {
 			for _,srcref := range devgo.CmdExecOnSrc(true, true, false, reline, "ineffassign", filerelpath) {
@@ -56,7 +54,7 @@ func newIneffAssign (filerelpaths []string, cont func(map[string][]*z.RespDiag))
 	}
 }
 
-func newGoLint (filerelpaths []string, cont func(map[string][]*z.RespDiag)) func() {
+func linterGoLint (filerelpaths []string) func(func(map[string][]*z.RespDiag)) {
 	censored := func (msg string) (skip bool) {
 		skip = skip || msg == "if block ends with a return statement, so drop this else and outdent its block"
 		skip = skip || ustr.Has(msg, "ALL_CAPS")
@@ -69,7 +67,7 @@ func newGoLint (filerelpaths []string, cont func(map[string][]*z.RespDiag)) func
 		skip = skip || ustr.DistBetween(msg, "comment on exported ", " should be of the form \"") > 0
 		return
 	}
-	return func() {
+	return func(cont func(map[string][]*z.RespDiag)) {
 		filediags := map[string][]*z.RespDiag {}
 		for _,srcref := range devgo.CmdExecOnSrc(true, true, false, nil, "golint", filerelpaths...) {
 			if !censored(srcref.Msg) {
@@ -81,9 +79,9 @@ func newGoLint (filerelpaths []string, cont func(map[string][]*z.RespDiag)) func
 	}
 }
 
-func newGoVet (filerelpaths []string, cont func(map[string][]*z.RespDiag)) func() {
+func linterGoVet (filerelpaths []string) func(func(map[string][]*z.RespDiag)) {
 	reline := func (ln string) string {  if strings.HasPrefix(ln, "vet: ") { return "" } else { return ln }  }
-	return func() {
+	return func(cont func(map[string][]*z.RespDiag)) {
 		filediags := map[string][]*z.RespDiag {}
 		cmdargs := []string { "tool", "vet", "-shadow=true", "-shadowstrict", "-all" }
 		cmdargs = append(cmdargs, filerelpaths...)
@@ -96,39 +94,29 @@ func newGoVet (filerelpaths []string, cont func(map[string][]*z.RespDiag)) func(
 }
 
 
-func (self *zgo) Lint (filerelpaths []string, ondelayedlintersdone func(map[string][]*z.RespDiag)) (freshdiags map[string][]*z.RespDiag) {
-	if devgo.PkgsByDir==nil { return }
-	freshdiags = map[string][]*z.RespDiag {}  ;  latediags := map[string][]*z.RespDiag {}
 
-	pkgfiles := map[*devgo.Pkg][]string {}
-	for _,frp := range filerelpaths {
-		if pkg := devgo.PkgsByDir[filepath.Dir(filepath.Join(z.Ctx.SrcDir, frp))] ; pkg!=nil {
-			pkgfiles[pkg] = append(pkgfiles[pkg], frp)
+func (self *zgo) Lint (filerelpaths []string, ondelayedlintersdone func(map[string][]*z.RespDiag)) map[string][]*z.RespDiag {
+	funcs := []func(func(map[string][]*z.RespDiag)) {}  ;  latefuncs := []func(func(map[string][]*z.RespDiag)) {}
+	if devgo.PkgsByDir!=nil {
+		pkgfiles := map[*devgo.Pkg][]string {}
+		for _,frp := range filerelpaths {
+			if pkg := devgo.PkgsByDir[filepath.Dir(filepath.Join(z.Ctx.SrcDir, frp))] ; pkg!=nil {
+				pkgfiles[pkg] = append(pkgfiles[pkg], frp)
+			}
+		}
+		for fpkg,frps := range pkgfiles {
+			if devgo.Has_checkalign		{ latefuncs = append(latefuncs, linterGoCheck("align", fpkg.ImportPath)) }
+			if devgo.Has_checkstruct	{ latefuncs = append(latefuncs, linterGoCheck("struct", fpkg.ImportPath)) }
+			if devgo.Has_checkvar		{ latefuncs = append(latefuncs, linterGoCheck("var", fpkg.ImportPath)) }
+			if devgo.Has_ineffassign	{ funcs = append(funcs, linterIneffAssign(frps)) }
+			if devgo.HasGoDevEnv()		{ funcs = append(funcs, linterGoVet(frps)) }
+			if devgo.Has_golint			{ funcs = append(funcs, linterGoLint(frps)) }
 		}
 	}
-	var mutex sync.Mutex  ;  var mutexlate sync.Mutex
-	onlints := func(linterdiags map[string][]*z.RespDiag) {
-		mutex.Lock()  ;  defer mutex.Unlock()
-		for frp,filediags := range linterdiags { freshdiags[frp] = append(freshdiags[frp], filediags...) }
-	}
-	onlintslate := func(linterdiags map[string][]*z.RespDiag) {
-		mutexlate.Lock()  ;  defer mutexlate.Unlock()
-		for frp,filediags := range linterdiags { latediags[frp] = append(latediags[frp], filediags...) }
-	}
-	funcs := []func() {}  ;  latefuncs := []func() {}
-	runlatefuncs := func () { ugo.WaitOn(latefuncs...)  ;  ondelayedlintersdone(latediags) }
-	for fpkg,frps := range pkgfiles {
-		if devgo.Has_checkalign		{ latefuncs = append(latefuncs, newGoCheck("align", fpkg.ImportPath, onlintslate)) }
-		if devgo.Has_checkstruct	{ latefuncs = append(latefuncs, newGoCheck("struct", fpkg.ImportPath, onlintslate)) }
-		if devgo.Has_checkvar		{ latefuncs = append(latefuncs, newGoCheck("var", fpkg.ImportPath, onlintslate)) }
-		if devgo.Has_ineffassign	{ funcs = append(funcs, newIneffAssign(frps, onlints)) }
-		if devgo.HasGoDevEnv()		{ funcs = append(funcs, newGoVet(frps, onlints)) }
-		if devgo.Has_golint			{ funcs = append(funcs, newGoLint(frps, onlints)) }
-	}
-	go runlatefuncs()
-	ugo.WaitOn(funcs...)
-	return
+	return self.Base.Lint(funcs, latefuncs, ondelayedlintersdone)
 }
+
+
 
 func (self *zgo) BuildFrom (filerelpath string) (freshdiags map[string][]*z.RespDiag) {
 	freshdiags = map[string][]*z.RespDiag {}
