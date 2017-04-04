@@ -5,14 +5,16 @@ import (
 	"sync"
 
 	"github.com/metaleap/go-devgo"
+	"github.com/metaleap/go-util-fs"
 	"github.com/metaleap/go-util-misc"
+	"github.com/metaleap/go-util-str"
 
 	"github.com/metaleap/zentient/z"
 )
 
 
 func lnrelify (ln string) string {
-	if strings.HasPrefix(ln, z.Ctx.SrcDir) {
+	if ufs.PathPrefix(ln, z.Ctx.SrcDir) {
 		if ln = ln[len(z.Ctx.SrcDir):] ; ln[0]=='\\' || ln[0]=='/' { ln = ln[1:] }
 		return ln
 	}
@@ -41,10 +43,11 @@ func newGoCheck (chk string, pkgimppath string, filerelpaths []string, cont func
 }
 
 func newIneffAssign (pkgdirpath string, filerelpaths []string, cont func(map[string][]*z.RespDiag)) func() {
+	reline := lnrelify
 	return func() {
 		filediags := map[string][]*z.RespDiag {}
 		for _,filerelpath := range filerelpaths {
-			for _,srcref := range devgo.CmdExecOnSrc(true, false, lnrelify, "ineffassign", filerelpath) {
+			for _,srcref := range devgo.CmdExecOnSrc(true, false, reline, "ineffassign", filerelpath) {
 				filediags[srcref.FilePath] = append(filediags[srcref.FilePath],
 					&z.RespDiag { Cat: "ineffassign", Msg: srcref.Msg, PosLn: srcref.PosLn, PosCol: srcref.PosCol, Sev: z.DIAG_INFO })
 			}
@@ -54,11 +57,19 @@ func newIneffAssign (pkgdirpath string, filerelpaths []string, cont func(map[str
 }
 
 func newGoLint (pkgimppath string, filerelpaths []string, cont func(map[string][]*z.RespDiag)) func() {
+	censored := func (srcrefmsg string) (skip bool) {
+		skip = skip || ustr.DistBetween(srcrefmsg, "don't use underscores in Go names; ", " should be ") > 0
+		skip = skip || ustr.DistBetween(srcrefmsg, "exported ", " should have comment or be unexported") > 0
+		skip = skip || ustr.DistBetween(srcrefmsg, "comment on exported ", " should be of the form \"") > 0
+		return
+	}
 	return func() {
 		filediags := map[string][]*z.RespDiag {}
 		for _,srcref := range devgo.CmdExecOnSrc(true, false, nil, "golint", filerelpaths...) {
-			filediags[srcref.FilePath] = append(filediags[srcref.FilePath],
-				&z.RespDiag { Cat: "golint", Msg: srcref.Msg, PosLn: srcref.PosLn, PosCol: srcref.PosCol, Sev: z.DIAG_HINT })
+			if !censored(srcref.Msg) {
+				filediags[srcref.FilePath] = append(filediags[srcref.FilePath],
+					&z.RespDiag { Cat: "golint", Msg: srcref.Msg, PosLn: srcref.PosLn, PosCol: srcref.PosCol, Sev: z.DIAG_HINT })
+			}
 		}
 		cont(filediags)
 	}
