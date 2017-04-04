@@ -19,7 +19,7 @@ type Zengine interface {
 
 	Caps (string) []*RespCmd
 	DoFmt (string, string, uint8) (*RespFmt, error)
-	Lint ([]string) map[string][]*RespDiag
+	Lint ([]string, func(map[string][]*RespDiag)) map[string][]*RespDiag
 	OnFileClose (*File)
 	OnFileOpen (*File)
 	OnFileWrite (*File)
@@ -46,35 +46,29 @@ func doFmt (zid string, reqsrc string, reqcmd string, reqtabsize uint8) (resp ma
 }
 
 func onFileClose (µ Zengine, relpath string) {
-	if µ!=nil {
-		relpath = filepath.FromSlash(relpath)
-		OpenFiles = uslice.StrWithout(OpenFiles, false, relpath)
-		µ.B().RefreshDiags(µ, relpath, "", "")
-		µ.OnFileClose(AllFiles[relpath])
-	}
+	relpath = filepath.FromSlash(relpath)
+	OpenFiles = uslice.StrWithout(OpenFiles, false, relpath)
+	µ.B().RefreshDiags(µ, relpath, "", "")
+	µ.OnFileClose(AllFiles[relpath])
 }
 
 func onFileOpen (µ Zengine, relpath string) {
-	if µ!=nil {
-		relpath = filepath.FromSlash(relpath)
-		file := AllFiles[relpath]
-		if file == nil {
-			file = NewFile(µ, relpath)
-			AllFiles[relpath] = file
-		}
-		if isnew := !uslice.StrHas(OpenFiles, relpath) ; isnew {
-			OpenFiles = append(OpenFiles, relpath)
-			µ.B().RefreshDiags(µ, "", relpath, "")
-		}
-		µ.OnFileOpen(file)
+	relpath = filepath.FromSlash(relpath)
+	file := AllFiles[relpath]
+	if file == nil {
+		file = NewFile(µ, relpath)
+		AllFiles[relpath] = file
 	}
+	if isnew := !uslice.StrHas(OpenFiles, relpath) ; isnew {
+		OpenFiles = append(OpenFiles, relpath)
+		µ.B().RefreshDiags(µ, "", relpath, "")
+	}
+	µ.OnFileOpen(file)
 }
 
 func onFileWrite (µ Zengine, relpath string) {
-	if µ!=nil {
-		relpath = filepath.FromSlash(relpath)
-		file := AllFiles[relpath]
-		µ.B().RefreshDiags(µ, "", "", relpath)
-		µ.OnFileWrite(file)
-	}
+	relpath = filepath.FromSlash(relpath)
+	file := AllFiles[relpath]
+	µ.B().RefreshDiags(µ, "", "", relpath)
+	µ.OnFileWrite(file)
 }

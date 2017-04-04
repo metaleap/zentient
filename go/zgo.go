@@ -52,6 +52,7 @@ func (_ *zgo) Caps (cap string) (caps []*z.RespCmd) {
 								// &z.RespCmd { Title: "aligncheck",	Exists: devgo.Has_checkalign,	Hint: "`github.com/opennota/check`" },
 								// &z.RespCmd { Title: "structcheck",	Exists: devgo.Has_checkstruct,	Hint: "`github.com/opennota/check`" },
 								// &z.RespCmd { Title: "varcheck",		Exists: devgo.Has_checkvar,		Hint: "`github.com/opennota/check`" },
+								&z.RespCmd { Title: "interfacer",	Exists: devgo.Has_golint,		Hint: "`github.com/mvdan/interfacer`" },
 							}
 	}
 	return caps

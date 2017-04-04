@@ -10,6 +10,8 @@ import (
 type Base struct {
 	alldiags map[string][]*RespDiag
 	curdiags map[string][]*RespDiag
+	latediags map[string][]*RespDiag
+	diagmutex sync.Mutex
 
 	DbgMsgs []string
 	DbgObjs []interface{}
@@ -20,8 +22,7 @@ type Base struct {
 
 
 func (self *Base) Init () {
-	self.curdiags = map[string][]*RespDiag {}
-	self.alldiags = map[string][]*RespDiag {}
+	self.resetAllDiags()
 
 	self.DbgMsgs = []string {}
 	self.DbgObjs = []interface{} {}
@@ -64,6 +65,10 @@ func (self *Base) DoFmt (src string, custcmd string, cmds ...RespCmd) (resp *Res
 }
 
 func (self *Base) RefreshDiags (µ Zengine, closedfilerelpath string, openedfilerelpath string, writtenfilerelpath string) {
+	ondelayedlintersdone := func(diags map[string][]*RespDiag) {
+		if diags!=nil { self.latediags = diags }
+	}
+
 	var mutex sync.Mutex
 	lintfiles := []string {}
 	funcs := []func() {}
@@ -81,11 +86,8 @@ func (self *Base) RefreshDiags (µ Zengine, closedfilerelpath string, openedfile
 			lintfiles = append(lintfiles, openedfilerelpath)
 		}
 	}
-	dbgmsg := "[LINTED: "
 	if len(writtenfilerelpath)>0 {
-		dbgmsg += "sthwritten] "
-		self.curdiags = map[string][]*RespDiag {}
-		self.alldiags = map[string][]*RespDiag {}
+		self.resetAllDiags()
 		lintfiles = openfiles
 		funcs = append(funcs, func() {
 			diagsfrombuild := µ.BuildFrom(writtenfilerelpath)
@@ -93,7 +95,6 @@ func (self *Base) RefreshDiags (µ Zengine, closedfilerelpath string, openedfile
 			for relfilepath,filediags := range diagsfrombuild { freshdiags[relfilepath] = append(freshdiags[relfilepath], filediags...) }
 		})
 	} else { // edge-case: there may be openfiles without existing diags if they were opened before diagnostics were ready to run: attempt to catch up now
-		dbgmsg += "notthereyet] "
 		for _,relfilepath := range openfiles {
 			if _,cached := self.alldiags[relfilepath] ; (!cached) && !uslice.StrHas(lintfiles, relfilepath) {
 				lintfiles = append(lintfiles, relfilepath)
@@ -102,22 +103,31 @@ func (self *Base) RefreshDiags (µ Zengine, closedfilerelpath string, openedfile
 	}
 	if len(lintfiles)>0 {
 		funcs = append(funcs, func() {
-			diagsfromlint := µ.Lint(lintfiles)
+			diagsfromlint := µ.Lint(lintfiles, ondelayedlintersdone)
 			mutex.Lock()  ;  defer mutex.Unlock()
 			for relfilepath,filediags := range diagsfromlint { freshdiags[relfilepath] = append(freshdiags[relfilepath], filediags...) }
 		})
 	}
 	ugo.WaitOn(funcs...)
 
+	self.diagmutex.Lock() ; defer self.diagmutex.Unlock()
 	for relfilepath,filediags := range freshdiags {
 		self.alldiags[relfilepath] = filediags
 	}
 	for _,relfilepath := range openfiles {
 		self.curdiags[relfilepath] = self.alldiags[relfilepath]
-		// waslinted := uslice.StrHas(lintfiles, relfilepath)
-		// for _,diag := range self.curdiags[relfilepath] {
-		// 	if waslinted { diag.Msg = dbgmsg + diag.Msg } else { diag.Msg = "[cached] " + diag.Msg }
-		// }
 	}
-	allcurdiags[self.zId()] = self.curdiags
+	myallcurdiags := self.curdiags
+	for relfilepath,filediags := range self.latediags {
+		myallcurdiags[relfilepath] = append(myallcurdiags[relfilepath], filediags...)
+	}
+	allcurdiags[self.zId()] = myallcurdiags
+}
+
+
+func (self *Base) resetAllDiags () {
+	self.diagmutex.Lock() ; defer self.diagmutex.Unlock()
+	self.curdiags = map[string][]*RespDiag {}
+	self.alldiags = map[string][]*RespDiag {}
+	self.latediags = map[string][]*RespDiag {}
 }

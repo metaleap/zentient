@@ -4,7 +4,7 @@ import (
 )
 
 
-func (self *zhs) Lint (filerelpaths []string) (freshdiags map[string][]*z.RespDiag) {
+func (self *zhs) Lint (filerelpaths []string, ondelayedlintersdone func(map[string][]*z.RespDiag)) (freshdiags map[string][]*z.RespDiag) {
 	freshdiags = map[string][]*z.RespDiag {}
 	for _,filerelpath := range filerelpaths {
 		freshdiags[filerelpath] = append(freshdiags[filerelpath], &z.RespDiag { Cat: "devhs-mock", Msg: "isopenfile:" + filerelpath, PosLn: 19, PosCol: 1, Sev: z.DIAG_HINT })

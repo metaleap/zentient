@@ -11,6 +11,7 @@ const (
 	MSG_ZEN_LANGS	= "ZL:"
 
 	MSG_CAPS		= "CA:"
+	MSG_CURDIAGS	= "CD:"
 
 	MSG_DO_FMT		= "DF:"
 
@@ -55,6 +56,8 @@ func HandleRequest (queryln string) (e error) {
 			e = out(jsonZengines())
 		case MSG_ZEN_STATUS:
 			e = out(jsonStatus())
+		case MSG_CURDIAGS:
+			e = out(allcurdiags)
 		case MSG_FILE_WRITE:
 			onFileWrite(Zengines[zids[0]], msgargs)
 			e = out(allcurdiags)

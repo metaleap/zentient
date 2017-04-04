@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/metaleap/go-util-fs"
@@ -22,6 +23,7 @@ func main () {
 
 	if z.Ctx.SrcDir,err = os.Getwd() ; err != nil { return }
 	if err = ensureDataDirs() ; err != nil { return }
+	runtime.GOMAXPROCS(runtime.NumCPU() * 2)
 
 	//  get the IO stuff ready
 	stdin := bufio.NewScanner(os.Stdin)
