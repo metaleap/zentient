@@ -22,7 +22,7 @@ func lnrelify (ln string) string {
 }
 
 
-func newGoCheck (chk string, pkgimppath string, filerelpaths []string, cont func(map[string][]*z.RespDiag)) func() {
+func newGoCheck (chk string, pkgimppath string, cont func(map[string][]*z.RespDiag)) func() {
 	reline := func (pkgimppath string) func(string)string {
 		return func (ln string) string {
 			if strings.HasPrefix(ln, pkgimppath + ": ") { return lnrelify(ln[len(pkgimppath)+2:]) }
@@ -32,7 +32,7 @@ func newGoCheck (chk string, pkgimppath string, filerelpaths []string, cont func
 	return func() {
 		cmdname := chk + "check"
 		filediags := map[string][]*z.RespDiag {}
-		for _,srcref := range devgo.CmdExecOnSrc(true, true, reline(pkgimppath), cmdname, pkgimppath) {
+		for _,srcref := range devgo.CmdExecOnSrc(true, true, true, reline(pkgimppath), cmdname, pkgimppath) {
 			if strings.HasPrefix(srcref.Msg, pkgimppath+".") { srcref.Msg = srcref.Msg[len(pkgimppath)+1:] }
 			if chk!="align" { srcref.Msg = "(unused & unexported) " + srcref.Msg }
 			filediags[srcref.FilePath] = append(filediags[srcref.FilePath],
@@ -42,12 +42,12 @@ func newGoCheck (chk string, pkgimppath string, filerelpaths []string, cont func
 	}
 }
 
-func newIneffAssign (pkgdirpath string, filerelpaths []string, cont func(map[string][]*z.RespDiag)) func() {
+func newIneffAssign (filerelpaths []string, cont func(map[string][]*z.RespDiag)) func() {
 	reline := lnrelify
 	return func() {
 		filediags := map[string][]*z.RespDiag {}
 		for _,filerelpath := range filerelpaths {
-			for _,srcref := range devgo.CmdExecOnSrc(true, false, reline, "ineffassign", filerelpath) {
+			for _,srcref := range devgo.CmdExecOnSrc(true, true, false, reline, "ineffassign", filerelpath) {
 				filediags[srcref.FilePath] = append(filediags[srcref.FilePath],
 					&z.RespDiag { Cat: "ineffassign", Msg: srcref.Msg, PosLn: srcref.PosLn, PosCol: srcref.PosCol, Sev: z.DIAG_INFO })
 			}
@@ -56,16 +56,18 @@ func newIneffAssign (pkgdirpath string, filerelpaths []string, cont func(map[str
 	}
 }
 
-func newGoLint (pkgimppath string, filerelpaths []string, cont func(map[string][]*z.RespDiag)) func() {
-	censored := func (srcrefmsg string) (skip bool) {
-		skip = skip || ustr.DistBetween(srcrefmsg, "don't use underscores in Go names; ", " should be ") > 0
-		skip = skip || ustr.DistBetween(srcrefmsg, "exported ", " should have comment or be unexported") > 0
-		skip = skip || ustr.DistBetween(srcrefmsg, "comment on exported ", " should be of the form \"") > 0
+func newGoLint (filerelpaths []string, cont func(map[string][]*z.RespDiag)) func() {
+	censored := func (msg string) (skip bool) {
+		skip = skip || ustr.Has(msg, "underscore")
+		skip = skip || ustr.Has(msg, " should have comment ")
+		skip = skip || ustr.Has(msg, "package comment should be of the form \"")
+		skip = skip || ustr.Has(msg, "should omit 2nd value from range; this loop is equivalent to ")
+		skip = skip || ustr.DistBetween(msg, "comment on exported ", " should be of the form \"") > 0
 		return
 	}
 	return func() {
 		filediags := map[string][]*z.RespDiag {}
-		for _,srcref := range devgo.CmdExecOnSrc(true, false, nil, "golint", filerelpaths...) {
+		for _,srcref := range devgo.CmdExecOnSrc(true, true, false, nil, "golint", filerelpaths...) {
 			if !censored(srcref.Msg) {
 				filediags[srcref.FilePath] = append(filediags[srcref.FilePath],
 					&z.RespDiag { Cat: "golint", Msg: srcref.Msg, PosLn: srcref.PosLn, PosCol: srcref.PosCol, Sev: z.DIAG_HINT })
@@ -75,13 +77,13 @@ func newGoLint (pkgimppath string, filerelpaths []string, cont func(map[string][
 	}
 }
 
-func newGoVet (pkgimppath string, filerelpaths []string, cont func(map[string][]*z.RespDiag)) func() {
+func newGoVet (filerelpaths []string, cont func(map[string][]*z.RespDiag)) func() {
 	reline := func (ln string) string {  if strings.HasPrefix(ln, "vet: ") { return "" } else { return ln }  }
 	return func() {
 		filediags := map[string][]*z.RespDiag {}
 		cmdargs := []string { "tool", "vet", "-shadow=true", "-shadowstrict", "-all" }
 		cmdargs = append(cmdargs, filerelpaths...)
-		for _,srcref := range devgo.CmdExecOnSrc(true, true, reline, "go", cmdargs...) {
+		for _,srcref := range devgo.CmdExecOnSrc(true, false, true, reline, "go", cmdargs...) {
 			filediags[srcref.FilePath] = append(filediags[srcref.FilePath],
 				&z.RespDiag { Cat: "go vet", Msg: srcref.Msg, PosLn: srcref.PosLn, PosCol: srcref.PosCol, Sev: z.DIAG_WARN })
 		}
@@ -107,12 +109,14 @@ func (self *zgo) Lint (filerelpaths []string) (freshdiags map[string][]*z.RespDi
 	}
 	funcs := []func() {}
 	for fpkg,frps := range pkgfiles {
-		if devgo.Has_checkalign		{ funcs = append(funcs, newGoCheck("align", fpkg.ImportPath, frps, onlints)) }
-		if devgo.Has_checkstruct	{ funcs = append(funcs, newGoCheck("struct", fpkg.ImportPath, frps, onlints)) }
-		if devgo.Has_checkvar		{ funcs = append(funcs, newGoCheck("var", fpkg.ImportPath, frps, onlints)) }
-		if devgo.Has_ineffassign	{ funcs = append(funcs, newIneffAssign(fpkg.Dir, frps, onlints)) }
-		if devgo.HasGoDevEnv()		{ funcs = append(funcs, newGoVet(fpkg.ImportPath, frps, onlints)) }
-		if devgo.Has_golint			{ funcs = append(funcs, newGoLint(fpkg.ImportPath, frps, onlints)) }
+		if 0>1 {
+			if devgo.Has_checkalign		{ funcs = append(funcs, newGoCheck("align", fpkg.ImportPath, onlints)) }
+			if devgo.Has_checkstruct	{ funcs = append(funcs, newGoCheck("struct", fpkg.ImportPath, onlints)) }
+			if devgo.Has_checkvar		{ funcs = append(funcs, newGoCheck("var", fpkg.ImportPath, onlints)) }
+		}
+		if devgo.Has_ineffassign	{ funcs = append(funcs, newIneffAssign(frps, onlints)) }
+		if devgo.HasGoDevEnv()		{ funcs = append(funcs, newGoVet(frps, onlints)) }
+		if devgo.Has_golint			{ funcs = append(funcs, newGoLint(frps, onlints)) }
 	}
 	ugo.WaitOn(funcs...)
 	return
