@@ -108,12 +108,10 @@ func (self *zgo) Lint (filerelpaths []string) (freshdiags map[string][]*z.RespDi
 		for frp,filediags := range linterdiags { freshdiags[frp] = append(freshdiags[frp], filediags...) }
 	}
 	funcs := []func() {}
-	for fpkg,frps := range pkgfiles {
-		if 0>1 {
-			if devgo.Has_checkalign		{ funcs = append(funcs, newGoCheck("align", fpkg.ImportPath, onlints)) }
-			if devgo.Has_checkstruct	{ funcs = append(funcs, newGoCheck("struct", fpkg.ImportPath, onlints)) }
-			if devgo.Has_checkvar		{ funcs = append(funcs, newGoCheck("var", fpkg.ImportPath, onlints)) }
-		}
+	for _,frps := range pkgfiles {
+		// if devgo.Has_checkalign		{ funcs = append(funcs, newGoCheck("align", _fpkg.ImportPath, onlints)) }
+		// if devgo.Has_checkstruct	{ funcs = append(funcs, newGoCheck("struct", _fpkg.ImportPath, onlints)) }
+		// if devgo.Has_checkvar		{ funcs = append(funcs, newGoCheck("var", _fpkg.ImportPath, onlints)) }
 		if devgo.Has_ineffassign	{ funcs = append(funcs, newIneffAssign(frps, onlints)) }
 		if devgo.HasGoDevEnv()		{ funcs = append(funcs, newGoVet(frps, onlints)) }
 		if devgo.Has_golint			{ funcs = append(funcs, newGoLint(frps, onlints)) }
