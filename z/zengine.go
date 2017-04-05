@@ -2,6 +2,7 @@ package z
 import (
 	"path/filepath"
 
+	"github.com/metaleap/go-util-misc"
 	"github.com/metaleap/go-util-slice"
 )
 
@@ -20,6 +21,7 @@ type Zengine interface {
 	Caps (string) []*RespCmd
 	DoFmt (string, string, uint8) (*RespFmt, error)
 	Lint ([]string, func(map[string][]*RespDiag)) map[string][]*RespDiag
+	LintReady () bool
 	OnFileClose (*File)
 	OnFileOpen (*File)
 	OnFileWrite (*File)
@@ -71,4 +73,11 @@ func onFileWrite (µ Zengine, relpath string) {
 	file := AllFiles[relpath]
 	µ.B().RefreshDiags(µ, "", "", relpath)
 	µ.OnFileWrite(file)
+}
+
+
+func refreshAllDiags() {
+	funcs := []func() {}
+	for _,zeng := range Zengines { µ := zeng  ;  funcs = append(funcs, func() { µ.B().RefreshDiags(µ, "", "", "") }) }
+	ugo.WaitOn_(funcs...)
 }

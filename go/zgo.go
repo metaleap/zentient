@@ -25,7 +25,7 @@ func (self *zgo) lateInit () {
 	//	this may well take a few seconds:
 	devgo.RefreshPkgs()
 	//	by now there may be openfiles unlinted, now we can lint them:
-	self.Base.RefreshDiags(self, "", "", "")
+	// self.Base.RefreshDiags(self, "", "", "")
 }
 
 
@@ -49,9 +49,9 @@ func (_ *zgo) Caps (cap string) (caps []*z.RespCmd) {
 								&z.RespCmd { Title: "go vet",		Exists: devgo.HasGoDevEnv(),	Hint: "check your Go installation" },
 								&z.RespCmd { Title: "golint",		Exists: devgo.Has_golint,		Hint: "`go get -u github.com/golang/lint/golint`" },
 								&z.RespCmd { Title: "ineffassign",	Exists: devgo.Has_ineffassign,	Hint: "`go get -u github.com/gordonklaus/ineffassign`" },
-								// &z.RespCmd { Title: "aligncheck",	Exists: devgo.Has_checkalign,	Hint: "`github.com/opennota/check`" },
-								// &z.RespCmd { Title: "structcheck",	Exists: devgo.Has_checkstruct,	Hint: "`github.com/opennota/check`" },
-								// &z.RespCmd { Title: "varcheck",		Exists: devgo.Has_checkvar,		Hint: "`github.com/opennota/check`" },
+								&z.RespCmd { Title: "aligncheck",	Exists: devgo.Has_checkalign,	Hint: "`github.com/opennota/check`" },
+								&z.RespCmd { Title: "structcheck",	Exists: devgo.Has_checkstruct,	Hint: "`github.com/opennota/check`" },
+								&z.RespCmd { Title: "varcheck",		Exists: devgo.Has_checkvar,		Hint: "`github.com/opennota/check`" },
 								&z.RespCmd { Title: "interfacer",	Exists: devgo.Has_golint,		Hint: "`github.com/mvdan/interfacer`" },
 							}
 	}

@@ -51,12 +51,12 @@ func HandleRequest (queryln string) (e error) {
 		//  each case is ideally just a single func-call out, rpc-like
 		//  anything else in a case then is only to furnish proper func args from msg-argstr
 
-
 		case MSG_ZEN_LANGS:
 			e = out(jsonZengines())
 		case MSG_ZEN_STATUS:
 			e = out(jsonStatus())
 		case MSG_CURDIAGS:
+			refreshAllDiags()
 			e = out(allcurdiags)
 		case MSG_FILE_WRITE:
 			onFileWrite(Zengines[zids[0]], msgargs)
@@ -75,7 +75,6 @@ func HandleRequest (queryln string) (e error) {
 		case MSG_DO_FMT:
 			if resp,err := doFmt(zids[0], ugo.S(inobj["s"]), ugo.S(inobj["c"]), uint8(ugo.F(inobj["t"])))  ;  (err != nil) {
 				e = out(err.Error())  } else {  e = out(resp)  }
-
 
 		//  nothing matched? a bug in client, throw at client
 		default:

@@ -16,6 +16,10 @@ func (self *zhs) Lint (filerelpaths []string, ondelayedlintersdone func(map[stri
 	return
 }
 
+func (_ *zhs) LintReady () bool {
+	return true
+}
+
 
 func (self *zhs) BuildFrom (filerelpath string) (freshdiags map[string][]*z.RespDiag) {
 	freshdiags = map[string][]*z.RespDiag {}
