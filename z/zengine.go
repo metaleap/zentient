@@ -50,6 +50,7 @@ func doFmt (zid string, reqsrc string, reqcmd string, reqtabsize uint8) (resp ma
 func onFileClose (µ Zengine, relpath string) {
 	relpath = filepath.FromSlash(relpath)
 	OpenFiles = uslice.StrWithout(OpenFiles, false, relpath)
+	µ.B().DbgMsgs = OpenFiles
 	µ.B().RefreshDiags(µ, relpath, "", "")
 	µ.OnFileClose(AllFiles[relpath])
 }
@@ -79,5 +80,5 @@ func onFileWrite (µ Zengine, relpath string) {
 func refreshAllDiags() {
 	funcs := []func() {}
 	for _,zeng := range Zengines { µ := zeng  ;  funcs = append(funcs, func() { µ.B().RefreshDiags(µ, "", "", "") }) }
-	ugo.WaitOn_(funcs...)
+	ugo.WaitOn(funcs...)
 }

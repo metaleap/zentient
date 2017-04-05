@@ -17,15 +17,8 @@ func Init () z.Zengine {
 	}
 	self := &zgo{}
 	self.Base.Init()
-	go self.lateInit()
+	go devgo.RefreshPkgs()
 	return self
-}
-
-func (self *zgo) lateInit () {
-	//	this may well take a few seconds:
-	devgo.RefreshPkgs()
-	//	by now there may be openfiles unlinted, now we can lint them:
-	// self.Base.RefreshDiags(self, "", "", "")
 }
 
 

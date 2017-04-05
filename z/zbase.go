@@ -28,7 +28,6 @@ func (self *Base) Init () {
 	self.DbgObjs = []interface{} {}
 }
 
-
 func (self *Base) zId () string {
 	if len(self.zid)==0 { for zid,µ := range Zengines { if µ.B()==self { self.zid = zid ; break } } }
 	return self.zid
@@ -65,6 +64,17 @@ func (self *Base) DoFmt (src string, custcmd string, cmds ...RespCmd) (resp *Res
 }
 
 
+func (self *Base) openFiles (µ Zengine) (openfiles []string) {
+	for _,frp := range OpenFiles {
+		if file := AllFiles[frp] ; file!=nil && file.µ==µ { openfiles = append(openfiles, frp) }
+	}
+	return
+}
+func (self *Base) OpenFiles () []string {
+	return self.openFiles(Zengines[self.zId()])
+}
+
+
 func (self *Base) Lint (linters []func(func(map[string][]*RespDiag)), linterslate []func(func(map[string][]*RespDiag)), ondelayedlintersdone func(map[string][]*RespDiag)) (freshdiags map[string][]*RespDiag) {
 	var mutex sync.Mutex  ;  var mutexlate sync.Mutex
 	freshdiags = map[string][]*RespDiag {}  ;  latediags := map[string][]*RespDiag {}
@@ -80,9 +90,9 @@ func (self *Base) Lint (linters []func(func(map[string][]*RespDiag)), linterslat
 	for _,linter := range linters { fn:=linter  ;  funcs = append(funcs, func() { fn(onlinterdone) } ) }
 	latefuncs := []func() {}
 	for _,linterlate := range linterslate { fn := linterlate  ;  latefuncs = append(latefuncs, func() { fn(onlinterdonelate) }) }
-	runlatefuncs := func () { ugo.WaitOn_(latefuncs...)  ;  ondelayedlintersdone(latediags) }
-	go runlatefuncs()
-	ugo.WaitOn_(funcs...)
+	runlatefuncs := func () { ugo.WaitOn(latefuncs...)  ;  ondelayedlintersdone(latediags) }
+	ugo.WaitOn(funcs...)
+	go runlatefuncs() // we run this only now so that the above returns potentially a bit quicker
 	return
 }
 
@@ -98,28 +108,25 @@ func (self *Base) RefreshDiags (µ Zengine, closedfilerelpath string, openedfile
 	lintfiles := []string {}
 	funcs := []func() {}
 	freshdiags := map[string][]*RespDiag {}
-	openfiles := uslice.StrFiltered(OpenFiles, func(relpath string) bool {
-		file := AllFiles[relpath]
-		return file!=nil && file.µ == µ
-	})
 
 	if len(openedfilerelpath)>0 {
 		if _,cached := self.alldiags[openedfilerelpath] ; !cached {
 			lintfiles = append(lintfiles, openedfilerelpath)
 		}
 	}
+	openfiles := self.openFiles(µ)
 	if len(writtenfilerelpath)>0 {
 		self.resetAllDiags()
 		lintfiles = openfiles
 		funcs = append(funcs, func() {
 			diagsfrombuild := µ.BuildFrom(writtenfilerelpath)
 			mutex.Lock()  ;  defer mutex.Unlock()
-			for relfilepath,filediags := range diagsfrombuild { freshdiags[relfilepath] = append(freshdiags[relfilepath], filediags...) }
+			for frp,filediags := range diagsfrombuild { freshdiags[frp] = append(freshdiags[frp], filediags...) }
 		})
 	} else { // edge-case: there may be openfiles without existing diags if they were opened before diagnostics were ready to run: attempt to catchup now
-		for _,relfilepath := range openfiles {
-			if _,cached := self.alldiags[relfilepath] ; (!cached) && !uslice.StrHas(lintfiles, relfilepath) {
-				lintfiles = append(lintfiles, relfilepath)
+		for _,frp := range openfiles {
+			if _,cached := self.alldiags[frp] ; (!cached) && !uslice.StrHas(lintfiles, frp) {
+				lintfiles = append(lintfiles, frp)
 			}
 		}
 	}
@@ -130,21 +137,22 @@ func (self *Base) RefreshDiags (µ Zengine, closedfilerelpath string, openedfile
 		funcs = append(funcs, func() {
 			diagsfromlint := µ.Lint(lintfiles, ondelayedlintersdone)
 			mutex.Lock()  ;  defer mutex.Unlock()
-			for relfilepath,filediags := range diagsfromlint { freshdiags[relfilepath] = append(freshdiags[relfilepath], filediags...) }
+			for frp,filediags := range diagsfromlint { freshdiags[frp] = append(freshdiags[frp], filediags...) }
 		})
 	}
-	ugo.WaitOn_(funcs...)
-	for _,relfilepath := range lintfiles {
-		if _,hadlints := freshdiags[relfilepath] ; !hadlints { freshdiags[relfilepath] = []*RespDiag {} } // mustn't be nil so our catchup above works
+	ugo.WaitOn(funcs...)
+	for _,frp := range lintfiles {
+		if _,hadlints := freshdiags[frp] ; !hadlints { freshdiags[frp] = []*RespDiag {} } // mustn't be nil so our catchup above works
 	}
 
+	openfiles = self.openFiles(µ)
 	self.diagmutex.Lock()  ;  defer self.diagmutex.Unlock()
-	for relfilepath,filediags := range freshdiags { self.alldiags[relfilepath] = filediags }
-	for _,relfilepath := range openfiles { if uslice.StrHas(OpenFiles, relfilepath) { // no-show for files that were closed in the meantime
-		self.curdiags[relfilepath] = self.alldiags[relfilepath] } }
-	for relfilepath,filediags := range self.latediags {
-		if uslice.StrHas(openfiles, relfilepath) && uslice.StrHas(OpenFiles, relfilepath) {
-			self.curdiags[relfilepath] = append(self.curdiags[relfilepath], filediags...)
+	for frp,filediags := range freshdiags { self.alldiags[frp] = filediags }
+	self.curdiags = map[string][]*RespDiag {}
+	for _,frp := range openfiles { self.curdiags[frp] = self.alldiags[frp] }
+	for frp,filediags := range self.latediags {
+		if uslice.StrHas(openfiles, frp) {
+			self.curdiags[frp] = append(self.curdiags[frp], filediags...)
 		}
 	}
 	allcurdiags[self.zId()] = self.curdiags

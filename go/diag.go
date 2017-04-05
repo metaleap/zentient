@@ -72,11 +72,11 @@ func linterIneffAssign (filerelpaths []string) func(func(map[string][]*z.RespDia
 
 func linterGoLint (filerelpaths []string) func(func(map[string][]*z.RespDiag)) {
 	censored := func (msg string) (skip bool) {
+		skip = skip || ustr.Has(msg, " should have comment ")
 		skip = skip || msg == "if block ends with a return statement, so drop this else and outdent its block"
 		skip = skip || ustr.Has(msg, "ALL_CAPS")
 		skip = skip || ustr.Has(msg, "underscore")
 		skip = skip || ustr.Has(msg, "CamelCase")
-		skip = skip || ustr.Has(msg, " should have comment ")
 		skip = skip || ustr.Has(msg, "package comment should be of the form \"")
 		skip = skip || ustr.Has(msg, "should omit 2nd value from range; this loop is equivalent to ")
 		skip = skip || ustr.Has(msg, "don't use generic names")
@@ -115,22 +115,18 @@ func (self *zgo) Lint (filerelpaths []string, ondelayedlintersdone func(map[stri
 	funcs := []func(func(map[string][]*z.RespDiag)) {}  ;  latefuncs := []func(func(map[string][]*z.RespDiag)) {}
 	pkgfiles := map[*devgo.Pkg][]string {}
 	for _,frp := range filerelpaths {
-		if pkg := devgo.PkgsByDir[filepath.Dir(filepath.Join(z.Ctx.SrcDir, frp))] ; pkg!=nil {
+		if pkg := devgo.PkgsByDir[strings.ToLower(filepath.Dir(filepath.Join(z.Ctx.SrcDir, frp)))] ; pkg!=nil {
 			pkgfiles[pkg] = append(pkgfiles[pkg], frp)
-		} else {
-			funcs = append(funcs, func(cont func(map[string][]*z.RespDiag)) {
-				cont(map[string][]*z.RespDiag { frp: []*z.RespDiag { &z.RespDiag { Cat: "WUT", Msg: "No pkg for " + frp, PosLn: 1, PosCol: 1, Sev: z.DIAG_WARN } } })
-			})
 		}
 	}
 
 	for fpkg,frps := range pkgfiles {
+		funcs = append(funcs, linterGoVet(frps))
 		if devgo.Has_interfacer		{ latefuncs = append(latefuncs, linterInterfacer(frps, fpkg.ImportPath)) }
 		if devgo.Has_checkalign		{ latefuncs = append(latefuncs, linterCheck("align", fpkg.ImportPath)) }
 		if devgo.Has_checkstruct	{ latefuncs = append(latefuncs, linterCheck("struct", fpkg.ImportPath)) }
 		if devgo.Has_checkvar		{ latefuncs = append(latefuncs, linterCheck("var", fpkg.ImportPath)) }
 		if devgo.Has_ineffassign	{ funcs = append(funcs, linterIneffAssign(frps)) }
-		if devgo.HasGoDevEnv()		{ funcs = append(funcs, linterGoVet(frps)) }
 		if devgo.Has_golint			{ funcs = append(funcs, linterGoLint(frps)) }
 	}
 	return self.Base.Lint(funcs, latefuncs, ondelayedlintersdone)
