@@ -8,15 +8,15 @@ import (
 )
 
 type Base struct {
-	alldiags map[string][]*RespDiag
-	curdiags map[string][]*RespDiag
-	latediags map[string][]*RespDiag
-	diagmutex sync.Mutex
+	alldiags	map[string][]*RespDiag
+	curdiags	map[string][]*RespDiag
+	latediags	map[string][]*RespDiag
+	diagmutex	sync.Mutex
 
-	DbgMsgs []string
-	DbgObjs []interface{}
+	DbgMsgs		[]string
+	DbgObjs		[]interface{}
 
-	zid string
+	zid			string
 }
 
 
@@ -87,10 +87,11 @@ func (self *Base) Lint (linters []func(func(map[string][]*RespDiag)), linterslat
 		for frp,filediags := range linterdiags { latediags[frp] = append(latediags[frp], filediags...) }
 	}
 	funcs := []func() {}
-	for _,linter := range linters { fn:=linter  ;  funcs = append(funcs, func() { fn(onlinterdone) } ) }
-	latefuncs := []func() {}
-	for _,linterlate := range linterslate { fn := linterlate  ;  latefuncs = append(latefuncs, func() { fn(onlinterdonelate) }) }
+	for _,linter := range linters { fn := linter  ;  funcs = append(funcs, func() { fn(onlinterdone) } ) }
 	ugo.WaitOn(funcs...)
+
+	latefuncs := []func() {}
+	for _,linter := range linterslate { fn := linter  ;  latefuncs = append(latefuncs, func() { fn(onlinterdonelate) }) }
 	runlatefuncs := func () { ugo.WaitOn(latefuncs...)  ;  ondelayedlintersdone(latediags) }
 	go runlatefuncs() // we run this only now so that the above returns potentially a bit quicker
 	return
