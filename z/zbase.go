@@ -64,14 +64,14 @@ func (self *Base) DoFmt (src string, custcmd string, cmds ...RespCmd) (resp *Res
 }
 
 
-func (self *Base) openFiles (µ Zengine) (openfiles []string) {
+func openFiles (µ Zengine) (openfiles []string) {
 	for _,frp := range OpenFiles {
 		if file := AllFiles[frp] ; file!=nil && file.µ==µ { openfiles = append(openfiles, frp) }
 	}
 	return
 }
 func (self *Base) OpenFiles () []string {
-	return self.openFiles(Zengines[self.zId()])
+	return openFiles(Zengines[self.zId()])
 }
 
 
@@ -90,8 +90,8 @@ func (self *Base) Lint (linters []func(func(map[string][]*RespDiag)), linterslat
 	for _,linter := range linters { fn:=linter  ;  funcs = append(funcs, func() { fn(onlinterdone) } ) }
 	latefuncs := []func() {}
 	for _,linterlate := range linterslate { fn := linterlate  ;  latefuncs = append(latefuncs, func() { fn(onlinterdonelate) }) }
-	runlatefuncs := func () { ugo.WaitOn(latefuncs...)  ;  ondelayedlintersdone(latediags) }
 	ugo.WaitOn(funcs...)
+	runlatefuncs := func () { ugo.WaitOn(latefuncs...)  ;  ondelayedlintersdone(latediags) }
 	go runlatefuncs() // we run this only now so that the above returns potentially a bit quicker
 	return
 }
@@ -114,7 +114,7 @@ func (self *Base) RefreshDiags (µ Zengine, closedfilerelpath string, openedfile
 			lintfiles = append(lintfiles, openedfilerelpath)
 		}
 	}
-	openfiles := self.openFiles(µ)
+	openfiles := openFiles(µ)
 	if len(writtenfilerelpath)>0 {
 		self.resetAllDiags()
 		lintfiles = openfiles
@@ -145,7 +145,7 @@ func (self *Base) RefreshDiags (µ Zengine, closedfilerelpath string, openedfile
 		if _,hadlints := freshdiags[frp] ; !hadlints { freshdiags[frp] = []*RespDiag {} } // mustn't be nil so our catchup above works
 	}
 
-	openfiles = self.openFiles(µ)
+	openfiles = openFiles(µ)
 	self.diagmutex.Lock()  ;  defer self.diagmutex.Unlock()
 	for frp,filediags := range freshdiags { self.alldiags[frp] = filediags }
 	self.curdiags = map[string][]*RespDiag {}
@@ -155,7 +155,6 @@ func (self *Base) RefreshDiags (µ Zengine, closedfilerelpath string, openedfile
 			self.curdiags[frp] = append(self.curdiags[frp], filediags...)
 		}
 	}
-	allcurdiags[self.zId()] = self.curdiags
 }
 
 

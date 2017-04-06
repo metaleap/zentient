@@ -36,7 +36,12 @@ const (
 	DIAG_HINT	uint8 = 3
 )
 
-var allcurdiags = map[string]map[string][]*RespDiag {}
+
+func jsonCurDiags () (allcurdiags map[string]map[string][]*RespDiag) {
+	allcurdiags = map[string]map[string][]*RespDiag {}
+	for zid,µ := range Zengines { allcurdiags[zid] = µ.B().curdiags }
+	return
+}
 
 
 // the ONLY jsonish func to return a string-encoded-as-JSON-value

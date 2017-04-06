@@ -41,16 +41,16 @@ func linterCheck (chk string, pkgimppath string) func(func(map[string][]*z.RespD
 	}
 }
 
-func linterInterfacer (filerelpaths []string, pkgimppath string) func(func(map[string][]*z.RespDiag)) {
+func linterMvDan (cmdname string, pkgimppath string) func(func(map[string][]*z.RespDiag)) {
 	reline := func (ln string) string {
-		if relified := lnrelify(ln) ; len(relified)>0 { return relified }
+		if rln := lnrelify(ln) ; len(rln)>0 { return rln }
 		return ln
 	}
 	return func(cont func(map[string][]*z.RespDiag)) {
 		filediags := map[string][]*z.RespDiag {}
-		for _,srcref := range udev.CmdExecOnSrc(true, true, false, reline, "interfacer", pkgimppath) {
+		for _,srcref := range udev.CmdExecOnSrc(true, true, false, reline, cmdname, pkgimppath) {
 			filediags[srcref.FilePath] = append(filediags[srcref.FilePath],
-				&z.RespDiag { Cat: "interfacer", Msg: srcref.Msg, PosLn: srcref.PosLn, PosCol: srcref.PosCol, Sev: z.DIAG_HINT })
+				&z.RespDiag { Cat: cmdname, Msg: srcref.Msg, PosLn: srcref.PosLn, PosCol: srcref.PosCol, Sev: z.DIAG_INFO })
 		}
 		cont(filediags)
 	}
@@ -122,7 +122,8 @@ func (self *zgo) Lint (filerelpaths []string, ondelayedlintersdone func(map[stri
 
 	for fpkg,frps := range pkgfiles {
 		funcs = append(funcs, linterGoVet(frps))
-		if devgo.Has_interfacer		{ latefuncs = append(latefuncs, linterInterfacer(frps, fpkg.ImportPath)) }
+		if devgo.Has_interfacer		{ latefuncs = append(latefuncs, linterMvDan("interfacer", fpkg.ImportPath)) }
+		// if devgo.Has_unparam		{ latefuncs = append(latefuncs, linterMvDan("unparam", fpkg.ImportPath)) }
 		if devgo.Has_checkalign		{ latefuncs = append(latefuncs, linterCheck("align", fpkg.ImportPath)) }
 		if devgo.Has_checkstruct	{ latefuncs = append(latefuncs, linterCheck("struct", fpkg.ImportPath)) }
 		if devgo.Has_checkvar		{ latefuncs = append(latefuncs, linterCheck("var", fpkg.ImportPath)) }
