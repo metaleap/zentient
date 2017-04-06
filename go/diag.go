@@ -123,7 +123,7 @@ func (self *zgo) Lint (filerelpaths []string, ondelayedlintersdone func(map[stri
 	for fpkg,frps := range pkgfiles {
 		funcs = append(funcs, linterGoVet(frps))
 		if devgo.Has_interfacer		{ latefuncs = append(latefuncs, linterMvDan("interfacer", fpkg.ImportPath)) }
-		// if devgo.Has_unparam		{ latefuncs = append(latefuncs, linterMvDan("unparam", fpkg.ImportPath)) }
+		if devgo.Has_unparam		{ latefuncs = append(latefuncs, linterMvDan("unparam", fpkg.ImportPath)) }
 		if devgo.Has_checkalign		{ latefuncs = append(latefuncs, linterCheck("align", fpkg.ImportPath)) }
 		if devgo.Has_checkstruct	{ latefuncs = append(latefuncs, linterCheck("struct", fpkg.ImportPath)) }
 		if devgo.Has_checkvar		{ latefuncs = append(latefuncs, linterCheck("var", fpkg.ImportPath)) }
