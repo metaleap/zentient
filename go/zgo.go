@@ -18,8 +18,8 @@ var (
 
 func Init () z.Zengine {
 	if !devgo.HasGoDevEnv() { return nil }
+	srcDir = z.Ctx.SrcDir  ;  devgo.SrcDir = srcDir
 	go devgo.RefreshPkgs()
-	srcDir = z.Ctx.SrcDir
 	self := &zgo{}
 	self.Base.Init()
 	return self

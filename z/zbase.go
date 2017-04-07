@@ -147,26 +147,25 @@ func (self *Base) RefreshDiags (µ Zengine, closedfilerelpath string, openedfile
 	}
 
 	//	duplicates are very much possible onFileWrite as we rebuild dependant pkgs/libs/projs, so detect them
-	frds := freshdiags  ;  for frp,fds := range frds {
-		mod := false  ;  for i,fd := range fds {  for j := i+1 ;  j<len(fds)  ;  j++ {
-			if fds[j].Msg==fd.Msg && fds[j].PosLn==fd.PosLn && fds[j].PosCol==fd.PosCol && fds[j].Sev==fd.Sev && fds[j].Cat==fd.Cat && fds[j].Code==fd.Code {
-				fds[j] = fds[len(fds)-1]  ;  fds = fds[:len(fds)-1]  ;  mod = true  ;  j--  } } }
-		if mod {  freshdiags[frp] = fds  }
+	if len(writtenfilerelpath)>0 {
+		frds := freshdiags  ;  for frp,fds := range frds {
+			mod := false  ;  for i,fd := range fds {  for j := i+1 ;  j<len(fds)  ;  j++ {
+				if fds[j].Msg==fd.Msg && fds[j].PosLn==fd.PosLn && fds[j].PosCol==fd.PosCol && fds[j].Sev==fd.Sev && fds[j].Cat==fd.Cat && fds[j].Code==fd.Code {
+					fds[j] = fds[len(fds)-1]  ;  fds = fds[:len(fds)-1]  ;  mod = true  ;  j--  } } }
+			if mod {  freshdiags[frp] = fds  }
+		}
 	}
-
+	openfiles = openFiles(µ) //	a refresh is prudent here
 	self.diagmutex.Lock()  ;  defer self.diagmutex.Unlock()
 	for frp,filediags := range freshdiags { self.alldiags[frp] = filediags }
 	self.curdiags = map[string][]*RespDiag {}
-	openfiles = openFiles(µ) //	a refresh is prudent here
 	for _,frp := range openfiles { self.curdiags[frp] = self.alldiags[frp] }
 	for frp,filediags := range self.alldiags { if !uslice.StrHas(openfiles, frp) {
 		// file closed or not --- any errors that we already found earlier WILL continue to be shown:
 		for _,diag := range filediags { if diag.Sev == DIAG_ERR { self.curdiags[frp] = append(self.curdiags[frp], diag) } }
 	} }
 	for frp,filediags := range self.latediags {
-		if uslice.StrHas(openfiles, frp) {
-			self.curdiags[frp] = append(self.curdiags[frp], filediags...)
-		}
+		if uslice.StrHas(openfiles, frp) { self.curdiags[frp] = append(self.curdiags[frp], filediags...) }
 	}
 }
 
