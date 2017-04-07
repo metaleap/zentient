@@ -146,6 +146,14 @@ func (self *Base) RefreshDiags (µ Zengine, closedfilerelpath string, openedfile
 		if _,hadlints := freshdiags[frp] ; !hadlints { freshdiags[frp] = []*RespDiag {} } // mustn't be nil so our catchup above works
 	}
 
+	//	duplicates are very much possible onFileWrite as we rebuild dependant pkgs/libs/projs, so detect them
+	frds := freshdiags  ;  for frp,fds := range frds {
+		mod := false  ;  for i,fd := range fds {  for j := i+1 ;  j<len(fds)  ;  j++ {
+			if fds[j].Msg==fd.Msg && fds[j].PosLn==fd.PosLn && fds[j].PosCol==fd.PosCol && fds[j].Sev==fd.Sev && fds[j].Cat==fd.Cat && fds[j].Code==fd.Code {
+				fds[j] = fds[len(fds)-1]  ;  fds = fds[:len(fds)-1]  ;  mod = true  ;  j--  } } }
+		if mod {  freshdiags[frp] = fds  }
+	}
+
 	self.diagmutex.Lock()  ;  defer self.diagmutex.Unlock()
 	for frp,filediags := range freshdiags { self.alldiags[frp] = filediags }
 	self.curdiags = map[string][]*RespDiag {}
@@ -159,17 +167,6 @@ func (self *Base) RefreshDiags (µ Zengine, closedfilerelpath string, openedfile
 		if uslice.StrHas(openfiles, frp) {
 			self.curdiags[frp] = append(self.curdiags[frp], filediags...)
 		}
-	}
-	//	duplicates are very much possible onFileWrite as we rebuild dependant pkgs/libs/projs, so detect them
-	scd := self.curdiags  ;  for frp,fds := range scd {
-		mod := false  ;  for i,fd := range fds {
-			for j := i+1 ;  j<len(fds)  ;  j++ {
-				if fds[j].Msg==fd.Msg && fds[j].PosLn==fd.PosLn && fds[j].PosCol==fd.PosCol && fds[j].Sev==fd.Sev /*&& fds[j].Cat==fd.Cat && fds[j].Code==fd.Code*/ {
-					fds[j] = fds[len(fds)-1]  ;  fds = fds[:len(fds)-1]  ;  mod = true  ;  j--
-				}
-			}
-		}
-		if mod { self.curdiags[frp] = fds }
 	}
 }
 
