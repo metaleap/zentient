@@ -18,10 +18,10 @@ var (
 
 func Init () z.Zengine {
 	if !devgo.HasGoDevEnv() { return nil }
+	go devgo.RefreshPkgs()
 	srcDir = z.Ctx.SrcDir
 	self := &zgo{}
 	self.Base.Init()
-	go devgo.RefreshPkgs()
 	return self
 }
 
@@ -66,5 +66,4 @@ func (self *zgo) OnFileClose (file *z.File) {
 }
 
 func (self *zgo) OnFileWrite (file *z.File) {
-	go devgo.RefreshPkgs()
 }

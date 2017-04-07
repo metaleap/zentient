@@ -3,14 +3,21 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/metaleap/go-devgo"
 	"github.com/metaleap/go-util-dev"
 	"github.com/metaleap/go-util-fs"
+	"github.com/metaleap/go-util-misc"
 	"github.com/metaleap/go-util-slice"
 	"github.com/metaleap/go-util-str"
 
 	"github.com/metaleap/zentient/z"
+)
+
+var (
+	dirrelpathpref = "." + string(os.PathSeparator)
+	laterebuilds sync.Mutex
 )
 
 
@@ -140,23 +147,29 @@ func (_ *zgo) LintReady () bool {
 }
 
 
-func (self *zgo) BuildFrom (filerelpath string) (freshdiags map[string][]*z.RespDiag) {
-	freshdiags = map[string][]*z.RespDiag {}
-	self.buildFrom(filepath.Dir(filerelpath), freshdiags)
-	return
-}
-func (self *zgo) buildFrom (dirrelpath string, freshdiags map[string][]*z.RespDiag) {
-	msgs := udev.CmdExecOnSrc(true, false, true, nil, "go", "install", "." + string(os.PathSeparator) + dirrelpath) // filepath.Join NOT good here: would remove ./ that `go install` does need to use dirrelpath instead of an imp-path
-	for _,srcref := range msgs { freshdiags[srcref.FilePath] = append(freshdiags[srcref.FilePath],
-		&z.RespDiag { Cat: "go install", Msg: srcref.Msg, PosLn: srcref.PosLn, PosCol: srcref.PosCol, Sev: z.DIAG_ERR }) }
-	if success := len(msgs)==0  ;  success {
-		if dispkg := devgo.PkgsByDir[strings.ToLower(filepath.Join(srcDir, dirrelpath))]  ;  dispkg!=nil && len(dispkg.ImportPath)>0 {
-			for pkgdir,subpkg := range devgo.PkgsByDir {	//	find importers of freshly installed pkg
-				if subpkgdirrelpath,_ := filepath.Rel(srcDir, pkgdir) ; len(subpkgdirrelpath)>0 && uslice.StrHas(subpkg.Deps, dispkg.ImportPath) {
-					//	rebuild it, too
-					self.buildFrom(subpkgdirrelpath, freshdiags)
-				}
-			}
+func (_ *zgo) BuildFrom (filerelpath string) (freshdiags map[string][]*z.RespDiag) {
+	dirrelpath := filepath.Dir(filerelpath)  ;  freshdiags = map[string][]*z.RespDiag {}
+	dirrelpaths := devgo.ImportersOf(filepath.Join(srcDir, dirrelpath), srcDir)
+	dirrelpathsmin := append([]string { dirrelpath }, devgo.ShakeOutIntermediateDepsViaDir(dirrelpaths, srcDir)...)
+
+	succeeded := []string {}  ;  for i,dirrelpath := range dirrelpathsmin {
+		msgs := udev.CmdExecOnSrc(true, false, true, nil, "go", "install", dirrelpathpref + dirrelpath) // filepath.Join NOT good here: would remove ./ that `go install` does need to use dirrelpath instead of an imp-path
+		for _,srcref := range msgs { freshdiags[srcref.FilePath] = append(freshdiags[srcref.FilePath],
+			&z.RespDiag { Cat: "gc ➜ " + dirrelpathpref + dirrelpath, Msg: srcref.Msg, PosLn: srcref.PosLn, PosCol: srcref.PosCol, Sev: z.DIAG_ERR }) }
+		if success := len(msgs)==0  ;  success {
+			succeeded = append(succeeded, dirrelpath)
+		} else if i==0 { return }
+	}
+
+	rebuildindirectdependantsasync := func() {
+		asyncrebuilds := []string {}
+		for _,dirrelpath := range dirrelpaths { if !uslice.StrHas(dirrelpathsmin, dirrelpath) { asyncrebuilds = append(asyncrebuilds, dirrelpath) } }
+		asyncrebuilds = uslice.StrMap(append(asyncrebuilds, succeeded...), func(drp string) string { return filepath.Join(srcDir, drp) })
+		if len(asyncrebuilds)>0 {
+			defer devgo.RefreshPkgs()  ;  laterebuilds.Lock()  ;  defer laterebuilds.Unlock()
+			for _,pkgimppath := range devgo.AllFinalDependants(asyncrebuilds) { ugo.CmdExec("go", "install", pkgimppath) }
 		}
 	}
+	go rebuildindirectdependantsasync()
+	return
 }
