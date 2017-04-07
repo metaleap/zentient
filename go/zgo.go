@@ -11,10 +11,14 @@ type zgo struct {
 }
 
 
+var (
+	srcDir string
+)
+
+
 func Init () z.Zengine {
-	if !devgo.HasGoDevEnv() {
-		return nil
-	}
+	if !devgo.HasGoDevEnv() { return nil }
+	srcDir = z.Ctx.SrcDir
 	self := &zgo{}
 	self.Base.Init()
 	go devgo.RefreshPkgs()

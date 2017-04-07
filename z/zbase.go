@@ -146,16 +146,21 @@ func (self *Base) RefreshDiags (µ Zengine, closedfilerelpath string, openedfile
 		if _,hadlints := freshdiags[frp] ; !hadlints { freshdiags[frp] = []*RespDiag {} } // mustn't be nil so our catchup above works
 	}
 
-	openfiles = openFiles(µ)
 	self.diagmutex.Lock()  ;  defer self.diagmutex.Unlock()
 	for frp,filediags := range freshdiags { self.alldiags[frp] = filediags }
 	self.curdiags = map[string][]*RespDiag {}
+	openfiles = openFiles(µ) //	a refresh is prudent here
 	for _,frp := range openfiles { self.curdiags[frp] = self.alldiags[frp] }
+	for frp,filediags := range self.alldiags { if !uslice.StrHas(openfiles, frp) {
+		// file closed or not --- any errors that we already found earlier WILL continue to be shown:
+		for _,diag := range filediags { if diag.Sev == DIAG_ERR { self.curdiags[frp] = append(self.curdiags[frp], diag) } }
+	} }
 	for frp,filediags := range self.latediags {
 		if uslice.StrHas(openfiles, frp) {
 			self.curdiags[frp] = append(self.curdiags[frp], filediags...)
 		}
 	}
+
 }
 
 

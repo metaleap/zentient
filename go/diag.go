@@ -1,11 +1,13 @@
 package zgo
 import (
+	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/metaleap/go-devgo"
 	"github.com/metaleap/go-util-dev"
 	"github.com/metaleap/go-util-fs"
+	"github.com/metaleap/go-util-slice"
 	"github.com/metaleap/go-util-str"
 
 	"github.com/metaleap/zentient/z"
@@ -13,8 +15,8 @@ import (
 
 
 func lnrelify (ln string) string {
-	if ufs.PathPrefix(ln, z.Ctx.SrcDir) {
-		if ln = ln[len(z.Ctx.SrcDir):] ; ln[0]=='\\' || ln[0]=='/' { ln = ln[1:] }
+	if ufs.PathPrefix(ln, srcDir) {
+		if ln = ln[len(srcDir):] ; ln[0]=='\\' || ln[0]=='/' { ln = ln[1:] }
 		return ln
 	}
 	return ""
@@ -115,7 +117,7 @@ func (self *zgo) Lint (filerelpaths []string, ondelayedlintersdone func(map[stri
 	funcs := []func(func(map[string][]*z.RespDiag)) {}  ;  latefuncs := []func(func(map[string][]*z.RespDiag)) {}
 	pkgfiles := map[*devgo.Pkg][]string {}
 	for _,frp := range filerelpaths {
-		if pkg := devgo.PkgsByDir[strings.ToLower(filepath.Dir(filepath.Join(z.Ctx.SrcDir, frp)))] ; pkg!=nil {
+		if pkg := devgo.PkgsByDir[strings.ToLower(filepath.Dir(filepath.Join(srcDir, frp)))] ; pkg!=nil {
 			pkgfiles[pkg] = append(pkgfiles[pkg], frp)
 		}
 	}
@@ -138,10 +140,23 @@ func (_ *zgo) LintReady () bool {
 }
 
 
-
 func (self *zgo) BuildFrom (filerelpath string) (freshdiags map[string][]*z.RespDiag) {
 	freshdiags = map[string][]*z.RespDiag {}
-	freshdiags[filerelpath] = append(freshdiags[filerelpath], &z.RespDiag { Cat: "devgo-mock", Msg: "rebuildfile:" + filerelpath, PosLn: 9, PosCol: 2, Sev: z.DIAG_ERR })
-	freshdiags[filerelpath] = append(freshdiags[filerelpath], &z.RespDiag { Cat: "devgo-mock", Msg: "filerebuild:" + filerelpath, PosLn: 18, PosCol: 4, Sev: z.DIAG_WARN })
+	self.buildFrom(filepath.Dir(filerelpath), freshdiags)
 	return
+}
+func (self *zgo) buildFrom (dirrelpath string, freshdiags map[string][]*z.RespDiag) {
+	msgs := udev.CmdExecOnSrc(true, false, true, nil, "go", "install", "." + string(os.PathSeparator) + dirrelpath) // filepath.Join NOT good here: would remove ./ that `go install` does need to use dirrelpath instead of an imp-path
+	for _,srcref := range msgs { freshdiags[srcref.FilePath] = append(freshdiags[srcref.FilePath],
+		&z.RespDiag { Cat: "go install", Msg: srcref.Msg, PosLn: srcref.PosLn, PosCol: srcref.PosCol, Sev: z.DIAG_ERR }) }
+	if success := len(msgs)==0  ;  success {
+		if dispkg := devgo.PkgsByDir[strings.ToLower(filepath.Join(srcDir, dirrelpath))]  ;  dispkg!=nil && len(dispkg.ImportPath)>0 {
+			for pkgdir,subpkg := range devgo.PkgsByDir {	//	find importers of freshly installed pkg
+				if subpkgdirrelpath,_ := filepath.Rel(srcDir, pkgdir) ; len(subpkgdirrelpath)>0 && uslice.StrHas(subpkg.Deps, dispkg.ImportPath) {
+					//	rebuild it, too
+					self.buildFrom(subpkgdirrelpath, freshdiags)
+				}
+			}
+		}
+	}
 }
