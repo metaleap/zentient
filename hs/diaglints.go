@@ -9,8 +9,9 @@ func linterHlint (filerelpaths []string) func(func(map[string][]*z.RespDiag)) {
 	return func (cont func(map[string][]*z.RespDiag)) {
 		filediags := map[string][]*z.RespDiag {}
 		for _,srcref := range devhs.LintHlint(filerelpaths) {
-			diag := &z.RespDiag { Cat: "hlint", Sev: z.DIAG_INFO, Msg: srcref.Msg, Data: srcref.Data, PosLn: srcref.PosLn-1, PosCol: srcref.PosCol-1, Pos2Ln: srcref.Pos2Ln-1, Pos2Col: srcref.Pos2Col-1 }
-			filediags[srcref.FilePath] = append(filediags[srcref.FilePath], diag)
+			d := &z.RespDiag { SrcMsg: srcref }  ;  d.Ref = "hlint" ; d.Sev = z.DIAG_SEV_INFO
+			d.PosLn = srcref.PosLn-1  ;  d.PosCol = srcref.PosCol-1  ;  d.Pos2Ln = srcref.Pos2Ln-1  ;  d.Pos2Col = srcref.Pos2Col-1
+			fpath := srcref.Ref  ;  filediags[fpath] = append(filediags[fpath], d)
 		}
 		cont(filediags)
 	}
@@ -27,12 +28,4 @@ func (self *zhs) Lint (filerelpaths []string, ondelayedlintersdone func(map[stri
 
 func (_ *zhs) LintReady () bool {
 	return true
-}
-
-
-func (_ *zhs) BuildFrom (filerelpath string) (freshdiags map[string][]*z.RespDiag) {
-	freshdiags = map[string][]*z.RespDiag {}
-	freshdiags[filerelpath] = append(freshdiags[filerelpath], &z.RespDiag { Cat: "devhs-mock", Msg: "rebuildfile:" + filerelpath, Sev: z.DIAG_ERR, PosLn: 9, PosCol: 2 })
-	freshdiags[filerelpath] = append(freshdiags[filerelpath], &z.RespDiag { Cat: "devhs-mock", Msg: "filerebuild:" + filerelpath, Sev: z.DIAG_WARN, PosLn: 18, PosCol: 4 })
-	return
 }

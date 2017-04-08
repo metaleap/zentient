@@ -20,12 +20,12 @@ func lnrelify (ln string) string {
 }
 
 
-func linter (diagcat string, diagsev uint8, each func() []udev.SrcRefMsg) func(func(map[string][]*z.RespDiag)) {
+func linter (diagcat string, diagsev uint8, each func() []udev.SrcMsg) func(func(map[string][]*z.RespDiag)) {
 	return func(cont func(map[string][]*z.RespDiag)) {
 		filediags := map[string][]*z.RespDiag {}
-		for _,srcref := range each() {
-			filediags[srcref.FilePath] = append(filediags[srcref.FilePath],
-				&z.RespDiag { Cat: diagcat, Sev: diagsev, Msg: srcref.Msg, Data: srcref.Data, PosLn: srcref.PosLn, PosCol: srcref.PosCol, Pos2Ln: srcref.Pos2Ln, Pos2Col: srcref.Pos2Col })
+		for _,srcref := range each() {  fpath := srcref.Ref
+			d := &z.RespDiag { Sev: diagsev, SrcMsg: srcref }  ;  d.Ref = diagcat
+			filediags[fpath] = append(filediags[fpath], d)
 		}
 		cont(filediags)
 	}
@@ -33,27 +33,27 @@ func linter (diagcat string, diagsev uint8, each func() []udev.SrcRefMsg) func(f
 
 
 func linterCheck (cmdname string, pkgimppath string) func(func(map[string][]*z.RespDiag)) {
-	return linter(cmdname, z.DIAG_INFO, func () []udev.SrcRefMsg {
+	return linter(cmdname, z.DIAG_SEV_INFO, func () []udev.SrcMsg {
 		return devgo.LintCheck(cmdname, pkgimppath)
 	})
 }
 func linterMvDan (cmdname string, pkgimppath string) func(func(map[string][]*z.RespDiag)) {
-	return linter(cmdname, z.DIAG_INFO, func () []udev.SrcRefMsg {
+	return linter(cmdname, z.DIAG_SEV_INFO, func () []udev.SrcMsg {
 		return devgo.LintMvDan(cmdname, pkgimppath)
 	})
 }
 func linterIneffAssign (filerelpaths []string) func(func(map[string][]*z.RespDiag)) {
-	return linter("ineffassign", z.DIAG_INFO, func () []udev.SrcRefMsg {
+	return linter("ineffassign", z.DIAG_SEV_INFO, func () []udev.SrcMsg {
 		return devgo.LintIneffAssign(filerelpaths)
 	})
 }
 func linterGoLint (filerelpaths []string) func(func(map[string][]*z.RespDiag)) {
-	return linter("golint", z.DIAG_HINT, func () []udev.SrcRefMsg {
+	return linter("golint", z.DIAG_SEV_HINT, func () []udev.SrcMsg {
 		return devgo.LintGolint(filerelpaths)
 	})
 }
 func linterGoVet (filerelpaths []string) func(func(map[string][]*z.RespDiag)) {
-	return linter("go vet", z.DIAG_WARN, func () []udev.SrcRefMsg {
+	return linter("go vet", z.DIAG_SEV_WARN, func () []udev.SrcMsg {
 		return devgo.LintGoVet(filerelpaths)
 	})
 }

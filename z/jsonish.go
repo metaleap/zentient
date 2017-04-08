@@ -1,5 +1,6 @@
 package z
 import (
+	"github.com/metaleap/go-util-dev"
 )
 
 
@@ -15,14 +16,8 @@ type RespCmd struct {
 }
 
 type RespDiag struct {
-	Data	string
-	Msg		string
-	PosLn	uint32
-	PosCol	uint32
-	Pos2Ln	uint32
-	Pos2Col	uint32
-	Sev		uint8
-	Cat		string
+	udev.SrcMsg
+	Sev uint8
 }
 
 type RespFmt struct {
@@ -32,10 +27,10 @@ type RespFmt struct {
 
 
 const (
-	DIAG_ERR	uint8 = 0
-	DIAG_WARN	uint8 = 1
-	DIAG_INFO	uint8 = 2
-	DIAG_HINT	uint8 = 3
+	DIAG_SEV_ERR	uint8 = 0
+	DIAG_SEV_WARN	uint8 = 1
+	DIAG_SEV_INFO	uint8 = 2
+	DIAG_SEV_HINT	uint8 = 3
 )
 
 
