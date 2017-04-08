@@ -20,6 +20,7 @@ type RespDiag struct {
 	Sev uint8
 }
 
+
 type RespFmt struct {
 	Result		string
 	Warnings	[]string

@@ -150,7 +150,7 @@ func (self *Base) RefreshDiags (µ Zengine, closedfilerelpath string, openedfile
 	if len(writtenfilerelpath)>0 {
 		frds := freshdiags  ;  for frp,fds := range frds {
 			mod := false  ;  for i,fd := range fds {  for j := i+1 ;  j<len(fds)  ;  j++ {
-				if fds[j].Msg==fd.Msg && fds[j].Sev==fd.Sev && fds[j].Ref==fd.Ref && fds[j].Data==fd.Data && fds[j].PosLn==fd.PosLn && fds[j].PosCol==fd.PosCol && fds[j].Pos2Ln==fd.Pos2Ln && fds[j].Pos2Col==fd.Pos2Col {
+				if fds[j].Msg==fd.Msg && fds[j].Sev==fd.Sev && fds[j].Ref==fd.Ref && fds[j].PosLn==fd.PosLn && fds[j].PosCol==fd.PosCol && fds[j].Pos2Ln==fd.Pos2Ln && fds[j].Pos2Col==fd.Pos2Col {
 					fds[j] = fds[len(fds)-1]  ;  fds = fds[:len(fds)-1]  ;  mod = true  ;  j--  } } }
 			if mod {  freshdiags[frp] = fds  }
 		}
