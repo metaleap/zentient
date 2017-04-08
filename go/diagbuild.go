@@ -27,7 +27,7 @@ func (_ *zgo) BuildFrom (filerelpath string) (freshdiags map[string][]*z.RespDia
 	succeeded := []string {}  ;  for i,dirrelpath := range dirrelpathsmin {
 		msgs := udev.CmdExecOnSrc(true, false, true, nil, "go", "install", relpathprefix + dirrelpath) // filepath.Join NOT good here: would remove ./ that `go install` does need to use dirrelpath instead of an imp-path
 		for _,srcref := range msgs { freshdiags[srcref.FilePath] = append(freshdiags[srcref.FilePath],
-			&z.RespDiag { Cat: "gc", Msg: srcref.Msg, PosLn: srcref.PosLn, PosCol: srcref.PosCol, Sev: z.DIAG_ERR }) }
+			&z.RespDiag { Cat: "gc", Sev: z.DIAG_ERR, Data: srcref.Data, Msg: srcref.Msg, PosLn: srcref.PosLn, PosCol: srcref.PosCol, Pos2Ln: srcref.Pos2Ln, Pos2Col: srcref.Pos2Col }) }
 		if success := len(msgs)==0  ;  success {
 			succeeded = append(succeeded, dirrelpath)
 		} else if i==0 { return }

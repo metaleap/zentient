@@ -15,10 +15,12 @@ type RespCmd struct {
 }
 
 type RespDiag struct {
-	Code	string
+	Data	string
 	Msg		string
 	PosLn	uint32
 	PosCol	uint32
+	Pos2Ln	uint32
+	Pos2Col	uint32
 	Sev		uint8
 	Cat		string
 }

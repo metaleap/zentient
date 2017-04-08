@@ -25,7 +25,7 @@ func linter (diagcat string, diagsev uint8, each func() []udev.SrcRefMsg) func(f
 		filediags := map[string][]*z.RespDiag {}
 		for _,srcref := range each() {
 			filediags[srcref.FilePath] = append(filediags[srcref.FilePath],
-				&z.RespDiag { Cat: diagcat, Sev: diagsev, Msg: srcref.Msg, PosLn: srcref.PosLn, PosCol: srcref.PosCol })
+				&z.RespDiag { Cat: diagcat, Sev: diagsev, Msg: srcref.Msg, Data: srcref.Data, PosLn: srcref.PosLn, PosCol: srcref.PosCol, Pos2Ln: srcref.Pos2Ln, Pos2Col: srcref.Pos2Col })
 		}
 		cont(filediags)
 	}
