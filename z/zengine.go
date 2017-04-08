@@ -51,7 +51,7 @@ func onFileClose (µ Zengine, relpath string) {
 	relpath = filepath.FromSlash(relpath)
 	OpenFiles = uslice.StrWithout(OpenFiles, false, relpath)
 	µ.B().DbgMsgs = OpenFiles
-	µ.B().RefreshDiags(µ, relpath, "", "")
+	µ.B().RefreshDiags(µ, relpath, "")
 	µ.OnFileClose(AllFiles[relpath])
 }
 
@@ -64,7 +64,7 @@ func onFileOpen (µ Zengine, relpath string) {
 	}
 	if isnew := !uslice.StrHas(OpenFiles, relpath) ; isnew {
 		OpenFiles = append(OpenFiles, relpath)
-		µ.B().RefreshDiags(µ, "", relpath, "")
+		µ.B().RefreshDiags(µ, "", "")
 	}
 	µ.OnFileOpen(file)
 }
@@ -72,13 +72,13 @@ func onFileOpen (µ Zengine, relpath string) {
 func onFileWrite (µ Zengine, relpath string) {
 	relpath = filepath.FromSlash(relpath)
 	file := AllFiles[relpath]
-	µ.B().RefreshDiags(µ, "", "", relpath)
+	µ.B().RefreshDiags(µ, "", relpath)
 	µ.OnFileWrite(file)
 }
 
 
 func refreshAllDiags() {
 	funcs := []func() {}
-	for _,zeng := range Zengines { µ := zeng  ;  funcs = append(funcs, func() { µ.B().RefreshDiags(µ, "", "", "") }) }
+	for _,zeng := range Zengines { µ := zeng  ;  funcs = append(funcs, func() { µ.B().RefreshDiags(µ, "", "") }) }
 	ugo.WaitOn(funcs...)
 }
