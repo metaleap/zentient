@@ -62,6 +62,6 @@ func (self *zhs) DoFmt (src string, custcmd string, tabsize uint8) (resp *z.Resp
 		)
 }
 
-func (_ *zhs) ReadyToBuildOrLint () bool {
+func (_ *zhs) ReadyToBuildAndLint () bool {
 	return true
 }

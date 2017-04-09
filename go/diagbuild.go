@@ -2,6 +2,7 @@ package zgo
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	"github.com/metaleap/go-devgo"
@@ -20,35 +21,59 @@ var (
 )
 
 
-func (_ *zgo) BuildFrom (filerelpath string) (freshdiags map[string][]*z.RespDiag) {
-	dirrelpath := filepath.Dir(filerelpath)  ;  freshdiags = map[string][]*z.RespDiag {}
-	dirrelpaths := devgo.ImportersOf(filepath.Join(srcDir, dirrelpath), srcDir)
-	dirrelpathsmin := append([]string { dirrelpath }, devgo.ShakeOutIntermediateDepsViaDir(dirrelpaths, srcDir)...)
+func buildPkg (pkgimppath string, fromfilerelpath string, diags map[string][]*z.RespDiag) bool {
+	msgs := udev.CmdExecOnSrc(true, nil, "go", "install", pkgimppath)
+	for _,srcref := range msgs { if srcref.Msg != "too many errors" {
+		d := &z.RespDiag { Sev: z.DIAG_SEV_ERR, SrcMsg: srcref }
+		fpath := srcref.Ref  ;  d.Ref = pkgimppath
+		if !ufs.FileExists(filepath.Join(srcDir, fpath)) { d.Msg = fpath + ": " + d.Msg  ;  fpath = fromfilerelpath }
+		diags[fpath] = append(diags[fpath], d)
+	} }
+	return len(msgs)==0
+}
 
-	succeeded := []string {}  ;  for _,dirrelpath := range dirrelpathsmin {
-		msgs := udev.CmdExecOnSrc(true, nil, "go", "install", relpathprefix + dirrelpath) // filepath.Join NOT good here: would remove ./ that `go install` does need to use dirrelpath instead of an imp-path
-		for _,srcref := range msgs { if srcref.Msg != "too many errors" {
-			d := &z.RespDiag { Sev: z.DIAG_SEV_ERR, SrcMsg: srcref }  ;  d.Ref = dirrelpath
-			fpath := srcref.Ref  ;  if !ufs.FileExists(filepath.Join(srcDir, fpath)) {
-				fpath = filerelpath  ;  d.Msg = srcref.Ref + ": " + d.Msg
+func (_ *zgo) BuildFrom (filerelpaths []string) (freshdiags map[string][]*z.RespDiag) {
+	pkgimppaths := []string {}  ;  pkgimpimppaths := []string {}
+
+	for _,frp := range filerelpaths {
+		if pkg := devgo.PkgsByDir[strings.ToLower(filepath.Dir(filepath.Join(srcDir, frp)))] ; pkg!=nil {
+			if !(uslice.StrHas(pkgimppaths, pkg.ImportPath) || uslice.StrHas(pkgimpimppaths, pkg.ImportPath)) {
+				pkgimppaths = append(pkgimppaths, pkg.ImportPath)
 			}
-			freshdiags[fpath] = append(freshdiags[fpath], d) } }
-		if success := len(msgs)==0  ;  success {
-			succeeded = append(succeeded, dirrelpath)
-		} else { return }
-	}
-
-	rebuildindirectdependantsasync := func() {
-		asyncrebuilds := []string {}
-		for _,dirrelpath := range dirrelpaths { if !uslice.StrHas(dirrelpathsmin, dirrelpath) { asyncrebuilds = append(asyncrebuilds, dirrelpath) } }
-		asyncrebuilds = uslice.StrMap(append(asyncrebuilds, succeeded...), func(drp string) string { return filepath.Join(srcDir, drp) })
-		if len(asyncrebuilds)>0 {
-			defer devgo.RefreshPkgs()  ;  laterebuilds.Lock()  ;  defer laterebuilds.Unlock()
-			for _,pkgimppath := range devgo.AllFinalDependants(asyncrebuilds) {
-				ugo.CmdExec("go", "install", pkgimppath)
+			for _,pip := range pkg.Importers("") {
+				if !(uslice.StrHas(pkgimppaths, pip) || uslice.StrHas(pkgimpimppaths, pip)) {
+					pkgimpimppaths = append(pkgimpimppaths, pip)
+				}
 			}
 		}
 	}
-	go rebuildindirectdependantsasync()
+	freshdiags = map[string][]*z.RespDiag {}  ;  succeeded := []string {}
+	for _,pkgimppath := range pkgimppaths {
+		if success := buildPkg(pkgimppath, filerelpaths[0], freshdiags)  ;  success {
+			d := &z.RespDiag { Sev: z.DIAG_SEV_WARN, SrcMsg: udev.SrcMsg {Ref: "L1", PosLn:1,PosCol:1,Msg:pkgimppath} }
+			freshdiags[filerelpaths[0]] = append(freshdiags[filerelpaths[0]], d)
+			succeeded = append(succeeded, pkgimppath)
+		} else { return }
+	}
+	for _,pkgimppath := range pkgimpimppaths {
+		if success := buildPkg(pkgimppath, filerelpaths[0], freshdiags)  ;  success {
+			d := &z.RespDiag { Sev: z.DIAG_SEV_WARN, SrcMsg: udev.SrcMsg {Ref: "L2", PosLn:1,PosCol:1,Msg:pkgimppath} }
+			freshdiags[filerelpaths[0]] = append(freshdiags[filerelpaths[0]], d)
+			succeeded = append(succeeded, pkgimppath)
+		}
+	}
+	refreshindirectdependants := func() {
+		if asyncrebuilds := devgo.AllFinalDependants(succeeded)  ;  len(asyncrebuilds)>0 {
+			defer devgo.RefreshPkgs()  ;  laterebuilds.Lock()  ;  defer laterebuilds.Unlock()
+			for _,pkgimppath := range asyncrebuilds {
+				if !(uslice.StrHas(pkgimppaths, pkgimppath) || uslice.StrHas(pkgimpimppaths, pkgimppath) || uslice.StrHas(succeeded, pkgimppath)) {
+					d := &z.RespDiag { Sev: z.DIAG_SEV_WARN, SrcMsg: udev.SrcMsg {Ref: "L3", PosLn:1,PosCol:1,Msg:pkgimppath} }
+					freshdiags[filerelpaths[0]] = append(freshdiags[filerelpaths[0]], d)
+					go ugo.CmdExec("go", "install", pkgimppath)
+				}
+			}
+		}
+	}
+	refreshindirectdependants()
 	return
 }

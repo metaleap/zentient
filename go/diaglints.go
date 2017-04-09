@@ -51,8 +51,7 @@ func linterGoVet (filerelpaths []string) func(func(map[string][]*z.RespDiag)) {
 
 func (self *zgo) Lint (filerelpaths []string, ondelayedlintersdone func(map[string][]*z.RespDiag)) map[string][]*z.RespDiag {
 	latefuncs := []func(func(map[string][]*z.RespDiag)) {}
-	pkgfiles := map[*devgo.Pkg][]string {}
-	for _,frp := range filerelpaths {
+	pkgfiles := map[*devgo.Pkg][]string {}  ;  for _,frp := range filerelpaths {
 		if pkg := devgo.PkgsByDir[strings.ToLower(filepath.Dir(filepath.Join(srcDir, frp)))] ; pkg!=nil {
 			pkgfiles[pkg] = append(pkgfiles[pkg], frp)
 		}

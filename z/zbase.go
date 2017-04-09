@@ -12,6 +12,7 @@ type Base struct {
 	lintdiags	map[string][]*RespDiag
 	livediags	map[string][]*RespDiag
 	livemutex	sync.Mutex
+	lintmutex	sync.Mutex
 
 	zid			string
 }
@@ -19,7 +20,6 @@ type Base struct {
 
 
 func (self *Base) Init () {
-	self.resetAllDiags()
 }
 
 func (self *Base) zId () string {
@@ -156,35 +156,40 @@ func (self *Base) OpenFiles () []string {
 
 
 func (self *Base) buildFrom (µ Zengine, filerelpath string) {
-	self.resetAllDiags()
-	if builddiags := µ.BuildFrom(filerelpath)  ;  builddiags!=nil {
-		self.resetAllDiags()
-		self.builddiags = builddiags
-	}
+	self.livemutex.Lock() ; defer self.livemutex.Unlock()
+	self.livediags = nil
+	self.lintdiags = nil
+	openfiles := append([]string { filerelpath }, uslice.StrWithout(openFiles(µ), false, filerelpath)...)
+	self.builddiags = µ.BuildFrom(openfiles)
 }
 
 
 func (self *Base) liveDiags (µ Zengine) map[string][]*RespDiag {
 	self.livemutex.Lock() ; defer self.livemutex.Unlock()
 	if self.livediags==nil {
-		openfiles := openFiles(µ)
 		self.livediags = map[string][]*RespDiag {}
-		for frp,fdiags := range self.builddiags { self.livediags[frp] = fdiags }
-		for frp,fdiags := range self.lintdiags {
-			if uslice.StrHas(openfiles, frp) { self.livediags[frp] = append(self.livediags[frp], fdiags...) }
+		if self.builddiags!=nil { for frp,fdiags := range self.builddiags { self.livediags[frp] = fdiags } }
+		if len(self.livediags)==0 {
+			self.lintmutex.Lock()  ;  defer self.lintmutex.Unlock()
+			if self.lintdiags==nil { } else {
+				openfiles := openFiles(µ)
+				for frp,fdiags := range self.lintdiags {
+					if uslice.StrHas(openfiles, frp) { self.livediags[frp] = append(self.livediags[frp], fdiags...) }
+				}
+			}
 		}
 	}
 	return self.livediags
 }
 
 
-func (self *Base) resetAllDiags () {
-	self.builddiags = map[string][]*RespDiag {}
-	self.lintdiags = map[string][]*RespDiag {}
-	self.resetLiveDiags()
-}
+func (self *Base) relint (µ Zengine, filerelpaths []string) {
+	// self.lintdiags = map[string][]*RespDiag {}
+	// files := openFiles(µ)
+	// if len(files)>0{
 
-func (self *Base) resetLiveDiags () {
-	self.livemutex.Lock() ; defer self.livemutex.Unlock()
-	self.livediags = nil
+
+	// 	if self.lintdiags!=nil {
+	// 	}
+	// }
 }

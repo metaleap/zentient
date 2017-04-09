@@ -20,8 +20,8 @@ type Zengine interface {
 	Caps (string) []*RespCmd
 	DoFmt (string, string, uint8) (*RespFmt, error)
 	// Lint ([]string, func(map[string][]*RespDiag)) map[string][]*RespDiag
-	ReadyToBuildOrLint () bool
-	BuildFrom (string) map[string][]*RespDiag
+	ReadyToBuildAndLint () bool
+	BuildFrom ([]string) map[string][]*RespDiag
 	DiagResident (sev uint8) bool
 }
 

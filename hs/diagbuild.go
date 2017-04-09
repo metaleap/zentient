@@ -12,7 +12,8 @@ import (
 )
 
 
-func (_ *zhs) BuildFrom (filerelpath string) (freshdiags map[string][]*z.RespDiag) {
+func (_ *zhs) BuildFrom (filerelpaths []string) (freshdiags map[string][]*z.RespDiag) {
+	filerelpath := filerelpaths[0]
 	filefullpath := filepath.Join(srcDir, filerelpath)  ;  dirfullpath := filepath.Dir(filefullpath)
 	cmdargs := append(append([]string { "build" }, devhs.StackArgs...), devhs.StackArgsBuild...)
 	raw,_ := ugo.CmdExecIn(dirfullpath, "stack", cmdargs...)  ;  lns := ustr.Split(raw, "\n")
