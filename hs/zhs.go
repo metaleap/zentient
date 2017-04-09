@@ -13,15 +13,20 @@ type zhs struct {
 }
 
 
+var (
+	srcDir string
+)
+
+
+
 func Init () z.Zengine {
 	if !devhs.HasHsDevEnv() { return nil }
+	srcDir = z.Ctx.SrcDir
 
 	self := &zhs{}
 	self.Base.Init()
 	return self
 }
-
-
 
 
 func (_ *zhs) EdLangIDs () []string {
@@ -33,7 +38,6 @@ func (self *zhs) B () *z.Base {
 }
 
 
-
 func (_ *zhs) Caps (cap string) (caps []*z.RespCmd) {
 	switch cap {
 	case "fmt":
@@ -42,7 +46,7 @@ func (_ *zhs) Caps (cap string) (caps []*z.RespCmd) {
 								&z.RespCmd { Title: "brittany",			Exists: devhs.Has_brittany,			Hint: "`github.com/lspitzner/brittany`" },
 							}
 	case "diag":
-		caps = []*z.RespCmd	{	&z.RespCmd { Title: "stack install",	Exists: devhs.HasHsDevEnv(),	Hint: "check your Stack installation" },
+		caps = []*z.RespCmd	{	&z.RespCmd { Title: "stack install",	Exists: true },
 								&z.RespCmd { Title: "hlint",			Exists: devhs.Has_hlint,		Hint: "`stack install hlint`" },
 							}
 	}

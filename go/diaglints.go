@@ -5,19 +5,9 @@ import (
 
 	"github.com/metaleap/go-devgo"
 	"github.com/metaleap/go-util-dev"
-	"github.com/metaleap/go-util-fs"
 
 	"github.com/metaleap/zentient/z"
 )
-
-
-func lnrelify (ln string) string {
-	if ufs.PathPrefix(ln, srcDir) {
-		if ln = ln[len(srcDir):] ; ln[0]=='\\' || ln[0]=='/' { ln = ln[1:] }
-		return ln
-	}
-	return ""
-}
 
 
 func linter (diagcat string, diagsev uint8, each func() []udev.SrcMsg) func(func(map[string][]*z.RespDiag)) {

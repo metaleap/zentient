@@ -41,9 +41,9 @@ func (_ *zgo) Caps (cap string) (caps []*z.RespCmd) {
 		caps = []*z.RespCmd	{	&z.RespCmd { Title: "gofmt",	Exists: devgo.Has_gofmt,		Hint: "check your Go installation" },
 							}
 	case "diag":
-		caps = []*z.RespCmd	{	&z.RespCmd { Title: "go install",	Exists: devgo.HasGoDevEnv(),	Hint: "check your Go installation" },
-								// &z.RespCmd { Title: "go list",	Exists: devgo.HasGoDevEnv(),	Hint: "check your Go installation" },
-								&z.RespCmd { Title: "go vet",		Exists: devgo.HasGoDevEnv(),	Hint: "check your Go installation" },
+		caps = []*z.RespCmd	{	&z.RespCmd { Title: "go install",	Exists: true },
+								// &z.RespCmd { Title: "go list",	Exists: true },
+								&z.RespCmd { Title: "go vet",		Exists: true },
 								&z.RespCmd { Title: "golint",		Exists: devgo.Has_golint,		Hint: "`go get -u github.com/golang/lint/golint`" },
 								&z.RespCmd { Title: "ineffassign",	Exists: devgo.Has_ineffassign,	Hint: "`go get -u github.com/gordonklaus/ineffassign`" },
 								&z.RespCmd { Title: "aligncheck",	Exists: devgo.Has_checkalign,	Hint: "`github.com/opennota/check`" },
