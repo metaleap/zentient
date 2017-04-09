@@ -67,3 +67,7 @@ func (self *zgo) OnFileClose (file *z.File) {
 
 func (self *zgo) OnFileWrite (file *z.File) {
 }
+
+func (_ *zgo) ReadyToBuildOrLint () bool {
+	return devgo.PkgsByDir!=nil
+}

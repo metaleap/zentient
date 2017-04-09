@@ -21,7 +21,7 @@ type Zengine interface {
 	Caps (string) []*RespCmd
 	DoFmt (string, string, uint8) (*RespFmt, error)
 	Lint ([]string, func(map[string][]*RespDiag)) map[string][]*RespDiag
-	LintReady () bool
+	ReadyToBuildOrLint () bool
 	OnFileClose (*File)
 	OnFileOpen (*File)
 	OnFileWrite (*File)

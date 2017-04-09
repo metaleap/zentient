@@ -70,7 +70,3 @@ func (self *zgo) Lint (filerelpaths []string, ondelayedlintersdone func(map[stri
 	}
 	return self.Base.Lint(funcs, latefuncs, ondelayedlintersdone)
 }
-
-func (_ *zgo) LintReady () bool {
-	return devgo.PkgsByDir!=nil
-}

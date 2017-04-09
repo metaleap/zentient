@@ -99,7 +99,7 @@ func (self *Base) Lint (linters []func(func(map[string][]*RespDiag)), linterslat
 
 
 func (self *Base) RefreshDiags (µ Zengine, closedfilerelpath string, writtenfilerelpath string) {
-	if (!µ.LintReady()) { return }
+	if (!µ.ReadyToBuildOrLint()) { return }
 	var mutex sync.Mutex
 	lintfiles := []string {}
 	funcs := []func() {}
