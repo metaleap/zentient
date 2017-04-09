@@ -1,6 +1,7 @@
 package z
 import (
 	"sync"
+	"time"
 
 	"github.com/metaleap/go-util-misc"
 	"github.com/metaleap/go-util-slice"
@@ -8,13 +9,14 @@ import (
 )
 
 type Base struct {
+	DbgMsgs		[]string
+	DbgObjs		[]interface{}
+
 	alldiags	map[string][]*RespDiag
 	curdiags	map[string][]*RespDiag
 	latediags	map[string][]*RespDiag
+	latediagt	int
 	diagmutex	sync.Mutex
-
-	DbgMsgs		[]string
-	DbgObjs		[]interface{}
 
 	zid			string
 }
@@ -77,22 +79,29 @@ func (self *Base) OpenFiles () []string {
 
 func (self *Base) Lint (linters []func(func(map[string][]*RespDiag)), linterslate []func(func(map[string][]*RespDiag)), ondelayedlintersdone func(map[string][]*RespDiag)) (freshdiags map[string][]*RespDiag) {
 	var mutex sync.Mutex  ;  var mutexlate sync.Mutex
-	freshdiags = map[string][]*RespDiag {}  ;  latediags := map[string][]*RespDiag {}
-	onlinterdone := func(linterdiags map[string][]*RespDiag) {
+	freshdiags = map[string][]*RespDiag {}  ;  var ldiags map[string][]*RespDiag
+
+	funcs := []func() {}
+	onsinglelinterdone := func(linterdiags map[string][]*RespDiag) {
 		mutex.Lock()  ;  defer mutex.Unlock()
 		for frp,filediags := range linterdiags { freshdiags[frp] = append(freshdiags[frp], filediags...) }
 	}
-	onlinterdonelate := func(linterdiags map[string][]*RespDiag) {
-		mutexlate.Lock()  ;  defer mutexlate.Unlock()
-		for frp,filediags := range linterdiags { latediags[frp] = append(latediags[frp], filediags...) }
-	}
-	funcs := []func() {}
-	for _,linter := range linters { fn := linter  ;  funcs = append(funcs, func() { fn(onlinterdone) } ) }
+	for _,linter := range linters { fn := linter  ;  funcs = append(funcs, func() { fn(onsinglelinterdone) } ) }
 	ugo.WaitOn(funcs...)
 
 	latefuncs := []func() {}
-	for _,linter := range linterslate { fn := linter  ;  latefuncs = append(latefuncs, func() { fn(onlinterdonelate) }) }
-	runlatefuncs := func () { ugo.WaitOn(latefuncs...)  ;  ondelayedlintersdone(latediags) }
+	var runlatefuncs func()
+	runlatefuncs = func () {
+		latestart := time.Now().Nanosecond()  ;  ldiags = map[string][]*RespDiag {}
+		if ugo.WaitOn(latefuncs...)  ;  latestart > self.latediagt { // don't do another run if stale, can wreck machine perf in extremely rapid progressions of repeated `onFileWrite`s
+			ondelayedlintersdone(ldiags)
+		}
+	}
+	onsinglelinterdonelate := func(linterdiags map[string][]*RespDiag) {
+		mutexlate.Lock()  ;  defer mutexlate.Unlock()
+		for frp,filediags := range linterdiags { ldiags[frp] = append(ldiags[frp], filediags...) }
+	}
+	for _,linter := range linterslate { fn := linter  ;  latefuncs = append(latefuncs, func() { fn(onsinglelinterdonelate) }) }
 	go runlatefuncs() // we run this only now so that the above returns potentially a bit quicker
 	return
 }
@@ -168,4 +177,5 @@ func (self *Base) resetAllDiags () {
 	self.curdiags = map[string][]*RespDiag {}
 	self.alldiags = map[string][]*RespDiag {}
 	self.latediags = map[string][]*RespDiag {}
+	self.latediagt = time.Now().Nanosecond()
 }
