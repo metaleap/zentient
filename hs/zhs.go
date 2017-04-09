@@ -41,13 +41,13 @@ func (self *zhs) B () *z.Base {
 func (_ *zhs) Caps (cap string) (caps []*z.RespCmd) {
 	switch cap {
 	case "fmt":
-		caps = []*z.RespCmd	{	&z.RespCmd { Title: "stylish-haskell",	Exists: devhs.Has_stylish_haskell,	Hint: "`stack install stylish-haskell`" },
-								&z.RespCmd { Title: "hindent",			Exists: devhs.Has_hindent,			Hint: "`stack install hindent`" },
-								&z.RespCmd { Title: "brittany",			Exists: devhs.Has_brittany,			Hint: "`github.com/lspitzner/brittany`" },
+		caps = []*z.RespCmd	{	{ Title: "stylish-haskell",	Exists: devhs.Has_stylish_haskell,	Hint: "`stack install stylish-haskell`" },
+								{ Title: "hindent",			Exists: devhs.Has_hindent,			Hint: "`stack install hindent`" },
+								{ Title: "brittany",		Exists: devhs.Has_brittany,			Hint: "`github.com/lspitzner/brittany`" },
 							}
 	case "diag":
-		caps = []*z.RespCmd	{	&z.RespCmd { Title: "stack install",	Exists: true },
-								&z.RespCmd { Title: "hlint",			Exists: devhs.Has_hlint,		Hint: "`stack install hlint`" },
+		caps = []*z.RespCmd	{	{ Title: "stack install",	Exists: true },
+								{ Title: "hlint",			Exists: devhs.Has_hlint,			Hint: "`stack install hlint`" },
 							}
 	}
 	return caps
@@ -60,15 +60,6 @@ func (self *zhs) DoFmt (src string, custcmd string, tabsize uint8) (resp *z.Resp
 		z.RespCmd { Exists: devhs.Has_hindent,			Name: "hindent",			Args: []string{"--no-force-newline", "--indent-size", ts} },
 		z.RespCmd { Exists: devhs.Has_brittany,			Name: "brittany",			Args: []string{"--indent", ts} },
 		)
-}
-
-func (_ *zhs) OnFileOpen (file *z.File) {
-}
-
-func (_ *zhs) OnFileClose (file *z.File) {
-}
-
-func (_ *zhs) OnFileWrite (file *z.File) {
 }
 
 func (_ *zhs) ReadyToBuildOrLint () bool {

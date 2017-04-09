@@ -50,7 +50,7 @@ func linterGoVet (filerelpaths []string) func(func(map[string][]*z.RespDiag)) {
 
 
 func (self *zgo) Lint (filerelpaths []string, ondelayedlintersdone func(map[string][]*z.RespDiag)) map[string][]*z.RespDiag {
-	funcs := []func(func(map[string][]*z.RespDiag)) {}  ;  latefuncs := []func(func(map[string][]*z.RespDiag)) {}
+	latefuncs := []func(func(map[string][]*z.RespDiag)) {}
 	pkgfiles := map[*devgo.Pkg][]string {}
 	for _,frp := range filerelpaths {
 		if pkg := devgo.PkgsByDir[strings.ToLower(filepath.Dir(filepath.Join(srcDir, frp)))] ; pkg!=nil {
@@ -59,14 +59,19 @@ func (self *zgo) Lint (filerelpaths []string, ondelayedlintersdone func(map[stri
 	}
 
 	for fpkg,frps := range pkgfiles {
-		funcs = append(funcs, linterGoVet(frps))
+		latefuncs = append(latefuncs, linterGoVet(frps))
 		if devgo.Has_interfacer		{ latefuncs = append(latefuncs, linterMvDan("interfacer", fpkg.ImportPath)) }
 		if devgo.Has_unparam		{ latefuncs = append(latefuncs, linterMvDan("unparam", fpkg.ImportPath)) }
 		if devgo.Has_checkalign		{ latefuncs = append(latefuncs, linterCheck("aligncheck", fpkg.ImportPath)) }
 		if devgo.Has_checkstruct	{ latefuncs = append(latefuncs, linterCheck("structcheck", fpkg.ImportPath)) }
 		if devgo.Has_checkvar		{ latefuncs = append(latefuncs, linterCheck("varcheck", fpkg.ImportPath)) }
-		if devgo.Has_ineffassign	{ funcs = append(funcs, linterIneffAssign(frps)) }
-		if devgo.Has_golint			{ funcs = append(funcs, linterGoLint(frps)) }
+		if devgo.Has_ineffassign	{ latefuncs = append(latefuncs, linterIneffAssign(frps)) }
+		if devgo.Has_golint			{ latefuncs = append(latefuncs, linterGoLint(frps)) }
 	}
-	return self.Base.Lint(funcs, latefuncs, ondelayedlintersdone)
+	return nil // self.Base.Lint(latefuncs, ondelayedlintersdone)
+}
+
+
+func (self *zgo) DiagResident (sev uint8) bool {
+	return sev==z.DIAG_SEV_ERR
 }

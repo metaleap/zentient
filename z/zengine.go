@@ -2,7 +2,6 @@ package z
 import (
 	"path/filepath"
 
-	"github.com/metaleap/go-util-misc"
 	"github.com/metaleap/go-util-slice"
 )
 
@@ -20,12 +19,10 @@ type Zengine interface {
 
 	Caps (string) []*RespCmd
 	DoFmt (string, string, uint8) (*RespFmt, error)
-	Lint ([]string, func(map[string][]*RespDiag)) map[string][]*RespDiag
+	// Lint ([]string, func(map[string][]*RespDiag)) map[string][]*RespDiag
 	ReadyToBuildOrLint () bool
-	OnFileClose (*File)
-	OnFileOpen (*File)
-	OnFileWrite (*File)
 	BuildFrom (string) map[string][]*RespDiag
+	DiagResident (sev uint8) bool
 }
 
 
@@ -50,9 +47,6 @@ func doFmt (zid string, reqsrc string, reqcmd string, reqtabsize uint8) (resp ma
 func onFileClose (µ Zengine, relpath string) {
 	relpath = filepath.FromSlash(relpath)
 	OpenFiles = uslice.StrWithout(OpenFiles, false, relpath)
-	µ.B().DbgMsgs = OpenFiles
-	µ.B().RefreshDiags(µ, relpath, "")
-	µ.OnFileClose(AllFiles[relpath])
 }
 
 func onFileOpen (µ Zengine, relpath string) {
@@ -64,21 +58,17 @@ func onFileOpen (µ Zengine, relpath string) {
 	}
 	if isnew := !uslice.StrHas(OpenFiles, relpath) ; isnew {
 		OpenFiles = append(OpenFiles, relpath)
-		µ.B().RefreshDiags(µ, "", "")
 	}
-	µ.OnFileOpen(file)
 }
 
 func onFileWrite (µ Zengine, relpath string) {
 	relpath = filepath.FromSlash(relpath)
-	file := AllFiles[relpath]
-	µ.B().RefreshDiags(µ, "", relpath)
-	µ.OnFileWrite(file)
+	µ.B().buildFrom(µ, relpath)
 }
 
 
-func refreshAllDiags() {
-	funcs := []func() {}
-	for _,zeng := range Zengines { µ := zeng  ;  funcs = append(funcs, func() { µ.B().RefreshDiags(µ, "", "") }) }
-	ugo.WaitOn(funcs...)
-}
+// func refreshAllDiags() {
+// 	funcs := []func() {}
+// 	// for _,zeng := range Zengines { µ := zeng  ;  funcs = append(funcs, func() { µ.B().RefreshDiags(µ, "", "") }) }
+// 	ugo.WaitOn(funcs...)
+// }

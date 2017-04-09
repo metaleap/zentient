@@ -19,9 +19,14 @@ func linterHlint (filerelpaths []string) func(func(map[string][]*z.RespDiag)) {
 
 
 func (self *zhs) Lint (filerelpaths []string, ondelayedlintersdone func(map[string][]*z.RespDiag)) (freshdiags map[string][]*z.RespDiag) {
-	funcs := []func(func(map[string][]*z.RespDiag)) {}  ;  latefuncs := []func(func(map[string][]*z.RespDiag)) {}
+	latefuncs := []func(func(map[string][]*z.RespDiag)) {}
 	if devhs.Has_hlint {
-		funcs = append(funcs, linterHlint(filerelpaths))
+		latefuncs = append(latefuncs, linterHlint(filerelpaths))
 	}
-	return self.Base.Lint(funcs, latefuncs, ondelayedlintersdone)
+	return // self.Base.Lint(latefuncs, ondelayedlintersdone)
+}
+
+
+func (self *zhs) DiagResident (sev uint8) bool {
+	return sev==z.DIAG_SEV_ERR || sev==z.DIAG_SEV_WARN
 }

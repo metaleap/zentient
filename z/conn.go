@@ -56,17 +56,17 @@ func HandleRequest (queryln string) (e error) {
 		case MSG_ZEN_STATUS:
 			e = out(jsonStatus())
 		case MSG_CURDIAGS:
-			refreshAllDiags()
-			e = out(jsonCurDiags())
+			// refreshAllDiags()
+			e = out(jsonLiveDiags())
 		case MSG_FILE_WRITE:
 			onFileWrite(Zengines[zids[0]], msgargs)
-			e = out(jsonCurDiags())
+			e = out(jsonLiveDiags())
 		case MSG_FILE_OPEN:
 			onFileOpen(Zengines[zids[0]], msgargs)
-			e = out(jsonCurDiags())
+			e = out(jsonLiveDiags())
 		case MSG_FILE_CLOSE:
 			onFileClose(Zengines[zids[0]], msgargs)
-			e = out(jsonCurDiags())
+			e = out(jsonLiveDiags())
 		case MSG_CAPS:
 			resp := map[string][]*RespCmd {}
 			for _, zid := range zids { if µ := Zengines[zid] ; µ != nil {

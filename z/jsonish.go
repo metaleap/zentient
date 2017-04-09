@@ -35,9 +35,9 @@ const (
 )
 
 
-func jsonCurDiags () (allcurdiags map[string]map[string][]*RespDiag) {
-	allcurdiags = map[string]map[string][]*RespDiag {}
-	for zid,µ := range Zengines { allcurdiags[zid] = µ.B().curdiags }
+func jsonLiveDiags () (livediags map[string]map[string][]*RespDiag) {
+	livediags = map[string]map[string][]*RespDiag {}
+	for zid,µ := range Zengines { livediags[zid] = µ.B().liveDiags(µ) }
 	return
 }
 
