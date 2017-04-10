@@ -57,6 +57,8 @@ func (_ *zgo) Caps (cap string) (caps []*z.RespCmd) {
 								{ Title: "unconvert",	Exists: devgo.Has_unconvert,	Hint: "`github.com/mdempsky/unconvert`" },
 								{ Title: "maligned",	Exists: devgo.Has_maligned,		Hint: "`github.com/mdempsky/maligned`" },
 								{ Title: "gosimple",	Exists: devgo.Has_gosimple,		Hint: "`github.com/dominikh/go-tools`" },
+								{ Title: "unused",		Exists: devgo.Has_unused,		Hint: "`github.com/dominikh/go-tools`" },
+								{ Title: "staticcheck",	Exists: devgo.Has_staticcheck,	Hint: "`github.com/dominikh/go-tools`" },
 							}
 	}
 	return caps

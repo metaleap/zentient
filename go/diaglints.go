@@ -54,9 +54,9 @@ func linterGoVet (filerelpaths []string) func()map[string][]*z.RespDiag {
 		return devgo.LintGoVet(filerelpaths)
 	})
 }
-func linterGosimple (pkgimppath string) func()map[string][]*z.RespDiag {
-	return linter("gosimple", z.DIAG_SEV_INFO, func () []udev.SrcMsg {
-		return devgo.LintGosimple(pkgimppath)
+func linterHonnef (cmdname string, pkgimppath string) func()map[string][]*z.RespDiag {
+	return linter(cmdname, z.DIAG_SEV_INFO, func () []udev.SrcMsg {
+		return devgo.LintHonnef(cmdname, pkgimppath)
 	})
 }
 
@@ -78,7 +78,9 @@ func (self *zgo) Linters (filerelpaths []string) (linters []func()map[string][]*
 		if devgo.Has_checkstruct { linters = append(linters, linterCheck("structcheck", fpkg.ImportPath)) }
 		if devgo.Has_checkvar { linters = append(linters, linterCheck("varcheck", fpkg.ImportPath)) }
 		if devgo.Has_maligned { linters = append(linters, linterMaligned(fpkg.ImportPath)) }
-		if devgo.Has_gosimple { linters = append(linters, linterGosimple(fpkg.ImportPath)) }
+		if devgo.Has_gosimple { linters = append(linters, linterHonnef("gosimple", fpkg.ImportPath)) }
+		if devgo.Has_unused { linters = append(linters, linterHonnef("unused", fpkg.ImportPath)) }
+		if devgo.Has_staticcheck { linters = append(linters, linterHonnef("staticcheck", fpkg.ImportPath)) }
 	}
 	return
 }
