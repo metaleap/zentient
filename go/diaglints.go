@@ -39,6 +39,11 @@ func linterUnconvert (pkgimppath string) func()map[string][]*z.RespDiag {
 		return devgo.LintUnconvert(pkgimppath)
 	})
 }
+func linterMaligned (pkgimppath string) func()map[string][]*z.RespDiag {
+	return linter("maligned", z.DIAG_SEV_INFO, func () []udev.SrcMsg {
+		return devgo.LintMaligned(pkgimppath)
+	})
+}
 func linterGoLint (filerelpaths []string) func()map[string][]*z.RespDiag {
 	return linter("golint", z.DIAG_SEV_HINT, func () []udev.SrcMsg {
 		return devgo.LintGolint(filerelpaths)
@@ -67,6 +72,7 @@ func (self *zgo) Linters (filerelpaths []string) (linters []func()map[string][]*
 		if devgo.Has_checkalign { linters = append(linters, linterCheck("aligncheck", fpkg.ImportPath)) }
 		if devgo.Has_checkstruct { linters = append(linters, linterCheck("structcheck", fpkg.ImportPath)) }
 		if devgo.Has_checkvar { linters = append(linters, linterCheck("varcheck", fpkg.ImportPath)) }
+		if devgo.Has_maligned { linters = append(linters, linterMaligned(fpkg.ImportPath)) }
 	}
 	return
 }
