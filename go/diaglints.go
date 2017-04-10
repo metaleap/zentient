@@ -46,7 +46,12 @@ func linterGoVet (filerelpaths []string) func(func(map[string][]*z.RespDiag)) {
 }
 
 
-func (self *zgo) Lint (filerelpaths []string, ondelayedlintersdone func(map[string][]*z.RespDiag)) map[string][]*z.RespDiag {
+func (self *zgo) Linters (filerelpaths []string) (linters []func()map[string][]*z.RespDiag) {
+	return
+}
+
+
+func (self *zgo) OldLint (filerelpaths []string, ondelayedlintersdone func(map[string][]*z.RespDiag)) map[string][]*z.RespDiag {
 	latefuncs := []func(func(map[string][]*z.RespDiag)) {}
 	pkgfiles := map[*devgo.Pkg][]string {}  ;  for _,frp := range filerelpaths {
 		if pkg := filePkg(frp) ; pkg!=nil {

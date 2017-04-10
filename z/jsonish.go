@@ -35,9 +35,9 @@ const (
 )
 
 
-func jsonLiveDiags () (livediags map[string]map[string][]*RespDiag) {
+func jsonLiveDiags (closedfrp string, openedfrp string) (livediags map[string]map[string][]*RespDiag) {
 	livediags = map[string]map[string][]*RespDiag {}
-	for zid,µ := range Zengines { livediags[zid] = µ.B().liveDiags(µ) }
+	for zid,µ := range Zengines { livediags[zid] = µ.B().liveDiags(µ, closedfrp, openedfrp) }
 	return
 }
 
