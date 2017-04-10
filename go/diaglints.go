@@ -1,5 +1,7 @@
 package zgo
 import (
+	"path/filepath"
+
 	"github.com/metaleap/go-devgo"
 	"github.com/metaleap/go-util-dev"
 
@@ -29,19 +31,14 @@ func linterMvDan (cmdname string, pkgimppath string) func()map[string][]*z.RespD
 		return devgo.LintMvDan(cmdname, pkgimppath)
 	})
 }
-func linterIneffAssign (filerelpaths []string) func()map[string][]*z.RespDiag {
+func linterIneffAssign (dirrelpath string) func()map[string][]*z.RespDiag {
 	return linter("ineffassign", z.DIAG_SEV_INFO, func () []udev.SrcMsg {
-		return devgo.LintIneffAssign(filerelpaths)
+		return devgo.LintIneffAssign(dirrelpath)
 	})
 }
-func linterUnconvert (pkgimppath string) func()map[string][]*z.RespDiag {
-	return linter("unconvert", z.DIAG_SEV_INFO, func () []udev.SrcMsg {
-		return devgo.LintUnconvert(pkgimppath)
-	})
-}
-func linterMaligned (pkgimppath string) func()map[string][]*z.RespDiag {
-	return linter("maligned", z.DIAG_SEV_INFO, func () []udev.SrcMsg {
-		return devgo.LintMaligned(pkgimppath)
+func linterMDempsky (cmdname string, pkgimppath string) func()map[string][]*z.RespDiag {
+	return linter(cmdname, z.DIAG_SEV_INFO, func () []udev.SrcMsg {
+		return devgo.LintMDempsky(cmdname, pkgimppath)
 	})
 }
 func linterGolint (filerelpaths []string) func()map[string][]*z.RespDiag {
@@ -70,14 +67,14 @@ func (self *zgo) Linters (filerelpaths []string) (linters []func()map[string][]*
 	for fpkg,frps := range pkgfiles {
 		linters = append(linters, linterGoVet(frps))
 		if devgo.Has_golint { linters = append(linters, linterGolint(frps)) }
-		if devgo.Has_ineffassign { linters = append(linters, linterIneffAssign(frps)) }
+		if devgo.Has_ineffassign { linters = append(linters, linterIneffAssign(filepath.Dir(frps[0]))) }
 		if devgo.Has_interfacer { linters = append(linters, linterMvDan("interfacer", fpkg.ImportPath)) }
 		if devgo.Has_unparam { linters = append(linters, linterMvDan("unparam", fpkg.ImportPath)) }
-		if devgo.Has_unconvert { linters = append(linters, linterUnconvert(fpkg.ImportPath)) }
 		if devgo.Has_checkalign { linters = append(linters, linterCheck("aligncheck", fpkg.ImportPath)) }
 		if devgo.Has_checkstruct { linters = append(linters, linterCheck("structcheck", fpkg.ImportPath)) }
 		if devgo.Has_checkvar { linters = append(linters, linterCheck("varcheck", fpkg.ImportPath)) }
-		if devgo.Has_maligned { linters = append(linters, linterMaligned(fpkg.ImportPath)) }
+		if devgo.Has_unconvert { linters = append(linters, linterMDempsky("unconvert", fpkg.ImportPath)) }
+		if devgo.Has_maligned { linters = append(linters, linterMDempsky("maligned", fpkg.ImportPath)) }
 		if devgo.Has_gosimple { linters = append(linters, linterHonnef("gosimple", fpkg.ImportPath)) }
 		if devgo.Has_unused { linters = append(linters, linterHonnef("unused", fpkg.ImportPath)) }
 		if devgo.Has_staticcheck { linters = append(linters, linterHonnef("staticcheck", fpkg.ImportPath)) }
