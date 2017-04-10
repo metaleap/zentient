@@ -1,8 +1,5 @@
 package zgo
 import (
-	"path/filepath"
-	"strings"
-
 	"github.com/metaleap/go-devgo"
 	"github.com/metaleap/go-util-dev"
 
@@ -43,7 +40,7 @@ func linterGoLint (filerelpaths []string) func(func(map[string][]*z.RespDiag)) {
 	})
 }
 func linterGoVet (filerelpaths []string) func(func(map[string][]*z.RespDiag)) {
-	return linter("go vet", z.DIAG_SEV_WARN, func () []udev.SrcMsg {
+	return linter("go vet", z.DIAG_SEV_INFO, func () []udev.SrcMsg {
 		return devgo.LintGoVet(filerelpaths)
 	})
 }
@@ -52,7 +49,7 @@ func linterGoVet (filerelpaths []string) func(func(map[string][]*z.RespDiag)) {
 func (self *zgo) Lint (filerelpaths []string, ondelayedlintersdone func(map[string][]*z.RespDiag)) map[string][]*z.RespDiag {
 	latefuncs := []func(func(map[string][]*z.RespDiag)) {}
 	pkgfiles := map[*devgo.Pkg][]string {}  ;  for _,frp := range filerelpaths {
-		if pkg := devgo.PkgsByDir[strings.ToLower(filepath.Dir(filepath.Join(srcDir, frp)))] ; pkg!=nil {
+		if pkg := filePkg(frp) ; pkg!=nil {
 			pkgfiles[pkg] = append(pkgfiles[pkg], frp)
 		}
 	}
@@ -68,9 +65,4 @@ func (self *zgo) Lint (filerelpaths []string, ondelayedlintersdone func(map[stri
 		if devgo.Has_golint			{ latefuncs = append(latefuncs, linterGoLint(frps)) }
 	}
 	return nil // self.Base.Lint(latefuncs, ondelayedlintersdone)
-}
-
-
-func (self *zgo) DiagResident (sev uint8) bool {
-	return sev==z.DIAG_SEV_ERR
 }

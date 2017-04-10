@@ -22,7 +22,7 @@ type Zengine interface {
 	// Lint ([]string, func(map[string][]*RespDiag)) map[string][]*RespDiag
 	ReadyToBuildAndLint () bool
 	BuildFrom ([]string) map[string][]*RespDiag
-	DiagResident (sev uint8) bool
+	OnFile (*File)
 }
 
 
@@ -54,6 +54,7 @@ func onFileOpen (µ Zengine, relpath string) {
 	file := AllFiles[relpath]
 	if file == nil {
 		file = NewFile(µ, relpath)
+		µ.OnFile(file)
 		AllFiles[relpath] = file
 	}
 	if isnew := !uslice.StrHas(OpenFiles, relpath) ; isnew {

@@ -11,7 +11,6 @@ type Base struct {
 	builddiags	map[string][]*RespDiag
 	lintdiags	map[string][]*RespDiag
 	livediags	map[string][]*RespDiag
-	livemutex	sync.Mutex
 	lintmutex	sync.Mutex
 
 	zid			string
@@ -156,40 +155,28 @@ func (self *Base) OpenFiles () []string {
 
 
 func (self *Base) buildFrom (µ Zengine, filerelpath string) {
-	self.livemutex.Lock() ; defer self.livemutex.Unlock()
-	self.livediags = nil
-	self.lintdiags = nil
-	openfiles := append([]string { filerelpath }, uslice.StrWithout(openFiles(µ), false, filerelpath)...)
-	self.builddiags = µ.BuildFrom(openfiles)
+	if µ.ReadyToBuildAndLint() {
+		self.livediags = nil
+		self.lintdiags = nil
+		fromfiles := append([]string { filerelpath }, uslice.StrWithout(openFiles(µ), false, filerelpath)...)
+		go self.relint(µ, fromfiles)
+		self.builddiags = µ.BuildFrom(fromfiles)
+	}
 }
 
 
 func (self *Base) liveDiags (µ Zengine) map[string][]*RespDiag {
-	self.livemutex.Lock() ; defer self.livemutex.Unlock()
 	if self.livediags==nil {
 		self.livediags = map[string][]*RespDiag {}
 		if self.builddiags!=nil { for frp,fdiags := range self.builddiags { self.livediags[frp] = fdiags } }
-		if len(self.livediags)==0 {
-			self.lintmutex.Lock()  ;  defer self.lintmutex.Unlock()
-			if self.lintdiags==nil { } else {
-				openfiles := openFiles(µ)
-				for frp,fdiags := range self.lintdiags {
-					if uslice.StrHas(openfiles, frp) { self.livediags[frp] = append(self.livediags[frp], fdiags...) }
-				}
-			}
-		}
+		self.lintmutex.Lock()  ;  defer self.lintmutex.Unlock()
+		if self.lintdiags!=nil { openfiles := openFiles(µ)  ;  for _,frp := range openfiles {
+			self.livediags[frp] = append(self.livediags[frp], self.lintdiags[frp]...)
+		} }
 	}
 	return self.livediags
 }
 
 
-func (self *Base) relint (µ Zengine, filerelpaths []string) {
-	// self.lintdiags = map[string][]*RespDiag {}
-	// files := openFiles(µ)
-	// if len(files)>0{
-
-
-	// 	if self.lintdiags!=nil {
-	// 	}
-	// }
+func (self *Base) relint (µ Zengine, openfiles []string) {
 }

@@ -2,7 +2,6 @@ package zgo
 import (
 	"os"
 	"path/filepath"
-	"strings"
 	"sync"
 
 	"github.com/metaleap/go-devgo"
@@ -25,7 +24,7 @@ func buildPkg (pkgimppath string, fromfilerelpath string, diags map[string][]*z.
 	msgs := udev.CmdExecOnSrc(true, nil, "go", "install", pkgimppath)
 	for _,srcref := range msgs { if srcref.Msg != "too many errors" {
 		d := &z.RespDiag { Sev: z.DIAG_SEV_ERR, SrcMsg: srcref }
-		fpath := srcref.Ref  ;  d.Ref = pkgimppath
+		fpath := srcref.Ref  ;  d.Ref = "go install " + pkgimppath
 		if !ufs.FileExists(filepath.Join(srcDir, fpath)) { d.Msg = fpath + ": " + d.Msg  ;  fpath = fromfilerelpath }
 		diags[fpath] = append(diags[fpath], d)
 	} }
@@ -36,18 +35,16 @@ func buildPkg (pkgimppath string, fromfilerelpath string, diags map[string][]*z.
 func (_ *zgo) BuildFrom (filerelpaths []string) (freshdiags map[string][]*z.RespDiag) {
 	pkgimppaths := []string {}  ;  pkgimpimppaths := []string {}
 
-	for _,frp := range filerelpaths {
-		if pkg := devgo.PkgsByDir[strings.ToLower(filepath.Dir(filepath.Join(srcDir, frp)))] ; pkg!=nil {
-			if !(uslice.StrHas(pkgimppaths, pkg.ImportPath) || uslice.StrHas(pkgimpimppaths, pkg.ImportPath)) {
-				pkgimppaths = append(pkgimppaths, pkg.ImportPath)
-			}
-			for _,pip := range pkg.Importers("") {
-				if !(uslice.StrHas(pkgimppaths, pip) || uslice.StrHas(pkgimpimppaths, pip)) {
-					pkgimpimppaths = append(pkgimpimppaths, pip)
-				}
+	for _,frp := range filerelpaths { if pkg := filePkg(frp)  ;  pkg!=nil {
+		if !(uslice.StrHas(pkgimppaths, pkg.ImportPath) || uslice.StrHas(pkgimpimppaths, pkg.ImportPath)) {
+			pkgimppaths = append(pkgimppaths, pkg.ImportPath)
+		}
+		for _,pip := range pkg.Importers("") {
+			if !(uslice.StrHas(pkgimppaths, pip) || uslice.StrHas(pkgimpimppaths, pip)) {
+				pkgimpimppaths = append(pkgimpimppaths, pip)
 			}
 		}
-	}
+	} }
 	freshdiags = map[string][]*z.RespDiag {}  ;  succeeded := []string {}
 	for _,pkgimppath := range pkgimppaths {
 		if success := buildPkg(pkgimppath, filerelpaths[0], freshdiags)  ;  success {
@@ -61,7 +58,7 @@ func (_ *zgo) BuildFrom (filerelpaths []string) (freshdiags map[string][]*z.Resp
 	}
 	refreshindirectdependants := func() {
 		if asyncrebuilds := devgo.AllFinalDependants(succeeded)  ;  len(asyncrebuilds)>0 {
-			defer devgo.RefreshPkgs()  ;  laterebuilds.Lock()  ;  defer laterebuilds.Unlock()
+			defer refreshPkgs()  ;  laterebuilds.Lock()  ;  defer laterebuilds.Unlock()
 			for _,pkgimppath := range asyncrebuilds {
 				if !(uslice.StrHas(pkgimppaths, pkgimppath) || uslice.StrHas(pkgimpimppaths, pkgimppath) || uslice.StrHas(succeeded, pkgimppath)) {
 					go ugo.CmdExec("go", "install", pkgimppath)

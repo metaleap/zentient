@@ -1,5 +1,8 @@
 package zgo
 import (
+	"runtime"
+	"strings"
+
 	"github.com/metaleap/go-devgo"
 
 	"github.com/metaleap/zentient/z"
@@ -19,7 +22,7 @@ var (
 func Init () z.Zengine {
 	if !devgo.HasGoDevEnv() { return nil }
 	srcDir = z.Ctx.SrcDir  ;  devgo.SrcDir = srcDir
-	go devgo.RefreshPkgs()
+	go refreshPkgs()
 	self := &zgo{}
 	self.Base.Init()
 	return self
@@ -42,7 +45,6 @@ func (_ *zgo) Caps (cap string) (caps []*z.RespCmd) {
 							}
 	case "diag":
 		caps = []*z.RespCmd	{	{ Title: "go install",	Exists: true },
-								// { Title: "go list",	Exists: true },
 								{ Title: "go vet",		Exists: true },
 								{ Title: "golint",		Exists: devgo.Has_golint,		Hint: "`go get -u github.com/golang/lint/golint`" },
 								{ Title: "ineffassign",	Exists: devgo.Has_ineffassign,	Hint: "`go get -u github.com/gordonklaus/ineffassign`" },
@@ -59,6 +61,28 @@ func (self *zgo) DoFmt (src string, custcmd string, tabsize uint8) (*z.RespFmt, 
 	return self.Base.DoFmt(src, custcmd, z.RespCmd { Exists: devgo.Has_gofmt, Name: "gofmt", Args: []string{"-e", "-s"} })
 }
 
+func (_ *zgo) OnFile (newfile *z.File) {
+	setFilePkgInfo(newfile)
+}
+
 func (_ *zgo) ReadyToBuildAndLint () bool {
 	return devgo.PkgsByDir!=nil
+}
+
+
+func filePkg (relfilepath string) *devgo.Pkg {
+	if f := z.AllFiles[relfilepath]  ;  f != nil {
+		if pkg,ok := f.Proj.(*devgo.Pkg)  ;  ok { return pkg }
+	}
+	return nil
+}
+
+func refreshPkgs () {
+	devgo.RefreshPkgs()
+	for _,file := range z.AllFiles { setFilePkgInfo(file) }
+}
+
+func setFilePkgInfo (file *z.File) {
+	dir := file.DirFull  ;  if runtime.GOOS=="windows" { dir = strings.ToLower(dir) }
+	if pkg := devgo.PkgsByDir[dir]  ;  pkg!=nil { file.Proj = pkg }
 }

@@ -25,8 +25,3 @@ func (self *zhs) Lint (filerelpaths []string, ondelayedlintersdone func(map[stri
 	}
 	return // self.Base.Lint(latefuncs, ondelayedlintersdone)
 }
-
-
-func (self *zhs) DiagResident (sev uint8) bool {
-	return sev==z.DIAG_SEV_ERR || sev==z.DIAG_SEV_WARN
-}

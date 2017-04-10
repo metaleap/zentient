@@ -62,6 +62,9 @@ func (self *zhs) DoFmt (src string, custcmd string, tabsize uint8) (resp *z.Resp
 		)
 }
 
+func (_ *zhs) OnFile (newfile *z.File) {
+}
+
 func (_ *zhs) ReadyToBuildAndLint () bool {
 	return true
 }
