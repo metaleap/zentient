@@ -9,9 +9,15 @@ func linterHlint (filerelpaths []string) func()map[string][]*z.RespDiag {
 	return func () map[string][]*z.RespDiag {
 		filediags := map[string][]*z.RespDiag {}
 		for _,srcref := range devhs.LintHlint(filerelpaths) {
-			d := &z.RespDiag { Sev: z.DIAG_SEV_INFO , SrcMsg: srcref }  ;  d.Ref = "hlint"
-			d.PosLn = srcref.PosLn  ;  d.PosCol = srcref.PosCol  ;  d.Pos2Ln = srcref.Pos2Ln  ;  d.Pos2Col = srcref.Pos2Col
-			fpath := srcref.Ref  ;  filediags[fpath] = append(filediags[fpath], d)
+			diag := &z.RespDiag { Sev: z.DIAG_SEV_INFO , SrcMsg: srcref }  ;  diag.Ref = "hlint"
+			diag.PosLn = srcref.PosLn  ;  diag.PosCol = srcref.PosCol  ;  diag.Pos2Ln = srcref.Pos2Ln  ;  diag.Pos2Col = srcref.Pos2Col
+			if srcref.Data != nil {
+				if _md,ok := srcref.Data["_md"].(string)  ;  ok {
+					diag.Ref = diag.Ref + " » " + _md
+					delete(srcref.Data, "_md")
+				}
+			}
+			fpath := srcref.Ref  ;  filediags[fpath] = append(filediags[fpath], diag)
 		}
 		return filediags
 	}

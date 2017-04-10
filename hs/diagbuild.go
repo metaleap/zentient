@@ -49,6 +49,9 @@ func (_ *zhs) BuildFrom (filerelpaths []string) (freshdiags map[string][]*z.Resp
 			fpath,_ := filepath.Rel(srcDir, cur.Ref)
 			if len(fpath)==0 {  fpath = cur.Ref  }
 			cur.Ref = "ghc"  ;  cur.Msg = strings.TrimSpace(cur.Msg)
+			if i := strings.Index(cur.Msg, "]")  ;  ustr.Pref(cur.Msg, "[") && i>0 {
+				cur.Ref = cur.Ref + "  » " + cur.Msg[1:i]  ;  cur.Msg = strings.TrimSpace(cur.Msg[i+1:])
+			}
 			freshdiags[fpath] = append(freshdiags[fpath], cur)
 		} }
 		for _,ln := range lns { if len(ln)> 0 {

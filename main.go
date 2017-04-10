@@ -7,6 +7,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/metaleap/go-util-dev"
 	"github.com/metaleap/go-util-fs"
 	"github.com/metaleap/go-util-misc"
 
@@ -22,6 +23,7 @@ func main () {
 	runtime.GOMAXPROCS(runtime.NumCPU() * 2)
 	var err error
 	if z.Ctx.SrcDir,err = os.Getwd() ; err != nil { return }
+	udev.SrcDir = z.Ctx.SrcDir
 	if err = ensureDataDirs() ; err != nil { return }
 
 	//  get the IO stuff ready
