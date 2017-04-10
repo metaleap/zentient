@@ -24,12 +24,3 @@ func (self *zhs) Linters (filerelpaths []string) (linters []func()map[string][]*
 	}
 	return
 }
-
-
-// func (self *zhs) OldLint (filerelpaths []string, ondelayedlintersdone func(map[string][]*z.RespDiag)) (freshdiags map[string][]*z.RespDiag) {
-// 	latefuncs := []func(func(map[string][]*z.RespDiag)) {}
-// 	if devhs.Has_hlint {
-// 		latefuncs = append(latefuncs, linterHlint(filerelpaths))
-// 	}
-// 	return // self.Base.Lint(latefuncs, ondelayedlintersdone)
-// }

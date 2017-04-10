@@ -37,7 +37,13 @@ const (
 
 func jsonLiveDiags (closedfrp string, openedfrp string) (livediags map[string]map[string][]*RespDiag) {
 	livediags = map[string]map[string][]*RespDiag {}
-	for zid,µ := range Zengines { livediags[zid] = µ.B().liveDiags(µ, closedfrp, openedfrp) }
+	fc := AllFiles[closedfrp]  ;  fo := AllFiles[openedfrp]
+	for zid,µ := range Zengines {
+		var fcrp, forp string
+		if fc!=nil && fc.µ==µ { fcrp = fc.RelPath } else { fcrp = "" }
+		if fo!=nil && fo.µ==µ { forp = fo.RelPath } else { forp = "" }
+		livediags[zid] = µ.B().liveDiags(µ, fcrp, forp)
+	}
 	return
 }
 
@@ -52,13 +58,16 @@ func jsonErrMsg (msg string) interface{} {
 
 func jsonStatus () interface{} {
 	resp := map[string]interface{} {}
-	resp["Ctx"] = Ctx
-	resp["OpenFiles"] = OpenFiles
-	resp["AllFiles"] = AllFiles
-	resp["Zengines"] = jsonZengines()
-	for zid, zengine := range Zengines {
-		resp["Zengines["+zid+"]"] = zengine
-	}
+	resp["livediags"] = Zengines["go"].B().livediags
+	resp["lintdiags"] = Zengines["go"].B().lintdiags
+	resp["builddiags"] = Zengines["go"].B().builddiags
+	// resp["Ctx"] = Ctx
+	// resp["OpenFiles"] = OpenFiles
+	// resp["AllFiles"] = AllFiles
+	// resp["Zengines"] = jsonZengines()
+	// for zid, zengine := range Zengines {
+	// 	resp["Zengines["+zid+"]"] = zengine
+	// }
 	return resp
 }
 

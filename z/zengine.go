@@ -51,8 +51,7 @@ func onFileClose (µ Zengine, relpath string) {
 
 func onFileOpen (µ Zengine, relpath string) {
 	relpath = filepath.FromSlash(relpath)
-	file := AllFiles[relpath]
-	if file == nil {
+	file := AllFiles[relpath]  ;  if file == nil {
 		file = NewFile(µ, relpath)
 		µ.OnFile(file)
 		AllFiles[relpath] = file
