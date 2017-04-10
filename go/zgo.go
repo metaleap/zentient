@@ -47,14 +47,16 @@ func (_ *zgo) Caps (cap string) (caps []*z.RespCmd) {
 	case "diag":
 		caps = []*z.RespCmd	{	{ Title: "go install",	Exists: true },
 								{ Title: "go vet",		Exists: true },
-								{ Title: "golint",		Exists: devgo.Has_golint,		Hint: "`go get -u github.com/golang/lint/golint`" },
-								{ Title: "ineffassign",	Exists: devgo.Has_ineffassign,	Hint: "`go get -u github.com/gordonklaus/ineffassign`" },
+								{ Title: "golint",		Exists: devgo.Has_golint,		Hint: "`github.com/golang/lint/`" },
+								{ Title: "ineffassign",	Exists: devgo.Has_ineffassign,	Hint: "`github.com/gordonklaus/ineffassign`" },
 								{ Title: "aligncheck",	Exists: devgo.Has_checkalign,	Hint: "`github.com/opennota/check`" },
 								{ Title: "structcheck",	Exists: devgo.Has_checkstruct,	Hint: "`github.com/opennota/check`" },
 								{ Title: "varcheck",	Exists: devgo.Has_checkvar,		Hint: "`github.com/opennota/check`" },
 								{ Title: "interfacer",	Exists: devgo.Has_golint,		Hint: "`github.com/mvdan/interfacer`" },
+								{ Title: "unparam",		Exists: devgo.Has_unparam,		Hint: "`github.com/mvdan/unparam`" },
 								{ Title: "unconvert",	Exists: devgo.Has_unconvert,	Hint: "`github.com/mdempsky/unconvert`" },
 								{ Title: "maligned",	Exists: devgo.Has_maligned,		Hint: "`github.com/mdempsky/maligned`" },
+								{ Title: "gosimple",	Exists: devgo.Has_gosimple,		Hint: "`github.com/dominikh/go-tools`" },
 							}
 	}
 	return caps
