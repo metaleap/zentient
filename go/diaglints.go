@@ -34,6 +34,11 @@ func linterIneffAssign (filerelpaths []string) func()map[string][]*z.RespDiag {
 		return devgo.LintIneffAssign(filerelpaths)
 	})
 }
+func linterUnconvert (pkgimppath string) func()map[string][]*z.RespDiag {
+	return linter("unconvert", z.DIAG_SEV_INFO, func () []udev.SrcMsg {
+		return devgo.LintUnconvert(pkgimppath)
+	})
+}
 func linterGoLint (filerelpaths []string) func()map[string][]*z.RespDiag {
 	return linter("golint", z.DIAG_SEV_HINT, func () []udev.SrcMsg {
 		return devgo.LintGolint(filerelpaths)
@@ -58,6 +63,7 @@ func (self *zgo) Linters (filerelpaths []string) (linters []func()map[string][]*
 		if devgo.Has_ineffassign { linters = append(linters, linterIneffAssign(frps)) }
 		if devgo.Has_interfacer { linters = append(linters, linterMvDan("interfacer", fpkg.ImportPath)) }
 		if devgo.Has_unparam { linters = append(linters, linterMvDan("unparam", fpkg.ImportPath)) }
+		if devgo.Has_unconvert { linters = append(linters, linterUnconvert(fpkg.ImportPath)) }
 		if devgo.Has_checkalign { linters = append(linters, linterCheck("aligncheck", fpkg.ImportPath)) }
 		if devgo.Has_checkstruct { linters = append(linters, linterCheck("structcheck", fpkg.ImportPath)) }
 		if devgo.Has_checkvar { linters = append(linters, linterCheck("varcheck", fpkg.ImportPath)) }
