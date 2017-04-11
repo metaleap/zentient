@@ -14,6 +14,7 @@ const (
 	MSG_CURDIAGS	= "CD:"
 
 	MSG_DO_FMT		= "DF:"
+	MSG_DO_RENAME	= "DR:"
 
 	MSG_FILE_OPEN	= "FO:"
 	MSG_FILE_CLOSE	= "FC:"

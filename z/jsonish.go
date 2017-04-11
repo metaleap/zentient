@@ -36,7 +36,6 @@ const (
 
 
 var (
-	_jsonlivediags map[string]map[string][]*RespDiag
 	newlivediags = true
 )
 
