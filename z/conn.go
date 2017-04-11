@@ -56,7 +56,6 @@ func HandleRequest (queryln string) (e error) {
 		case MSG_ZEN_STATUS:
 			e = out(jsonStatus())
 		case MSG_CURDIAGS:
-			// refreshAllDiags()
 			e = out(jsonLiveDiags("", ""))
 		case MSG_FILE_WRITE:
 			onFileWrite(Zengines[zids[0]], msgargs)

@@ -35,14 +35,24 @@ const (
 )
 
 
-func jsonLiveDiags (closedfrp string, openedfrp string) (livediags map[string]map[string][]*RespDiag) {
-	livediags = map[string]map[string][]*RespDiag {}
-	fc := AllFiles[closedfrp]  ;  fo := AllFiles[openedfrp]
-	for zid,µ := range Zengines {
-		var fcrp, forp string
-		if fc!=nil && fc.µ==µ { fcrp = fc.RelPath } else { fcrp = "" }
-		if fo!=nil && fo.µ==µ { forp = fo.RelPath } else { forp = "" }
-		livediags[zid] = µ.B().liveDiags(µ, fcrp, forp)
+var (
+	jsonlivediags map[string]map[string][]*RespDiag
+)
+
+
+func jsonLiveDiags (closedfrp string, openedfrp string) (jld map[string]map[string][]*RespDiag) {
+	if len(closedfrp)>0 || len(openedfrp)>0 {  jsonlivediags = nil  }
+	if jld = jsonlivediags  ;  jld==nil {
+		cancache := true  ;  jld = map[string]map[string][]*RespDiag {}
+		fc := AllFiles[closedfrp]  ;  fo := AllFiles[openedfrp]
+		for zid,µ := range Zengines {
+			var fcrp, forp string
+			if fc!=nil && fc.µ==µ { fcrp = fc.RelPath } else { fcrp = "" }
+			if fo!=nil && fo.µ==µ { forp = fo.RelPath } else { forp = "" }
+			if (!µ.ReadyToBuildAndLint()) { cancache = false }
+			jld[zid] = µ.B().liveDiags(µ, fcrp, forp)
+		}
+		if cancache { jsonlivediags = jld }
 	}
 	return
 }
