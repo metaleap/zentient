@@ -71,7 +71,7 @@ func (self *Base) OpenFiles () []string {
 
 func (self *Base) buildFrom (µ Zengine, filerelpath string) {
 	if µ.ReadyToBuildAndLint() {
-		jsonlivediags = nil  ;  self.livediags = nil  ;  self.lintdiags = nil
+		newlivediags = true  ;  self.livediags = nil  ;  self.lintdiags = nil
 		fromfiles := append([]string { filerelpath }, uslice.StrWithout(openFiles(µ), false, filerelpath)...)
 		self.builddiags = µ.BuildFrom(fromfiles)
 	}
@@ -79,7 +79,7 @@ func (self *Base) buildFrom (µ Zengine, filerelpath string) {
 
 
 func (self *Base) liveDiags (µ Zengine, closedfrp string, openedfrp string) map[string][]*RespDiag {
-	if len(openedfrp)>0 || len(closedfrp)>0 {  self.livediags = nil  }
+	if len(openedfrp)>0 || len(closedfrp)>0 {  newlivediags = true  ;  self.livediags = nil  }
 	openfiles := openFiles(µ)  ;  livediags := self.livediags  ;  if livediags==nil {
 		livediags = map[string][]*RespDiag {}
 		if self.builddiags!=nil { for frp,fdiags := range self.builddiags { livediags[frp] = fdiags } }
@@ -109,7 +109,7 @@ func (self *Base) relint (µ Zengine, mytime int64) {
 				if lintdiags = self.lintdiags  ;  lintdiags!=nil && mytime>=self.linttime {
 					for frp,fdiags := range freshdiags { lintdiags[frp] = fdiags }
 					if self.lintdiags!=nil && mytime>=self.linttime {
-						self.lintdiags , self.livediags , jsonlivediags = lintdiags , nil , nil
+						self.lintdiags , self.livediags , newlivediags = lintdiags , nil , true
 					}
 				}
 			}

@@ -36,23 +36,24 @@ const (
 
 
 var (
-	jsonlivediags map[string]map[string][]*RespDiag
+	_jsonlivediags map[string]map[string][]*RespDiag
+	newlivediags = true
 )
 
 
 func jsonLiveDiags (closedfrp string, openedfrp string) (jld map[string]map[string][]*RespDiag) {
-	if len(closedfrp)>0 || len(openedfrp)>0 {  jsonlivediags = nil  }
-	if jld = jsonlivediags  ;  jld==nil {
-		cancache := true  ;  jld = map[string]map[string][]*RespDiag {}
+	if len(closedfrp)>0 || len(openedfrp)>0 {  newlivediags = true  }
+	if newlivediags {
+		diagsready := true  ;  jld = map[string]map[string][]*RespDiag {}
 		fc := AllFiles[closedfrp]  ;  fo := AllFiles[openedfrp]
 		for zid,µ := range Zengines {
+			if (!µ.ReadyToBuildAndLint()) { diagsready = false }
 			var fcrp, forp string
 			if fc!=nil && fc.µ==µ { fcrp = fc.RelPath } else { fcrp = "" }
 			if fo!=nil && fo.µ==µ { forp = fo.RelPath } else { forp = "" }
-			if (!µ.ReadyToBuildAndLint()) { cancache = false }
 			jld[zid] = µ.B().liveDiags(µ, fcrp, forp)
 		}
-		if cancache { jsonlivediags = jld }
+		if diagsready { newlivediags = false }
 	}
 	return
 }
