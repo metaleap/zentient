@@ -20,12 +20,12 @@ var (
 )
 
 
-func buildPkg (pkgimppath string, fromfilerelpath string, diags map[string][]*z.RespDiag) bool {
+func buildPkg (pkgimppath string, fallbackfilerelpath string, diags map[string][]*z.RespDiag) bool {
 	msgs := udev.CmdExecOnSrc(true, nil, "go", "install", pkgimppath)
 	for _,srcref := range msgs { if srcref.Msg != "too many errors" {
 		d := &z.RespDiag { Sev: z.DIAG_SEV_ERR, SrcMsg: srcref }
 		fpath := srcref.Ref  ;  d.Ref = "go install " + pkgimppath
-		if !ufs.FileExists(filepath.Join(srcDir, fpath)) { d.Msg = fpath + ": " + d.Msg  ;  fpath = fromfilerelpath }
+		if !ufs.FileExists(filepath.Join(srcDir, fpath)) { d.Msg = fpath + ": " + d.Msg  ;  fpath = fallbackfilerelpath }
 		diags[fpath] = append(diags[fpath], d)
 	} }
 	return len(msgs)==0

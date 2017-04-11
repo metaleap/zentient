@@ -44,31 +44,22 @@ func doFmt (zid string, reqsrc string, reqcmd string, reqtabsize uint8) (resp ma
 	return
 }
 
-func onFileClose (µ Zengine, relpath string) {
-	relpath = filepath.FromSlash(relpath)
-	OpenFiles = uslice.StrWithout(OpenFiles, false, relpath)
+func onFilesClosed (µ Zengine, relpaths []string) {
+	for i,_ := range relpaths { relpaths[i] = filepath.FromSlash(relpaths[i]) }
+	OpenFiles = uslice.StrWithout(OpenFiles, false, relpaths...)
 }
 
-func onFileOpen (µ Zengine, relpath string) {
-	relpath = filepath.FromSlash(relpath)
-	file := AllFiles[relpath]  ;  if file == nil {
-		file = NewFile(µ, relpath)
-		µ.OnFile(file)
-		AllFiles[relpath] = file
-	}
-	if isnew := !uslice.StrHas(OpenFiles, relpath) ; isnew {
-		OpenFiles = append(OpenFiles, relpath)
+func onFilesOpened (µ Zengine, relpaths []string) {
+	for _,relpath := range relpaths {
+		relpath = filepath.FromSlash(relpath)
+		file := AllFiles[relpath]  ;  if file == nil {
+			file = NewFile(µ, relpath)  ;  µ.OnFile(file)  ;  AllFiles[relpath] = file
+		}
+		if isopened := !uslice.StrHas(OpenFiles, relpath) ; isopened {  OpenFiles = append(OpenFiles, relpath)  }
 	}
 }
 
-func onFileWrite (µ Zengine, relpath string) {
-	relpath = filepath.FromSlash(relpath)
-	µ.B().buildFrom(µ, relpath)
+func onFilesWritten (µ Zengine, relpaths []string) {
+	for i,_ := range relpaths { relpaths[i] = filepath.FromSlash(relpaths[i]) }
+	µ.B().buildFrom(µ, relpaths)
 }
-
-
-// func refreshAllDiags() {
-// 	funcs := []func() {}
-// 	// for _,zeng := range Zengines { µ := zeng  ;  funcs = append(funcs, func() { µ.B().RefreshDiags(µ, "", "") }) }
-// 	ugo.WaitOn(funcs...)
-// }

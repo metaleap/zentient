@@ -40,21 +40,18 @@ var (
 )
 
 
-func jsonLiveDiags (closedfrp string, openedfrp string) (jld map[string]map[string][]*RespDiag) {
-	if len(closedfrp)>0 || len(openedfrp)>0 {  newlivediags = true  }
+func jsonLiveDiags (frpszid string, closedfrps []string, openedfrps []string) (jld map[string]map[string][]*RespDiag) {
+	if len(closedfrps)>0 || len(openedfrps)>0 {  newlivediags = true  }
 	if newlivediags {
-		diagsready := true  ;  jld = map[string]map[string][]*RespDiag {}
-		fc := AllFiles[closedfrp]  ;  fo := AllFiles[openedfrp]
+		diagsready := true  ;  jld = map[string]map[string][]*RespDiag {}  ;  var fc, fo []string
 		for zid,µ := range Zengines {
 			if (!µ.ReadyToBuildAndLint()) { diagsready = false }
-			var fcrp, forp string
-			if fc!=nil && fc.µ==µ { fcrp = fc.RelPath } else { fcrp = "" }
-			if fo!=nil && fo.µ==µ { forp = fo.RelPath } else { forp = "" }
-			jld[zid] = µ.B().liveDiags(µ, fcrp, forp)
+			if zid==frpszid { fc,fo = closedfrps,openedfrps } else { fc,fo = nil,nil }
+			jld[zid] = µ.B().liveDiags(µ, fc, fo)
 		}
 		if diagsready { newlivediags = false }
 	}
-	return
+	return // if diags haven't changed since last req, send nil
 }
 
 

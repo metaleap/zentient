@@ -7,18 +7,18 @@ import (
 )
 
 const (
-	MSG_ZEN_STATUS	= "ZS:"
-	MSG_ZEN_LANGS	= "ZL:"
+	MSG_ZEN_STATUS		= "ZS:"
+	MSG_ZEN_LANGS		= "ZL:"
 
-	MSG_CAPS		= "CA:"
-	MSG_CURDIAGS	= "CD:"
+	MSG_QUERY_CAPS		= "QC:"
+	MSG_QUERY_DIAGS		= "QD:"
 
-	MSG_DO_FMT		= "DF:"
-	MSG_DO_RENAME	= "DR:"
+	MSG_DO_FMT			= "DF:"
+	MSG_DO_RENAME		= "DR:"
 
-	MSG_FILE_OPEN	= "FO:"
-	MSG_FILE_CLOSE	= "FC:"
-	MSG_FILE_WRITE	= "FW:"
+	MSG_FILES_OPENED	= "FO:"
+	MSG_FILES_CLOSED	= "FC:"
+	MSG_FILES_WRITTEN	= "FW:"
 )
 
 
@@ -36,17 +36,15 @@ func out (v interface{}) error {
 
 
 func HandleRequest (queryln string) (e error) {
-	// var instr string
-	var inany interface{}
-	var inobj map[string]interface{}
+	var inlst []string
+	var inmap map[string]interface{}
 
 	msgid,msgrest := ustr.BreakAt(queryln, 3)
 	msgzids,msgargs := ustr.BreakOn(msgrest, ":")
 	zids := ustr.Split(msgzids, ",")
-	if len(msgargs)>1 && (msgargs[0]=='"' || msgargs[0]=='{' || msgargs[0]=='[' || msgargs[0]=='(' || msgargs[0]=='\'') {
-		json.Unmarshal([]byte(msgargs), &inany)
-		// instr,_ = inany.(string)
-		inobj,_ = inany.(map[string]interface{})
+	if len(msgargs)>1 {
+		if (msgargs[0]=='{') { json.Unmarshal([]byte(msgargs), &inmap) } else
+			if (msgargs[0]=='[') { json.Unmarshal([]byte(msgargs), &inlst) }
 	}
 	switch msgid {
 		//  each case is ideally just a single func-call out, rpc-like
@@ -56,25 +54,30 @@ func HandleRequest (queryln string) (e error) {
 			e = out(jsonZengines())
 		case MSG_ZEN_STATUS:
 			e = out(jsonStatus())
-		case MSG_CURDIAGS:
-			e = out(jsonLiveDiags("", ""))
-		case MSG_FILE_WRITE:
-			onFileWrite(Zengines[zids[0]], msgargs)
-			e = out(jsonLiveDiags("", ""))
-		case MSG_FILE_OPEN:
-			onFileOpen(Zengines[zids[0]], msgargs)
-			e = out(jsonLiveDiags("", msgargs))
-		case MSG_FILE_CLOSE:
-			onFileClose(Zengines[zids[0]], msgargs)
-			e = out(jsonLiveDiags(msgargs, ""))
-		case MSG_CAPS:
+
+		case MSG_QUERY_DIAGS:
+			e = out(jsonLiveDiags("", nil, nil))
+		case MSG_QUERY_CAPS:
 			resp := map[string][]*RespCmd {}
 			for _, zid := range zids { if µ := Zengines[zid] ; µ != nil {
 				resp[zid] = µ.Caps(msgargs)  }  }
 			e = out(resp)
+
+		case MSG_FILES_WRITTEN:
+			onFilesWritten(Zengines[zids[0]], inlst)
+			e = out(jsonLiveDiags(zids[0], nil, nil))
+		case MSG_FILES_OPENED:
+			onFilesOpened(Zengines[zids[0]], inlst)
+			e = out(jsonLiveDiags(zids[0], nil, inlst))
+		case MSG_FILES_CLOSED:
+			onFilesClosed(Zengines[zids[0]], inlst)
+			e = out(jsonLiveDiags(zids[0], inlst, nil))
+
 		case MSG_DO_FMT:
-			if resp,err := doFmt(zids[0], ugo.S(inobj["s"]), ugo.S(inobj["c"]), uint8(ugo.F(inobj["t"])))  ;  (err != nil) {
+			if resp,err := doFmt(zids[0], ugo.S(inmap["s"]), ugo.S(inmap["c"]), uint8(ugo.F(inmap["t"])))  ;  (err != nil) {
 				e = out(err.Error())  } else {  e = out(resp)  }
+		case MSG_DO_RENAME:
+			e = out("No formatter")
 
 		//  nothing matched? a bug in client, throw at client
 		default:

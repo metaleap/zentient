@@ -1,10 +1,10 @@
 package z
 import (
 	"sync"
+	"strings"
 	"time"
 
 	"github.com/metaleap/go-util-misc"
-	"github.com/metaleap/go-util-slice"
 	"github.com/metaleap/go-util-str"
 )
 
@@ -69,17 +69,16 @@ func (self *Base) OpenFiles () []string {
 }
 
 
-func (self *Base) buildFrom (µ Zengine, filerelpath string) {
+func (self *Base) buildFrom (µ Zengine, filerelpaths []string) {
 	if µ.ReadyToBuildAndLint() {
 		newlivediags = true  ;  self.livediags = nil  ;  self.lintdiags = nil
-		fromfiles := append([]string { filerelpath }, uslice.StrWithout(openFiles(µ), false, filerelpath)...)
-		self.builddiags = µ.BuildFrom(fromfiles)
+		self.builddiags = µ.BuildFrom(filerelpaths)
 	}
 }
 
 
-func (self *Base) liveDiags (µ Zengine, closedfrp string, openedfrp string) map[string][]*RespDiag {
-	if len(openedfrp)>0 || len(closedfrp)>0 {  newlivediags = true  ;  self.livediags = nil  }
+func (self *Base) liveDiags (µ Zengine, closedfrps []string, openedfrps []string) map[string][]*RespDiag {
+	if len(openedfrps)>0 || len(closedfrps)>0 {  newlivediags = true  ;  self.livediags = nil  }
 	openfiles := openFiles(µ)  ;  livediags := self.livediags  ;  if livediags==nil {
 		livediags = map[string][]*RespDiag {}
 		if self.builddiags!=nil { for frp,fdiags := range self.builddiags { livediags[frp] = fdiags } }
@@ -87,7 +86,7 @@ func (self *Base) liveDiags (µ Zengine, closedfrp string, openedfrp string) map
 			for _,frp := range openfiles { livediags[frp] = append(livediags[frp], lintdiags[frp]...) }
 		}
 	}
-	if len(openedfrp)>0 || self.lintdiags==nil { self.linttime = time.Now().UnixNano()  ;  go self.relint(µ, self.linttime) }
+	if len(openedfrps)>0 || self.lintdiags==nil { now := time.Now().UnixNano()  ;  self.linttime = now  ;  go self.relint(µ, now) }
 	self.livediags = livediags  ;  return livediags
 }
 
@@ -107,9 +106,14 @@ func (self *Base) relint (µ Zengine, mytime int64) {
 			if len(lintfiles)>0 && mytime>=self.linttime {
 				self.runLinters(µ.Linters(lintfiles), freshdiags)
 				if lintdiags = self.lintdiags  ;  lintdiags!=nil && mytime>=self.linttime {
-					for frp,fdiags := range freshdiags { lintdiags[frp] = fdiags }
+					prependnowtime := false  ;  nowstr := "" // turn on after major refactors to verify things stay cached as long as possible/permissable
+					if prependnowtime {  nowstr = ustr.After(time.Now().String(), " ")  ;  nowstr = (nowstr[:strings.LastIndex(nowstr, ":")]) + "\t"  }
+					for frp,fdiags := range freshdiags {
+						if prependnowtime { for i,_ := range fdiags { fd := fdiags[i] ; fd.Ref = nowstr + fd.Ref ; fdiags[i] = fd } }
+						lintdiags[frp] = fdiags
+					}
 					if self.lintdiags!=nil && mytime>=self.linttime {
-						self.lintdiags , self.livediags , newlivediags = lintdiags , nil , true
+						self.lintdiags = lintdiags  ;  self.livediags = nil  ;  newlivediags = true
 					}
 				}
 			}

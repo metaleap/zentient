@@ -60,6 +60,9 @@ func (_ *zgo) Caps (cap string) (caps []*z.RespCmd) {
 								{ Title: "unused",		Exists: devgo.Has_unused,		Hint: "`github.com/dominikh/go-tools`" },
 								{ Title: "staticcheck",	Exists: devgo.Has_staticcheck,	Hint: "`github.com/dominikh/go-tools`" },
 							}
+	case "ren":
+		caps = []*z.RespCmd	{	{ Title: "gorename",	Exists: devgo.Has_gorename,		Hint: "`go get golang.org/x/tools/cmd/gorename`" },
+							}
 	}
 	return caps
 }
