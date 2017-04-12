@@ -61,21 +61,22 @@ func (self *zgo) Linters (filerelpaths []string) (linters []func()map[string][]*
 			pkgfiles[pkg] = append(pkgfiles[pkg], frp)
 		}
 	}
+	cfgok := self.Base.CfgDiagCmdEnabled
 	for fpkg,frps := range pkgfiles { dirrelpath := filepath.Dir(frps[0])
-		linters = append(linters, linterGoVet(dirrelpath))
-		if devgo.Has_golint { linters = append(linters, linterGolint(dirrelpath)) }
-		if devgo.Has_ineffassign { linters = append(linters, linterIneffAssign(dirrelpath)) }
-		if devgo.Has_interfacer { linters = append(linters, linterMvDan(dirrelpath, "interfacer", fpkg.ImportPath)) }
-		if devgo.Has_unparam { linters = append(linters, linterMvDan(dirrelpath, "unparam", fpkg.ImportPath)) }
-		if devgo.Has_checkalign { linters = append(linters, linterCheck(dirrelpath, "aligncheck", fpkg.ImportPath)) }
-		if devgo.Has_checkstruct { linters = append(linters, linterCheck(dirrelpath, "structcheck", fpkg.ImportPath)) }
-		if devgo.Has_checkvar { linters = append(linters, linterCheck(dirrelpath, "varcheck", fpkg.ImportPath)) }
-		if devgo.Has_unconvert { linters = append(linters, linterMDempsky(dirrelpath, "unconvert", fpkg.ImportPath)) }
-		if devgo.Has_maligned { linters = append(linters, linterMDempsky(dirrelpath, "maligned", fpkg.ImportPath)) }
-		if devgo.Has_gosimple { linters = append(linters, linterHonnef(dirrelpath, "gosimple", fpkg.ImportPath)) }
-		if devgo.Has_unused { linters = append(linters, linterHonnef(dirrelpath, "unused", fpkg.ImportPath)) }
-		if devgo.Has_staticcheck { linters = append(linters, linterHonnef(dirrelpath, "staticcheck", fpkg.ImportPath)) }
-		if devgo.Has_errcheck { linters = append(linters, linterErrcheck(dirrelpath, fpkg.ImportPath)) }
+		if cfgok("go vet")									{ linters = append(linters, linterGoVet(dirrelpath)) }
+		if devgo.Has_golint && cfgok("golint")				{ linters = append(linters, linterGolint(dirrelpath)) }
+		if devgo.Has_ineffassign && cfgok("ineffassign")	{ linters = append(linters, linterIneffAssign(dirrelpath)) }
+		if devgo.Has_interfacer && cfgok("interfacer")		{ linters = append(linters, linterMvDan(dirrelpath, "interfacer", fpkg.ImportPath)) }
+		if devgo.Has_unparam && cfgok("unparam")			{ linters = append(linters, linterMvDan(dirrelpath, "unparam", fpkg.ImportPath)) }
+		if devgo.Has_checkalign && cfgok("aligncheck")		{ linters = append(linters, linterCheck(dirrelpath, "aligncheck", fpkg.ImportPath)) }
+		if devgo.Has_checkstruct && cfgok("structcheck")	{ linters = append(linters, linterCheck(dirrelpath, "structcheck", fpkg.ImportPath)) }
+		if devgo.Has_checkvar && cfgok("varcheck")			{ linters = append(linters, linterCheck(dirrelpath, "varcheck", fpkg.ImportPath)) }
+		if devgo.Has_unconvert && cfgok("unconvert")		{ linters = append(linters, linterMDempsky(dirrelpath, "unconvert", fpkg.ImportPath)) }
+		if devgo.Has_maligned && cfgok("maligned")			{ linters = append(linters, linterMDempsky(dirrelpath, "maligned", fpkg.ImportPath)) }
+		if devgo.Has_gosimple && cfgok("gosimple")			{ linters = append(linters, linterHonnef(dirrelpath, "gosimple", fpkg.ImportPath)) }
+		if devgo.Has_unused && cfgok("unused")				{ linters = append(linters, linterHonnef(dirrelpath, "unused", fpkg.ImportPath)) }
+		if devgo.Has_staticcheck && cfgok("staticcheck")	{ linters = append(linters, linterHonnef(dirrelpath, "staticcheck", fpkg.ImportPath)) }
+		if devgo.Has_errcheck && cfgok("errcheck")			{ linters = append(linters, linterErrcheck(dirrelpath, fpkg.ImportPath)) }
 	}
 	return
 }

@@ -11,6 +11,7 @@ type RespCmd struct {
 	Title	string		//	display name, eg: N = "go vet" when C = "go" with A = ["vet"]  ;  if empty fall back to C
 	Exists	bool		//	installed?
 	Hint	string		//	install hint
+	For		string
 
 	f	func()		//	tmp field used in Base.DoFmt()
 }

@@ -5,16 +5,18 @@ import (
 	"time"
 
 	"github.com/metaleap/go-util-misc"
+	"github.com/metaleap/go-util-slice"
 	"github.com/metaleap/go-util-str"
 )
 
 type Base struct {
-	builddiags	map[string][]*RespDiag
-	lintdiags	map[string][]*RespDiag
-	livediags	map[string][]*RespDiag
-	lintmutex	sync.Mutex
-	linttime	int64
-	zid			string
+	builddiags		map[string][]*RespDiag
+	lintdiags		map[string][]*RespDiag
+	livediags		map[string][]*RespDiag
+	lintmutex		sync.Mutex
+	linttime		int64
+	zid				string
+	diagsDisabled	[]string
 }
 
 
@@ -66,6 +68,16 @@ func openFiles (µ Zengine) (openfiles []string) {
 }
 func (self *Base) OpenFiles () []string {
 	return openFiles(Zengines[self.zId()])
+}
+
+func (self *Base) CfgDiagCmdEnabled (cmdname string) bool {
+	return !uslice.StrHas(self.diagsDisabled, cmdname)
+}
+
+func (self *Base) OnCfg (cfg map[string]interface{}) {
+	self.diagsDisabled = ustr.Split(cfg["diag.disabled"].(string), ",")
+	self.lintmutex.Lock()  ;  defer self.lintmutex.Unlock()
+	self.lintdiags = nil  ;  self.livediags = nil  ;  newlivediags = true
 }
 
 

@@ -25,6 +25,7 @@ type Zengine interface {
 	Linters ([]string) []func()map[string][]*RespDiag
 	ReadyToBuildAndLint () bool
 	BuildFrom ([]string) map[string][]*RespDiag
+	OnCfg (map[string]interface{})
 	OnFile (*File)
 	QueryDefLoc (string, string, string) (*udev.SrcMsg, error)
 }

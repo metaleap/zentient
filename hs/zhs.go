@@ -42,13 +42,12 @@ func (self *zhs) B () *z.Base {
 func (_ *zhs) Caps (cap string) (caps []*z.RespCmd) {
 	switch cap {
 	case "fmt":
-		caps = []*z.RespCmd	{	{ Title: "stylish-haskell",	Exists: devhs.Has_stylish_haskell,	Hint: "`stack install stylish-haskell`" },
-								{ Title: "hindent",			Exists: devhs.Has_hindent,			Hint: "`stack install hindent`" },
-								{ Title: "brittany",		Exists: devhs.Has_brittany,			Hint: "`github.com/lspitzner/brittany`" },
+		caps = []*z.RespCmd	{	{ Title: "stylish-haskell",	Exists: devhs.Has_stylish_haskell,	Hint: "hackage.haskell.org/package/stylish-haskell" },
+								{ Title: "hindent",			Exists: devhs.Has_hindent,			Hint: "hackage.haskell.org/package/hindent" },
+								{ Title: "brittany",		Exists: devhs.Has_brittany,			Hint: "github.com/lspitzner/brittany" },
 							}
 	case "diag":
-		caps = []*z.RespCmd	{	{ Title: "stack install",	Exists: true },
-								{ Title: "hlint",			Exists: devhs.Has_hlint,			Hint: "`stack install hlint`" },
+		caps = []*z.RespCmd	{	{ Title: "hlint",			Exists: devhs.Has_hlint,			Hint: "hackage.haskell.org/package/hlint" },
 							}
 	}
 	return caps
@@ -66,6 +65,10 @@ func (self *zhs) DoFmt (src string, custcmd string, tabsize uint8) (resp *z.Resp
 func (self *zhs) DoRename (reqcmd string, relfilepath string, offset uint64, newname string, eol string, oldname string, off1 uint64, off2 uint64) (resp map[string][]*udev.SrcMsg, err error) {
 	err = ugo.E("Renaming symbol `" + oldname + "` in " + relfilepath + " at :" + ugo.SPr(offset) + " (" + ugo.SPr(off1) + " - " + ugo.SPr(off2) + ") to `" + newname + "` rejected")
 	return
+}
+
+func (self *zhs) OnCfg (cfg map[string]interface{}) {
+	self.Base.OnCfg(cfg)
 }
 
 func (_ *zhs) OnFile (newfile *z.File) {
