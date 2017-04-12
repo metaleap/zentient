@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/metaleap/go-devgo"
+	"github.com/metaleap/go-util-dev"
 	"github.com/metaleap/zentient/z"
 )
 
@@ -71,6 +72,15 @@ func (self *zgo) DoFmt (src string, custcmd string, tabsize uint8) (*z.RespFmt, 
 	return self.Base.DoFmt(src, custcmd,
 		z.RespCmd { Exists: devgo.Has_goimports, Name: "goimports", Args: []string { "-e" } },
 		z.RespCmd { Exists: devgo.Has_gofmt, Name: "gofmt", Args: []string {"-e", "-s"} })
+}
+
+func (self *zgo) DoRename (reqcmd string, relfilepath string, offset uint64, newname string, eol string, oldname string, off1 uint64, off2 uint64) (resp map[string][]*udev.SrcMsg, err error) {
+	var fileedits []*udev.SrcMsg  ;  if fileedits,err = devgo.Gorename(reqcmd, relfilepath, offset, newname, eol)  ;  len(fileedits)>0 {
+		resp = map[string][]*udev.SrcMsg {}  ;  for _,sr := range fileedits {
+			ffp := sr.Ref  ;  sr.Ref = ""  ;  resp[ffp] = append(resp[ffp], sr)
+		}
+	}
+	return
 }
 
 func (_ *zgo) OnFile (newfile *z.File) {

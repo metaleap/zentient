@@ -26,15 +26,6 @@ type RespFmt struct {
 	Warnings	[]string
 }
 
-type RespRen struct {
-	NewText		string
-	Dbg			interface{}
-	StartLn		int64
-	StartChr	int64
-	EndLn		int64
-	EndChr		int64
-}
-
 
 const (
 	DIAG_SEV_ERR	uint8 = 0

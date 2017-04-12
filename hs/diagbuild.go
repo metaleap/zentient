@@ -31,17 +31,17 @@ func (_ *zhs) BuildFrom (filerelpaths []string) (freshdiags map[string][]*z.Resp
 		freshdiags = map[string][]*z.RespDiag {}
 
 		for _,wln := range lnstackwarns { if parts := ustr.Split(wln, ":")  ;  len(parts)>1 {
-			freshdiags[parts[0]] = append(freshdiags[parts[0]], &z.RespDiag { Sev: z.DIAG_SEV_WARN, SrcMsg: udev.SrcMsg { Ref: "stack", Msg: ustr.Join(parts[1:], ":"), PosLn: 1, PosCol: 1 } })
+			freshdiags[parts[0]] = append(freshdiags[parts[0]], &z.RespDiag { Sev: z.DIAG_SEV_WARN, SrcMsg: udev.SrcMsg { Ref: "stack", Msg: ustr.Join(parts[1:], ":"), Pos1Ln: 1, Pos1Ch: 1 } })
 		}}
 
 		if _p := "Could not parse '" + srcDir  ;  ustr.Pref(lns[0], _p) {
 			stackyamlpath := strings.TrimRight(strings.TrimLeft(lns[0][len(_p):], "/\\"), "':")
-			freshdiags[stackyamlpath] = append(freshdiags[stackyamlpath], &z.RespDiag { SrcMsg: udev.SrcMsg { Ref: "stack", Msg: ustr.Join(lns[1:], "\n"), PosLn: 1, PosCol: 1 } })
+			freshdiags[stackyamlpath] = append(freshdiags[stackyamlpath], &z.RespDiag { SrcMsg: udev.SrcMsg { Ref: "stack", Msg: ustr.Join(lns[1:], "\n"), Pos1Ln: 1, Pos1Ch: 1 } })
 			return
 		}
 
 		if _e := "Error: "  ;  ustr.Pref(lns[0], _e) {
-			freshdiags[filerelpath] = append(freshdiags[filerelpath], &z.RespDiag { SrcMsg: udev.SrcMsg { Ref: "stack", Msg: ustr.Join(lns, "\n")[len(_e):], PosLn: 1, PosCol: 1 } })
+			freshdiags[filerelpath] = append(freshdiags[filerelpath], &z.RespDiag { SrcMsg: udev.SrcMsg { Ref: "stack", Msg: ustr.Join(lns, "\n")[len(_e):], Pos1Ln: 1, Pos1Ch: 1 } })
 			return
 		}
 
