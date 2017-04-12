@@ -15,6 +15,7 @@ const (
 	MSG_QUERY_DIAGS		= "QD:"
 
 	MSG_INTEL_DEFLOC	= "IL:"
+	MSG_INTEL_HOVER		= "IH:"
 
 	MSG_DO_FMT			= "DF:"
 	MSG_DO_RENAME		= "DR:"
@@ -53,25 +54,11 @@ func HandleRequest (queryln string) (e error) {
 		//  each case is ideally just a single func-call out, rpc-like
 		//  anything else in a case then is only to furnish proper func args from msg-argstr
 
-		case MSG_ZEN_LANGS:
-			e = out(jsonZengines())
-		case MSG_ZEN_STATUS:
-			e = out(jsonStatus())
-		case MSG_ZEN_CONFIG:
-			Zengines[zids[0]].OnCfg(inmap)
-			e = out(nil)
-
 		case MSG_INTEL_DEFLOC:
-			if resp,err := Zengines[zids[0]].QueryDefLoc(ugo.S(inmap["ffp"]), ugo.S(inmap["i"]), ugo.S(inmap["o"]))  ;  resp!=nil {
+			if resp,err := Zengines[zids[0]].IntelDefLoc(ugo.S(inmap["ffp"]), ugo.S(inmap["i"]), ugo.S(inmap["o"]))  ;  resp!=nil {
 				e = out(resp) } else if err!=nil { e = out(err.Error()) } else { e = out(nil) }
-
-		case MSG_QUERY_DIAGS:
-			e = out(jsonLiveDiags("", nil, nil))
-		case MSG_QUERY_CAPS:
-			resp := map[string][]*RespCmd {}
-			for _, zid := range zids { if µ := Zengines[zid] ; µ != nil {
-				resp[zid] = µ.Caps(msgargs)  }  }
-			e = out(resp)
+		case MSG_INTEL_HOVER:
+			e = out(Zengines[zids[0]].IntelHovs(ugo.S(inmap["ffp"]), ugo.S(inmap["i"]), ugo.S(inmap["o"])))
 
 		case MSG_FILES_WRITTEN:
 			onFilesWritten(Zengines[zids[0]], inlst)
@@ -89,6 +76,22 @@ func HandleRequest (queryln string) (e error) {
 		case MSG_DO_RENAME:
 			if resp,err := doRename(zids[0], ugo.S(inmap["c"]), ugo.S(inmap["rfp"]), uint64(ustr.ParseInt(ugo.S(inmap["o"]))), ugo.S(inmap["nn"]), ugo.S(inmap["e"]), ugo.S(inmap["no"]), uint64(ustr.ParseInt(ugo.S(inmap["o1"]))), uint64(ustr.ParseInt(ugo.S(inmap["o2"]))))  ;  (err != nil) {
 				e = out(err.Error())  } else {  e = out(resp)  }
+
+		case MSG_QUERY_DIAGS:
+			e = out(jsonLiveDiags("", nil, nil))
+		case MSG_QUERY_CAPS:
+			resp := map[string][]*RespCmd {}
+			for _, zid := range zids { if µ := Zengines[zid] ; µ != nil {
+				resp[zid] = µ.Caps(msgargs)  }  }
+			e = out(resp)
+
+		case MSG_ZEN_LANGS:
+			e = out(jsonZengines())
+		case MSG_ZEN_STATUS:
+			e = out(jsonStatus())
+		case MSG_ZEN_CONFIG:
+			Zengines[zids[0]].OnCfg(inmap)
+			e = out(nil)
 
 		//  nothing matched? a bug in client, throw at client
 		default:

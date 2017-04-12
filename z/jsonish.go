@@ -27,6 +27,11 @@ type RespFmt struct {
 	Warnings	[]string
 }
 
+type RespHov struct {
+	Txt		string
+	Lang	string
+}
+
 
 const (
 	DIAG_SEV_ERR	uint8 = 0
