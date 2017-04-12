@@ -28,6 +28,7 @@ type RespFmt struct {
 
 type RespRen struct {
 	NewText		string
+	Dbg			interface{}
 	StartLn		uint64
 	StartChr	uint64
 	EndLn		uint64
