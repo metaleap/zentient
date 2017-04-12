@@ -20,7 +20,7 @@ type Zengine interface {
 
 	Caps (string) []*RespCmd
 	DoFmt (string, string, uint8) (*RespFmt, error)
-	DoRename (string, string, uint64, string, string, uint64, uint64) (map[string][]*RespRen, error)
+	DoRename (string, string, uint64, string, string, string, uint64, uint64) (map[string][]*RespRen, error)
 	Linters ([]string) []func()map[string][]*RespDiag
 	ReadyToBuildAndLint () bool
 	BuildFrom ([]string) map[string][]*RespDiag
@@ -41,9 +41,9 @@ func doFmt (zid string, reqsrc string, reqcmd string, reqtabsize uint8) (resp *R
 	return
 }
 
-func doRename (zid string, reqcmd string, relfilepath string, offset uint64, newname string, oldname string, off1 uint64, off2 uint64) (resp map[string][]*RespRen, err error) {
+func doRename (zid string, reqcmd string, relfilepath string, offset uint64, newname string, eol string, oldname string, off1 uint64, off2 uint64) (resp map[string][]*RespRen, err error) {
 	µ := Zengines[zid]   ;  if µ==nil {  err = ugo.E("Bad zid: " + zid)  }  ;  if len(newname)==0 {  err = ugo.E("No newname given")  }
-	resp,err = µ.DoRename(reqcmd, relfilepath, offset, newname, oldname, off1, off2)
+	resp,err = µ.DoRename(reqcmd, relfilepath, offset, newname, eol, oldname, off1, off2)
 	return
 }
 

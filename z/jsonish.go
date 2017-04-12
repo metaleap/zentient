@@ -29,10 +29,10 @@ type RespFmt struct {
 type RespRen struct {
 	NewText		string
 	Dbg			interface{}
-	StartLn		uint64
-	StartChr	uint64
-	EndLn		uint64
-	EndChr		uint64
+	StartLn		int64
+	StartChr	int64
+	EndLn		int64
+	EndChr		int64
 }
 
 

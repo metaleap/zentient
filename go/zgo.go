@@ -40,7 +40,7 @@ func (self *zgo) B () *z.Base {
 func (_ *zgo) Caps (cap string) (caps []*z.RespCmd) {
 	switch cap {
 	case "fmt":
-		caps = []*z.RespCmd	{	{ Title: "goimports",	Exists: devgo.Has_goimports,	Hint: "`go get golang.org/x/tools/cmd/goimports`" },
+		caps = []*z.RespCmd	{	{ Title: "goimports",	Exists: devgo.Has_goimports,	Hint: "`golang.org/x/tools/cmd/goimports`" },
 								{ Title: "gofmt",		Exists: devgo.Has_gofmt,		Hint: "fix your Go installation" },
 							}
 	case "diag":
@@ -51,6 +51,7 @@ func (_ *zgo) Caps (cap string) (caps []*z.RespCmd) {
 								{ Title: "aligncheck",	Exists: devgo.Has_checkalign,	Hint: "`github.com/opennota/check`" },
 								{ Title: "structcheck",	Exists: devgo.Has_checkstruct,	Hint: "`github.com/opennota/check`" },
 								{ Title: "varcheck",	Exists: devgo.Has_checkvar,		Hint: "`github.com/opennota/check`" },
+								{ Title: "errcheck",	Exists: devgo.Has_errcheck,		Hint: "`github.com/kisielk/errcheck`" },
 								{ Title: "interfacer",	Exists: devgo.Has_golint,		Hint: "`github.com/mvdan/interfacer`" },
 								{ Title: "unparam",		Exists: devgo.Has_unparam,		Hint: "`github.com/mvdan/unparam`" },
 								{ Title: "unconvert",	Exists: devgo.Has_unconvert,	Hint: "`github.com/mdempsky/unconvert`" },

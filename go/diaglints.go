@@ -51,6 +51,11 @@ func linterGoVet (filerelpaths []string) func()map[string][]*z.RespDiag {
 		return devgo.LintGoVet(filerelpaths)
 	})
 }
+func linterErrcheck (pkgimppath string) func()map[string][]*z.RespDiag {
+	return linter("errcheck", z.DIAG_SEV_INFO, func () []udev.SrcMsg {
+		return devgo.LintErrcheck(pkgimppath)
+	})
+}
 func linterHonnef (cmdname string, pkgimppath string) func()map[string][]*z.RespDiag {
 	return linter(cmdname, z.DIAG_SEV_INFO, func () []udev.SrcMsg {
 		return devgo.LintHonnef(cmdname, pkgimppath)
@@ -78,6 +83,7 @@ func (self *zgo) Linters (filerelpaths []string) (linters []func()map[string][]*
 		if devgo.Has_gosimple { linters = append(linters, linterHonnef("gosimple", fpkg.ImportPath)) }
 		if devgo.Has_unused { linters = append(linters, linterHonnef("unused", fpkg.ImportPath)) }
 		if devgo.Has_staticcheck { linters = append(linters, linterHonnef("staticcheck", fpkg.ImportPath)) }
+		if devgo.Has_errcheck { linters = append(linters, linterErrcheck(fpkg.ImportPath)) }
 	}
 	return
 }

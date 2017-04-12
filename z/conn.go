@@ -77,7 +77,7 @@ func HandleRequest (queryln string) (e error) {
 			if resp,err := doFmt(zids[0], ugo.S(inmap["s"]), ugo.S(inmap["c"]), uint8(ugo.F(inmap["t"])))  ;  (err != nil) {
 				e = out(err.Error())  } else {  e = out(resp)  }
 		case MSG_DO_RENAME:
-			if resp,err := doRename(zids[0], ugo.S(inmap["c"]), ugo.S(inmap["rfp"]), uint64(ustr.ParseInt(ugo.S(inmap["o"]))), ugo.S(inmap["nn"]), ugo.S(inmap["no"]), uint64(ustr.ParseInt(ugo.S(inmap["o1"]))), uint64(ustr.ParseInt(ugo.S(inmap["o2"]))))  ;  (err != nil) {
+			if resp,err := doRename(zids[0], ugo.S(inmap["c"]), ugo.S(inmap["rfp"]), uint64(ustr.ParseInt(ugo.S(inmap["o"]))), ugo.S(inmap["nn"]), ugo.S(inmap["e"]), ugo.S(inmap["no"]), uint64(ustr.ParseInt(ugo.S(inmap["o1"]))), uint64(ustr.ParseInt(ugo.S(inmap["o2"]))))  ;  (err != nil) {
 				e = out(err.Error())  } else {  e = out(resp)  }
 
 		//  nothing matched? a bug in client, throw at client
