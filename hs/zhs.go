@@ -2,9 +2,9 @@ package zhs
 import (
 	"fmt"
 
-	"github.com/metaleap/zentient/z"
-
 	"github.com/metaleap/go-devhs"
+	"github.com/metaleap/go-util-misc"
+	"github.com/metaleap/zentient/z"
 )
 
 
@@ -60,6 +60,11 @@ func (self *zhs) DoFmt (src string, custcmd string, tabsize uint8) (resp *z.Resp
 		z.RespCmd { Exists: devhs.Has_hindent,			Name: "hindent",			Args: []string{"--no-force-newline", "--indent-size", ts} },
 		z.RespCmd { Exists: devhs.Has_brittany,			Name: "brittany",			Args: []string{"--indent", ts} },
 		)
+}
+
+func (self *zhs) DoRename (reqcmd string, relfilepath string, offset uint64, newname string, oldname string, off1 uint64, off2 uint64) (resp map[string][]*z.RespRen, err error) {
+	err = ugo.E("Not impl")
+	return
 }
 
 func (_ *zhs) OnFile (newfile *z.File) {

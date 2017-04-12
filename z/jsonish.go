@@ -26,6 +26,14 @@ type RespFmt struct {
 	Warnings	[]string
 }
 
+type RespRen struct {
+	NewText		string
+	StartLn		uint64
+	StartChr	uint64
+	EndLn		uint64
+	EndChr		uint64
+}
+
 
 const (
 	DIAG_SEV_ERR	uint8 = 0

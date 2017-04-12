@@ -1,10 +1,10 @@
 package zgo
 import (
+	"path/filepath"
 	"runtime"
 	"strings"
 
 	"github.com/metaleap/go-devgo"
-
 	"github.com/metaleap/zentient/z"
 )
 
@@ -71,6 +71,14 @@ func (self *zgo) DoFmt (src string, custcmd string, tabsize uint8) (*z.RespFmt, 
 	return self.Base.DoFmt(src, custcmd,
 		z.RespCmd { Exists: devgo.Has_goimports, Name: "goimports", Args: []string { "-e" } },
 		z.RespCmd { Exists: devgo.Has_gofmt, Name: "gofmt", Args: []string {"-e", "-s"} })
+}
+
+func (self *zgo) DoRename (reqcmd string, relfilepath string, offset uint64, newname string, oldname string, off1 uint64, off2 uint64) (resp map[string][]*z.RespRen, err error) {
+	// err = ugo.E("Renaming symbol `" + oldname + "` in " + relfilepath + " at :" + ugo.SPr(offset) + " (" + ugo.SPr(off1) + " - " + ugo.SPr(off2) + ") to `" + newname + "` rejected")
+	resp = map[string][]*z.RespRen {
+		filepath.Join(z.Ctx.SrcDir, relfilepath): []*z.RespRen { { NewText: "yackage", StartLn: 0, StartChr: 0, EndLn: 0, EndChr: 7 }, {NewText:"OooCrikey",StartLn:4,EndLn:4,StartChr:9,EndChr:12} },
+	}
+	return
 }
 
 func (_ *zgo) OnFile (newfile *z.File) {
