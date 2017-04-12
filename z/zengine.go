@@ -26,6 +26,7 @@ type Zengine interface {
 	ReadyToBuildAndLint () bool
 	BuildFrom ([]string) map[string][]*RespDiag
 	OnFile (*File)
+	QueryDefLoc (string, string, string) (*udev.SrcMsg, error)
 }
 
 

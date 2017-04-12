@@ -12,6 +12,7 @@ const (
 
 	MSG_QUERY_CAPS		= "QC:"
 	MSG_QUERY_DIAGS		= "QD:"
+	MSG_QUERY_DEFLOC	= "QL:"
 
 	MSG_DO_FMT			= "DF:"
 	MSG_DO_RENAME		= "DR:"
@@ -62,6 +63,9 @@ func HandleRequest (queryln string) (e error) {
 			for _, zid := range zids { if µ := Zengines[zid] ; µ != nil {
 				resp[zid] = µ.Caps(msgargs)  }  }
 			e = out(resp)
+		case MSG_QUERY_DEFLOC:
+			if resp,err := Zengines[zids[0]].QueryDefLoc(ugo.S(inmap["ffp"]), ugo.S(inmap["i"]), ugo.S(inmap["o"]))  ;  resp!=nil {
+				e = out(resp) } else if err!=nil { e = out(err.Error()) } else { e = out(nil) }
 
 		case MSG_FILES_WRITTEN:
 			onFilesWritten(Zengines[zids[0]], inlst)
