@@ -10,12 +10,12 @@ import (
 
 func (self *zgo) IntelDefLoc (req *z.ReqIntel) *udev.SrcMsg {
 	if !devgo.Has_godef { return nil }
-	return devgo.QueryDefLoc_Godef(req.Ffp, req.Src, req.Pos, req.EoL)
+	return devgo.QueryDefLoc_Godef(req.Ffp, req.Src, req.Pos, req.EoL==1)
 }
 
 
 func (self *zgo) IntelHovs (req *z.ReqIntel) (hovs []*z.RespHov) {
-	if devgo.Has_godef { if defdecl := devgo.QueryDefDecl_GoDef(req.Ffp, req.Src, req.Pos, req.EoL)  ;  len(defdecl)>0 {
+	if devgo.Has_godef { if defdecl := devgo.QueryDefDecl_GoDef(req.Ffp, req.Src, req.Pos, req.EoL==1)  ;  len(defdecl)>0 {
 		hovs = append(hovs, &z.RespHov { Lang: "go", Txt: defdecl })
 	} }
 	if len(hovs)==0 { hovs = append(hovs, &z.RespHov { Txt: "No applicable Code Intel tools available." }) }

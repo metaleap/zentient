@@ -8,7 +8,7 @@ import (
 type ReqIntel struct {
 	Ffp	string
 	Pos	string
-	EoL	string
+	EoL	int
 	Src	string
 }
 

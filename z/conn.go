@@ -41,23 +41,13 @@ func out (v interface{}) error {
 
 
 func HandleRequest (queryln string) (e error) {
-	var inlst []string
-	var inmap map[string]interface{}
-	var inint ReqIntel
+	var inlst []string  ;  var inmap map[string]interface{}  ;  var inint ReqIntel
+	msgid,msgrest := ustr.BreakAt(queryln, 3)  ;  msgzids,msgargs := ustr.BreakOn(msgrest, ":")  ;  zids := ustr.Split(msgzids, ",")
 
-	msgid,msgrest := ustr.BreakAt(queryln, 3)
-	msgzids,msgargs := ustr.BreakOn(msgrest, ":")
-	zids := ustr.Split(msgzids, ",")
-	if len(msgargs)>1 {
-		// *ReqIntel
-		if msgargs[0]=='[' && msgargs[len(msgargs)-1]==']' {
-			json.Unmarshal([]byte(msgargs), &inlst)
-		} else if msgargs[0]=='{' && msgargs[len(msgargs)-1]=='}' {
-			if ustr.Pref(msgargs, "{\"Ffp\":\"") { json.Unmarshal([]byte(msgargs), &inint) } else {
-				json.Unmarshal([]byte(msgargs), &inmap)
-			}
-		}
-	}
+	if len(msgargs)>1 { if msgargs[0]=='[' { json.Unmarshal([]byte(msgargs), &inlst)} else if msgargs[0]=='{' {
+		if ustr.Pref(msgargs, "{\"Ffp\":\"") { json.Unmarshal([]byte(msgargs), &inint)
+		} else { json.Unmarshal([]byte(msgargs), &inmap) }
+	} }
 	switch msgid {
 		//  each case is ideally just a single func-call out, rpc-like
 		//  anything else in a case then is only to furnish proper func args from msg-argstr
