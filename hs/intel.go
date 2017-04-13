@@ -14,3 +14,8 @@ func (self *zhs) IntelHovs (fullsrcfilepath string, srcin string, offset string)
 	hovs = append(hovs, &z.RespHov { Txt: "No applicable Code Intel tools yet." })
 	return
 }
+
+func (self *zhs) IntelCmpl (fullsrcfilepath string, srcin string, offset string) (cmpls []*z.RespCmpl) {
+	cmpls = append(cmpls, &z.RespCmpl { Label: "BarBaz", Kind: z.CMPL_METHOD })
+	return
+}

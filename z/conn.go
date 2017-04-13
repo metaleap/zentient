@@ -60,6 +60,8 @@ func HandleRequest (queryln string) (e error) {
 				e = out(resp) } else if err!=nil { e = out(err.Error()) } else { e = out(nil) }
 		case REQ_INTEL_HOVER:
 			e = out(Zengines[zids[0]].IntelHovs(ugo.S(inmap["ffp"]), ugo.S(inmap["i"]), ugo.S(inmap["o"])))
+		case REQ_INTEL_CMPL:
+			e = out(Zengines[zids[0]].IntelCmpl(ugo.S(inmap["ffp"]), ugo.S(inmap["i"]), ugo.S(inmap["o"])))
 
 		case REQ_FILES_WRITTEN:
 			onFilesWritten(Zengines[zids[0]], inlst)
