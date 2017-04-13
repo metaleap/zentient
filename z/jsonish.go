@@ -4,6 +4,14 @@ import (
 )
 
 
+
+type ReqIntel struct {
+	Ffp	string
+	Pos	string
+	EoL	string
+	Src	string
+}
+
 type RespCmd struct {
 	Name	string		//	actual cmd name
 	Args	[]string	//	args

@@ -43,25 +43,31 @@ func out (v interface{}) error {
 func HandleRequest (queryln string) (e error) {
 	var inlst []string
 	var inmap map[string]interface{}
+	var inint ReqIntel
 
 	msgid,msgrest := ustr.BreakAt(queryln, 3)
 	msgzids,msgargs := ustr.BreakOn(msgrest, ":")
 	zids := ustr.Split(msgzids, ",")
 	if len(msgargs)>1 {
-		if (msgargs[0]=='{') { json.Unmarshal([]byte(msgargs), &inmap) } else
-			if (msgargs[0]=='[') { json.Unmarshal([]byte(msgargs), &inlst) }
+		// *ReqIntel
+		if msgargs[0]=='[' && msgargs[len(msgargs)-1]==']' {
+			json.Unmarshal([]byte(msgargs), &inlst)
+		} else if msgargs[0]=='{' && msgargs[len(msgargs)-1]=='}' {
+			if ustr.Pref(msgargs, "{\"Ffp\":\"") { json.Unmarshal([]byte(msgargs), &inint) } else {
+				json.Unmarshal([]byte(msgargs), &inmap)
+			}
+		}
 	}
 	switch msgid {
 		//  each case is ideally just a single func-call out, rpc-like
 		//  anything else in a case then is only to furnish proper func args from msg-argstr
 
 		case REQ_INTEL_DEFLOC:
-			if resp,err := Zengines[zids[0]].IntelDefLoc(ugo.S(inmap["ffp"]), ugo.S(inmap["i"]), ugo.S(inmap["o"]))  ;  resp!=nil {
-				e = out(resp) } else if err!=nil { e = out(err.Error()) } else { e = out(nil) }
+			e = out(Zengines[zids[0]].IntelDefLoc(&inint))
 		case REQ_INTEL_HOVER:
-			e = out(Zengines[zids[0]].IntelHovs(ugo.S(inmap["ffp"]), ugo.S(inmap["i"]), ugo.S(inmap["o"])))
+			e = out(Zengines[zids[0]].IntelHovs(&inint))
 		case REQ_INTEL_CMPL:
-			e = out(Zengines[zids[0]].IntelCmpl(ugo.S(inmap["ffp"]), ugo.S(inmap["i"]), ugo.S(inmap["o"])))
+			e = out(Zengines[zids[0]].IntelCmpl(&inint))
 
 		case REQ_FILES_WRITTEN:
 			onFilesWritten(Zengines[zids[0]], inlst)

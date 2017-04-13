@@ -27,9 +27,9 @@ type Zengine interface {
 	BuildFrom ([]string) map[string][]*RespDiag
 	OnCfg (map[string]interface{})
 	OnFile (*File)
-	IntelDefLoc (string, string, string) (*udev.SrcMsg, error)
-	IntelHovs (string, string, string) []*RespHov
-	IntelCmpl (string, string, string) []*RespCmpl
+	IntelDefLoc (*ReqIntel) *udev.SrcMsg
+	IntelHovs (*ReqIntel) []*RespHov
+	IntelCmpl (*ReqIntel) []*RespCmpl
 }
 
 
