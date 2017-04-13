@@ -29,8 +29,8 @@ func main () {
 	//  get the IO stuff ready
 	stdin := bufio.NewScanner(os.Stdin)
 	stdin.Buffer(make([]byte, 1024*1024, bufferCapacity), bufferCapacity)
-	stdout := bufio.NewWriterSize(os.Stdout, bufferCapacity)
-	z.Out = json.NewEncoder(stdout)
+	z.RawOut = bufio.NewWriterSize(os.Stdout, bufferCapacity)
+	z.Out = json.NewEncoder(z.RawOut)
 	z.Out.SetEscapeHTML(false)
 	z.Out.SetIndent("","")
 
@@ -42,11 +42,11 @@ func main () {
 
 	for stdin.Scan() {
 		if err = z.HandleRequest(stdin.Text()) ; err == nil {
-			err = stdout.Flush()
+			err = z.RawOut.Flush()
 		}
 		if err != nil {
 			z.Out.Encode(err.Error())
-			err = stdout.Flush()
+			err = z.RawOut.Flush()
 			break
 		}
 	}

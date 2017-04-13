@@ -1,6 +1,8 @@
 package z
 import (
+	"bufio"
 	"encoding/json"
+	"strings"
 
 	"github.com/metaleap/go-util-misc"
 	"github.com/metaleap/go-util-str"
@@ -13,6 +15,7 @@ const (
 
 	REQ_QUERY_CAPS		= "QC:"
 	REQ_QUERY_DIAGS		= "QD:"
+	REQ_QUERY_TOOL		= "Qt:"
 
 	REQ_INTEL_DEFLOC	= "IL:"
 	REQ_INTEL_HOVER		= "IH:"
@@ -30,6 +33,7 @@ const (
 // globals set from main-app on init. 'bad style', but ok for this personal pet project
 var (
 	Out *json.Encoder
+	RawOut *bufio.Writer
 )
 
 
@@ -76,6 +80,14 @@ func HandleRequest (queryln string) (e error) {
 			if resp,err := doRename(zids[0], ugo.S(inmap["c"]), ugo.S(inmap["rfp"]), uint64(ustr.ParseInt(ugo.S(inmap["o"]))), ugo.S(inmap["nn"]), ugo.S(inmap["e"]), ugo.S(inmap["no"]), uint64(ustr.ParseInt(ugo.S(inmap["o1"]))), uint64(ustr.ParseInt(ugo.S(inmap["o2"]))))  ;  (err != nil) {
 				e = out(err.Error())  } else {  e = out(resp)  }
 
+		case REQ_QUERY_TOOL:
+			cmdargs := ustr.Split(msgrest, " ")  ;  cmdstdout,cmdstderr,cmderr := ugo.CmdExecStdin("", "", cmdargs[0], cmdargs[1:]...)
+			cmdstdout = strings.TrimSpace(cmdstdout)  ;  errstr := ""  ;  if cmderr!=nil {  errstr = cmderr.Error()  }
+			if len(errstr)==0 && len(cmdstderr)==0 && ustr.Pref(cmdstdout, "{") && ustr.Suff(cmdstdout, "}") {
+				RawOut.Write([]byte(strings.Replace(cmdstdout, "\n", " ", -1) + "\n"))
+			} else {
+				e = out(map[string]string{"_stdout":cmdstdout,"_stderr":cmdstderr,"_err":errstr})
+			}
 		case REQ_QUERY_DIAGS:
 			e = out(jsonLiveDiags("", nil, nil))
 		case REQ_QUERY_CAPS:
