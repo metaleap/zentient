@@ -27,17 +27,52 @@ type RespFmt struct {
 	Warnings	[]string
 }
 
+type RespCmpl struct {
+	Label		string	`json:"label"`
+	Kind		int		`json:"kind"`
+	Detail		string	`json:"detail"`
+	Doc			string	`json:"documentation"`
+	SortTxt		string	`json:"sortText"`
+	FilterTxt	string	`json:"filterText"`
+	InsertTxt	string	`json:"insertText"`
+}
+
 type RespHov struct {
-	Txt		string
-	Lang	string
+	Txt		string	`json:"value"`
+	Lang	string	`json:"language"`
 }
 
 
 const (
-	DIAG_SEV_ERR	uint8 = 0
-	DIAG_SEV_WARN	uint8 = 1
-	DIAG_SEV_INFO	uint8 = 2
-	DIAG_SEV_HINT	uint8 = 3
+	DIAG_SEV_ERR	= 0
+	DIAG_SEV_WARN	= 1
+	DIAG_SEV_INFO	= 2
+	DIAG_SEV_HINT	= 3
+)
+
+const (
+	CMPL_TEXT			= 0
+	CMPL_METHOD			= 1
+	CMPL_FUNCTION		= 2
+	CMPL_CONSTRUCTOR	= 3
+	CMPL_FIELD			= 4
+	CMPL_VARIABLE		= 5
+	CMPL_CLASS			= 6
+	CMPL_INTERFACE		= 7
+	CMPL_STRUCT			= 21
+	CMPL_MODULE			= 8
+	CMPL_PROPERTY		= 9
+	CMPL_UNIT			= 10
+	CMPL_VALUE			= 11
+	CMPL_CONSTANT		= 20
+	CMPL_ENUM			= 12
+	CMPL_ENUMMEMBER		= 19
+	CMPL_KEYWORD		= 13
+	CMPL_SNIPPET		= 14
+	CMPL_COLOR			= 15
+	CMPL_REFERENCE		= 17
+	CMPL_FILE			= 16
+	CMPL_FOLDER			= 18
 )
 
 

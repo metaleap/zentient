@@ -6,6 +6,9 @@ import (
 	"github.com/metaleap/zentient/z"
 )
 
+
+
+
 func (self *zgo) IntelDefLoc (ffp string, srcin string, offset string) (*udev.SrcMsg, error) {
 	if !devgo.Has_godef { return nil , ugo.E("No applicable Code Intel tools available.") }
 	return devgo.QueryDefLoc_Godef(ffp, srcin, offset)

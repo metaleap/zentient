@@ -66,6 +66,7 @@ func (_ *zgo) Caps (cap string) (caps []*z.RespCmd) {
 							}
 	case "int":
 		caps = []*z.RespCmd	{	{ Title: "godef",		Exists: devgo.Has_godef,		Hint: "github.com/rogpeppe/godef",			For: "Go to Definition, Hover Tips" },
+								{ Title: "gocode",		Exists: devgo.Has_gocode,		Hint: "github.com/nsf/gocode",				For: "Completion Suggest" },
 							}
 	}
 	return caps
