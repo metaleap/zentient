@@ -61,7 +61,7 @@ func (_ *zgo) BuildFrom (filerelpaths []string) (freshdiags map[string][]*z.Resp
 			defer refreshPkgs()  ;  laterebuilds.Lock()  ;  defer laterebuilds.Unlock()
 			for _,pkgimppath := range asyncrebuilds {
 				if !(uslice.StrHas(pkgimppaths, pkgimppath) || uslice.StrHas(pkgimpimppaths, pkgimppath) || uslice.StrHas(succeeded, pkgimppath)) {
-					go ugo.CmdExec("go", "install", pkgimppath)
+					ugo.CmdExec("go", "install", pkgimppath)
 				}
 			}
 		}

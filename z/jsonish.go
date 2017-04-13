@@ -6,11 +6,11 @@ import (
 
 
 type ReqIntel struct {
-	Ffp	string
-	Pos	string
-	Src	string
-	Sym string
-	EoL	int
+	Ffp		string
+	Pos		string
+	Src		string
+	Sym 	string
+	CrLf	bool
 }
 
 type RespCmd struct {
@@ -37,19 +37,19 @@ type RespFmt struct {
 }
 
 type RespCmpl struct {
-	Label		string		`json:"label"`
-	Kind		int			`json:"kind"`
-	Detail		string		`json:"detail"`
-	Doc			string		`json:"documentation"`
-	SortTxt		string		`json:"sortText"`
-	FilterTxt	string		`json:"filterText"`
-	InsertTxt	string		`json:"insertText"`
-	CommitChars	[]string	`json:"commitCharacters"`
+	Label		string		`json:"label,omitempty"`
+	Kind		int			`json:"kind,omitempty"`
+	Detail		string		`json:"detail,omitempty"`
+	Doc			string		`json:"documentation,omitempty"`
+	SortTxt		string		`json:"sortText,omitempty"`
+	FilterTxt	string		`json:"filterText,omitempty"`
+	InsertTxt	string		`json:"insertText,omitempty"`
+	CommitChars	[]string	`json:"commitCharacters,omitempty"`
 }
 
 type RespHov struct {
-	Txt		string	`json:"value"`
-	Lang	string	`json:"language"`
+	Txt		string	`json:"value,omitempty"`
+	Lang	string	`json:"language,omitempty"`
 }
 
 
