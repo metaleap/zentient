@@ -50,7 +50,7 @@ func HandleRequest (queryln string) (e error) {
 	} }
 	switch msgid {
 		//  each case is ideally just a single func-call out, rpc-like
-		//  anything else in a case then is only to furnish proper func args from msg-argstr
+		//  anything else in a case then is only to furnish proper func args from msg-argstr / json
 
 		case REQ_INTEL_DEFLOC:
 			e = out(Zengines[zids[0]].IntelDefLoc(&inint))

@@ -7,15 +7,14 @@ import (
 
 
 
-
 func (self *zgo) IntelDefLoc (req *z.ReqIntel) *udev.SrcMsg {
 	if !devgo.Has_godef { return nil }
-	return devgo.QueryDefLoc_Godef(req.Ffp, req.Src, req.Pos, req.EoL==1)
+	return devgo.QueryDefLoc_Godef(req.Ffp, req.Src, req.Pos)
 }
 
 
 func (self *zgo) IntelHovs (req *z.ReqIntel) (hovs []*z.RespHov) {
-	if devgo.Has_godef { if defdecl := devgo.QueryDefDecl_GoDef(req.Ffp, req.Src, req.Pos, req.EoL==1)  ;  len(defdecl)>0 {
+	if devgo.Has_godef { if defdecl := devgo.QueryDefDecl_GoDef(req.Ffp, req.Src, req.Pos)  ;  len(defdecl)>0 {
 		hovs = append(hovs, &z.RespHov { Lang: "go", Txt: defdecl })
 	} }
 	if len(hovs)==0 { hovs = append(hovs, &z.RespHov { Txt: "No applicable Code Intel tools available." }) }
@@ -28,7 +27,7 @@ func (self *zgo) IntelCmpl (req *z.ReqIntel) (cmpls []*z.RespCmpl) {
 			for _,raw := range rawresp { if c,n,t := raw["class"] , raw["name"] , raw["type"] ; len(n)>0 {
 				cmpl := &z.RespCmpl{ Label: n, Detail: c, Doc: t }
 				switch c {
-				case "func": cmpl.Kind = z.CMPL_FUNCTION
+				case "func": cmpl.Kind = z.CMPL_FUNCTION  ;  cmpl.CommitChars = []string { "(" }
 				case "package": cmpl.Kind = z.CMPL_FOLDER
 				case "var": cmpl.Kind = z.CMPL_VARIABLE
 				case "const": cmpl.Kind = z.CMPL_CONSTANT

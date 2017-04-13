@@ -8,8 +8,9 @@ import (
 type ReqIntel struct {
 	Ffp	string
 	Pos	string
-	EoL	int
 	Src	string
+	Sym string
+	EoL	int
 }
 
 type RespCmd struct {
@@ -36,13 +37,14 @@ type RespFmt struct {
 }
 
 type RespCmpl struct {
-	Label		string	`json:"label"`
-	Kind		int		`json:"kind"`
-	Detail		string	`json:"detail"`
-	Doc			string	`json:"documentation"`
-	SortTxt		string	`json:"sortText"`
-	FilterTxt	string	`json:"filterText"`
-	InsertTxt	string	`json:"insertText"`
+	Label		string		`json:"label"`
+	Kind		int			`json:"kind"`
+	Detail		string		`json:"detail"`
+	Doc			string		`json:"documentation"`
+	SortTxt		string		`json:"sortText"`
+	FilterTxt	string		`json:"filterText"`
+	InsertTxt	string		`json:"insertText"`
+	CommitChars	[]string	`json:"commitCharacters"`
 }
 
 type RespHov struct {
@@ -114,12 +116,12 @@ func jsonErrMsg (msg string) interface{} {
 
 func jsonStatus () interface{} {
 	resp := map[string]interface{} {}
-	resp["livediags"] = Zengines["go"].B().livediags
-	resp["lintdiags"] = Zengines["go"].B().lintdiags
-	resp["builddiags"] = Zengines["go"].B().builddiags
-	// resp["Ctx"] = Ctx
-	// resp["OpenFiles"] = OpenFiles
-	// resp["AllFiles"] = AllFiles
+	// resp["livediags"] = Zengines["go"].B().livediags
+	// resp["lintdiags"] = Zengines["go"].B().lintdiags
+	// resp["builddiags"] = Zengines["go"].B().builddiags
+	resp["Ctx"] = Ctx
+	resp["OpenFiles"] = OpenFiles
+	resp["AllFiles"] = AllFiles
 	// resp["Zengines"] = jsonZengines()
 	// for zid, zengine := range Zengines {
 	// 	resp["Zengines["+zid+"]"] = zengine
