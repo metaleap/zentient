@@ -14,7 +14,7 @@ type File struct {
 }
 
 
-func NewFile (z Zengine, relpath string) *File {
+func newFile (z Zengine, relpath string) *File {
 	var f File
 	f.µ = z
 	f.RelPath = relpath  ;  f.DirRel = filepath.Dir(f.RelPath)

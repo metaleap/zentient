@@ -61,7 +61,7 @@ func onFilesOpened (µ Zengine, relpaths []string) {
 	for _,relpath := range relpaths {
 		relpath = filepath.FromSlash(relpath)
 		file := AllFiles[relpath]  ;  if file == nil {
-			file = NewFile(µ, relpath)  ;  µ.OnFile(file)  ;  AllFiles[relpath] = file
+			file = newFile(µ, relpath)  ;  µ.OnFile(file)  ;  AllFiles[relpath] = file
 		}
 		if isopened := !uslice.StrHas(OpenFiles, relpath) ; isopened {  OpenFiles = append(OpenFiles, relpath)  }
 	}

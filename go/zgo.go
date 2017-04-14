@@ -62,11 +62,12 @@ func (_ *zgo) Caps (cap string) (caps []*z.RespCmd) {
 								{ Title: "staticcheck",	Exists: devgo.Has_staticcheck,	Hint: "github.com/dominikh/go-tools" },
 							}
 	case "ren":
-		caps = []*z.RespCmd	{	{ Title: "gorename",	Exists: devgo.Has_gorename,		Hint: "golang.org/x/tools/cmd/gorename" },
+		caps = []*z.RespCmd	{	{ Title: "gorename",	Exists: devgo.Has_gorename,		Hint: "golang.org/x/tools/cmd/gorename",	More: "(affected files will be formatted gofmt-style)" },
 							}
-	case "int":
-		caps = []*z.RespCmd	{	{ Title: "godef",		Exists: devgo.Has_godef,		Hint: "github.com/rogpeppe/godef",			For: "Go to Definition, Hover Tips" },
-								{ Title: "gocode",		Exists: devgo.Has_gocode,		Hint: "github.com/nsf/gocode",				For: "Completion Suggest" },
+	case "intel":
+		caps = []*z.RespCmd	{	{ Title: "gocode",		Exists: devgo.Has_gocode,		Hint: "github.com/nsf/gocode",				More: "Completion Suggest" },
+								{ Title: "getgetdoc",	Exists: devgo.Has_gogetdoc,		Hint: "github.com/zmb3/gogetdoc",			More: "Hover Tips, Go to Definition" },
+								{ Title: "godef",		Exists: devgo.Has_godef,		Hint: "github.com/rogpeppe/godef",			More: "Go to Definition, Hover Tips" },
 							}
 	}
 	return caps

@@ -2,6 +2,7 @@ package zgo
 import (
 	"github.com/metaleap/go-devgo"
 	"github.com/metaleap/go-util-dev"
+	"github.com/metaleap/go-util-str"
 	"github.com/metaleap/zentient/z"
 )
 
@@ -10,9 +11,10 @@ func (me *zgo) may (cmdname string) bool {
 }
 
 
-func (me *zgo) IntelDefLoc (req *z.ReqIntel) *udev.SrcMsg {
-	if devgo.Has_godef && me.may("godef") { return devgo.QueryDefLoc_Godef(req.Ffp, req.Src, req.Pos) }
-	return nil
+func (me *zgo) IntelDefLoc (req *z.ReqIntel) (refloc *udev.SrcMsg) {
+	if refloc==nil && devgo.Has_godef && me.may("godef") { refloc = devgo.QueryDefLoc_Godef(req.Ffp, req.Src, req.Pos) }
+	if refloc==nil && devgo.Has_gogetdoc && me.may("gogetdoc") { refloc = devgo.QueryDefLoc_Gogetdoc(req.Ffp, req.Pos) }
+	return
 }
 
 
@@ -34,18 +36,19 @@ func (me *zgo) IntelCmpl (req *z.ReqIntel) (cmpls []*z.RespCmpl) {
 	if devgo.Has_gocode && me.may("gocode") {
 		if rawresp := devgo.QueryCmplSugg_Gocode(req.Ffp, req.Src, req.Pos)  ;  len(rawresp)>0 {
 			for _,raw := range rawresp { if c,n,t := raw["class"] , raw["name"] , raw["type"] ; len(n)>0 {
-				cmpl := &z.RespCmpl{ Label: n, Detail: c, Doc: t }
+				cmpl := &z.RespCmpl{ Label: n, Detail: t, Doc: c }
 				switch c {
-				case "func": cmpl.Kind = z.CMPL_FUNCTION  ;  cmpl.CommitChars = []string { "(" }
-				case "package": cmpl.Kind = z.CMPL_FOLDER
-				case "var": cmpl.Kind = z.CMPL_VARIABLE
-				case "const": cmpl.Kind = z.CMPL_CONSTANT
-				case "type": switch t {
+				case "func": cmpl.Kind = z.CMPL_FUNCTION   ;  cmpl.SortTxt = "9" + cmpl.Label  ;  cmpl.CommitChars = []string { "(" }
+				case "package": cmpl.Kind = z.CMPL_FOLDER  ;  cmpl.SortTxt = "1" + cmpl.Label
+				case "var": cmpl.Kind = z.CMPL_VARIABLE  ;  cmpl.SortTxt = "4" + cmpl.Label
+				case "const": cmpl.Kind = z.CMPL_CONSTANT  ;  cmpl.SortTxt = "3" + cmpl.Label
+				case "type": cmpl.SortTxt = "2" + cmpl.Label  ;  switch t {
 					case "struct": cmpl.Kind = z.CMPL_STRUCT
 					case "interface": cmpl.Kind = z.CMPL_INTERFACE
-					default: cmpl.Kind = z.CMPL_CLASS
+					default: if ustr.Pref(t, "func(") {
+						cmpl.Kind = z.CMPL_METHOD } else { cmpl.Kind = z.CMPL_CLASS }
 				}
-				default: cmpl.Kind = z.CMPL_COLOR
+				default: cmpl.Kind = z.CMPL_COLOR  ;  cmpl.SortTxt = "0" + cmpl.Label
 				}
 				if (len(raw) > 3) { for k,v := range raw { if k!="class" && k!="name" && k!="type" {
 					cmpl.Doc = "❬" + k + "=" + v + "❭ " + cmpl.Doc
