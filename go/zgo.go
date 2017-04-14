@@ -73,7 +73,7 @@ func (_ *zgo) Caps (cap string) (caps []*z.RespCmd) {
 	return caps
 }
 
-func (me *zgo) DoFmt (src string, custcmd string, tabsize uint8) (*z.RespFmt, error) {
+func (me *zgo) DoFmt (src string, custcmd string, tabsize uint8) (*z.RespTxt, error) {
 	return me.Base.DoFmt(src, custcmd,
 		z.RespCmd { Exists: devgo.Has_goimports, Name: "goimports", Args: []string { "-e" } },
 		z.RespCmd { Exists: devgo.Has_gofmt, Name: "gofmt", Args: []string {"-e", "-s"} })

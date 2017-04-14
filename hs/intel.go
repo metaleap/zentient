@@ -18,3 +18,7 @@ func (_ *zhs) IntelCmpl (req *z.ReqIntel) (cmpls []*z.RespCmpl) {
 	cmpls = append(cmpls, &z.RespCmpl { Label: "BarBaz", Kind: z.CMPL_METHOD })
 	return
 }
+
+func (_ *zhs) IntelCmplDoc(req *z.ReqIntel) *z.RespTxt {
+	return nil
+}

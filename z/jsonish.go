@@ -1,26 +1,39 @@
 package z
 import (
 	"github.com/metaleap/go-util-dev"
+	"github.com/metaleap/go-util-fs"
+	"github.com/metaleap/go-util-misc"
+	"github.com/metaleap/go-util-str"
 )
 
 
 
 type ReqIntel struct {
-	Ffp		string
-	Pos		string
-	Src		string
-	Sym 	string
-	CrLf	bool
+	Ffp		string	`json:",omitempty"`
+	Pos		string	`json:",omitempty"`
+	Src		string	`json:",omitempty"`
+	Sym1 	string	`json:",omitempty"`
+	Sym2 	string	`json:",omitempty"`
+	CrLf	bool	`json:",omitempty"`
 }
 
-type RespCmd struct {
-	Name	string		//	actual cmd name
-	Args	[]string	//	args
+func (self *ReqIntel) RunePosToBytePos () {
+	if len(self.Src)==0 {  self.Src = ufs.ReadTextFile(self.Ffp, false, "")  }
+	if off := int(ustr.ParseInt(self.Pos))  ;  off>0 && len(self.Src)>0 {
+		reoff := func() int { r := 0  ;  for i, _ := range self.Src { if r==off { return i }  ;  { r++ } }  ;  return len([]byte(self.Src)) }
+		self.Pos = ugo.SPr(reoff())
+	}
+}
 
-	Title	string		//	display name, eg: N = "go vet" when C = "go" with A = ["vet"]  ;  if empty fall back to C
-	Exists	bool		//	installed?
-	Hint	string		//	install hint
-	More	string
+
+type RespCmd struct {
+	Name	string		`json:",omitempty"`		//	actual cmd name
+	Args	[]string	`json:",omitempty"`	//	args
+
+	Title	string		`json:",omitempty"`	//	display name, eg: N = "go vet" when C = "go" with A = ["vet"]  ;  if empty fall back to C
+	Exists	bool		`json:",omitempty"`	//	installed?
+	Hint	string		`json:",omitempty"`	//	install hint
+	More	string		`json:",omitempty"`
 
 	f	func()		//	tmp field used in Base.DoFmt()
 }
@@ -31,9 +44,9 @@ type RespDiag struct {
 }
 
 
-type RespFmt struct {
-	Result		string
-	Warnings	[]string
+type RespTxt struct {
+	Result		string		`json:",omitempty"`
+	Warnings	[]string	`json:",omitempty"`
 }
 
 type RespCmpl struct {

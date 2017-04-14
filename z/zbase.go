@@ -31,14 +31,14 @@ func (me *Base) zId () string {
 }
 
 
-func (me *Base) DoFmt (src string, custcmd string, cmds ...RespCmd) (resp *RespFmt, err error) {
+func (me *Base) DoFmt (src string, custcmd string, cmds ...RespCmd) (resp *RespTxt, err error) {
 	var (	cmdoutstderr string
 			c = -1
 			run = false
 			c2f = func(c RespCmd) func() { return func() {
 					resp.Result, cmdoutstderr, err = ugo.CmdExecStdin(src, "", c.Name, c.Args...)  } }
 		)
-	resp = &RespFmt{}
+	resp = &RespTxt{}
 	for i, cmd := range cmds {
 		if cmd.f = c2f(cmd); len(cmd.Title)==0 {  cmd.Title = cmd.Name  }
 		if cmds[i] = cmd; cmd.Title==custcmd && c<0 {  c = i  }

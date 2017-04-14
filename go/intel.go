@@ -12,6 +12,7 @@ func (me *zgo) may (cmdname string) bool {
 
 
 func (me *zgo) IntelDefLoc (req *z.ReqIntel) (refloc *udev.SrcMsg) {
+	req.RunePosToBytePos()
 	if refloc==nil && devgo.Has_godef && me.may("godef") { refloc = devgo.QueryDefLoc_Godef(req.Ffp, req.Src, req.Pos) }
 	if refloc==nil && devgo.Has_gogetdoc && me.may("gogetdoc") { refloc = devgo.QueryDefLoc_Gogetdoc(req.Ffp, req.Pos) }
 	return
@@ -19,6 +20,7 @@ func (me *zgo) IntelDefLoc (req *z.ReqIntel) (refloc *udev.SrcMsg) {
 
 
 func (me *zgo) IntelHovs (req *z.ReqIntel) (hovs []*z.RespHov) {
+	req.RunePosToBytePos()
 	var ggd *devgo.Gogetdoc
 	var decl string
 	if devgo.Has_gogetdoc && me.may("gogetdoc") { if ggd = devgo.Query_Gogetdoc(req.Ffp, req.Pos)  ;  ggd!=nil {
@@ -34,7 +36,7 @@ func (me *zgo) IntelHovs (req *z.ReqIntel) (hovs []*z.RespHov) {
 
 func (me *zgo) IntelCmpl (req *z.ReqIntel) (cmpls []*z.RespCmpl) {
 	if devgo.Has_gocode && me.may("gocode") {
-		if rawresp := devgo.QueryCmplSugg_Gocode(req.Ffp, req.Src, req.Pos)  ;  len(rawresp)>0 {
+		if rawresp := devgo.QueryCmplSugg_Gocode(req.Ffp, req.Src, "c" + req.Pos)  ;  len(rawresp)>0 {
 			for _,raw := range rawresp { if c,n,t := raw["class"] , raw["name"] , raw["type"] ; len(n)>0 {
 				cmpl := &z.RespCmpl{ Label: n, Detail: t, Doc: c }
 				switch c {
@@ -59,4 +61,8 @@ func (me *zgo) IntelCmpl (req *z.ReqIntel) (cmpls []*z.RespCmpl) {
 
 	}
 	return
+}
+
+func (_ *zgo) IntelCmplDoc(req *z.ReqIntel) *z.RespTxt {
+	return &z.RespTxt { Result: "foo `" + req.Sym1 + "` > `" + req.Sym2 + "` dis" }
 }

@@ -20,7 +20,7 @@ type Zengine interface {
 	B () *Base
 
 	Caps (string) []*RespCmd
-	DoFmt (string, string, uint8) (*RespFmt, error)
+	DoFmt (string, string, uint8) (*RespTxt, error)
 	DoRename (string, string, uint64, string, string, string, uint64, uint64) (map[string][]*udev.SrcMsg, error)
 	Linters ([]string) []func()map[string][]*RespDiag
 	ReadyToBuildAndLint () bool
@@ -30,6 +30,7 @@ type Zengine interface {
 	IntelDefLoc (*ReqIntel) *udev.SrcMsg
 	IntelHovs (*ReqIntel) []*RespHov
 	IntelCmpl (*ReqIntel) []*RespCmpl
+	IntelCmplDoc(*ReqIntel) *RespTxt
 }
 
 
@@ -41,7 +42,7 @@ var (
 )
 
 
-func doFmt (zid string, reqsrc string, reqcmd string, reqtabsize uint8) (resp *RespFmt, err error) {
+func doFmt (zid string, reqsrc string, reqcmd string, reqtabsize uint8) (resp *RespTxt, err error) {
 	if µ := Zengines[zid]  ;  µ==nil || len(reqsrc)==0 { err = ugo.E("Bad zid or input src") } else { resp,err = µ.DoFmt(reqsrc, reqcmd, reqtabsize) }
 	return
 }

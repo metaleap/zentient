@@ -53,7 +53,7 @@ func (_ *zhs) Caps (cap string) (caps []*z.RespCmd) {
 	return caps
 }
 
-func (me *zhs) DoFmt (src string, custcmd string, tabsize uint8) (resp *z.RespFmt, err error) {
+func (me *zhs) DoFmt (src string, custcmd string, tabsize uint8) (resp *z.RespTxt, err error) {
 	ts := fmt.Sprint(tabsize)
 	return me.Base.DoFmt(src, custcmd,
 		z.RespCmd { Exists: devhs.Has_stylish_haskell,	Name: "stylish-haskell",	Args: []string{} },
