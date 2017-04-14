@@ -55,13 +55,13 @@ func linterHonnef (dirrelpath string, cmdname string, pkgimppath string) func()m
 }
 
 
-func (self *zgo) Linters (filerelpaths []string) (linters []func()map[string][]*z.RespDiag) {
+func (me *zgo) Linters (filerelpaths []string) (linters []func()map[string][]*z.RespDiag) {
 	pkgfiles := map[*devgo.Pkg][]string {}  ;  for _,frp := range filerelpaths {
 		if pkg := filePkg(frp) ; pkg!=nil {
 			pkgfiles[pkg] = append(pkgfiles[pkg], frp)
 		}
 	}
-	cfgok := self.Base.CfgDiagCmdEnabled
+	cfgok := me.Base.CfgDiagToolEnabled
 	for fpkg,frps := range pkgfiles { dirrelpath := filepath.Dir(frps[0])
 		if cfgok("go vet")									{ linters = append(linters, linterGoVet(dirrelpath)) }
 		if devgo.Has_golint && cfgok("golint")				{ linters = append(linters, linterGolint(dirrelpath)) }

@@ -5,16 +5,16 @@ import (
 	"github.com/metaleap/zentient/z"
 )
 
-func (self *zhs) IntelDefLoc (req *z.ReqIntel) *udev.SrcMsg {
+func (_ *zhs) IntelDefLoc (req *z.ReqIntel) *udev.SrcMsg {
 	return nil
 }
 
-func (self *zhs) IntelHovs (req *z.ReqIntel) (hovs []*z.RespHov) {
+func (_ *zhs) IntelHovs (req *z.ReqIntel) (hovs []*z.RespHov) {
 	hovs = append(hovs, &z.RespHov { Txt: "No applicable Code Intel tools yet." })
 	return
 }
 
-func (self *zhs) IntelCmpl (req *z.ReqIntel) (cmpls []*z.RespCmpl) {
+func (_ *zhs) IntelCmpl (req *z.ReqIntel) (cmpls []*z.RespCmpl) {
 	cmpls = append(cmpls, &z.RespCmpl { Label: "BarBaz", Kind: z.CMPL_METHOD })
 	return
 }

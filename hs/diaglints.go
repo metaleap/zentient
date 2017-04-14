@@ -21,8 +21,8 @@ func linterHlint (filerelpaths []string) func()map[string][]*z.RespDiag {
 }
 
 
-func (self *zhs) Linters (filerelpaths []string) (linters []func()map[string][]*z.RespDiag) {
-	cfgok := self.Base.CfgDiagCmdEnabled
+func (me *zhs) Linters (filerelpaths []string) (linters []func()map[string][]*z.RespDiag) {
+	cfgok := me.Base.CfgDiagToolEnabled
 	if devhs.Has_hlint && cfgok("hlint") { linters = append(linters, linterHlint(filerelpaths)) }
 	return
 }

@@ -10,27 +10,28 @@ import (
 )
 
 type Base struct {
-	builddiags		map[string][]*RespDiag
-	lintdiags		map[string][]*RespDiag
-	livediags		map[string][]*RespDiag
-	lintmutex		sync.Mutex
-	linttime		int64
-	zid				string
-	diagsDisabled	[]string
+	builddiags			map[string][]*RespDiag
+	lintdiags			map[string][]*RespDiag
+	livediags			map[string][]*RespDiag
+	lintmutex			sync.Mutex
+	linttime			int64
+	zid					string
+	disabledToolsDiag	[]string
+	disabledToolsIntel	[]string
 }
 
 
 
-func (self *Base) Init () {
+func (me *Base) Init () {
 }
 
-func (self *Base) zId () string {
-	if len(self.zid)==0 { for zid,µ := range Zengines { if µ.B()==self { self.zid = zid ; break } } }
-	return self.zid
+func (me *Base) zId () string {
+	if len(me.zid)==0 { for zid,µ := range Zengines { if µ.B()==me { me.zid = zid ; break } } }
+	return me.zid
 }
 
 
-func (self *Base) DoFmt (src string, custcmd string, cmds ...RespCmd) (resp *RespFmt, err error) {
+func (me *Base) DoFmt (src string, custcmd string, cmds ...RespCmd) (resp *RespFmt, err error) {
 	var (	cmdoutstderr string
 			c = -1
 			run = false
@@ -66,66 +67,73 @@ func openFiles (µ Zengine) (openfiles []string) {
 	}
 	return
 }
-func (self *Base) OpenFiles () []string {
-	return openFiles(Zengines[self.zId()])
+func (me *Base) OpenFiles () []string {
+	return openFiles(Zengines[me.zId()])
 }
 
-func (self *Base) CfgDiagCmdEnabled (cmdname string) bool {
-	return !uslice.StrHas(self.diagsDisabled, cmdname)
+func (me *Base) CfgDiagToolEnabled (cmdname string) bool {
+	return !uslice.StrHas(me.disabledToolsDiag, cmdname)
 }
 
-func (self *Base) OnCfg (cfg map[string]interface{}) {
-	self.diagsDisabled = ustr.Split(cfg["diag.disabled"].(string), ",")
-	self.lintmutex.Lock()  ;  defer self.lintmutex.Unlock()
-	self.lintdiags = nil  ;  self.livediags = nil  ;  newlivediags = true
+func (me *Base) CfgIntelToolEnabled (cmdname string) bool {
+	return !uslice.StrHas(me.disabledToolsIntel, cmdname)
 }
 
-
-func (self *Base) buildFrom (µ Zengine, filerelpaths []string) {
-	if µ.ReadyToBuildAndLint() {
-		newlivediags = true  ;  self.livediags = nil  ;  self.lintdiags = nil
-		self.builddiags = µ.BuildFrom(filerelpaths)
+func (me *Base) OnCfg (cfg map[string]interface{}) {
+	if cfg != nil {
+		if s,ok := cfg["diag.disabled"].(string)  ;  ok { me.disabledToolsDiag = ustr.Split(s, ",") }
+		if s,ok := cfg["intel.disabled"].(string)  ;  ok { me.disabledToolsIntel = ustr.Split(s, ",") }
+		me.lintmutex.Lock()  ;  defer me.lintmutex.Unlock()
+		me.lintdiags = nil  ;  me.livediags = nil  ;  newlivediags = true
 	}
 }
 
 
-func (self *Base) liveDiags (µ Zengine, closedfrps []string, openedfrps []string) map[string][]*RespDiag {
-	if len(openedfrps)>0 || len(closedfrps)>0 {  newlivediags = true  ;  self.livediags = nil  }
-	openfiles := openFiles(µ)  ;  livediags := self.livediags  ;  if livediags==nil {
+func (me *Base) buildFrom (µ Zengine, filerelpaths []string) {
+	if µ.ReadyToBuildAndLint() {
+		newlivediags = true  ;  me.livediags = nil  ;  me.lintdiags = nil
+		me.builddiags = µ.BuildFrom(filerelpaths)
+	}
+}
+
+
+func (me *Base) liveDiags (µ Zengine, closedfrps []string, openedfrps []string) map[string][]*RespDiag {
+	if len(openedfrps)>0 || len(closedfrps)>0 {  newlivediags = true  ;  me.livediags = nil  }
+	openfiles := openFiles(µ)  ;  livediags := me.livediags  ;  if livediags==nil {
 		livediags = map[string][]*RespDiag {}
-		if self.builddiags!=nil { for frp,fdiags := range self.builddiags { livediags[frp] = fdiags } }
-		if lintdiags := self.lintdiags  ;  lintdiags!=nil {
+		if me.builddiags!=nil { for frp,fdiags := range me.builddiags { livediags[frp] = fdiags } }
+		if lintdiags := me.lintdiags  ;  lintdiags!=nil {
 			for _,frp := range openfiles { livediags[frp] = append(livediags[frp], lintdiags[frp]...) }
 		}
 	}
-	if len(openedfrps)>0 || self.lintdiags==nil { now := time.Now().UnixNano()  ;  self.linttime = now  ;  go self.relint(µ, now) }
-	self.livediags = livediags  ;  return livediags
+	if len(openedfrps)>0 || me.lintdiags==nil { now := time.Now().UnixNano()  ;  me.linttime = now  ;  go me.relint(µ, now) }
+	me.livediags = livediags  ;  return livediags
 }
 
 
-func (self *Base) relint (µ Zengine, mytime int64) {
-	if µ.ReadyToBuildAndLint() && mytime>=self.linttime {
-		self.lintmutex.Lock()  ;  defer self.lintmutex.Unlock() // we won't race ourselves doing the same work n times over
+func (me *Base) relint (µ Zengine, mytime int64) {
+	if µ.ReadyToBuildAndLint() && mytime>=me.linttime {
+		me.lintmutex.Lock()  ;  defer me.lintmutex.Unlock() // we won't race ourselves doing the same work n times over
 
-		if mytime>=self.linttime {
-			lintdiags := self.lintdiags  ;  if lintdiags==nil { // so we can check at the end whether we're already outdated
-				lintdiags = map[string][]*RespDiag {}  ;  self.lintdiags = lintdiags
+		if mytime>=me.linttime {
+			lintdiags := me.lintdiags  ;  if lintdiags==nil { // so we can check at the end whether we're already outdated
+				lintdiags = map[string][]*RespDiag {}  ;  me.lintdiags = lintdiags
 			}
 			freshdiags := map[string][]*RespDiag {}  ;  lintfiles := []string {}
 			for _,frp := range openFiles(µ) { if _,alreadylinted := lintdiags[frp]  ;  !alreadylinted { lintfiles = append(lintfiles, frp) } }
 			for _,frp := range lintfiles { freshdiags[frp] = []*RespDiag {} } // init to non-nil so our next alreadylinted above will be correct
 
-			if len(lintfiles)>0 && mytime>=self.linttime {
-				self.runLinters(µ.Linters(lintfiles), freshdiags)
-				if lintdiags = self.lintdiags  ;  lintdiags!=nil && mytime>=self.linttime {
+			if len(lintfiles)>0 && mytime>=me.linttime {
+				me.runLinters(µ.Linters(lintfiles), freshdiags)
+				if lintdiags = me.lintdiags  ;  lintdiags!=nil && mytime>=me.linttime {
 					prependnowtime := false  ;  nowstr := "" // turn on after major refactors to verify things stay cached as long as possible/permissable
 					if prependnowtime {  nowstr = ustr.After(time.Now().String(), " ")  ;  nowstr = (nowstr[:strings.LastIndex(nowstr, ":")]) + "\t"  }
 					for frp,fdiags := range freshdiags {
 						if prependnowtime { for i,_ := range fdiags { fd := fdiags[i] ; fd.Ref = nowstr + fd.Ref ; fdiags[i] = fd } }
 						lintdiags[frp] = fdiags
 					}
-					if self.lintdiags!=nil && mytime>=self.linttime {
-						self.lintdiags = lintdiags  ;  self.livediags = nil  ;  newlivediags = true
+					if me.lintdiags!=nil && mytime>=me.linttime {
+						me.lintdiags = lintdiags  ;  me.livediags = nil  ;  newlivediags = true
 					}
 				}
 			}
@@ -134,7 +142,7 @@ func (self *Base) relint (µ Zengine, mytime int64) {
 }
 
 
-func (self *Base) runLinters (linters []func()map[string][]*RespDiag, freshdiags map[string][]*RespDiag) {
+func (me *Base) runLinters (linters []func()map[string][]*RespDiag, freshdiags map[string][]*RespDiag) {
 	var mutex sync.Mutex
 	lintjobs := []func() {}
 	for _,linter := range linters {

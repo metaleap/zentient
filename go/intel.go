@@ -5,24 +5,33 @@ import (
 	"github.com/metaleap/zentient/z"
 )
 
-
-
-func (self *zgo) IntelDefLoc (req *z.ReqIntel) *udev.SrcMsg {
-	if !devgo.Has_godef { return nil }
-	return devgo.QueryDefLoc_Godef(req.Ffp, req.Src, req.Pos)
+func (me *zgo) may (cmdname string) bool {
+	return me.Base.CfgIntelToolEnabled(cmdname)
 }
 
 
-func (self *zgo) IntelHovs (req *z.ReqIntel) (hovs []*z.RespHov) {
-	if devgo.Has_godef { if defdecl := devgo.QueryDefDecl_GoDef(req.Ffp, req.Src, req.Pos)  ;  len(defdecl)>0 {
-		hovs = append(hovs, &z.RespHov { Lang: "go", Txt: defdecl })
+func (me *zgo) IntelDefLoc (req *z.ReqIntel) *udev.SrcMsg {
+	if devgo.Has_godef && me.may("godef") { return devgo.QueryDefLoc_Godef(req.Ffp, req.Src, req.Pos) }
+	return nil
+}
+
+
+func (me *zgo) IntelHovs (req *z.ReqIntel) (hovs []*z.RespHov) {
+	var ggd *devgo.Gogetdoc
+	var decl string
+	if devgo.Has_gogetdoc && me.may("gogetdoc") { if ggd = devgo.Query_Gogetdoc(req.Ffp, req.Pos)  ;  ggd!=nil {
+		d := ggd.ImpN  ;  if len(d)>0  {  d = "**" + d + "**\n\n"  }
+		d = d + ggd.Doc
+		hovs = append(hovs, &z.RespHov { Txt: d })
 	} }
-	if len(hovs)==0 { hovs = append(hovs, &z.RespHov { Txt: "No applicable Code Intel tools available." }) }
+	if ggd!=nil && len(ggd.Decl)>0 { decl = ggd.Decl }
+	if len(decl)==0 && devgo.Has_godef && me.may("godef") { decl = devgo.QueryDefDecl_GoDef(req.Ffp, req.Src, req.Pos) }
+	if len(decl)>0 { hovs = append(hovs, &z.RespHov { Lang: "go", Txt: decl }) }
 	return
 }
 
-func (self *zgo) IntelCmpl (req *z.ReqIntel) (cmpls []*z.RespCmpl) {
-	if devgo.Has_gocode {
+func (me *zgo) IntelCmpl (req *z.ReqIntel) (cmpls []*z.RespCmpl) {
+	if devgo.Has_gocode && me.may("gocode") {
 		if rawresp := devgo.QueryCmplSugg_Gocode(req.Ffp, req.Src, req.Pos)  ;  len(rawresp)>0 {
 			for _,raw := range rawresp { if c,n,t := raw["class"] , raw["name"] , raw["type"] ; len(n)>0 {
 				cmpl := &z.RespCmpl{ Label: n, Detail: c, Doc: t }

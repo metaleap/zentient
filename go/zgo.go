@@ -24,9 +24,9 @@ func Init () z.Zengine {
 	if !devgo.HasGoDevEnv() { return nil }
 	srcDir = z.Ctx.SrcDir
 	go refreshPkgs()
-	self := &zgo{}
-	self.Base.Init()
-	return self
+	me := &zgo{}
+	me.Base.Init()
+	return me
 }
 
 
@@ -34,8 +34,8 @@ func (_ *zgo) EdLangIDs () []string {
 	return []string { "go", "Go" }
 }
 
-func (self *zgo) B () *z.Base {
-	return &self.Base
+func (me *zgo) B () *z.Base {
+	return &me.Base
 }
 
 
@@ -72,13 +72,13 @@ func (_ *zgo) Caps (cap string) (caps []*z.RespCmd) {
 	return caps
 }
 
-func (self *zgo) DoFmt (src string, custcmd string, tabsize uint8) (*z.RespFmt, error) {
-	return self.Base.DoFmt(src, custcmd,
+func (me *zgo) DoFmt (src string, custcmd string, tabsize uint8) (*z.RespFmt, error) {
+	return me.Base.DoFmt(src, custcmd,
 		z.RespCmd { Exists: devgo.Has_goimports, Name: "goimports", Args: []string { "-e" } },
 		z.RespCmd { Exists: devgo.Has_gofmt, Name: "gofmt", Args: []string {"-e", "-s"} })
 }
 
-func (self *zgo) DoRename (reqcmd string, relfilepath string, offset uint64, newname string, eol string, oldname string, off1 uint64, off2 uint64) (resp map[string][]*udev.SrcMsg, err error) {
+func (me *zgo) DoRename (reqcmd string, relfilepath string, offset uint64, newname string, eol string, oldname string, off1 uint64, off2 uint64) (resp map[string][]*udev.SrcMsg, err error) {
 	if len(reqcmd)==0 && !devgo.Has_gorename { return nil , ugo.E("Couldn't find `gorename` command, and no custom tool was specified either.") }
 	var fileedits []*udev.SrcMsg  ;  if fileedits,err = devgo.Gorename(reqcmd, relfilepath, offset, newname, eol)  ;  len(fileedits)>0 {
 		resp = map[string][]*udev.SrcMsg {}  ;  for _,sr := range fileedits {
@@ -88,8 +88,8 @@ func (self *zgo) DoRename (reqcmd string, relfilepath string, offset uint64, new
 	return
 }
 
-func (self *zgo) OnCfg (cfg map[string]interface{}) {
-	self.Base.OnCfg(cfg)
+func (me *zgo) OnCfg (cfg map[string]interface{}) {
+	me.Base.OnCfg(cfg)
 }
 
 func (_ *zgo) OnFile (newfile *z.File) {
