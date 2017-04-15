@@ -39,11 +39,15 @@ const (
 	CMPL_FOLDER			= 18
 )
 
-type RespCmpl struct {
+type RespIntel struct {
 	Label		string		`json:"label,omitempty"`
+	Doc			string		`json:"documentation,omitempty"`
+}
+
+type RespCmpl struct {
+	RespIntel
 	Kind		int			`json:"kind,omitempty"` // CMPL_FOO
 	Detail		string		`json:"detail,omitempty"`
-	Doc			string		`json:"documentation,omitempty"`
 	SortTxt		string		`json:"sortText,omitempty"`
 	FilterTxt	string		`json:"filterText,omitempty"`
 	InsertTxt	string		`json:"insertText,omitempty"`
@@ -78,6 +82,17 @@ type RespTxt struct {
 type RespHov struct {
 	Txt		string	`json:"value,omitempty"`
 	Lang	string	`json:"language,omitempty"`
+}
+
+type RespSigHelp struct {
+	Sigs	[]*RespSigInfo	`json:"signatures,omitempty"`
+	CurSig	int				`json:"activeSignature"`
+	CurArg	int				`json:"activeParameter"`
+}
+
+type RespSigInfo struct {
+	RespIntel
+	Args	[]*RespIntel	`json:"parameters,omitempty"`
 }
 
 type ReqIntel struct {

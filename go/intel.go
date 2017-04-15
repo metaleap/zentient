@@ -18,7 +18,7 @@ func (me *zgo) IntelDefLoc (req *z.ReqIntel, typedef bool) (refloc *udev.SrcMsg)
 	req.RunePosToBytePos()
 	//	go to definition
 	if (!typedef) {
-		if refloc==nil && devgo.Has_guru && me.may("guru") { if gd := devgo.QueryDescribe_Guru(req.Ffp, req.Src, req.Pos)  ;  gd!=nil {
+		if refloc==nil && devgo.Has_guru && me.may("guru") { if gd := devgo.QueryDesc_Guru(req.Ffp, req.Src, req.Pos)  ;  gd!=nil {
 			if gd.Type!=nil && len(gd.Type.NamePos)>0 { if rl,ok := udev.SrcMsgFromLn(gd.Type.NamePos)  ;  ok { refloc = &rl } }
 			if gd.Value!=nil && len(gd.Value.ObjPos)>0 { if rl,ok := udev.SrcMsgFromLn(gd.Value.ObjPos)  ;  ok { refloc = &rl } }
 		} }
@@ -28,15 +28,16 @@ func (me *zgo) IntelDefLoc (req *z.ReqIntel, typedef bool) (refloc *udev.SrcMsg)
 	}
 	//	go to type definition
 	if devgo.Has_guru && me.may("guru") {
-		if gd := devgo.QueryDescribe_Guru(req.Ffp, req.Src, req.Pos)  ;  gd!=nil {
+		if gd := devgo.QueryDesc_Guru(req.Ffp, req.Src, req.Pos)  ;  gd!=nil {
 			if gd.Type!=nil && len(gd.Type.NamePos)>0 {
 				if rl,ok := udev.SrcMsgFromLn(gd.Type.NamePos)  ;  ok { refloc = &rl }
 			} else if gd.Value!=nil && len(gd.Value.Type)>0 {
+				for ustr.Pref(gd.Value.Type, "map[") {  gd.Value.Type = gd.Value.Type[ustr.Idx(gd.Value.Type, "]")+1:]  }
 				possiblyfullyqualified := strings.TrimLeft(strings.TrimPrefix(strings.TrimLeft(gd.Value.Type, "*"), "[]"), "*")
 				pkgimppath,typename := ustr.BreakOnLast(possiblyfullyqualified, ".")  ;  pkgname := ustr.AfterLast(pkgimppath, "/", false)
 				if devgo.PkgsByImP!=nil { if pkg := devgo.PkgsByImP[pkgimppath]  ;  pkg!=nil && len(pkg.Name)>0 {  pkgname = pkg.Name  } }
 				hacky1 := "\n\nfunc Zen" + req.Id + " () *"  ;  hacky2 := " { return nil }\n"  ;  if len(pkgname)>0 {  hacky1 = hacky1 + pkgname + "."  }
-				req.Pos = ugo.SPr(len( (req.Src)) + len(hacky1))  ;  req.Src = req.Src + hacky1 + typename + hacky2
+				req.Pos = ugo.SPr(len(req.Src) + len(hacky1))  ;  req.Src = req.Src + hacky1 + typename + hacky2
 				refloc = me.IntelDefLoc(req, false)
 			}
 		}
@@ -66,7 +67,7 @@ func (me *zgo) IntelCmpl (req *z.ReqIntel) (cmpls []*z.RespCmpl) {
 	if devgo.Has_gocode && me.may("gocode") {
 		if rawresp := devgo.QueryCmplSugg_Gocode(req.Ffp, req.Src, "c" + req.Pos)  ;  len(rawresp)>0 {
 			for _,raw := range rawresp { if c,n,t := raw["class"] , raw["name"] , raw["type"] ; len(n)>0 {
-				cmpl := &z.RespCmpl{ Label: n, Detail: t, Doc: c }
+				cmpl := &z.RespCmpl{ RespIntel: z.RespIntel { Label: n, Doc: c }, Detail: t }
 				switch c {
 				case "func": cmpl.Kind = z.CMPL_FUNCTION   ;  cmpl.SortTxt = "9" + cmpl.Label  ;  cmpl.CommitChars = []string { "(" }
 				case "package": cmpl.Kind = z.CMPL_FOLDER  ;  cmpl.SortTxt = "1" + cmpl.Label
