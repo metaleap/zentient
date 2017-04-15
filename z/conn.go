@@ -18,6 +18,7 @@ const (
 	REQ_QUERY_TOOL		= "Qt:"
 
 	REQ_INTEL_DEFLOC	= "IL:"
+	REQ_INTEL_TDEFLOC	= "IT:"
 	REQ_INTEL_HOVER		= "IH:"
 	REQ_INTEL_CMPL		= "IC:"
 	REQ_INTEL_CMPLDOC	= "ID:"
@@ -58,7 +59,9 @@ func HandleRequest (queryln string) (e error) {
 		//  anything else in a case then is only to furnish proper func args from msg-argstr / json
 
 		case REQ_INTEL_DEFLOC:
-			e = out(Zengines[zids[0]].IntelDefLoc(&inint))
+			e = out(Zengines[zids[0]].IntelDefLoc(&inint, false))
+		case REQ_INTEL_TDEFLOC:
+			e = out(Zengines[zids[0]].IntelDefLoc(&inint, true))
 		case REQ_INTEL_HOVER:
 			e = out(Zengines[zids[0]].IntelHovs(&inint))
 		case REQ_INTEL_CMPL:

@@ -5,7 +5,7 @@ import (
 	"github.com/metaleap/zentient/z"
 )
 
-func (_ *zhs) IntelDefLoc (req *z.ReqIntel) *udev.SrcMsg {
+func (_ *zhs) IntelDefLoc (req *z.ReqIntel, typedef bool) *udev.SrcMsg {
 	return nil
 }
 

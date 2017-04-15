@@ -12,10 +12,29 @@ func (me *zgo) may (cmdname string) bool {
 }
 
 
-func (me *zgo) IntelDefLoc (req *z.ReqIntel) (refloc *udev.SrcMsg) {
+func (me *zgo) IntelDefLoc (req *z.ReqIntel, typedef bool) (refloc *udev.SrcMsg) {
 	req.RunePosToBytePos()
-	if refloc==nil && devgo.Has_godef && me.may("godef") { refloc = devgo.QueryDefLoc_Godef(req.Ffp, req.Src, req.Pos) }
-	if refloc==nil && devgo.Has_gogetdoc && me.may("gogetdoc") { refloc = devgo.QueryDefLoc_Gogetdoc(req.Ffp, req.Src, req.Pos) }
+	if (!typedef) {
+		if refloc==nil && devgo.Has_guru && me.may("guru") { if gd := devgo.QueryDescribe_Guru(req.Ffp, req.Src, req.Pos)  ;  gd!=nil {
+			if gd.Type!=nil && len(gd.Type.NamePos)>0 { if rl,ok := udev.SrcMsgFromLn(gd.Type.NamePos)  ;  ok { refloc = &rl } }
+			if gd.Value!=nil && len(gd.Value.ObjPos)>0 { if rl,ok := udev.SrcMsgFromLn(gd.Value.ObjPos)  ;  ok { refloc = &rl } }
+		} }
+		if refloc==nil && devgo.Has_gogetdoc && me.may("gogetdoc") { refloc = devgo.QueryDefLoc_Gogetdoc(req.Ffp, req.Src, req.Pos) }
+		if refloc==nil && devgo.Has_godef && me.may("godef") { refloc = devgo.QueryDefLoc_Godef(req.Ffp, req.Src, req.Pos) }
+		return
+	}
+
+	if devgo.Has_guru && me.may("guru") {
+		gd := devgo.QueryDescribe_Guru(req.Ffp, req.Src, req.Pos)
+		msg := "NIL"  ;  if gd!=nil {
+			if gd.Type!=nil && len(gd.Type.NamePos)>0 {
+				if rl,ok := udev.SrcMsgFromLn(gd.Type.NamePos)  ;  ok { refloc = &rl }
+			} else if gd.Value!=nil {
+				msg = "Type:" + gd.Value.Type + "\nValue:" + gd.Value.Value + "\nObjPos:" + gd.Value.ObjPos
+				refloc = &udev.SrcMsg { Pos1Ln: 1, Pos1Ch: 1, Ref: "zen://out/" + msg }
+			}
+		}
+	}
 	return
 }
 
