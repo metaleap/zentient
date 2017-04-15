@@ -2,6 +2,7 @@ package zgo
 import (
 	"github.com/metaleap/go-devgo"
 	"github.com/metaleap/go-util-dev"
+	"github.com/metaleap/go-util-misc"
 	"github.com/metaleap/go-util-str"
 	"github.com/metaleap/zentient/z"
 )
@@ -14,7 +15,7 @@ func (me *zgo) may (cmdname string) bool {
 func (me *zgo) IntelDefLoc (req *z.ReqIntel) (refloc *udev.SrcMsg) {
 	req.RunePosToBytePos()
 	if refloc==nil && devgo.Has_godef && me.may("godef") { refloc = devgo.QueryDefLoc_Godef(req.Ffp, req.Src, req.Pos) }
-	if refloc==nil && devgo.Has_gogetdoc && me.may("gogetdoc") { refloc = devgo.QueryDefLoc_Gogetdoc(req.Ffp, req.Pos) }
+	if refloc==nil && devgo.Has_gogetdoc && me.may("gogetdoc") { refloc = devgo.QueryDefLoc_Gogetdoc(req.Ffp, req.Src, req.Pos) }
 	return
 }
 
@@ -23,14 +24,16 @@ func (me *zgo) IntelHovs (req *z.ReqIntel) (hovs []*z.RespHov) {
 	req.RunePosToBytePos()
 	var ggd *devgo.Gogetdoc
 	var decl string
-	if devgo.Has_gogetdoc && me.may("gogetdoc") { if ggd = devgo.Query_Gogetdoc(req.Ffp, req.Pos)  ;  ggd!=nil {
+	if devgo.Has_gogetdoc && me.may("gogetdoc") { if ggd = devgo.Query_Gogetdoc(req.Ffp, req.Src, req.Pos)  ;  ggd!=nil && len(ggd.Doc)>0 {
 		d := ggd.ImpN  ;  if len(d)>0  {  d = "**" + d + "**\n\n"  }
 		d = d + ggd.Doc
 		hovs = append(hovs, &z.RespHov { Txt: d })
 	} }
 	if ggd!=nil && len(ggd.Decl)>0 { decl = ggd.Decl }
 	if len(decl)==0 && devgo.Has_godef && me.may("godef") { decl = devgo.QueryDefDecl_GoDef(req.Ffp, req.Src, req.Pos) }
-	if len(decl)>0 { hovs = append(hovs, &z.RespHov { Lang: "go", Txt: decl }) }
+	if decl = ustr.Trim(decl)  ;  len(decl)>0 {  declhov := &z.RespHov { Lang: "go", Txt: decl }
+		if ustr.Has(decl, "\n") { hovs = append(hovs, declhov) } else {
+			hovs = append([]*z.RespHov{ declhov }, hovs...) } }
 	return
 }
 
@@ -63,6 +66,16 @@ func (me *zgo) IntelCmpl (req *z.ReqIntel) (cmpls []*z.RespCmpl) {
 	return
 }
 
-func (_ *zgo) IntelCmplDoc(req *z.ReqIntel) *z.RespTxt {
-	return &z.RespTxt { Result: "foo `" + req.Sym1 + "` > `" + req.Sym2 + "` dis" }
+func (me *zgo) IntelCmplDoc(req *z.ReqIntel) *z.RespTxt {
+	req.RunePosToBytePos()
+	curword := req.Sym1	 ;  replword := req.Sym2  ;  wordpos := int(ustr.ParseInt(req.Pos))
+	if curword!=replword {  l := len(curword)+1  ;  wp := -1
+		for i := wordpos  ;  i>=0 && i>wordpos-l  ;  i-- {
+			if idx := ustr.Idx(req.Src[i:], curword)  ;  idx==0 { wp = i  ;  break } }
+		if wp>=0 { wordpos = wp  ;  req.Pos = ugo.SPr(wp)
+			req.Src = req.Src[:wordpos] + replword + req.Src[wordpos+len(curword):] }
+	}
+	if devgo.Has_gogetdoc && me.may("gogetdoc") { if ggd := devgo.Query_Gogetdoc(req.Ffp, req.Src, req.Pos)  ;  ggd!=nil {
+		if d := ustr.Trim(ggd.Doc)  ;  len(d)>0 { return &z.RespTxt { Id: req.Id, Result: d } } } }
+	return nil
 }

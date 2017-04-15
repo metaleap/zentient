@@ -7,65 +7,6 @@ import (
 )
 
 
-
-type ReqIntel struct {
-	Ffp		string	`json:",omitempty"`
-	Pos		string	`json:",omitempty"`
-	Src		string	`json:",omitempty"`
-	Sym1 	string	`json:",omitempty"`
-	Sym2 	string	`json:",omitempty"`
-	CrLf	bool	`json:",omitempty"`
-}
-
-func (self *ReqIntel) RunePosToBytePos () {
-	if len(self.Src)==0 {  self.Src = ufs.ReadTextFile(self.Ffp, false, "")  }
-	if off := int(ustr.ParseInt(self.Pos))  ;  off>0 && len(self.Src)>0 {
-		reoff := func() int { r := 0  ;  for i, _ := range self.Src { if r==off { return i }  ;  { r++ } }  ;  return len([]byte(self.Src)) }
-		self.Pos = ugo.SPr(reoff())
-	}
-}
-
-
-type RespCmd struct {
-	Name	string		`json:",omitempty"`		//	actual cmd name
-	Args	[]string	`json:",omitempty"`	//	args
-
-	Title	string		`json:",omitempty"`	//	display name, eg: N = "go vet" when C = "go" with A = ["vet"]  ;  if empty fall back to C
-	Exists	bool		`json:",omitempty"`	//	installed?
-	Hint	string		`json:",omitempty"`	//	install hint
-	More	string		`json:",omitempty"`
-
-	f	func()		//	tmp field used in Base.DoFmt()
-}
-
-type RespDiag struct {
-	udev.SrcMsg
-	Sev uint8
-}
-
-
-type RespTxt struct {
-	Result		string		`json:",omitempty"`
-	Warnings	[]string	`json:",omitempty"`
-}
-
-type RespCmpl struct {
-	Label		string		`json:"label,omitempty"`
-	Kind		int			`json:"kind,omitempty"`
-	Detail		string		`json:"detail,omitempty"`
-	Doc			string		`json:"documentation,omitempty"`
-	SortTxt		string		`json:"sortText,omitempty"`
-	FilterTxt	string		`json:"filterText,omitempty"`
-	InsertTxt	string		`json:"insertText,omitempty"`
-	CommitChars	[]string	`json:"commitCharacters,omitempty"`
-}
-
-type RespHov struct {
-	Txt		string	`json:"value,omitempty"`
-	Lang	string	`json:"language,omitempty"`
-}
-
-
 const (
 	DIAG_SEV_ERR	= 0
 	DIAG_SEV_WARN	= 1
@@ -98,12 +39,72 @@ const (
 	CMPL_FOLDER			= 18
 )
 
+type RespCmpl struct {
+	Label		string		`json:"label,omitempty"`
+	Kind		int			`json:"kind,omitempty"` // CMPL_FOO
+	Detail		string		`json:"detail,omitempty"`
+	Doc			string		`json:"documentation,omitempty"`
+	SortTxt		string		`json:"sortText,omitempty"`
+	FilterTxt	string		`json:"filterText,omitempty"`
+	InsertTxt	string		`json:"insertText,omitempty"`
+	CommitChars	[]string	`json:"commitCharacters,omitempty"`
+}
 
-var (
-	newlivediags = true
-)
+
+type RespCmd struct {
+	Name	string		`json:",omitempty"`		//	actual cmd name
+	Args	[]string	`json:",omitempty"`	//	args
+
+	Title	string		`json:",omitempty"`	//	display name, eg: N = "go vet" when C = "go" with A = ["vet"]  ;  if empty fall back to C
+	Exists	bool		`json:",omitempty"`	//	installed?
+	Hint	string		`json:",omitempty"`	//	install hint
+	More	string		`json:",omitempty"`
+
+	f	func()		//	tmp field used in Base.DoFmt()
+}
+
+type RespDiag struct {
+	udev.SrcMsg
+	Sev uint8
+}
 
 
+type RespTxt struct {
+	Result		string		`json:",omitempty"`
+	Id			string		`json:",omitempty"`
+	Warnings	[]string	`json:",omitempty"`
+}
+
+type RespHov struct {
+	Txt		string	`json:"value,omitempty"`
+	Lang	string	`json:"language,omitempty"`
+}
+
+type ReqIntel struct {
+	Ffp		string	`json:",omitempty"`
+	Pos		string	`json:",omitempty"`
+	Src		string	`json:",omitempty"`
+	Sym1 	string	`json:",omitempty"`
+	Sym2 	string	`json:",omitempty"`
+	CrLf	bool	`json:",omitempty"`
+	Id		string	`json:",omitempty"`
+}
+
+func (self *ReqIntel) EnsureSrc () {
+	if len(self.Src)==0 {  self.Src = ufs.ReadTextFile(self.Ffp, false, "")  }
+}
+
+func (self *ReqIntel) RunePosToBytePos () {
+	self.EnsureSrc()
+	if off := int(ustr.ParseInt(self.Pos))  ;  off>0 && len(self.Src)>0 {
+		reoff := func() int { r := 0  ;  for i, _ := range self.Src { if r==off { return i }  ;  { r++ } }  ;  return len([]byte(self.Src)) }
+		self.Pos = ugo.SPr(reoff())
+	}
+}
+
+
+
+var newlivediags = true
 func jsonLiveDiags (frpszid string, closedfrps []string, openedfrps []string) (jld map[string]map[string][]*RespDiag) {
 	if len(closedfrps)>0 || len(openedfrps)>0 {  newlivediags = true  }
 	if newlivediags {
