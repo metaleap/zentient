@@ -47,8 +47,9 @@ func out (v interface{}) error {
 
 
 func HandleRequest (queryln string) (e error) {
-	var inlst []string  ;  var inmap map[string]interface{}  ;  var inint ReqIntel
-	msgid,msgrest := ustr.BreakAt(queryln, 3)  ;  msgzids,msgargs := ustr.BreakOn(msgrest, ":")  ;  zids := ustr.Split(msgzids, ",")
+	var inlst []string  ;  var inmap map[string]interface{}  ;  var inint ReqIntel  ;  var zid string
+	msgid,msgrest := ustr.BreakAt(queryln, 3)  ;  msgzids,msgargs := ustr.BreakOn(msgrest, ":")
+	zids := ustr.Split(msgzids, ",")  ;  if len(zids)>0 {  zid = zids[0]  }
 
 	if len(msgargs)>1 { if msgargs[0]=='[' { json.Unmarshal([]byte(msgargs), &inlst)} else if msgargs[0]=='{' {
 		if ustr.Pref(msgargs, "{\"Ffp\":\"") { json.Unmarshal([]byte(msgargs), &inint)
@@ -59,31 +60,31 @@ func HandleRequest (queryln string) (e error) {
 		//  anything else in a case then is only to furnish proper func args from msg-argstr / json
 
 		case REQ_INTEL_DEFLOC:
-			e = out(Zengines[zids[0]].IntelDefLoc(&inint, false))
+			e = out(Zengines[zid].IntelDefLoc(&inint, false))
 		case REQ_INTEL_TDEFLOC:
-			e = out(Zengines[zids[0]].IntelDefLoc(&inint, true))
+			e = out(Zengines[zid].IntelDefLoc(&inint, true))
 		case REQ_INTEL_HOVER:
-			e = out(Zengines[zids[0]].IntelHovs(&inint))
+			e = out(Zengines[zid].IntelHovs(&inint))
 		case REQ_INTEL_CMPL:
-			e = out(Zengines[zids[0]].IntelCmpl(&inint))
+			e = out(Zengines[zid].IntelCmpl(&inint))
 		case REQ_INTEL_CMPLDOC:
-			e = out(Zengines[zids[0]].IntelCmplDoc(&inint))
+			e = out(Zengines[zid].IntelCmplDoc(&inint))
 
 		case REQ_FILES_WRITTEN:
-			onFilesWritten(Zengines[zids[0]], inlst)
-			e = out(jsonLiveDiags(zids[0], nil, nil))
+			onFilesWritten(Zengines[zid], inlst)
+			e = out(jsonLiveDiags(zid, nil, nil))
 		case REQ_FILES_OPENED:
-			onFilesOpened(Zengines[zids[0]], inlst)
-			e = out(jsonLiveDiags(zids[0], nil, inlst))
+			onFilesOpened(Zengines[zid], inlst)
+			e = out(jsonLiveDiags(zid, nil, inlst))
 		case REQ_FILES_CLOSED:
-			onFilesClosed(Zengines[zids[0]], inlst)
-			e = out(jsonLiveDiags(zids[0], inlst, nil))
+			onFilesClosed(Zengines[zid], inlst)
+			e = out(jsonLiveDiags(zid, inlst, nil))
 
 		case REQ_DO_FMT:
-			if resp,err := doFmt(zids[0], ugo.S(inmap["s"]), ugo.S(inmap["c"]), uint8(ugo.F(inmap["t"])))  ;  (err != nil) {
+			if resp,err := doFmt(zid, ugo.S(inmap["s"]), ugo.S(inmap["c"]), uint8(ugo.F(inmap["t"])))  ;  (err != nil) {
 				e = out(err.Error())  } else {  e = out(resp)  }
 		case REQ_DO_RENAME:
-			if resp,err := doRename(zids[0], ugo.S(inmap["c"]), ugo.S(inmap["rfp"]), uint64(ustr.ParseInt(ugo.S(inmap["o"]))), ugo.S(inmap["nn"]), ugo.S(inmap["e"]), ugo.S(inmap["no"]), uint64(ustr.ParseInt(ugo.S(inmap["o1"]))), uint64(ustr.ParseInt(ugo.S(inmap["o2"]))))  ;  (err != nil) {
+			if resp,err := doRename(zid, ugo.S(inmap["c"]), ugo.S(inmap["rfp"]), uint64(ustr.ParseInt(ugo.S(inmap["o"]))), ugo.S(inmap["nn"]), ugo.S(inmap["e"]), ugo.S(inmap["no"]), uint64(ustr.ParseInt(ugo.S(inmap["o1"]))), uint64(ustr.ParseInt(ugo.S(inmap["o2"]))))  ;  (err != nil) {
 				e = out(err.Error())  } else {  e = out(resp)  }
 
 		case REQ_QUERY_TOOL:
@@ -107,12 +108,12 @@ func HandleRequest (queryln string) (e error) {
 		case REQ_ZEN_STATUS:
 			e = out(jsonStatus())
 		case REQ_ZEN_CONFIG:
-			Zengines[zids[0]].OnCfg(inmap)
+			Zengines[zid].OnCfg(inmap)
 			e = out(nil)
 
 		//  nothing matched? a bug in client, throw at client
 		default:
-			e = out(jsonErrMsg("Unknown MSG-ID `" + msgid + "` --- for diagnostics, msg-args were: " + msgargs))
+			e = out(jsonErrMsg("Unknown MSG-ID in: `" + queryln + "`"))
 	}
 	return
 }

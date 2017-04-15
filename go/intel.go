@@ -32,8 +32,10 @@ func (me *zgo) IntelDefLoc (req *z.ReqIntel, typedef bool) (refloc *udev.SrcMsg)
 			if gd.Type!=nil && len(gd.Type.NamePos)>0 {
 				if rl,ok := udev.SrcMsgFromLn(gd.Type.NamePos)  ;  ok { refloc = &rl }
 			} else if gd.Value!=nil && len(gd.Value.Type)>0 {
-				typename := ustr.AfterLast(strings.TrimLeft(strings.TrimPrefix(strings.TrimLeft(gd.Value.Type, "*"), "[]"), "*"), "/", false)
-				hacky1 := "\n\nfunc Zen" + req.Id + " () *"  ;  hacky2 := " { return nil }\n"
+				possiblyfullyqualified := strings.TrimLeft(strings.TrimPrefix(strings.TrimLeft(gd.Value.Type, "*"), "[]"), "*")
+				pkgimppath,typename := ustr.BreakOnLast(possiblyfullyqualified, ".")  ;  pkgname := ustr.AfterLast(pkgimppath, "/", false)
+				if devgo.PkgsByImP!=nil { if pkg := devgo.PkgsByImP[pkgimppath]  ;  pkg!=nil && len(pkg.Name)>0 {  pkgname = pkg.Name  } }
+				hacky1 := "\n\nfunc Zen" + req.Id + " () *"  ;  hacky2 := " { return nil }\n"  ;  if len(pkgname)>0 {  hacky1 = hacky1 + pkgname + "."  }
 				req.Pos = ugo.SPr(len( (req.Src)) + len(hacky1))  ;  req.Src = req.Src + hacky1 + typename + hacky2
 				refloc = me.IntelDefLoc(req, false)
 			}
