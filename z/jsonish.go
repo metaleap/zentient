@@ -86,8 +86,10 @@ type ReqIntel struct {
 	Src		string	`json:",omitempty"`
 	Sym1 	string	`json:",omitempty"`
 	Sym2 	string	`json:",omitempty"`
-	CrLf	bool	`json:",omitempty"`
 	Id		string	`json:",omitempty"`
+	CrLf	bool	`json:",omitempty"`
+
+	r2b_	bool
 }
 
 func (self *ReqIntel) EnsureSrc () {
@@ -95,11 +97,11 @@ func (self *ReqIntel) EnsureSrc () {
 }
 
 func (self *ReqIntel) RunePosToBytePos () {
-	self.EnsureSrc()
-	if off := int(ustr.ParseInt(self.Pos))  ;  off>0 && len(self.Src)>0 {
-		reoff := func() int { r := 0  ;  for i, _ := range self.Src { if r==off { return i }  ;  { r++ } }  ;  return len([]byte(self.Src)) }
-		self.Pos = ugo.SPr(reoff())
-	}
+	if (!self.r2b_) {
+		self.r2b_ = true  ;  self.EnsureSrc()  ;  if off := int(ustr.ParseInt(self.Pos))  ;  off>0 && len(self.Src)>0 {
+			reoff := func() int { r := 0  ;  for i, _ := range self.Src { if r==off { return i }  ;  { r++ } }  ;  return len([]byte(self.Src)) }
+			self.Pos = ugo.SPr(reoff())
+	} }
 }
 
 

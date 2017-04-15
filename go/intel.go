@@ -1,5 +1,7 @@
 package zgo
 import (
+	"strings"
+
 	"github.com/metaleap/go-devgo"
 	"github.com/metaleap/go-util-dev"
 	"github.com/metaleap/go-util-misc"
@@ -14,6 +16,7 @@ func (me *zgo) may (cmdname string) bool {
 
 func (me *zgo) IntelDefLoc (req *z.ReqIntel, typedef bool) (refloc *udev.SrcMsg) {
 	req.RunePosToBytePos()
+	//	go to definition
 	if (!typedef) {
 		if refloc==nil && devgo.Has_guru && me.may("guru") { if gd := devgo.QueryDescribe_Guru(req.Ffp, req.Src, req.Pos)  ;  gd!=nil {
 			if gd.Type!=nil && len(gd.Type.NamePos)>0 { if rl,ok := udev.SrcMsgFromLn(gd.Type.NamePos)  ;  ok { refloc = &rl } }
@@ -23,15 +26,16 @@ func (me *zgo) IntelDefLoc (req *z.ReqIntel, typedef bool) (refloc *udev.SrcMsg)
 		if refloc==nil && devgo.Has_godef && me.may("godef") { refloc = devgo.QueryDefLoc_Godef(req.Ffp, req.Src, req.Pos) }
 		return
 	}
-
+	//	go to type definition
 	if devgo.Has_guru && me.may("guru") {
-		gd := devgo.QueryDescribe_Guru(req.Ffp, req.Src, req.Pos)
-		msg := "NIL"  ;  if gd!=nil {
+		if gd := devgo.QueryDescribe_Guru(req.Ffp, req.Src, req.Pos)  ;  gd!=nil {
 			if gd.Type!=nil && len(gd.Type.NamePos)>0 {
 				if rl,ok := udev.SrcMsgFromLn(gd.Type.NamePos)  ;  ok { refloc = &rl }
-			} else if gd.Value!=nil {
-				msg = "Type:" + gd.Value.Type + "\nValue:" + gd.Value.Value + "\nObjPos:" + gd.Value.ObjPos
-				refloc = &udev.SrcMsg { Pos1Ln: 1, Pos1Ch: 1, Ref: "zen://out/" + msg }
+			} else if gd.Value!=nil && len(gd.Value.Type)>0 {
+				typename := ustr.AfterLast(strings.TrimLeft(strings.TrimPrefix(strings.TrimLeft(gd.Value.Type, "*"), "[]"), "*"), "/", false)
+				hacky1 := "\n\nfunc Zen" + req.Id + " () *"  ;  hacky2 := " { return nil }\n"
+				req.Pos = ugo.SPr(len( (req.Src)) + len(hacky1))  ;  req.Src = req.Src + hacky1 + typename + hacky2
+				refloc = me.IntelDefLoc(req, false)
 			}
 		}
 	}
@@ -88,13 +92,18 @@ func (me *zgo) IntelCmpl (req *z.ReqIntel) (cmpls []*z.RespCmpl) {
 func (me *zgo) IntelCmplDoc(req *z.ReqIntel) *z.RespTxt {
 	req.RunePosToBytePos()
 	curword := req.Sym1	 ;  replword := req.Sym2  ;  wordpos := int(ustr.ParseInt(req.Pos))
-	if curword!=replword {  l := len(curword)+1  ;  wp := -1
-		for i := wordpos  ;  i>=0 && i>wordpos-l  ;  i-- {
-			if idx := ustr.Idx(req.Src[i:], curword)  ;  idx==0 { wp = i  ;  break } }
-		if wp>=0 { wordpos = wp  ;  req.Pos = ugo.SPr(wp)
-			req.Src = req.Src[:wordpos] + replword + req.Src[wordpos+len(curword):] }
-	}
+	if curword!=replword { if wp := wordPos(req.Src, curword, wordpos)  ;  wp>=0 {
+		wordpos = wp  ;  req.Pos = ugo.SPr(wp)
+		req.Src = req.Src[:wordpos] + replword + req.Src[wordpos+len(curword):]
+	} }
 	if devgo.Has_gogetdoc && me.may("gogetdoc") { if ggd := devgo.Query_Gogetdoc(req.Ffp, req.Src, req.Pos)  ;  ggd!=nil {
 		if d := ustr.Trim(ggd.Doc)  ;  len(d)>0 { return &z.RespTxt { Id: req.Id, Result: d } } } }
 	return nil
+}
+
+
+func wordPos (src string, word string, wordpos int) (wp int) {
+	for i,l := wordpos , len(word)+1  ;  i>=0 && i>wordpos-l  ;  i-- {
+		if idx := ustr.Idx(src[i:], word)  ;  idx==0 { wp = i  ;  break } }
+	return
 }

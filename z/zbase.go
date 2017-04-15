@@ -127,7 +127,7 @@ func (me *Base) relint (µ Zengine, mytime int64) {
 				me.runLinters(µ.Linters(lintfiles), freshdiags)
 				if lintdiags = me.lintdiags  ;  lintdiags!=nil && mytime>=me.linttime {
 					prependnowtime := false  ;  nowstr := "" // turn on after major refactors to verify things stay cached as long as possible/permissable
-					if prependnowtime {  nowstr = ustr.After(time.Now().String(), " ")  ;  nowstr = (nowstr[:strings.LastIndex(nowstr, ":")]) + "\t"  }
+					if prependnowtime {  nowstr = ustr.After(time.Now().String(), " ", true)  ;  nowstr = (nowstr[:strings.LastIndex(nowstr, ":")]) + "\t"  }
 					for frp,fdiags := range freshdiags {
 						if prependnowtime { for i,_ := range fdiags { fd := fdiags[i] ; fd.Ref = nowstr + fd.Ref ; fdiags[i] = fd } }
 						lintdiags[frp] = fdiags
