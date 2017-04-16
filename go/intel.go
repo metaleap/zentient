@@ -1,5 +1,6 @@
 package zgo
 import (
+	"bytes"
 	"strings"
 
 	"github.com/metaleap/go-devgo"
@@ -63,6 +64,7 @@ func (me *zgo) IntelHovs (req *z.ReqIntel) (hovs []*z.RespHov) {
 	return
 }
 
+
 func (me *zgo) IntelCmpl (req *z.ReqIntel) (cmpls []*z.RespCmpl) {
 	if devgo.Has_gocode && me.may("gocode") {
 		if rawresp := devgo.QueryCmplSugg_Gocode(req.Ffp, req.Src, "c" + req.Pos)  ;  len(rawresp)>0 {
@@ -92,6 +94,38 @@ func (me *zgo) IntelCmpl (req *z.ReqIntel) (cmpls []*z.RespCmpl) {
 	return
 }
 
+
+func (me *zgo) IntelHiLites(req *z.ReqIntel) (srcrefs []*udev.SrcMsg) {
+	req.RunePosToBytePos()
+	if devgo.Has_guru && me.may("guru") { if gw := devgo.QueryWhat_Guru(req.Ffp, req.Src, req.Pos1)  ;  gw!=nil {
+		for _,sameid := range gw.SameIDs { if srcref,ok := udev.SrcMsgFromLn(sameid)  ;  ok {
+			srcrefs = append(srcrefs, &srcref)
+		} }
+		if len(srcrefs)==0 && len(gw.Enclosing)>0 {
+			bpos2rpos := func(bytepos int) int {
+				return bytepos // *technically* the below is "correcter" but *practically* we get the same off-by-n quirks with utf8 chars with the below as with the left.. thanks, guru, for friggin "byte offsets" everywhere
+				var strbuf bytes.Buffer  ;  for byteidx,char := range req.Src {
+					if byteidx>=bytepos { return strbuf.Len() }  ;  strbuf.WriteRune(char) }
+				return bytepos
+			}
+			check := func (num int, checks ...string) bool {
+				if ustr.AnyOf(gw.Enclosing[0].Description, checks[:num]...) {
+					for _,syntaxnode := range gw.Enclosing { if ustr.AnyOf(syntaxnode.Description, checks[num:]...) {
+						srcrefs = append(srcrefs, &udev.SrcMsg { Pos2Ln: bpos2rpos(syntaxnode.Start), Pos2Ch: bpos2rpos(syntaxnode.End) })
+						return true
+					} }
+				}
+				return false
+			}
+			if check(2, "defer statement", "return statement", "function literal", "function declaration") { return }
+			if check(1, "break statement", "range loop", "for loop", "select statement", "switch statement") { return }
+			if check(1, "continue statement", "range loop", "for loop") { return }
+		}
+	} }
+	return
+}
+
+
 func (me *zgo) IntelCmplDoc(req *z.ReqIntel) *z.RespTxt {
 	req.RunePosToBytePos()
 	curword := req.Sym1	 ;  replword := req.Sym2  ;  wordpos := int(ustr.ParseInt(req.Pos))
@@ -103,8 +137,6 @@ func (me *zgo) IntelCmplDoc(req *z.ReqIntel) *z.RespTxt {
 		if d := ustr.Trim(ggd.Doc)  ;  len(d)>0 { return &z.RespTxt { Id: req.Id, Result: d } } } }
 	return nil
 }
-
-
 func wordPos (src string, word string, wordpos int) (wp int) {
 	for i,l := wordpos , len(word)+1  ;  i>=0 && i>wordpos-l  ;  i-- {
 		if idx := ustr.Idx(src[i:], word)  ;  idx==0 { wp = i  ;  break } }

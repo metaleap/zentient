@@ -31,6 +31,7 @@ type Zengine interface {
 	IntelHovs (*ReqIntel) []*RespHov
 	IntelCmpl (*ReqIntel) []*RespCmpl
 	IntelCmplDoc(*ReqIntel) *RespTxt
+	IntelHiLites(*ReqIntel) []*udev.SrcMsg
 }
 
 

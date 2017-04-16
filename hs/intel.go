@@ -22,3 +22,7 @@ func (_ *zhs) IntelCmpl (req *z.ReqIntel) (cmpls []*z.RespCmpl) {
 func (_ *zhs) IntelCmplDoc (req *z.ReqIntel) *z.RespTxt {
 	return nil
 }
+
+func (_ *zhs) IntelHiLites(req *z.ReqIntel) []*udev.SrcMsg {
+	return nil
+}

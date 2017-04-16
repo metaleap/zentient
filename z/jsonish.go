@@ -90,22 +90,29 @@ type ReqIntel struct {
 	Src		string	`json:",omitempty"`
 	Sym1 	string	`json:",omitempty"`
 	Sym2 	string	`json:",omitempty"`
+	Pos1	string	`json:",omitempty"`
+	Pos2	string	`json:",omitempty"`
 	Id		string	`json:",omitempty"`
-	CrLf	bool	`json:",omitempty"`
 
 	r2b_	bool
 }
 
-func (self *ReqIntel) EnsureSrc () {
-	if len(self.Src)==0 {  self.Src = ufs.ReadTextFile(self.Ffp, false, "")  }
+func (me *ReqIntel) EnsureSrc () {
+	if len(me.Src)==0 {  me.Src = ufs.ReadTextFile(me.Ffp, false, "")  }
 }
 
-func (self *ReqIntel) RunePosToBytePos () {
-	if (!self.r2b_) {
-		self.r2b_ = true  ;  self.EnsureSrc()  ;  if off := int(ustr.ParseInt(self.Pos))  ;  off>0 && len(self.Src)>0 {
-			reoff := func() int { r := 0  ;  for i, _ := range self.Src { if r==off { return i }  ;  { r++ } }  ;  return len([]byte(self.Src)) }
-			self.Pos = ugo.SPr(reoff())
-	} }
+func (me *ReqIntel) RunePosToBytePos () {
+	if (!me.r2b_) {
+		me.EnsureSrc()  ;  srcraw := []byte(me.Src)
+		reoff := func(off int) int { r := 0  ;  for i, _ := range me.Src { if r==off { return i }  ;  { r++ } }  ;  return len(srcraw) }
+		rpos2bpos := func (off int, posfield *string) { if off>0 && len(me.Src)>0 {
+			*posfield = ugo.SPr(reoff(off))
+		} }
+		rpos2bpos(ustr.ToInt(me.Pos), &me.Pos)
+		rpos2bpos(ustr.ToInt(me.Pos1), &me.Pos1)
+		rpos2bpos(ustr.ToInt(me.Pos2), &me.Pos2)
+		me.r2b_ = true
+	}
 }
 
 

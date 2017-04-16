@@ -20,6 +20,7 @@ const (
 	REQ_INTEL_HOVER		= "IH:"
 	REQ_INTEL_CMPL		= "IC:"
 	REQ_INTEL_CMPLDOC	= "ID:"
+	REQ_INTEL_HILITES	= "II:"
 	REQ_DO_FMT			= "DF:"
 	REQ_DO_RENAME		= "DR:"
 	REQ_FILES_OPENED	= "FO:"
@@ -65,6 +66,8 @@ func HandleRequest (queryln string) (e error) {
 			e = out(Zengines[zid].IntelCmpl(&inint))
 		case REQ_INTEL_CMPLDOC:
 			e = out(Zengines[zid].IntelCmplDoc(&inint))
+		case REQ_INTEL_HILITES:
+			e = out(Zengines[zid].IntelHiLites(&inint))
 
 		case REQ_FILES_WRITTEN:
 			onFilesWritten(Zengines[zid], inlst)
