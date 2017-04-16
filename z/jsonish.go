@@ -84,17 +84,6 @@ type RespHov struct {
 	Lang	string	`json:"language,omitempty"`
 }
 
-type RespSigHelp struct {
-	Sigs	[]*RespSigInfo	`json:"signatures,omitempty"`
-	CurSig	int				`json:"activeSignature"`
-	CurArg	int				`json:"activeParameter"`
-}
-
-type RespSigInfo struct {
-	RespIntel
-	Args	[]*RespIntel	`json:"parameters,omitempty"`
-}
-
 type ReqIntel struct {
 	Ffp		string	`json:",omitempty"`
 	Pos		string	`json:",omitempty"`
