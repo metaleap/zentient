@@ -3,8 +3,6 @@ import (
 	"bytes"
 	"strings"
 
-	gurujson "golang.org/x/tools/cmd/guru/serial"
-
 	"github.com/metaleap/go-devgo"
 	"github.com/metaleap/go-util-dev"
 	"github.com/metaleap/go-util-misc"
@@ -128,24 +126,6 @@ func (me *zgo) IntelHiLites(req *z.ReqIntel) (srcrefs []*udev.SrcMsg) {
 }
 
 
-func (me *zgo) IntelCmplDoc(req *z.ReqIntel) *z.RespTxt {
-	req.RunePosToBytePos()
-	curword := req.Sym1	 ;  replword := req.Sym2  ;  wordpos := int(ustr.ParseInt(req.Pos))
-	if curword!=replword { if wp := wordPos(req.Src, curword, wordpos)  ;  wp>=0 {
-		wordpos = wp  ;  req.Pos = ugo.SPr(wp)
-		req.Src = req.Src[:wordpos] + replword + req.Src[wordpos+len(curword):]
-	} }
-	if devgo.Has_gogetdoc && me.may("gogetdoc") { if ggd := devgo.Query_Gogetdoc(req.Ffp, req.Src, req.Pos)  ;  ggd!=nil {
-		if d := ustr.Trim(ggd.Doc)  ;  len(d)>0 { return &z.RespTxt { Id: req.Id, Result: d } } } }
-	return nil
-}
-func wordPos (src string, word string, wordpos int) (wp int) {
-	for i,l := wordpos , len(word)+1  ;  i>=0 && i>wordpos-l  ;  i-- {
-		if idx := ustr.Idx(src[i:], word)  ;  idx==0 { wp = i  ;  break } }
-	return
-}
-
-
 func (me *zgo) IntelSymbols(req *z.ReqIntel, allfiles bool) (srcrefs []*udev.SrcMsg) {
 	req.EnsureSrc()
 	if ustr.Pref(req.Src, "package ") { req.Pos = "8" } else {
@@ -166,9 +146,10 @@ func (me *zgo) IntelSymbols(req *z.ReqIntel, allfiles bool) (srcrefs []*udev.Src
 			}
 			return
 		}
-		member2srcref := func (mem *gurujson.DescribeMember) {
+		fpathok := func (fpath string) bool {  return fpath==req.Ffp || (allfiles && ustr.Pref(fpath, srcDir))  }
+		for _,mem := range gd.Package.Members {
 			if srcref := udev.SrcMsgFromLn(mem.Pos)  ;  srcref!=nil {
-				if allfiles || req.Ffp==srcref.Ref {
+				if fpathok(srcref.Ref) {
 					mem.Type = devgo.ShortenImPs(mem.Type)  ;  srcref.Msg = mem.Kind + " " + mem.Name  ;  srcref.Flag = z.SYM_PACKAGE
 					if mem.Kind=="const" {  srcref.Flag = z.SYM_CONSTANT  ;  srcref.Misc = "= " + mem.Value }
 					if mem.Kind=="var" {  srcref.Flag = z.SYM_VARIABLE  ;  srcref.Misc = mem.Type }
@@ -194,16 +175,35 @@ func (me *zgo) IntelSymbols(req *z.ReqIntel, allfiles bool) (srcrefs []*udev.Src
 					}
 					srcrefs = append(srcrefs, srcref)
 				}
-				for _,method := range mem.Methods { if mref := udev.SrcMsgFromLn(method.Pos)  ;  mref!=nil && (allfiles || req.Ffp==mref.Ref) {
+				for _,method := range mem.Methods { if mref := udev.SrcMsgFromLn(method.Pos)  ;  mref!=nil && fpathok(mref.Ref) {
 					p1 , p2 := ustr.Idx(method.Name, " (") , ustr.Idx(method.Name, ") ")
 					mref.Msg = method.Name[:p2][p1+2:] + "·" + method.Name[p2+2:] ;  mref.Flag = z.SYM_METHOD
 					mref.Msg,mref.Misc = fbreak(mref.Msg)  ;  if i := ustr.Idx(mref.Msg, "(")  ;  i>0 {  mref.Msg = mref.Msg[:i] + " " + mref.Msg[i:]  }
 					srcrefs = append(srcrefs, mref)
 				} }
 			}
-			return
 		}
-		for _,mem := range gd.Package.Members { member2srcref(mem) }
+		if allfiles { for _,srcref := range srcrefs {
+			srcref.Msg = "[ " + strings.TrimLeft(srcref.Ref[len(srcDir):], "/\\") + " ]\t" + srcref.Msg
+		} }
 	} }
+	return
+}
+
+
+func (me *zgo) IntelCmplDoc(req *z.ReqIntel) *z.RespTxt {
+	req.RunePosToBytePos()
+	curword := req.Sym1	 ;  replword := req.Sym2  ;  wordpos := int(ustr.ParseInt(req.Pos))
+	if curword!=replword { if wp := wordPos(req.Src, curword, wordpos)  ;  wp>=0 {
+		wordpos = wp  ;  req.Pos = ugo.SPr(wp)
+		req.Src = req.Src[:wordpos] + replword + req.Src[wordpos+len(curword):]
+	} }
+	if devgo.Has_gogetdoc && me.may("gogetdoc") { if ggd := devgo.Query_Gogetdoc(req.Ffp, req.Src, req.Pos)  ;  ggd!=nil {
+		if d := ustr.Trim(ggd.Doc)  ;  len(d)>0 { return &z.RespTxt { Id: req.Id, Result: d } } } }
+	return nil
+}
+func wordPos (src string, word string, wordpos int) (wp int) {
+	for i,l := wordpos , len(word)+1  ;  i>=0 && i>wordpos-l  ;  i-- {
+		if idx := ustr.Idx(src[i:], word)  ;  idx==0 { wp = i  ;  break } }
 	return
 }
