@@ -3,6 +3,8 @@ import (
 	"bytes"
 	"strings"
 
+	gurujson "golang.org/x/tools/cmd/guru/serial"
+
 	"github.com/metaleap/go-devgo"
 	"github.com/metaleap/go-util-dev"
 	"github.com/metaleap/go-util-misc"
@@ -140,5 +142,56 @@ func (me *zgo) IntelCmplDoc(req *z.ReqIntel) *z.RespTxt {
 func wordPos (src string, word string, wordpos int) (wp int) {
 	for i,l := wordpos , len(word)+1  ;  i>=0 && i>wordpos-l  ;  i-- {
 		if idx := ustr.Idx(src[i:], word)  ;  idx==0 { wp = i  ;  break } }
+	return
+}
+
+
+func (me *zgo) IntelSymbols(req *z.ReqIntel, allfiles bool) (srcrefs []*udev.SrcMsg) {
+	req.EnsureSrc()
+	if ustr.Pref(req.Src, "package ") { req.Pos = "8" } else {
+		j := 0  ;  lns := ustr.Split(req.Src, "\n")
+		for i,ln := range lns { if ustr.Pref(ustr.Trim(ln), "package ") {
+			for bytepos,char := range req.Src { if char=='\n' { if j++  ;  j==i {
+				req.Pos = ugo.SPr(bytepos + 9)
+				break
+			} } }
+			break
+		} }
+	}
+	if devgo.Has_guru && me.may("guru") { if gd := devgo.QueryDesc_Guru(req.Ffp, req.Src, req.Pos)  ;  gd!=nil && gd.Package!=nil {
+		member2srcref := func (mem *gurujson.DescribeMember) {
+			if srcref := udev.SrcMsgFromLn(mem.Pos)  ;  srcref!=nil && (allfiles || req.Ffp==srcref.Ref) {
+				srcref.Msg = mem.Kind + " " + mem.Name  ;  srcref.Flag = z.SYM_PACKAGE
+				if mem.Kind=="const" {  srcref.Flag = z.SYM_CONSTANT  ;  srcref.Misc = "= " + mem.Value }
+				if mem.Kind=="var" {  srcref.Flag = z.SYM_VARIABLE  ;  srcref.Misc = mem.Type }
+				if mem.Kind=="func" {  srcref.Flag = z.SYM_FUNCTION  ;  srcref.Misc = mem.Type }
+				if mem.Kind=="type" {
+					srcref.Misc = mem.Type  ;  srcref.Flag = z.SYM_CLASS
+					if ustr.Pref(mem.Type, "struct{") { srcref.Flag = z.SYM_STRUCT }
+					if ustr.Pref(mem.Type, "interface{") { srcref.Flag = z.SYM_INTERFACE }
+					if ustr.Pref(mem.Type, "func(") { srcref.Flag = z.SYM_CONSTRUCTOR }
+					if ustr.Pref(mem.Type, "[]") { srcref.Flag = z.SYM_ARRAY }
+					if ustr.Pref(mem.Type, "map[") { srcref.Flag = z.SYM_NAMESPACE }
+					if ustr.Pref(mem.Type, "*") { srcref.Flag = z.SYM_NULL }
+					if ustr.AnyOf(mem.Type, "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64", "float32", "float64", "float", "complex") { srcref.Flag = z.SYM_NUMBER }
+					if ustr.AnyOf(mem.Type, "string", "rune") { srcref.Flag = z.SYM_STRING }
+					switch mem.Type {
+					case "bool": srcref.Flag = z.SYM_BOOLEAN
+					}
+				}
+				srcrefs = append(srcrefs, srcref)
+				for _,method := range mem.Methods { if mref := udev.SrcMsgFromLn(method.Pos)  ;  mref!=nil && (allfiles || req.Ffp==mref.Ref) {
+					p1 , p2 := ustr.Idx(method.Name, " (") , ustr.Idx(method.Name, ") ")
+					mref.Msg = method.Name[:p2][p1+2:] + "·" + method.Name[p2+2:]  ;  mref.Flag = z.SYM_METHOD
+					if p3 := ustr.Idx(mref.Msg, ") ")  ;  p3<=0 {  mref.Misc = "void"  } else {
+						mref.Misc = mref.Msg[p3+2:]  ;  mref.Msg = mref.Msg[:p3+1]
+					}
+					srcrefs = append(srcrefs, mref)
+				} }
+			}
+			return
+		}
+		for _,mem := range gd.Package.Members { member2srcref(mem) }
+	} }
 	return
 }

@@ -26,3 +26,7 @@ func (_ *zhs) IntelCmplDoc (req *z.ReqIntel) *z.RespTxt {
 func (_ *zhs) IntelHiLites(req *z.ReqIntel) []*udev.SrcMsg {
 	return nil
 }
+
+func (_ *zhs) IntelSymbols(req *z.ReqIntel, allfiles bool) []*udev.SrcMsg {
+	return nil
+}

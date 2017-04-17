@@ -1,6 +1,5 @@
 package zgo
 import (
-	"os"
 	"path/filepath"
 	"sync"
 

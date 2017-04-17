@@ -30,6 +30,7 @@ type Zengine interface {
 	IntelCmpl (*ReqIntel) []*RespCmpl
 	IntelCmplDoc(*ReqIntel) *RespTxt
 	IntelHiLites(*ReqIntel) []*udev.SrcMsg
+	IntelSymbols(*ReqIntel, bool) []*udev.SrcMsg
 }
 
 
