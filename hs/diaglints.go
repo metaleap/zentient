@@ -11,9 +11,6 @@ func linterHlint (filerelpaths []string) func()map[string][]*udev.SrcMsg {
 		filediags := map[string][]*udev.SrcMsg {}
 		for _,srcref := range devhs.LintHlint(filerelpaths) {
 			fpath := srcref.Ref  ;  srcref.Ref = "hlint"  ;  srcref.Flag = z.DIAG_SEV_INFO
-			if srcref.Data != nil { if len(srcref.Misc)>0 {
-				srcref.Ref = srcref.Ref + " » " + srcref.Misc
-			} }
 			filediags[fpath] = append(filediags[fpath], srcref)
 		}
 		return filediags

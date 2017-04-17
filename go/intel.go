@@ -159,33 +159,45 @@ func (me *zgo) IntelSymbols(req *z.ReqIntel, allfiles bool) (srcrefs []*udev.Src
 		} }
 	}
 	if devgo.Has_guru && me.may("guru") { if gd := devgo.QueryDesc_Guru(req.Ffp, req.Src, req.Pos)  ;  gd!=nil && gd.Package!=nil {
+		fbreak := func (fdecl string) (fargs string , fret string) {
+			fdecl = devgo.ShortenImPs(fdecl)
+			if p3 := ustr.Idx(fdecl, ") ")  ;  p3<=0 {  fargs,fret = fdecl,"void"  } else {
+				fret = fdecl[p3+2:]  ;  fargs = fdecl[:p3+1]
+			}
+			return
+		}
 		member2srcref := func (mem *gurujson.DescribeMember) {
-			if srcref := udev.SrcMsgFromLn(mem.Pos)  ;  srcref!=nil && (allfiles || req.Ffp==srcref.Ref) {
-				srcref.Msg = mem.Kind + " " + mem.Name  ;  srcref.Flag = z.SYM_PACKAGE
-				if mem.Kind=="const" {  srcref.Flag = z.SYM_CONSTANT  ;  srcref.Misc = "= " + mem.Value }
-				if mem.Kind=="var" {  srcref.Flag = z.SYM_VARIABLE  ;  srcref.Misc = mem.Type }
-				if mem.Kind=="func" {  srcref.Flag = z.SYM_FUNCTION  ;  srcref.Misc = mem.Type }
-				if mem.Kind=="type" {
-					srcref.Misc = mem.Type  ;  srcref.Flag = z.SYM_CLASS
-					if ustr.Pref(mem.Type, "struct{") { srcref.Flag = z.SYM_STRUCT }
-					if ustr.Pref(mem.Type, "interface{") { srcref.Flag = z.SYM_INTERFACE }
-					if ustr.Pref(mem.Type, "func(") { srcref.Flag = z.SYM_CONSTRUCTOR }
-					if ustr.Pref(mem.Type, "[]") { srcref.Flag = z.SYM_ARRAY }
-					if ustr.Pref(mem.Type, "map[") { srcref.Flag = z.SYM_NAMESPACE }
-					if ustr.Pref(mem.Type, "*") { srcref.Flag = z.SYM_NULL }
-					if ustr.AnyOf(mem.Type, "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64", "float32", "float64", "float", "complex") { srcref.Flag = z.SYM_NUMBER }
-					if ustr.AnyOf(mem.Type, "string", "rune") { srcref.Flag = z.SYM_STRING }
-					switch mem.Type {
-					case "bool": srcref.Flag = z.SYM_BOOLEAN
+			if srcref := udev.SrcMsgFromLn(mem.Pos)  ;  srcref!=nil {
+				if allfiles || req.Ffp==srcref.Ref {
+					mem.Type = devgo.ShortenImPs(mem.Type)  ;  srcref.Msg = mem.Kind + " " + mem.Name  ;  srcref.Flag = z.SYM_PACKAGE
+					if mem.Kind=="const" {  srcref.Flag = z.SYM_CONSTANT  ;  srcref.Misc = "= " + mem.Value }
+					if mem.Kind=="var" {  srcref.Flag = z.SYM_VARIABLE  ;  srcref.Misc = mem.Type }
+					if mem.Kind=="func" {
+						srcref.Flag = z.SYM_FUNCTION
+						fargs,fret := fbreak(mem.Type)
+						srcref.Misc = fret
+						srcref.Msg = srcref.Msg + " " + strings.TrimPrefix(fargs, "func")
 					}
+					if mem.Kind=="type" {
+						srcref.Misc = mem.Type  ;  srcref.Flag = z.SYM_CLASS
+						if ustr.Pref(mem.Type, "struct{") { srcref.Flag = z.SYM_STRUCT }
+						if ustr.Pref(mem.Type, "interface{") { srcref.Flag = z.SYM_INTERFACE }
+						if ustr.Pref(mem.Type, "func(") { srcref.Flag = z.SYM_CONSTRUCTOR }
+						if ustr.Pref(mem.Type, "[]") { srcref.Flag = z.SYM_ARRAY }
+						if ustr.Pref(mem.Type, "map[") { srcref.Flag = z.SYM_NAMESPACE }
+						if ustr.Pref(mem.Type, "*") { srcref.Flag = z.SYM_NULL }
+						if ustr.AnyOf(mem.Type, "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64", "float32", "float64", "float", "complex") { srcref.Flag = z.SYM_NUMBER }
+						if ustr.AnyOf(mem.Type, "string", "rune") { srcref.Flag = z.SYM_STRING }
+						switch mem.Type {
+						case "bool": srcref.Flag = z.SYM_BOOLEAN
+						}
+					}
+					srcrefs = append(srcrefs, srcref)
 				}
-				srcrefs = append(srcrefs, srcref)
 				for _,method := range mem.Methods { if mref := udev.SrcMsgFromLn(method.Pos)  ;  mref!=nil && (allfiles || req.Ffp==mref.Ref) {
 					p1 , p2 := ustr.Idx(method.Name, " (") , ustr.Idx(method.Name, ") ")
-					mref.Msg = method.Name[:p2][p1+2:] + "·" + method.Name[p2+2:]  ;  mref.Flag = z.SYM_METHOD
-					if p3 := ustr.Idx(mref.Msg, ") ")  ;  p3<=0 {  mref.Misc = "void"  } else {
-						mref.Misc = mref.Msg[p3+2:]  ;  mref.Msg = mref.Msg[:p3+1]
-					}
+					mref.Msg = method.Name[:p2][p1+2:] + "·" + method.Name[p2+2:] ;  mref.Flag = z.SYM_METHOD
+					mref.Msg,mref.Misc = fbreak(mref.Msg)  ;  if i := ustr.Idx(mref.Msg, "(")  ;  i>0 {  mref.Msg = mref.Msg[:i] + " " + mref.Msg[i:]  }
 					srcrefs = append(srcrefs, mref)
 				} }
 			}
