@@ -1,6 +1,7 @@
 package zgo
 import (
 	"bytes"
+	"sort"
 	"strings"
 
 	"github.com/metaleap/go-devgo"
@@ -52,7 +53,9 @@ func (me *zgo) IntelHovs (req *z.ReqIntel) (hovs []*z.RespHov) {
 	var ggd *devgo.Gogetdoc
 	var decl string
 	if devgo.Has_gogetdoc && me.may("gogetdoc") { if ggd = devgo.Query_Gogetdoc(req.Ffp, req.Src, req.Pos)  ;  ggd!=nil && len(ggd.Doc)>0 {
-		d := ggd.ImpN  ;  if len(d)>0  {  d = "**" + d + "**\n\n"  }
+		//	https://godoc.org/fmt#Sprintf
+		//
+		d := ggd.ImpN  ;  if len(d)>0  {  d = "### " + d + " [🕮](http://godoc.org/" + ggd.DocUrl + ")\n\n"  }
 		d = d + ggd.Doc
 		hovs = append(hovs, &z.RespHov { Txt: d })
 	} }
@@ -183,8 +186,8 @@ func (me *zgo) IntelSymbols(req *z.ReqIntel, allfiles bool) (srcrefs []*udev.Src
 				} }
 			}
 		}
-		if allfiles { for _,srcref := range srcrefs {
-			srcref.Msg = "[ " + strings.TrimLeft(srcref.Ref[len(srcDir):], "/\\") + " ]\t" + srcref.Msg
+		if allfiles { sort.Sort(udev.SrcMsgs(srcrefs))  ;  for _,srcref := range srcrefs {
+			srcref.Msg = "[ " + strings.TrimLeft(srcref.Ref[len(srcDir):], "/\\") + " ]\t\t" + srcref.Msg
 		} }
 	} }
 	return
