@@ -53,9 +53,7 @@ func (me *zgo) IntelHovs (req *z.ReqIntel) (hovs []*z.RespHov) {
 	var ggd *devgo.Gogetdoc
 	var decl string
 	if devgo.Has_gogetdoc && me.may("gogetdoc") { if ggd = devgo.Query_Gogetdoc(req.Ffp, req.Src, req.Pos)  ;  ggd!=nil && len(ggd.Doc)>0 {
-		//	https://godoc.org/fmt#Sprintf
-		//
-		d := ggd.ImpN  ;  if len(d)>0  {  d = "### " + d + " [🕮](http://godoc.org/" + ggd.DocUrl + ")\n\n"  }
+		d := ggd.ImpN  ;  if len(d)>0  {  d = "### " + d + " [🕮](http://godoc.org/" + ggd.DocUrl + ")\n\n"  }
 		d = d + ggd.Doc
 		hovs = append(hovs, &z.RespHov { Txt: d })
 	} }
