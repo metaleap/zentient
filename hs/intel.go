@@ -31,6 +31,10 @@ func (_ *zhs) IntelHiLites(req *z.ReqIntel) udev.SrcMsgs {
 	return nil
 }
 
+func (_ *zhs) IntelRefs(req *z.ReqIntel) udev.SrcMsgs {
+	return nil
+}
+
 func (_ *zhs) IntelSymbols(req *z.ReqIntel, allfiles bool) udev.SrcMsgs {
 	return nil
 }

@@ -18,6 +18,7 @@ const (
 	REQ_INTEL_DEFLOC	= "IL:"
 	REQ_INTEL_TDEFLOC	= "IT:"
 	REQ_INTEL_IMPLS		= "IM:"
+	REQ_INTEL_REFS		= "IR:"
 	REQ_INTEL_HOVER		= "IH:"
 	REQ_INTEL_CMPL		= "IC:"
 	REQ_INTEL_CMPLDOC	= "ID:"
@@ -65,6 +66,8 @@ func HandleRequest (queryln string) (e error) {
 			e = out(Zengines[zid].IntelDefLoc(&inint, true))
 		case REQ_INTEL_IMPLS:
 			e = out(Zengines[zid].IntelImpls(&inint))
+		case REQ_INTEL_REFS:
+			e = out(Zengines[zid].IntelRefs(&inint))
 		case REQ_INTEL_HOVER:
 			e = out(Zengines[zid].IntelHovs(&inint))
 		case REQ_INTEL_CMPL:
@@ -98,7 +101,7 @@ func HandleRequest (queryln string) (e error) {
 		case REQ_QUERY_TOOL:
 			cmdargs := ustr.Split(msgrest, " ")  ;  cmdstdout,cmdstderr,cmderr := ugo.CmdExecStdin("", "", cmdargs[0], cmdargs[1:]...)
 			cmdstdout = strings.TrimSpace(cmdstdout)  ;  errstr := ""  ;  if cmderr!=nil {  errstr = cmderr.Error()  }
-			if len(errstr)==0 && len(cmdstderr)==0 && ustr.Pref(cmdstdout, "{") && ustr.Suff(cmdstdout, "}") {
+			if len(errstr)==0 && len(cmdstderr)==0 && ((ustr.Pref(cmdstdout, "{") && ustr.Suff(cmdstdout, "}")) || (ustr.Pref(cmdstdout, "[") && ustr.Suff(cmdstdout, "]"))) {
 				RawOut.Write([]byte(strings.Replace(cmdstdout, "\n", " ", -1) + "\n"))
 			} else {
 				e = out(map[string]string{"_stdout":cmdstdout,"_stderr":cmdstderr,"_err":errstr})

@@ -66,7 +66,7 @@ func (_ *zgo) Caps (cap string) (caps []*z.RespCmd) {
 							}
 	case "intel":
 		caps = []*z.RespCmd	{	{ Title: "gocode",		Exists: devgo.Has_gocode,		Hint: "github.com/nsf/gocode",				More: "Completion Suggest" },
-								{ Title: "guru",		Exists: devgo.Has_guru,			Hint: "golang.org/x/tools/cmd/guru",		More: "Go to Definition, Go to Type Definition, Semantic Highlighting, Symbol Lookup" },
+								{ Title: "guru",		Exists: devgo.Has_guru,			Hint: "golang.org/x/tools/cmd/guru",		More: "Go to Definition, Go to Type Definition, Go to Interfaces/Implementers, Semantic Highlighting, Symbol Lookup" },
 								{ Title: "gogetdoc",	Exists: devgo.Has_gogetdoc,		Hint: "github.com/zmb3/gogetdoc",			More: "Hover Tips, Go to Definition, summaries for Completion Suggest" },
 								{ Title: "godef",		Exists: devgo.Has_godef,		Hint: "github.com/rogpeppe/godef",			More: "Go to Definition, Hover Tips" },
 							}

@@ -68,6 +68,17 @@ func (me *zgo) IntelImpls (req *z.ReqIntel) (srcrefs udev.SrcMsgs) {
 }
 
 
+func (me *zgo) IntelRefs(req *z.ReqIntel) (srcrefs udev.SrcMsgs) {
+	req.RunePosToBytePos()
+	if devgo.Has_guru && me.may("guru") { if gr := devgo.QueryRefs_Guru(req.Ffp, req.Src, req.Pos)  ;  len(gr)>0 {
+		for _,gref := range gr { if srcref := udev.SrcMsgFromLn(gref.Pos)  ;  srcref!=nil {
+			srcrefs = append(srcrefs, srcref)
+		} }
+	} }
+	return
+}
+
+
 func (me *zgo) IntelHovs (req *z.ReqIntel) (hovs []*z.RespHov) {
 	req.RunePosToBytePos()
 	var ggd *devgo.Gogetdoc

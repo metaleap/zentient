@@ -25,13 +25,14 @@ type Zengine interface {
 	BuildFrom ([]string) map[string]udev.SrcMsgs
 	OnCfg (map[string]interface{})
 	OnFile (*File)
-	IntelDefLoc (*ReqIntel, bool) *udev.SrcMsg
-	IntelImpls (*ReqIntel) udev.SrcMsgs
 	IntelHovs (*ReqIntel) []*RespHov
 	IntelCmpl (*ReqIntel) []*RespCmpl
 	IntelCmplDoc(*ReqIntel) *RespTxt
+	IntelDefLoc (*ReqIntel, bool) *udev.SrcMsg
+	IntelImpls (*ReqIntel) udev.SrcMsgs
 	IntelHiLites(*ReqIntel) udev.SrcMsgs
 	IntelSymbols(*ReqIntel, bool) udev.SrcMsgs
+	IntelRefs(*ReqIntel) udev.SrcMsgs
 }
 
 
