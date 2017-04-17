@@ -9,9 +9,9 @@ import (
 )
 
 
-func linter (dirrelpath string, diagcat string, diagsev int, each func() []*udev.SrcMsg) func()map[string][]*udev.SrcMsg {
-	return func () map[string][]*udev.SrcMsg {
-		filediags := map[string][]*udev.SrcMsg {}
+func linter (dirrelpath string, diagcat string, diagsev int, each func() udev.SrcMsgs) func()map[string]udev.SrcMsgs {
+	return func () map[string]udev.SrcMsgs {
+		filediags := map[string]udev.SrcMsgs {}
 		for _,srcref := range each() {  if fpath := srcref.Ref  ;  filepath.Dir(fpath)==dirrelpath {
 			srcref.Ref = diagcat  ;  srcref.Flag = diagsev
 			filediags[fpath] = append(filediags[fpath], srcref)
@@ -21,41 +21,41 @@ func linter (dirrelpath string, diagcat string, diagsev int, each func() []*udev
 }
 
 
-func linterCheck (dirrelpath string, cmdname string, pkgimppath string) func()map[string][]*udev.SrcMsg {
+func linterCheck (dirrelpath string, cmdname string, pkgimppath string) func()map[string]udev.SrcMsgs {
 	return linter(dirrelpath, cmdname, z.DIAG_SEV_INFO,
-		func () []*udev.SrcMsg { return devgo.LintCheck(cmdname, pkgimppath) })
+		func () udev.SrcMsgs { return devgo.LintCheck(cmdname, pkgimppath) })
 }
-func linterMvDan (dirrelpath string, cmdname string, pkgimppath string) func()map[string][]*udev.SrcMsg {
+func linterMvDan (dirrelpath string, cmdname string, pkgimppath string) func()map[string]udev.SrcMsgs {
 	return linter(dirrelpath, cmdname, z.DIAG_SEV_INFO,
-		func () []*udev.SrcMsg { return devgo.LintMvDan(cmdname, pkgimppath) })
+		func () udev.SrcMsgs { return devgo.LintMvDan(cmdname, pkgimppath) })
 }
-func linterIneffAssign (dirrelpath string) func()map[string][]*udev.SrcMsg {
+func linterIneffAssign (dirrelpath string) func()map[string]udev.SrcMsgs {
 	return linter(dirrelpath, "ineffassign", z.DIAG_SEV_INFO,
-		func () []*udev.SrcMsg { return devgo.LintIneffAssign(dirrelpath) })
+		func () udev.SrcMsgs { return devgo.LintIneffAssign(dirrelpath) })
 }
-func linterMDempsky (dirrelpath string, cmdname string, pkgimppath string) func()map[string][]*udev.SrcMsg {
+func linterMDempsky (dirrelpath string, cmdname string, pkgimppath string) func()map[string]udev.SrcMsgs {
 	return linter(dirrelpath, cmdname, z.DIAG_SEV_INFO,
-		func () []*udev.SrcMsg { return devgo.LintMDempsky(cmdname, pkgimppath) })
+		func () udev.SrcMsgs { return devgo.LintMDempsky(cmdname, pkgimppath) })
 }
-func linterGolint (dirrelpath string) func()map[string][]*udev.SrcMsg {
+func linterGolint (dirrelpath string) func()map[string]udev.SrcMsgs {
 	return linter(dirrelpath, "golint", z.DIAG_SEV_HINT,
-		func () []*udev.SrcMsg { return devgo.LintGolint(dirrelpath) })
+		func () udev.SrcMsgs { return devgo.LintGolint(dirrelpath) })
 }
-func linterGoVet (dirrelpath string) func()map[string][]*udev.SrcMsg {
+func linterGoVet (dirrelpath string) func()map[string]udev.SrcMsgs {
 	return linter(dirrelpath, "go vet", z.DIAG_SEV_INFO,
-		func () []*udev.SrcMsg { return devgo.LintGoVet(dirrelpath) })
+		func () udev.SrcMsgs { return devgo.LintGoVet(dirrelpath) })
 }
-func linterErrcheck (dirrelpath string, pkgimppath string) func()map[string][]*udev.SrcMsg {
+func linterErrcheck (dirrelpath string, pkgimppath string) func()map[string]udev.SrcMsgs {
 	return linter(dirrelpath, "errcheck", z.DIAG_SEV_INFO,
-		func () []*udev.SrcMsg { return devgo.LintErrcheck(pkgimppath) })
+		func () udev.SrcMsgs { return devgo.LintErrcheck(pkgimppath) })
 }
-func linterHonnef (dirrelpath string, cmdname string, pkgimppath string) func()map[string][]*udev.SrcMsg {
+func linterHonnef (dirrelpath string, cmdname string, pkgimppath string) func()map[string]udev.SrcMsgs {
 	return linter(dirrelpath, cmdname, z.DIAG_SEV_INFO,
-		func () []*udev.SrcMsg { return devgo.LintHonnef(cmdname, pkgimppath) })
+		func () udev.SrcMsgs { return devgo.LintHonnef(cmdname, pkgimppath) })
 }
 
 
-func (me *zgo) Linters (filerelpaths []string) (linters []func()map[string][]*udev.SrcMsg) {
+func (me *zgo) Linters (filerelpaths []string) (linters []func()map[string]udev.SrcMsgs) {
 	pkgfiles := map[*devgo.Pkg][]string {}  ;  for _,frp := range filerelpaths {
 		if pkg := filePkg(frp) ; pkg!=nil {
 			pkgfiles[pkg] = append(pkgfiles[pkg], frp)

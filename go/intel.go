@@ -4,6 +4,8 @@ import (
 	"sort"
 	"strings"
 
+	gurujson "golang.org/x/tools/cmd/guru/serial"
+
 	"github.com/metaleap/go-devgo"
 	"github.com/metaleap/go-util-dev"
 	"github.com/metaleap/go-util-misc"
@@ -44,6 +46,24 @@ func (me *zgo) IntelDefLoc (req *z.ReqIntel, typedef bool) (refloc *udev.SrcMsg)
 			}
 		}
 	}
+	return
+}
+
+
+func (me *zgo) IntelImpls (req *z.ReqIntel) (srcrefs udev.SrcMsgs) {
+	req.RunePosToBytePos()
+	if devgo.Has_guru && me.may("guru") { if gi := devgo.QueryImpl_Guru(req.Ffp, req.Src, req.Pos)  ;  gi!=nil && (len(gi.AssignableTo)>0 || len(gi.AssignableFrom)>0 || len(gi.AssignableFromPtr)>0) {
+		add := func (desc string, its ...gurujson.ImplementsType) {
+			for _,it := range its { if srcref := udev.SrcMsgFromLn(it.Pos)  ;  srcref!=nil {
+				srcref.Msg = devgo.ShortenImPs(it.Name)  ;  srcref.Misc = it.Kind + " " + desc
+				srcrefs = append(srcrefs, srcref)
+			} }
+		}
+		add("type of current selection", gi.T)  ;  tname := devgo.ShortenImPs(gi.T.Name)
+		add("type implementing `" + tname + "`", gi.AssignableTo...)
+		add("type implemented by `" + tname + "`", gi.AssignableFrom...)
+		add("type implemented by `*" + tname + "`", gi.AssignableFromPtr...)
+	} }
 	return
 }
 
@@ -96,7 +116,7 @@ func (me *zgo) IntelCmpl (req *z.ReqIntel) (cmpls []*z.RespCmpl) {
 }
 
 
-func (me *zgo) IntelHiLites(req *z.ReqIntel) (srcrefs []*udev.SrcMsg) {
+func (me *zgo) IntelHiLites(req *z.ReqIntel) (srcrefs udev.SrcMsgs) {
 	req.RunePosToBytePos()
 	if devgo.Has_guru && me.may("guru") { if gw := devgo.QueryWhat_Guru(req.Ffp, req.Src, req.Pos1)  ;  gw!=nil {
 		for _,sameid := range gw.SameIDs { if srcref := udev.SrcMsgFromLn(sameid)  ;  srcref!=nil {
@@ -127,7 +147,7 @@ func (me *zgo) IntelHiLites(req *z.ReqIntel) (srcrefs []*udev.SrcMsg) {
 }
 
 
-func (me *zgo) IntelSymbols(req *z.ReqIntel, allfiles bool) (srcrefs []*udev.SrcMsg) {
+func (me *zgo) IntelSymbols(req *z.ReqIntel, allfiles bool) (srcrefs udev.SrcMsgs) {
 	req.EnsureSrc()
 	if ustr.Pref(req.Src, "package ") { req.Pos = "8" } else {
 		j := 0  ;  lns := ustr.Split(req.Src, "\n")
@@ -184,7 +204,7 @@ func (me *zgo) IntelSymbols(req *z.ReqIntel, allfiles bool) (srcrefs []*udev.Src
 				} }
 			}
 		}
-		if allfiles { sort.Sort(udev.SrcMsgs(srcrefs))  ;  for _,srcref := range srcrefs {
+		if allfiles { sort.Sort(srcrefs)  ;  for _,srcref := range srcrefs {
 			srcref.Msg = "[ " + strings.TrimLeft(srcref.Ref[len(srcDir):], "/\\") + " ]\t\t" + srcref.Msg
 		} }
 	} }

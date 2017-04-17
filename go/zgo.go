@@ -80,10 +80,10 @@ func (me *zgo) DoFmt (src string, custcmd string, tabsize uint8) (*z.RespTxt, er
 		z.RespCmd { Exists: devgo.Has_gofmt, Name: "gofmt", Args: []string {"-e", "-s"} })
 }
 
-func (me *zgo) DoRename (reqcmd string, relfilepath string, offset uint64, newname string, eol string, oldname string, off1 uint64, off2 uint64) (resp map[string][]*udev.SrcMsg, err error) {
+func (me *zgo) DoRename (reqcmd string, relfilepath string, offset uint64, newname string, eol string, oldname string, off1 uint64, off2 uint64) (resp map[string]udev.SrcMsgs, err error) {
 	if len(reqcmd)==0 && !devgo.Has_gorename { return nil , ugo.E("Couldn't find `gorename` command, and no custom tool was specified either.") }
-	var fileedits []*udev.SrcMsg  ;  if fileedits,err = devgo.Gorename(reqcmd, relfilepath, offset, newname, eol)  ;  len(fileedits)>0 {
-		resp = map[string][]*udev.SrcMsg {}  ;  for _,sr := range fileedits {
+	var fileedits udev.SrcMsgs  ;  if fileedits,err = devgo.Gorename(reqcmd, relfilepath, offset, newname, eol)  ;  len(fileedits)>0 {
+		resp = map[string]udev.SrcMsgs {}  ;  for _,sr := range fileedits {
 			ffp := sr.Ref  ;  sr.Ref = ""  ;  resp[ffp] = append(resp[ffp], sr)
 		}
 	}

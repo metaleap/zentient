@@ -137,10 +137,10 @@ func (me *ReqIntel) RunePosToBytePos () {
 
 
 var newlivediags = true
-func jsonLiveDiags (frpszid string, closedfrps []string, openedfrps []string) (jld map[string]map[string][]*udev.SrcMsg) {
+func jsonLiveDiags (frpszid string, closedfrps []string, openedfrps []string) (jld map[string]map[string]udev.SrcMsgs) {
 	if len(closedfrps)>0 || len(openedfrps)>0 {  newlivediags = true  }
 	if newlivediags {
-		diagsready := true  ;  jld = map[string]map[string][]*udev.SrcMsg {}  ;  var fc, fo []string
+		diagsready := true  ;  jld = map[string]map[string]udev.SrcMsgs {}  ;  var fc, fo []string
 		for zid,µ := range Zengines {
 			if (!µ.ReadyToBuildAndLint()) { diagsready = false }
 			if zid==frpszid { fc,fo = closedfrps,openedfrps } else { fc,fo = nil,nil }

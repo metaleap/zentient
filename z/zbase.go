@@ -11,9 +11,9 @@ import (
 )
 
 type Base struct {
-	builddiags			map[string][]*udev.SrcMsg
-	lintdiags			map[string][]*udev.SrcMsg
-	livediags			map[string][]*udev.SrcMsg
+	builddiags			map[string]udev.SrcMsgs
+	lintdiags			map[string]udev.SrcMsgs
+	livediags			map[string]udev.SrcMsgs
 	lintmutex			sync.Mutex
 	linttime			int64
 	zid					string
@@ -98,10 +98,10 @@ func (me *Base) buildFrom (µ Zengine, filerelpaths []string) {
 }
 
 
-func (me *Base) liveDiags (µ Zengine, closedfrps []string, openedfrps []string) map[string][]*udev.SrcMsg {
+func (me *Base) liveDiags (µ Zengine, closedfrps []string, openedfrps []string) map[string]udev.SrcMsgs {
 	if len(openedfrps)>0 || len(closedfrps)>0 {  newlivediags = true  ;  me.livediags = nil  }
 	openfiles := openFiles(µ)  ;  livediags := me.livediags  ;  if livediags==nil {
-		livediags = map[string][]*udev.SrcMsg {}
+		livediags = map[string]udev.SrcMsgs {}
 		if me.builddiags!=nil { for frp,fdiags := range me.builddiags { livediags[frp] = fdiags } }
 		if lintdiags := me.lintdiags  ;  lintdiags!=nil {
 			for _,frp := range openfiles { livediags[frp] = append(livediags[frp], lintdiags[frp]...) }
@@ -118,11 +118,11 @@ func (me *Base) relint (µ Zengine, mytime int64) {
 
 		if mytime>=me.linttime {
 			lintdiags := me.lintdiags  ;  if lintdiags==nil { // so we can check at the end whether we're already outdated
-				lintdiags = map[string][]*udev.SrcMsg {}  ;  me.lintdiags = lintdiags
+				lintdiags = map[string]udev.SrcMsgs {}  ;  me.lintdiags = lintdiags
 			}
-			freshdiags := map[string][]*udev.SrcMsg {}  ;  lintfiles := []string {}
+			freshdiags := map[string]udev.SrcMsgs {}  ;  lintfiles := []string {}
 			for _,frp := range openFiles(µ) { if _,alreadylinted := lintdiags[frp]  ;  !alreadylinted { lintfiles = append(lintfiles, frp) } }
-			for _,frp := range lintfiles { freshdiags[frp] = []*udev.SrcMsg {} } // init to non-nil so our next alreadylinted above will be correct
+			for _,frp := range lintfiles { freshdiags[frp] = udev.SrcMsgs {} } // init to non-nil so our next alreadylinted above will be correct
 
 			if len(lintfiles)>0 && mytime>=me.linttime {
 				me.runLinters(µ.Linters(lintfiles), freshdiags)
@@ -143,7 +143,7 @@ func (me *Base) relint (µ Zengine, mytime int64) {
 }
 
 
-func (me *Base) runLinters (linters []func()map[string][]*udev.SrcMsg, freshdiags map[string][]*udev.SrcMsg) {
+func (me *Base) runLinters (linters []func()map[string]udev.SrcMsgs, freshdiags map[string]udev.SrcMsgs) {
 	var mutex sync.Mutex
 	lintjobs := []func() {}
 	for _,linter := range linters {

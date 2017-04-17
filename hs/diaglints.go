@@ -6,9 +6,9 @@ import (
 )
 
 
-func linterHlint (filerelpaths []string) func()map[string][]*udev.SrcMsg {
-	return func () map[string][]*udev.SrcMsg {
-		filediags := map[string][]*udev.SrcMsg {}
+func linterHlint (filerelpaths []string) func()map[string]udev.SrcMsgs {
+	return func () map[string]udev.SrcMsgs {
+		filediags := map[string]udev.SrcMsgs {}
 		for _,srcref := range devhs.LintHlint(filerelpaths) {
 			fpath := srcref.Ref  ;  srcref.Ref = "hlint"  ;  srcref.Flag = z.DIAG_SEV_INFO
 			filediags[fpath] = append(filediags[fpath], srcref)
@@ -18,7 +18,7 @@ func linterHlint (filerelpaths []string) func()map[string][]*udev.SrcMsg {
 }
 
 
-func (me *zhs) Linters (filerelpaths []string) (linters []func()map[string][]*udev.SrcMsg) {
+func (me *zhs) Linters (filerelpaths []string) (linters []func()map[string]udev.SrcMsgs) {
 	cfgok := me.Base.CfgDiagToolEnabled
 	if devhs.Has_hlint && cfgok("hlint") { linters = append(linters, linterHlint(filerelpaths)) }
 	return

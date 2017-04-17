@@ -12,7 +12,7 @@ import (
 )
 
 
-func (_ *zhs) BuildFrom (filerelpaths []string) (freshdiags map[string][]*udev.SrcMsg) {
+func (_ *zhs) BuildFrom (filerelpaths []string) (freshdiags map[string]udev.SrcMsgs) {
 	filerelpath := filerelpaths[0]
 	filefullpath := filepath.Join(srcDir, filerelpath)  ;  dirfullpath := filepath.Dir(filefullpath)
 	cmdargs := append(append([]string { "build" }, devhs.StackArgs...), devhs.StackArgsBuild...)
@@ -28,7 +28,7 @@ func (_ *zhs) BuildFrom (filerelpaths []string) (freshdiags map[string][]*udev.S
 		wasnoop = true  ;  for i := 3 ; i < len(lns) ; i++ { if !ustr.Pref(lns[i], "- ") { wasnoop = false } }
 	}
 	if !wasnoop {
-		freshdiags = map[string][]*udev.SrcMsg {}
+		freshdiags = map[string]udev.SrcMsgs {}
 
 		for _,wln := range lnstackwarns { if parts := ustr.Split(wln, ":")  ;  len(parts)>1 {
 			freshdiags[parts[0]] = append(freshdiags[parts[0]], &udev.SrcMsg { Flag: z.DIAG_SEV_WARN, Ref: "stack", Msg: ustr.Join(parts[1:], ":"), Pos1Ln: 1, Pos1Ch: 1 })
