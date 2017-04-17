@@ -1,27 +1,27 @@
 package zhs
 import (
 	"github.com/metaleap/go-devhs"
+	"github.com/metaleap/go-util-dev"
 	"github.com/metaleap/zentient/z"
 )
 
 
-func linterHlint (filerelpaths []string) func()map[string][]*z.RespDiag {
-	return func () map[string][]*z.RespDiag {
-		filediags := map[string][]*z.RespDiag {}
+func linterHlint (filerelpaths []string) func()map[string][]*udev.SrcMsg {
+	return func () map[string][]*udev.SrcMsg {
+		filediags := map[string][]*udev.SrcMsg {}
 		for _,srcref := range devhs.LintHlint(filerelpaths) {
-			diag := &z.RespDiag { Sev: z.DIAG_SEV_INFO , SrcMsg: srcref }  ;  diag.Ref = "hlint"
-			// diag.Pos1Ln = srcref.Pos1Ln  ;  diag.Pos1Ch = srcref.Pos1Ch  ;  diag.Pos2Ln = srcref.Pos2Ln  ;  diag.Pos2Ch = srcref.Pos2Ch
+			fpath := srcref.Ref  ;  srcref.Ref = "hlint"  ;  srcref.Flag = z.DIAG_SEV_INFO
 			if srcref.Data != nil { if _md,_ := srcref.Data["_md"].(string)  ;  len(_md)>0 {
-				diag.Ref = diag.Ref + " » " + _md  ;  delete(srcref.Data, "_md")
+				srcref.Ref = srcref.Ref + " » " + _md  ;  delete(srcref.Data, "_md")
 			} }
-			fpath := srcref.Ref  ;  filediags[fpath] = append(filediags[fpath], diag)
+			filediags[fpath] = append(filediags[fpath], srcref)
 		}
 		return filediags
 	}
 }
 
 
-func (me *zhs) Linters (filerelpaths []string) (linters []func()map[string][]*z.RespDiag) {
+func (me *zhs) Linters (filerelpaths []string) (linters []func()map[string][]*udev.SrcMsg) {
 	cfgok := me.Base.CfgDiagToolEnabled
 	if devhs.Has_hlint && cfgok("hlint") { linters = append(linters, linterHlint(filerelpaths)) }
 	return

@@ -1,6 +1,8 @@
 package z
 import (
 	"path/filepath"
+	"runtime"
+	"strings"
 )
 
 
@@ -18,6 +20,11 @@ func newFile (z Zengine, relpath string) *File {
 	var f File
 	f.µ = z
 	f.RelPath = relpath  ;  f.DirRel = filepath.Dir(f.RelPath)
-	f.FullPath = filepath.Join(Ctx.SrcDir, relpath)  ;  f.DirFull = filepath.Dir(f.FullPath)
+	f.FullPath = normalizeFilePath(filepath.Join(Ctx.SrcDir, relpath))  ;  f.DirFull = filepath.Dir(f.FullPath)
 	return &f
+}
+
+func normalizeFilePath (fpath string) string {
+	if runtime.GOOS=="windows" { return strings.ToLower(filepath.FromSlash(fpath)) }
+	return fpath
 }

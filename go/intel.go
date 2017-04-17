@@ -20,8 +20,8 @@ func (me *zgo) IntelDefLoc (req *z.ReqIntel, typedef bool) (refloc *udev.SrcMsg)
 	//	go to definition
 	if (!typedef) {
 		if refloc==nil && devgo.Has_guru && me.may("guru") { if gd := devgo.QueryDesc_Guru(req.Ffp, req.Src, req.Pos)  ;  gd!=nil {
-			if gd.Type!=nil && len(gd.Type.NamePos)>0 { if rl,ok := udev.SrcMsgFromLn(gd.Type.NamePos)  ;  ok { refloc = &rl } }
-			if gd.Value!=nil && len(gd.Value.ObjPos)>0 { if rl,ok := udev.SrcMsgFromLn(gd.Value.ObjPos)  ;  ok { refloc = &rl } }
+			if gd.Type!=nil && len(gd.Type.NamePos)>0 { if rl := udev.SrcMsgFromLn(gd.Type.NamePos)  ;  rl!=nil { refloc = rl } }
+			if gd.Value!=nil && len(gd.Value.ObjPos)>0 { if rl := udev.SrcMsgFromLn(gd.Value.ObjPos)  ;  rl!=nil { refloc = rl } }
 		} }
 		if refloc==nil && devgo.Has_gogetdoc && me.may("gogetdoc") { refloc = devgo.QueryDefLoc_Gogetdoc(req.Ffp, req.Src, req.Pos) }
 		if refloc==nil && devgo.Has_godef && me.may("godef") { refloc = devgo.QueryDefLoc_Godef(req.Ffp, req.Src, req.Pos) }
@@ -31,7 +31,7 @@ func (me *zgo) IntelDefLoc (req *z.ReqIntel, typedef bool) (refloc *udev.SrcMsg)
 	if devgo.Has_guru && me.may("guru") {
 		if gd := devgo.QueryDesc_Guru(req.Ffp, req.Src, req.Pos)  ;  gd!=nil {
 			if gd.Type!=nil && len(gd.Type.NamePos)>0 {
-				if rl,ok := udev.SrcMsgFromLn(gd.Type.NamePos)  ;  ok { refloc = &rl }
+				if rl := udev.SrcMsgFromLn(gd.Type.NamePos)  ;  rl!=nil { refloc = rl }
 			} else if gd.Value!=nil && len(gd.Value.Type)>0 {
 				for ustr.Pref(gd.Value.Type, "map[") {  gd.Value.Type = gd.Value.Type[ustr.Idx(gd.Value.Type, "]")+1:]  }
 				possiblyfullyqualified := strings.TrimLeft(strings.TrimPrefix(strings.TrimLeft(gd.Value.Type, "*"), "[]"), "*")
@@ -98,8 +98,8 @@ func (me *zgo) IntelCmpl (req *z.ReqIntel) (cmpls []*z.RespCmpl) {
 func (me *zgo) IntelHiLites(req *z.ReqIntel) (srcrefs []*udev.SrcMsg) {
 	req.RunePosToBytePos()
 	if devgo.Has_guru && me.may("guru") { if gw := devgo.QueryWhat_Guru(req.Ffp, req.Src, req.Pos1)  ;  gw!=nil {
-		for _,sameid := range gw.SameIDs { if srcref,ok := udev.SrcMsgFromLn(sameid)  ;  ok {
-			srcrefs = append(srcrefs, &srcref)
+		for _,sameid := range gw.SameIDs { if srcref := udev.SrcMsgFromLn(sameid)  ;  srcref!=nil {
+			srcrefs = append(srcrefs, srcref)
 		} }
 		if len(srcrefs)==0 && len(gw.Enclosing)>0 {
 			bpos2rpos := func(bytepos int) int {

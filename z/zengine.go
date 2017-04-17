@@ -1,7 +1,5 @@
 package z
 import (
-	"path/filepath"
-
 	"github.com/metaleap/go-util-dev"
 	"github.com/metaleap/go-util-misc"
 	"github.com/metaleap/go-util-slice"
@@ -22,9 +20,9 @@ type Zengine interface {
 	Caps (string) []*RespCmd
 	DoFmt (string, string, uint8) (*RespTxt, error)
 	DoRename (string, string, uint64, string, string, string, uint64, uint64) (map[string][]*udev.SrcMsg, error)
-	Linters ([]string) []func()map[string][]*RespDiag
+	Linters ([]string) []func()map[string][]*udev.SrcMsg
 	ReadyToBuildAndLint () bool
-	BuildFrom ([]string) map[string][]*RespDiag
+	BuildFrom ([]string) map[string][]*udev.SrcMsg
 	OnCfg (map[string]interface{})
 	OnFile (*File)
 	IntelDefLoc (*ReqIntel, bool) *udev.SrcMsg
@@ -55,13 +53,13 @@ func doRename (zid string, reqcmd string, relfilepath string, offset uint64, new
 }
 
 func onFilesClosed (µ Zengine, relpaths []string) {
-	for i,_ := range relpaths { relpaths[i] = filepath.FromSlash(relpaths[i]) }
+	for i,_ := range relpaths { relpaths[i] = normalizeFilePath(relpaths[i]) }
 	OpenFiles = uslice.StrWithout(OpenFiles, false, relpaths...)
 }
 
 func onFilesOpened (µ Zengine, relpaths []string) {
 	for _,relpath := range relpaths {
-		relpath = filepath.FromSlash(relpath)
+		relpath = normalizeFilePath(relpath)
 		file := AllFiles[relpath]  ;  if file == nil {
 			file = newFile(µ, relpath)  ;  µ.OnFile(file)  ;  AllFiles[relpath] = file
 		}
@@ -70,6 +68,6 @@ func onFilesOpened (µ Zengine, relpaths []string) {
 }
 
 func onFilesWritten (µ Zengine, relpaths []string) {
-	for i,_ := range relpaths { relpaths[i] = filepath.FromSlash(relpaths[i]) }
+	for i,_ := range relpaths { relpaths[i] = normalizeFilePath(relpaths[i]) }
 	µ.B().buildFrom(µ, relpaths)
 }

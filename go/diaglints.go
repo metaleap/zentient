@@ -9,53 +9,53 @@ import (
 )
 
 
-func linter (dirrelpath string, diagcat string, diagsev uint8, each func() []udev.SrcMsg) func()map[string][]*z.RespDiag {
-	return func () map[string][]*z.RespDiag {
-		filediags := map[string][]*z.RespDiag {}
+func linter (dirrelpath string, diagcat string, diagsev int, each func() []*udev.SrcMsg) func()map[string][]*udev.SrcMsg {
+	return func () map[string][]*udev.SrcMsg {
+		filediags := map[string][]*udev.SrcMsg {}
 		for _,srcref := range each() {  if fpath := srcref.Ref  ;  filepath.Dir(fpath)==dirrelpath {
-			d := &z.RespDiag { Sev: diagsev, SrcMsg: srcref }  ;  d.Ref = diagcat
-			filediags[fpath] = append(filediags[fpath], d)
+			srcref.Ref = diagcat  ;  srcref.Flag = diagsev
+			filediags[fpath] = append(filediags[fpath], srcref)
 		} }
 		return filediags
 	}
 }
 
 
-func linterCheck (dirrelpath string, cmdname string, pkgimppath string) func()map[string][]*z.RespDiag {
+func linterCheck (dirrelpath string, cmdname string, pkgimppath string) func()map[string][]*udev.SrcMsg {
 	return linter(dirrelpath, cmdname, z.DIAG_SEV_INFO,
-		func () []udev.SrcMsg { return devgo.LintCheck(cmdname, pkgimppath) })
+		func () []*udev.SrcMsg { return devgo.LintCheck(cmdname, pkgimppath) })
 }
-func linterMvDan (dirrelpath string, cmdname string, pkgimppath string) func()map[string][]*z.RespDiag {
+func linterMvDan (dirrelpath string, cmdname string, pkgimppath string) func()map[string][]*udev.SrcMsg {
 	return linter(dirrelpath, cmdname, z.DIAG_SEV_INFO,
-		func () []udev.SrcMsg { return devgo.LintMvDan(cmdname, pkgimppath) })
+		func () []*udev.SrcMsg { return devgo.LintMvDan(cmdname, pkgimppath) })
 }
-func linterIneffAssign (dirrelpath string) func()map[string][]*z.RespDiag {
+func linterIneffAssign (dirrelpath string) func()map[string][]*udev.SrcMsg {
 	return linter(dirrelpath, "ineffassign", z.DIAG_SEV_INFO,
-		func () []udev.SrcMsg { return devgo.LintIneffAssign(dirrelpath) })
+		func () []*udev.SrcMsg { return devgo.LintIneffAssign(dirrelpath) })
 }
-func linterMDempsky (dirrelpath string, cmdname string, pkgimppath string) func()map[string][]*z.RespDiag {
+func linterMDempsky (dirrelpath string, cmdname string, pkgimppath string) func()map[string][]*udev.SrcMsg {
 	return linter(dirrelpath, cmdname, z.DIAG_SEV_INFO,
-		func () []udev.SrcMsg { return devgo.LintMDempsky(cmdname, pkgimppath) })
+		func () []*udev.SrcMsg { return devgo.LintMDempsky(cmdname, pkgimppath) })
 }
-func linterGolint (dirrelpath string) func()map[string][]*z.RespDiag {
+func linterGolint (dirrelpath string) func()map[string][]*udev.SrcMsg {
 	return linter(dirrelpath, "golint", z.DIAG_SEV_HINT,
-		func () []udev.SrcMsg { return devgo.LintGolint(dirrelpath) })
+		func () []*udev.SrcMsg { return devgo.LintGolint(dirrelpath) })
 }
-func linterGoVet (dirrelpath string) func()map[string][]*z.RespDiag {
+func linterGoVet (dirrelpath string) func()map[string][]*udev.SrcMsg {
 	return linter(dirrelpath, "go vet", z.DIAG_SEV_INFO,
-		func () []udev.SrcMsg { return devgo.LintGoVet(dirrelpath) })
+		func () []*udev.SrcMsg { return devgo.LintGoVet(dirrelpath) })
 }
-func linterErrcheck (dirrelpath string, pkgimppath string) func()map[string][]*z.RespDiag {
+func linterErrcheck (dirrelpath string, pkgimppath string) func()map[string][]*udev.SrcMsg {
 	return linter(dirrelpath, "errcheck", z.DIAG_SEV_INFO,
-		func () []udev.SrcMsg { return devgo.LintErrcheck(pkgimppath) })
+		func () []*udev.SrcMsg { return devgo.LintErrcheck(pkgimppath) })
 }
-func linterHonnef (dirrelpath string, cmdname string, pkgimppath string) func()map[string][]*z.RespDiag {
+func linterHonnef (dirrelpath string, cmdname string, pkgimppath string) func()map[string][]*udev.SrcMsg {
 	return linter(dirrelpath, cmdname, z.DIAG_SEV_INFO,
-		func () []udev.SrcMsg { return devgo.LintHonnef(cmdname, pkgimppath) })
+		func () []*udev.SrcMsg { return devgo.LintHonnef(cmdname, pkgimppath) })
 }
 
 
-func (me *zgo) Linters (filerelpaths []string) (linters []func()map[string][]*z.RespDiag) {
+func (me *zgo) Linters (filerelpaths []string) (linters []func()map[string][]*udev.SrcMsg) {
 	pkgfiles := map[*devgo.Pkg][]string {}  ;  for _,frp := range filerelpaths {
 		if pkg := filePkg(frp) ; pkg!=nil {
 			pkgfiles[pkg] = append(pkgfiles[pkg], frp)

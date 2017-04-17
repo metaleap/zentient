@@ -15,6 +15,32 @@ const (
 )
 
 const (
+	SYM_FILE		= 0
+	SYM_MODULE		= 1
+	SYM_NAMESPACE	= 2
+	SYM_PACKAGE		= 3
+	SYM_CLASS		= 4
+	SYM_METHOD		= 5
+	SYM_PROPERTY	= 6
+	SYM_FIELD		= 7
+	SYM_CONSTRUCTOR	= 8
+	SYM_ENUM		= 9
+	SYM_ENUMMEMBER	= 21
+	SYM_STRUCT		= 22
+	SYM_INTERFACE	= 10
+	SYM_FUNCTION	= 11
+	SYM_VARIABLE	= 12
+	SYM_CONSTANT	= 13
+	SYM_STRING		= 14
+	SYM_NUMBER		= 15
+	SYM_BOOLEAN		= 16
+	SYM_ARRAY		= 17
+	SYM_OBJECT		= 18
+	SYM_KEY			= 19
+	SYM_NULL		= 20
+)
+
+const (
 	CMPL_TEXT			= 0
 	CMPL_METHOD			= 1
 	CMPL_FUNCTION		= 2
@@ -46,14 +72,13 @@ type RespIntel struct {
 
 type RespCmpl struct {
 	RespIntel
-	Kind		int			`json:"kind,omitempty"` // CMPL_FOO
+	Kind		int			`json:"kind,"` // CMPL_FOO
 	Detail		string		`json:"detail,omitempty"`
 	SortTxt		string		`json:"sortText,omitempty"`
 	FilterTxt	string		`json:"filterText,omitempty"`
 	InsertTxt	string		`json:"insertText,omitempty"`
 	CommitChars	[]string	`json:"commitCharacters,omitempty"`
 }
-
 
 type RespCmd struct {
 	Name	string		`json:",omitempty"`		//	actual cmd name
@@ -66,12 +91,6 @@ type RespCmd struct {
 
 	f	func()		//	tmp field used in Base.DoFmt()
 }
-
-type RespDiag struct {
-	udev.SrcMsg
-	Sev uint8
-}
-
 
 type RespTxt struct {
 	Result		string		`json:",omitempty"`
@@ -118,10 +137,10 @@ func (me *ReqIntel) RunePosToBytePos () {
 
 
 var newlivediags = true
-func jsonLiveDiags (frpszid string, closedfrps []string, openedfrps []string) (jld map[string]map[string][]*RespDiag) {
+func jsonLiveDiags (frpszid string, closedfrps []string, openedfrps []string) (jld map[string]map[string][]*udev.SrcMsg) {
 	if len(closedfrps)>0 || len(openedfrps)>0 {  newlivediags = true  }
 	if newlivediags {
-		diagsready := true  ;  jld = map[string]map[string][]*RespDiag {}  ;  var fc, fo []string
+		diagsready := true  ;  jld = map[string]map[string][]*udev.SrcMsg {}  ;  var fc, fo []string
 		for zid,µ := range Zengines {
 			if (!µ.ReadyToBuildAndLint()) { diagsready = false }
 			if zid==frpszid { fc,fo = closedfrps,openedfrps } else { fc,fo = nil,nil }

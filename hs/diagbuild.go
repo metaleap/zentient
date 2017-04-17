@@ -12,7 +12,7 @@ import (
 )
 
 
-func (_ *zhs) BuildFrom (filerelpaths []string) (freshdiags map[string][]*z.RespDiag) {
+func (_ *zhs) BuildFrom (filerelpaths []string) (freshdiags map[string][]*udev.SrcMsg) {
 	filerelpath := filerelpaths[0]
 	filefullpath := filepath.Join(srcDir, filerelpath)  ;  dirfullpath := filepath.Dir(filefullpath)
 	cmdargs := append(append([]string { "build" }, devhs.StackArgs...), devhs.StackArgsBuild...)
@@ -28,24 +28,24 @@ func (_ *zhs) BuildFrom (filerelpaths []string) (freshdiags map[string][]*z.Resp
 		wasnoop = true  ;  for i := 3 ; i < len(lns) ; i++ { if !ustr.Pref(lns[i], "- ") { wasnoop = false } }
 	}
 	if !wasnoop {
-		freshdiags = map[string][]*z.RespDiag {}
+		freshdiags = map[string][]*udev.SrcMsg {}
 
 		for _,wln := range lnstackwarns { if parts := ustr.Split(wln, ":")  ;  len(parts)>1 {
-			freshdiags[parts[0]] = append(freshdiags[parts[0]], &z.RespDiag { Sev: z.DIAG_SEV_WARN, SrcMsg: udev.SrcMsg { Ref: "stack", Msg: ustr.Join(parts[1:], ":"), Pos1Ln: 1, Pos1Ch: 1 } })
+			freshdiags[parts[0]] = append(freshdiags[parts[0]], &udev.SrcMsg { Flag: z.DIAG_SEV_WARN, Ref: "stack", Msg: ustr.Join(parts[1:], ":"), Pos1Ln: 1, Pos1Ch: 1 })
 		}}
 
 		if _p := "Could not parse '" + srcDir  ;  ustr.Pref(lns[0], _p) {
 			stackyamlpath := strings.TrimRight(strings.TrimLeft(lns[0][len(_p):], "/\\"), "':")
-			freshdiags[stackyamlpath] = append(freshdiags[stackyamlpath], &z.RespDiag { SrcMsg: udev.SrcMsg { Ref: "stack", Msg: ustr.Join(lns[1:], "\n"), Pos1Ln: 1, Pos1Ch: 1 } })
+			freshdiags[stackyamlpath] = append(freshdiags[stackyamlpath], &udev.SrcMsg { Ref: "stack", Msg: ustr.Join(lns[1:], "\n"), Pos1Ln: 1, Pos1Ch: 1 })
 			return
 		}
 
 		if _e := "Error: "  ;  ustr.Pref(lns[0], _e) {
-			freshdiags[filerelpath] = append(freshdiags[filerelpath], &z.RespDiag { SrcMsg: udev.SrcMsg { Ref: "stack", Msg: ustr.Join(lns, "\n")[len(_e):], Pos1Ln: 1, Pos1Ch: 1 } })
+			freshdiags[filerelpath] = append(freshdiags[filerelpath], &udev.SrcMsg { Ref: "stack", Msg: ustr.Join(lns, "\n")[len(_e):], Pos1Ln: 1, Pos1Ch: 1 })
 			return
 		}
 
-		var cur *z.RespDiag  ;  addlastcur := func() { if cur!=nil {
+		var cur *udev.SrcMsg  ;  addlastcur := func() { if cur!=nil {
 			fpath,_ := filepath.Rel(srcDir, cur.Ref)
 			if len(fpath)==0 {  fpath = cur.Ref  }
 			cur.Ref = "ghc"  ;  cur.Msg = strings.TrimSpace(cur.Msg)
@@ -55,10 +55,10 @@ func (_ *zhs) BuildFrom (filerelpaths []string) (freshdiags map[string][]*z.Resp
 			freshdiags[fpath] = append(freshdiags[fpath], cur)
 		} }
 		for _,ln := range lns { if len(ln)> 0 {
-			if msg,isghcmsg := udev.SrcMsgFromLn(ln)  ;  isghcmsg && ustr.Pref(msg.Ref, srcDir) && ufs.FileExists(msg.Ref) {
+			if msg := udev.SrcMsgFromLn(ln)  ;  msg!=nil && ustr.Pref(msg.Ref, srcDir) && ufs.FileExists(msg.Ref) {
 				addlastcur()
-				cur = &z.RespDiag {  SrcMsg: msg  }  ;  if _e := "error:"  ;  ustr.Pref(cur.Msg, _e) { cur.Msg = cur.Msg[len(_e):] }
-				if _w := "warning: "  ;  ustr.Pref(cur.Msg, _w) { cur.Sev = z.DIAG_SEV_WARN  ;  cur.Msg = cur.Msg[len(_w):] }
+				cur = msg  ;  if ustr.Pref(cur.Msg, "error: ") { cur.Msg = cur.Msg[7:] }
+				if ustr.Pref(cur.Msg, "warning: ") { cur.Flag = z.DIAG_SEV_WARN  ;  cur.Msg = cur.Msg[9:] }
 			} else if ustr.Pref(ln, "    ") && cur!=nil {
 				cur.Msg += ("\n" + ln)
 			} else {

@@ -15,24 +15,22 @@ import (
 
 
 var (
-	relpathprefix = "." + string(os.PathSeparator)
 	laterebuilds sync.Mutex
 )
 
 
-func buildPkg (pkgimppath string, fallbackfilerelpath string, diags map[string][]*z.RespDiag) bool {
+func buildPkg (pkgimppath string, fallbackfilerelpath string, diags map[string][]*udev.SrcMsg) bool {
 	msgs := udev.CmdExecOnSrc(true, nil, "go", "install", pkgimppath)
 	for _,srcref := range msgs { if srcref.Msg != "too many errors" {
-		d := &z.RespDiag { Sev: z.DIAG_SEV_ERR, SrcMsg: srcref }
-		fpath := srcref.Ref  ;  d.Ref = "go install " + pkgimppath
-		if !ufs.FileExists(filepath.Join(srcDir, fpath)) { d.Msg = fpath + ": " + d.Msg  ;  fpath = fallbackfilerelpath }
-		diags[fpath] = append(diags[fpath], d)
+		fpath := srcref.Ref  ;  srcref.Ref = "go install " + pkgimppath  ;  srcref.Flag = z.DIAG_SEV_ERR
+		if !ufs.FileExists(filepath.Join(srcDir, fpath)) { srcref.Msg = fpath + ": " + srcref.Msg  ;  fpath = fallbackfilerelpath }
+		diags[fpath] = append(diags[fpath], srcref)
 	} }
 	return len(msgs)==0
 }
 
 
-func (_ *zgo) BuildFrom (filerelpaths []string) (freshdiags map[string][]*z.RespDiag) {
+func (_ *zgo) BuildFrom (filerelpaths []string) (freshdiags map[string][]*udev.SrcMsg) {
 	pkgimppaths := []string {}  ;  pkgimpimppaths := []string {}
 
 	for _,frp := range filerelpaths { if pkg := filePkg(frp)  ;  pkg!=nil {
@@ -45,7 +43,7 @@ func (_ *zgo) BuildFrom (filerelpaths []string) (freshdiags map[string][]*z.Resp
 			}
 		}
 	} }
-	freshdiags = map[string][]*z.RespDiag {}  ;  succeeded := []string {}
+	freshdiags = map[string][]*udev.SrcMsg {}  ;  succeeded := []string {}
 	for _,pkgimppath := range pkgimppaths {
 		if success := buildPkg(pkgimppath, filerelpaths[0], freshdiags)  ;  success {
 			succeeded = append(succeeded, pkgimppath)

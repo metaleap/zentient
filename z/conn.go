@@ -49,7 +49,7 @@ func HandleRequest (queryln string) (e error) {
 	zids := ustr.Split(msgzids, ",")  ;  if len(zids)>0 {  zid = zids[0]  }
 
 	if len(msgargs)>1 { if msgargs[0]=='[' { json.Unmarshal([]byte(msgargs), &inlst)} else if msgargs[0]=='{' {
-		if ustr.Pref(msgargs, "{\"Ffp\":\"") { json.Unmarshal([]byte(msgargs), &inint)
+		if ustr.Pref(msgargs, "{\"Ffp\":\"") { json.Unmarshal([]byte(msgargs), &inint)  ;  inint.Ffp = normalizeFilePath(inint.Ffp)
 		} else { json.Unmarshal([]byte(msgargs), &inmap) }
 	} }
 	switch msgid {
