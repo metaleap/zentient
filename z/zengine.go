@@ -27,12 +27,13 @@ type Zengine interface {
 	OnFile (*File)
 	IntelHovs (*ReqIntel) []*RespHov
 	IntelCmpl (*ReqIntel) []*RespCmpl
-	IntelCmplDoc(*ReqIntel) *RespTxt
+	IntelCmplDoc (*ReqIntel) *RespTxt
 	IntelDefLoc (*ReqIntel, bool) *udev.SrcMsg
 	IntelImpls (*ReqIntel) udev.SrcMsgs
-	IntelHiLites(*ReqIntel) udev.SrcMsgs
-	IntelSymbols(*ReqIntel, bool) udev.SrcMsgs
-	IntelRefs(*ReqIntel) udev.SrcMsgs
+	IntelHiLites (*ReqIntel) udev.SrcMsgs
+	IntelSymbols (*ReqIntel, bool) udev.SrcMsgs
+	IntelRefs (*ReqIntel) udev.SrcMsgs
+	IntelTools () []*RespPick
 }
 
 

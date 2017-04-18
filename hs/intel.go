@@ -27,14 +27,18 @@ func (_ *zhs) IntelCmplDoc (req *z.ReqIntel) *z.RespTxt {
 	return nil
 }
 
-func (_ *zhs) IntelHiLites(req *z.ReqIntel) udev.SrcMsgs {
+func (_ *zhs) IntelHiLites (req *z.ReqIntel) udev.SrcMsgs {
 	return nil
 }
 
-func (_ *zhs) IntelRefs(req *z.ReqIntel) udev.SrcMsgs {
+func (_ *zhs) IntelRefs (req *z.ReqIntel) udev.SrcMsgs {
 	return nil
 }
 
-func (_ *zhs) IntelSymbols(req *z.ReqIntel, allfiles bool) udev.SrcMsgs {
+func (_ *zhs) IntelSymbols (req *z.ReqIntel, allfiles bool) udev.SrcMsgs {
+	return nil
+}
+
+func (_ *zhs) IntelTools () []*z.RespPick {
 	return nil
 }

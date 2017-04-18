@@ -82,6 +82,8 @@ func HandleRequest (queryln string) (e error) {
 			e = out(Zengines[zid].IntelSymbols(&inint, false))
 		case REQ_INTEL_WSYM:
 			e = out(Zengines[zid].IntelSymbols(&inint, true))
+		case REQ_INTEL_TOOLS:
+			e = out(Zengines[msgargs].IntelTools())
 
 		case REQ_FILES_WRITTEN:
 			onFilesWritten(Zengines[zid], inlst)

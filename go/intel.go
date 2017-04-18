@@ -79,6 +79,15 @@ func (me *zgo) IntelRefs(req *z.ReqIntel) (srcrefs udev.SrcMsgs) {
 }
 
 
+func (me *zgo) IntelTools () []*z.RespPick {
+	return []*z.RespPick {
+		&z.RespPick{ Label: "Function Call Targets", Detail: "For this function call, finds the possible call targets to which it might dispatch.", Desc: "guru callees" },
+		&z.RespPick{ Label: "Function Callers", Detail: "For this function, finds the (direct or indirect) possible callers. ", Desc: "guru callers" },
+		&z.RespPick{ Label: "Free Variables", Detail: "For this selection, shows the variables referenced but not defined within it.", Desc: "guru freevars" },
+	}
+}
+
+
 func (me *zgo) IntelHovs (req *z.ReqIntel) (hovs []*z.RespHov) {
 	req.RunePosToBytePos()
 	var ggd *devgo.Gogetdoc

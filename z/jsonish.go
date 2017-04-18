@@ -92,6 +92,12 @@ type RespCmd struct {
 	f	func()		//	tmp field used in Base.DoFmt()
 }
 
+type RespPick struct {
+	Label	string	`json:"label,omitempty"`
+	Desc	string	`json:"description,omitempty"`
+	Detail	string	`json:"detail,omitempty"`
+}
+
 type RespTxt struct {
 	Result		string		`json:",omitempty"`
 	Id			string		`json:",omitempty"`
