@@ -1,6 +1,7 @@
 package zgo
 import (
 	"bytes"
+	"fmt"
 	"sort"
 	"strings"
 
@@ -94,20 +95,64 @@ func (me *zgo) IntelRefs(req *z.ReqIntel) (srcrefs udev.SrcMsgs) {
 
 func (me *zgo) IntelTools () []*z.RespPick {
 	return []*z.RespPick {
-		&z.RespPick{ Label: "Function Call Targets", Detail: "For this function call, finds the possible call targets to which it might dispatch.", Desc: "guru.callees" },
-		&z.RespPick{ Label: "Function Callers", Detail: "For this function, finds the (direct or indirect) possible callers. ", Desc: "guru.callers" },
+		&z.RespPick{ Label: "Callees", Detail: "For this function / method call, finds the possible implementations to which it might dispatch.", Desc: "guru.callees" },
+		&z.RespPick{ Label: "Callers", Detail: "For this function / method implementation, finds its possible callers. ", Desc: "guru.callers" },
+		&z.RespPick{ Label: "Call Stack", Detail: "Shows an arbitrary path from the root of the call graph to this function / method.", Desc: "guru.callstack" },
 		&z.RespPick{ Label: "Free Variables", Detail: "For this selection, shows the variables referenced but not defined within it.", Desc: "guru.freevars" },
+		&z.RespPick{ Label: "Types of Errors", Detail: "For this `error` value, reports its possible concrete types.", Desc: "guru.whicherrs" },
+		&z.RespPick{ Label: "Points To", Detail: "For this pointer or reference-type expression, shows the possible contained types.", Desc: "guru.pointsto" },
 	}
 }
 
 
 func (me *zgo) IntelTool (req *z.ReqIntel) (srcrefs udev.SrcMsgs, err error) {
-	if ustr.Pref(req.Id, "guru.") { req.RunePosToBytePos() }
+	p1 := req.Pos1  ;  p2 := req.Pos2  ;  if len(p1)==0 {  p1,p2 = req.Pos,""  }
+	if ustr.Pref(req.Id, "guru.") {  if req.RunePosToBytePos()  ;  !(devgo.Has_guru && me.may("guru")) {
+		return nil , ugo.E("`guru` command disabled or not installed.")
+	} }
+	addsr := func (canreorder bool, sr *udev.SrcMsg, label string, desc string) (ok bool) {
+		if ok = sr!=nil  ;  ok { if sr.Msg,sr.Misc = label,desc  ;  sr.Ref==req.Ffp && canreorder {
+			srcrefs = append(udev.SrcMsgs{ sr }, srcrefs...)
+		} else { srcrefs = append(srcrefs, sr) } }
+		return
+	}
 	switch req.Id {
 		case "guru.callees":
-			srcrefs = append(srcrefs, &udev.SrcMsg { Pos1Ln: 1, Pos1Ch: 1, Ref: "http://godoc.org", Msg: "the label", Misc: "misc info" })
+			if gcs := devgo.QueryCallees_Guru(req.Ffp, req.Src, p1, p2)  ;  gcs!=nil {
+				for _,gc := range gcs.Callees {
+					addsr(true, udev.SrcMsgFromLn(gc.Pos), devgo.ShortenImPs(gc.Name), "Current selection: " + gcs.Desc)
+				}
+			}
 		case "guru.callers":
-			srcrefs = append(srcrefs, &udev.SrcMsg { Pos1Ln: 21, Pos1Ch: 4, Ref: "/home/rox/c/go/src/github.com/metaleap/go-util-dev/dev.go", Msg: "Here is some ref", Misc: "Totally happenin" })
+			for _,gc := range devgo.QueryCallers_Guru(req.Ffp, req.Src, p1, p2) {
+				addsr(true, udev.SrcMsgFromLn(gc.Pos), devgo.ShortenImPs(gc.Caller), gc.Desc)
+			}
+		case "guru.callstack":
+			if gcs := devgo.QueryCallstack_Guru(req.Ffp, req.Src, p1, p2)  ;  gcs!=nil {
+				for _,gc := range gcs.Callers {
+					addsr(false, udev.SrcMsgFromLn(gc.Pos), devgo.ShortenImPs(gc.Caller), gc.Desc)
+				}
+			}
+		case "guru.freevars":
+			for _,gfv := range devgo.QueryFreevars_Guru(req.Ffp, req.Src, p1, p2) {
+				addsr(false, udev.SrcMsgFromLn(gfv.Pos), gfv.Kind + " " + gfv.Ref, gfv.Type)
+			}
+		case "guru.whicherrs":
+			if gwe := devgo.QueryWhicherrs_Guru(req.Ffp, req.Src, p1, p2)  ;  gwe!=nil {
+				var desc string  ;  if lc,lg := len(gwe.Constants) , len(gwe.Globals)  ;  lc>0 || lg>0 {
+					desc = fmt.Sprintf("(NB. not listed: any one of %v constants and %v globals that may also appear in this `error` value.)", lc, lg)
+				}
+				for _,gwet := range gwe.Types {
+					addsr(true, udev.SrcMsgFromLn(gwet.Position), devgo.ShortenImPs(gwet.Type), desc)
+				}
+			}
+		case "guru.pointsto":
+			for _,gpt := range devgo.QueryPointsto_Guru(req.Ffp, req.Src, p1, p2) {
+				if len(gpt.NamePos)==0 {  gpt.NamePos = req.Ffp + ":0:0"  }
+				addsr(false, udev.SrcMsgFromLn(gpt.NamePos), devgo.ShortenImPs(gpt.Type), fmt.Sprintf("Pointing to the following %v symbol(s) ➜", len(gpt.Labels)))
+				for _,gptl := range gpt.Labels { addsr(false, udev.SrcMsgFromLn(gptl.Pos), "➜ " + gptl.Desc, "") }
+			}
+
 		default:
 			err = ugo.E("Unknown Code Intel tool: " + req.Id)
 	}
@@ -119,7 +164,7 @@ func (me *zgo) IntelHovs (req *z.ReqIntel) (hovs []*z.RespHov) {
 	req.RunePosToBytePos()
 	var ggd *devgo.Gogetdoc
 	var decl string
- 	if devgo.Has_gogetdoc && me.may("gogetdoc") { if ggd = devgo.Query_Gogetdoc(req.Ffp, req.Src, req.Pos)  ;  ggd!=nil && len(ggd.Doc)>0 {
+	if devgo.Has_gogetdoc && me.may("gogetdoc") { if ggd = devgo.Query_Gogetdoc(req.Ffp, req.Src, req.Pos)  ;  ggd!=nil && len(ggd.Doc)>0 {
 		d := ggd.ImpN  ;  if len(d)>0  {  d = "### " + d + " [🕮](http://godoc.org/" + ggd.DocUrl + ")\n\n"  }
 		if d = ustr.Trim(d + ggd.Doc)  ;  len(d)>0 {  hovs = append(hovs, &z.RespHov { Txt: d })  }
 	} }
