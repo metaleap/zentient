@@ -34,6 +34,7 @@ type Zengine interface {
 	IntelSymbols (*ReqIntel, bool) udev.SrcMsgs
 	IntelRefs (*ReqIntel) udev.SrcMsgs
 	IntelTools () []*RespPick
+	IntelTool (*ReqIntel) (udev.SrcMsgs, error)
 }
 
 

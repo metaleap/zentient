@@ -39,6 +39,10 @@ func (_ *zhs) IntelSymbols (req *z.ReqIntel, allfiles bool) udev.SrcMsgs {
 	return nil
 }
 
+func (me *zhs) IntelTool (req *z.ReqIntel) (srcrefs udev.SrcMsgs, err error) {
+	return
+}
+
 func (_ *zhs) IntelTools () []*z.RespPick {
 	return nil
 }

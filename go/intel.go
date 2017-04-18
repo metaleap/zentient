@@ -52,17 +52,30 @@ func (me *zgo) IntelDefLoc (req *z.ReqIntel, typedef bool) (refloc *udev.SrcMsg)
 
 func (me *zgo) IntelImpls (req *z.ReqIntel) (srcrefs udev.SrcMsgs) {
 	req.RunePosToBytePos()
-	if devgo.Has_guru && me.may("guru") { if gi := devgo.QueryImpl_Guru(req.Ffp, req.Src, req.Pos)  ;  gi!=nil && (len(gi.AssignableTo)>0 || len(gi.AssignableFrom)>0 || len(gi.AssignableFromPtr)>0) {
-		add := func (desc string, its ...gurujson.ImplementsType) {
-			for _,it := range its { if srcref := udev.SrcMsgFromLn(it.Pos)  ;  srcref!=nil {
+	if devgo.Has_guru && me.may("guru") { if gi := devgo.QueryImpl_Guru(req.Ffp, req.Src, req.Pos)  ;  gi!=nil && (len(gi.AssignableTo)>0 || len(gi.AssignableFrom)>0 || len(gi.AssignableFromPtr)>0 || gi.Method!=nil) {
+		addtypes := func (desc string, impltypes ...gurujson.ImplementsType) {
+			for _,it := range impltypes { if srcref := udev.SrcMsgFromLn(it.Pos)  ;  srcref!=nil {
 				srcref.Msg = devgo.ShortenImPs(it.Name)  ;  srcref.Misc = it.Kind + " " + desc
 				srcrefs = append(srcrefs, srcref)
 			} }
 		}
-		add("type of current selection", gi.T)  ;  tname := devgo.ShortenImPs(gi.T.Name)
-		add("type implementing `" + tname + "`", gi.AssignableTo...)
-		add("type implemented by `" + tname + "`", gi.AssignableFrom...)
-		add("type implemented by `*" + tname + "`", gi.AssignableFromPtr...)
+		addmethods := func (desc string, methods ...gurujson.DescribeMethod) {
+			for _,m := range methods { if srcref := udev.SrcMsgFromLn(m.Pos)  ;  srcref!=nil {
+				srcref.Msg = devgo.ShortenImPs(m.Name)  ;  srcref.Misc = desc
+				srcrefs = append(srcrefs, srcref)
+			} }
+		}
+		if gi.Method!=nil {
+			// addmethods("method in current selection", *gi.Method)
+			addmethods("implements `" + gi.Method.Name + "`", gi.AssignableToMethod...)
+			addmethods("implemented by `" + gi.Method.Name + "`", gi.AssignableFromMethod...)
+			addmethods("implemented by `" + gi.Method.Name + "`", gi.AssignableFromPtrMethod...)
+		} else {
+			/*addtypes("type in current selection", gi.T)  ;*/  tname := devgo.ShortenImPs(gi.T.Name)
+			addtypes("type implementing `" + tname + "`", gi.AssignableTo...)
+			addtypes("type implemented by `" + tname + "`", gi.AssignableFrom...)
+			addtypes("type implemented by `*" + tname + "`", gi.AssignableFromPtr...)
+		}
 	} }
 	return
 }
@@ -81,10 +94,24 @@ func (me *zgo) IntelRefs(req *z.ReqIntel) (srcrefs udev.SrcMsgs) {
 
 func (me *zgo) IntelTools () []*z.RespPick {
 	return []*z.RespPick {
-		&z.RespPick{ Label: "Function Call Targets", Detail: "For this function call, finds the possible call targets to which it might dispatch.", Desc: "guru callees" },
-		&z.RespPick{ Label: "Function Callers", Detail: "For this function, finds the (direct or indirect) possible callers. ", Desc: "guru callers" },
-		&z.RespPick{ Label: "Free Variables", Detail: "For this selection, shows the variables referenced but not defined within it.", Desc: "guru freevars" },
+		&z.RespPick{ Label: "Function Call Targets", Detail: "For this function call, finds the possible call targets to which it might dispatch.", Desc: "guru.callees" },
+		&z.RespPick{ Label: "Function Callers", Detail: "For this function, finds the (direct or indirect) possible callers. ", Desc: "guru.callers" },
+		&z.RespPick{ Label: "Free Variables", Detail: "For this selection, shows the variables referenced but not defined within it.", Desc: "guru.freevars" },
 	}
+}
+
+
+func (me *zgo) IntelTool (req *z.ReqIntel) (srcrefs udev.SrcMsgs, err error) {
+	if ustr.Pref(req.Id, "guru.") { req.RunePosToBytePos() }
+	switch req.Id {
+		case "guru.callees":
+			srcrefs = append(srcrefs, &udev.SrcMsg { Pos1Ln: 1, Pos1Ch: 1, Ref: "http://godoc.org", Msg: "the label", Misc: "misc info" })
+		case "guru.callers":
+			srcrefs = append(srcrefs, &udev.SrcMsg { Pos1Ln: 21, Pos1Ch: 4, Ref: "/home/rox/c/go/src/github.com/metaleap/go-util-dev/dev.go", Msg: "Here is some ref", Misc: "Totally happenin" })
+		default:
+			err = ugo.E("Unknown Code Intel tool: " + req.Id)
+	}
+	return
 }
 
 
@@ -92,7 +119,7 @@ func (me *zgo) IntelHovs (req *z.ReqIntel) (hovs []*z.RespHov) {
 	req.RunePosToBytePos()
 	var ggd *devgo.Gogetdoc
 	var decl string
-	if devgo.Has_gogetdoc && me.may("gogetdoc") { if ggd = devgo.Query_Gogetdoc(req.Ffp, req.Src, req.Pos)  ;  ggd!=nil && len(ggd.Doc)>0 {
+ 	if devgo.Has_gogetdoc && me.may("gogetdoc") { if ggd = devgo.Query_Gogetdoc(req.Ffp, req.Src, req.Pos)  ;  ggd!=nil && len(ggd.Doc)>0 {
 		d := ggd.ImpN  ;  if len(d)>0  {  d = "### " + d + " [🕮](http://godoc.org/" + ggd.DocUrl + ")\n\n"  }
 		if d = ustr.Trim(d + ggd.Doc)  ;  len(d)>0 {  hovs = append(hovs, &z.RespHov { Txt: d })  }
 	} }
