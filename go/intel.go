@@ -85,8 +85,7 @@ func (me *zgo) IntelHovs (req *z.ReqIntel) (hovs []*z.RespHov) {
 	var decl string
 	if devgo.Has_gogetdoc && me.may("gogetdoc") { if ggd = devgo.Query_Gogetdoc(req.Ffp, req.Src, req.Pos)  ;  ggd!=nil && len(ggd.Doc)>0 {
 		d := ggd.ImpN  ;  if len(d)>0  {  d = "### " + d + " [🕮](http://godoc.org/" + ggd.DocUrl + ")\n\n"  }
-		d = d + ggd.Doc
-		hovs = append(hovs, &z.RespHov { Txt: d })
+		if d = ustr.Trim(d + ggd.Doc)  ;  len(d)>0 {  hovs = append(hovs, &z.RespHov { Txt: d })  }
 	} }
 	if ggd!=nil && len(ggd.Decl)>0 { decl = ggd.Decl }
 	if len(decl)==0 && devgo.Has_godef && me.may("godef") { decl = devgo.QueryDefDecl_GoDef(req.Ffp, req.Src, req.Pos) }
