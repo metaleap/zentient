@@ -39,39 +39,54 @@ func (me *zgo) B () *z.Base {
 }
 
 
+var (
+	capsfmt, capsdiag, capsren, capsint []*z.RespCmd
+	capsinit = false
+)
 func (_ *zgo) Caps (cap string) (caps []*z.RespCmd) {
+	if (!capsinit) {
+		capsinit = true
+		capsfmt = []*z.RespCmd	{	{ Title: "goimports",	Exists: devgo.Has_goimports,	Hint: "golang.org/x/tools/cmd/goimports" },
+									{ Title: "gofmt",		Exists: devgo.Has_gofmt },
+								}
+		capsdiag = []*z.RespCmd	{	{ Title: "go vet",		Exists: true },
+									{ Title: "golint",		Exists: devgo.Has_golint,		Hint: "github.com/golang/lint" },
+									{ Title: "ineffassign",	Exists: devgo.Has_ineffassign,	Hint: "github.com/gordonklaus/ineffassign" },
+									{ Title: "aligncheck",	Exists: devgo.Has_checkalign,	Hint: "github.com/opennota/check" },
+									{ Title: "structcheck",	Exists: devgo.Has_checkstruct,	Hint: "github.com/opennota/check" },
+									{ Title: "varcheck",	Exists: devgo.Has_checkvar,		Hint: "github.com/opennota/check" },
+									{ Title: "errcheck",	Exists: devgo.Has_errcheck,		Hint: "github.com/kisielk/errcheck" },
+									{ Title: "interfacer",	Exists: devgo.Has_golint,		Hint: "github.com/mvdan/interfacer" },
+									{ Title: "unparam",		Exists: devgo.Has_unparam,		Hint: "github.com/mvdan/unparam" },
+									{ Title: "unconvert",	Exists: devgo.Has_unconvert,	Hint: "github.com/mdempsky/unconvert" },
+									{ Title: "maligned",	Exists: devgo.Has_maligned,		Hint: "github.com/mdempsky/maligned" },
+									{ Title: "gosimple",	Exists: devgo.Has_gosimple,		Hint: "github.com/dominikh/go-tools" },
+									{ Title: "unused",		Exists: devgo.Has_unused,		Hint: "github.com/dominikh/go-tools" },
+									{ Title: "staticcheck",	Exists: devgo.Has_staticcheck,	Hint: "github.com/dominikh/go-tools" },
+								}
+		capsren = []*z.RespCmd	{	{ Title: "gorename",	Exists: devgo.Has_gorename,		Hint: "golang.org/x/tools/cmd/gorename",	More: "(affected files will be formatted gofmt-style)" },
+								}
+		capsint = []*z.RespCmd	{	{ Title: "gocode",		Exists: devgo.Has_gocode,		Hint: "github.com/nsf/gocode",				More: "Completion Suggest" },
+									{ Title: "guru",		Exists: devgo.Has_guru,			Hint: "golang.org/x/tools/cmd/guru",		More: "Go to Definition, Go to Type Definition, Go to Interfaces/Implementers, References Lookup, Symbols Lookup, Semantic Highlighting, Code Intel Extras" },
+									{ Title: "gogetdoc",	Exists: devgo.Has_gogetdoc,		Hint: "github.com/zmb3/gogetdoc",			More: "Hover Tips, Go to Definition, summaries for Completion Suggest" },
+									{ Title: "godef",		Exists: devgo.Has_godef,		Hint: "github.com/rogpeppe/godef",			More: "Go to Definition, Hover Tips" },
+								}
+	}
 	switch cap {
 	case "fmt":
-		caps = []*z.RespCmd	{	{ Title: "goimports",	Exists: devgo.Has_goimports,	Hint: "golang.org/x/tools/cmd/goimports" },
-								{ Title: "gofmt",		Exists: devgo.Has_gofmt },
-							}
+		caps = capsfmt
 	case "diag":
-		caps = []*z.RespCmd	{	{ Title: "go vet",		Exists: true },
-								{ Title: "golint",		Exists: devgo.Has_golint,		Hint: "github.com/golang/lint" },
-								{ Title: "ineffassign",	Exists: devgo.Has_ineffassign,	Hint: "github.com/gordonklaus/ineffassign" },
-								{ Title: "aligncheck",	Exists: devgo.Has_checkalign,	Hint: "github.com/opennota/check" },
-								{ Title: "structcheck",	Exists: devgo.Has_checkstruct,	Hint: "github.com/opennota/check" },
-								{ Title: "varcheck",	Exists: devgo.Has_checkvar,		Hint: "github.com/opennota/check" },
-								{ Title: "errcheck",	Exists: devgo.Has_errcheck,		Hint: "github.com/kisielk/errcheck" },
-								{ Title: "interfacer",	Exists: devgo.Has_golint,		Hint: "github.com/mvdan/interfacer" },
-								{ Title: "unparam",		Exists: devgo.Has_unparam,		Hint: "github.com/mvdan/unparam" },
-								{ Title: "unconvert",	Exists: devgo.Has_unconvert,	Hint: "github.com/mdempsky/unconvert" },
-								{ Title: "maligned",	Exists: devgo.Has_maligned,		Hint: "github.com/mdempsky/maligned" },
-								{ Title: "gosimple",	Exists: devgo.Has_gosimple,		Hint: "github.com/dominikh/go-tools" },
-								{ Title: "unused",		Exists: devgo.Has_unused,		Hint: "github.com/dominikh/go-tools" },
-								{ Title: "staticcheck",	Exists: devgo.Has_staticcheck,	Hint: "github.com/dominikh/go-tools" },
-							}
+		caps = capsdiag
 	case "ren":
-		caps = []*z.RespCmd	{	{ Title: "gorename",	Exists: devgo.Has_gorename,		Hint: "golang.org/x/tools/cmd/gorename",	More: "(affected files will be formatted gofmt-style)" },
-							}
+		caps = capsren
 	case "intel":
-		caps = []*z.RespCmd	{	{ Title: "gocode",		Exists: devgo.Has_gocode,		Hint: "github.com/nsf/gocode",				More: "Completion Suggest" },
-								{ Title: "guru",		Exists: devgo.Has_guru,			Hint: "golang.org/x/tools/cmd/guru",		More: "Go to Definition, Go to Type Definition, Go to Interfaces/Implementers, References Lookup, Symbols Lookup, Semantic Highlighting, CodeIntel Extras" },
-								{ Title: "gogetdoc",	Exists: devgo.Has_gogetdoc,		Hint: "github.com/zmb3/gogetdoc",			More: "Hover Tips, Go to Definition, summaries for Completion Suggest" },
-								{ Title: "godef",		Exists: devgo.Has_godef,		Hint: "github.com/rogpeppe/godef",			More: "Go to Definition, Hover Tips" },
-							}
+		caps = capsint
 	}
 	return caps
+}
+func capByName (caps []*z.RespCmd, name string) *z.RespCmd {
+	for _,cap := range caps { if cap.Title==name { return cap } }
+	return nil
 }
 
 func (me *zgo) DoFmt (src string, custcmd string, tabsize uint8) (*z.RespTxt, error) {

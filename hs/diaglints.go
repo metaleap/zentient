@@ -18,7 +18,7 @@ func linterHlint (filerelpaths []string) func()map[string]udev.SrcMsgs {
 }
 
 
-func (me *zhs) Linters (filerelpaths []string) (linters []func()map[string]udev.SrcMsgs) {
+func (me *zhs) Linters (filerelpaths []string, forcelinters ...string) (linters []func()map[string]udev.SrcMsgs) {
 	cfgok := me.Base.CfgDiagToolEnabled
 	if devhs.Has_hlint && cfgok("hlint") { linters = append(linters, linterHlint(filerelpaths)) }
 	return

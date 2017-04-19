@@ -2,6 +2,7 @@ package zgo
 import (
 	"bytes"
 	"fmt"
+	"path/filepath"
 	"sort"
 	"strings"
 
@@ -93,8 +94,7 @@ func (me *zgo) IntelRefs(req *z.ReqIntel) (srcrefs udev.SrcMsgs) {
 }
 
 
-func (me *zgo) IntelTools () []*z.RespPick {
-	return []*z.RespPick {
+var intelTools = []*z.RespPick {
 		&z.RespPick{ Label: "Callees", Detail: "For this function / method call, lists possible implementations to which it might dispatch.", Desc: "guru.callees" },
 		&z.RespPick{ Label: "Callers", Detail: "For this function / method implementation, lists possible callers. ", Desc: "guru.callers" },
 		&z.RespPick{ Label: "Call Stack", Detail: "For this function / method, shows an arbitrary path to the root of the call graph.", Desc: "guru.callstack" },
@@ -103,40 +103,52 @@ func (me *zgo) IntelTools () []*z.RespPick {
 		&z.RespPick{ Label: "Points To", Detail: "For this pointer or reference-type expression, lists possible associated types and symbols.", Desc: "guru.pointsto" },
 		&z.RespPick{ Label: "Channel Peers", Detail: "For this `<-` operation's channel, lists associated allocations, sends, receives and closes.", Desc: "guru.peers" },
 	}
+func (me *zgo) IntelTools () []*z.RespPick {
+	tools := intelTools  ;  dcaps := []*z.RespCmd{}  ;  cd := me.Caps("diag")
+	for _,dt := range me.B().DisabledToolsDiag { if cap := capByName(cd, dt)  ;  cap!=nil && cap.Exists { dcaps = append(dcaps, cap) } }
+	if len(dcaps)>0 {
+		var xs string  ;  for _,dc := range dcaps { xs = xs + "." + dc.Title }
+		tools = append(tools, &z.RespPick{ Label: "Run Disabled Code Diagnostics", Detail: "Runs: " + ustr.Join(ustr.Split(xs[1:], "."), " · ") + " (all installed but disabled for on-the-fly diagnostics)", Desc: "__diags" + xs })
+	}
+	return tools
 }
 
 
 func (me *zgo) IntelTool (req *z.ReqIntel) (srcrefs udev.SrcMsgs, err error) {
 	p1 := req.Pos1  ;  p2 := req.Pos2  ;  if len(p1)==0 {  p1,p2 = req.Pos,""  }
-	if ustr.Pref(req.Id, "guru.") {  if req.RunePosToBytePos()  ;  !(devgo.Has_guru && me.may("guru")) {
-		return nil , ugo.E("`guru` command disabled or not installed.")
+	if ustr.Pref(req.Id, "guru.") {  if req.RunePosToBytePos()  ;  !(devgo.Has_guru) {
+		return nil , ugo.E("`guru` command not installed.")
 	} }
-	addsr := func (canreorder bool, sr *udev.SrcMsg, label string, desc string) (ok bool) {
-		if ok = sr!=nil  ;  ok { if sr.Msg,sr.Misc = label,desc  ;  sr.Ref==req.Ffp && canreorder {
-			srcrefs = append(udev.SrcMsgs{ sr }, srcrefs...)
-		} else { srcrefs = append(srcrefs, sr) } }
-		return
+	addsr := func (sr *udev.SrcMsg, label string, desc string) *udev.SrcMsg {
+		if sr!=nil { sr.Msg,sr.Misc = label,desc  ;  srcrefs = append(srcrefs, sr) }
+		return sr
 	}
-	switch req.Id {
+	if ustr.Pref(req.Id, "__diags.") {
+		var frp string  ;  tnames := ustr.Split(req.Id, ".")[1:]
+		if frp,err = filepath.Rel(srcDir, req.Ffp)  ;  err!=nil { return }
+		for _,linter := range me.Linters([]string{ frp }, tnames...) { if fdiags := linter()  ;  fdiags!=nil { for frp,fd := range fdiags { for _,sr := range fd {
+			addsr(sr, sr.Msg, sr.Ref).Ref = filepath.Join(srcDir, frp)
+		} } } }
+	} else { switch req.Id {
 		case "guru.callees":
 			if gcs := devgo.QueryCallees_Guru(req.Ffp, req.Src, p1, p2)  ;  gcs!=nil {
 				for _,gc := range gcs.Callees {
-					addsr(true, udev.SrcMsgFromLn(gc.Pos), devgo.ShortenImPs(gc.Name), "Current selection: " + gcs.Desc)
+					addsr(udev.SrcMsgFromLn(gc.Pos), devgo.ShortenImPs(gc.Name), "Current selection: " + gcs.Desc)
 				}
 			}
 		case "guru.callers":
 			for _,gc := range devgo.QueryCallers_Guru(req.Ffp, req.Src, p1, p2) {
-				addsr(true, udev.SrcMsgFromLn(gc.Pos), devgo.ShortenImPs(gc.Caller), gc.Desc)
+				addsr(udev.SrcMsgFromLn(gc.Pos), devgo.ShortenImPs(gc.Caller), gc.Desc)
 			}
 		case "guru.callstack":
 			if gcs := devgo.QueryCallstack_Guru(req.Ffp, req.Src, p1, p2)  ;  gcs!=nil {
 				for _,gc := range gcs.Callers {
-					addsr(false, udev.SrcMsgFromLn(gc.Pos), devgo.ShortenImPs(gc.Caller), gc.Desc)
+					addsr(udev.SrcMsgFromLn(gc.Pos), devgo.ShortenImPs(gc.Caller), gc.Desc)
 				}
 			}
 		case "guru.freevars":
 			for _,gfv := range devgo.QueryFreevars_Guru(req.Ffp, req.Src, p1, p2) {
-				addsr(false, udev.SrcMsgFromLn(gfv.Pos), gfv.Kind + " " + gfv.Ref, gfv.Type)
+				addsr(udev.SrcMsgFromLn(gfv.Pos), gfv.Kind + " " + gfv.Ref, gfv.Type)
 			}
 		case "guru.whicherrs":
 			if gwe := devgo.QueryWhicherrs_Guru(req.Ffp, req.Src, p1, p2)  ;  gwe!=nil {
@@ -144,24 +156,24 @@ func (me *zgo) IntelTool (req *z.ReqIntel) (srcrefs udev.SrcMsgs, err error) {
 					desc = fmt.Sprintf("(NB. not listed: any one of %v constants and %v globals that may also appear in this `error` value.)", lc, lg)
 				}
 				for _,gwet := range gwe.Types {
-					addsr(true, udev.SrcMsgFromLn(gwet.Position), devgo.ShortenImPs(gwet.Type), desc)
+					addsr(udev.SrcMsgFromLn(gwet.Position), devgo.ShortenImPs(gwet.Type), desc)
 				}
 			}
 		case "guru.pointsto":
 			for _,gpt := range devgo.QueryPointsto_Guru(req.Ffp, req.Src, p1, p2) {
 				if len(gpt.NamePos)==0 {  gpt.NamePos = req.Ffp + ":0:0"  }
-				addsr(false, udev.SrcMsgFromLn(gpt.NamePos), devgo.ShortenImPs(gpt.Type), fmt.Sprintf("Pointing to the following %v symbol(s) ➜", len(gpt.Labels)))
-				for _,gptl := range gpt.Labels { addsr(false, udev.SrcMsgFromLn(gptl.Pos), "➜ " + gptl.Desc, "") }
+				addsr(udev.SrcMsgFromLn(gpt.NamePos), devgo.ShortenImPs(gpt.Type), fmt.Sprintf("Pointing to the following %v symbol(s) ➜", len(gpt.Labels)))
+				for _,gptl := range gpt.Labels { addsr(udev.SrcMsgFromLn(gptl.Pos), "➜ " + gptl.Desc, "") }
 			}
 		case "guru.peers":
 			if gp := devgo.QueryPeers_Guru(req.Ffp, req.Src, p1, p2)  ;  gp!=nil {
 				for locsdesc,locslist := range map[string][]string { "Allocate": gp.Allocs, "Send": gp.Sends, "Receive": gp.Receives, "Close": gp.Closes } {
-					for _,loc := range locslist { addsr(true, udev.SrcMsgFromLn(loc), locsdesc, devgo.ShortenImPs(gp.Type)) }
+					for _,loc := range locslist { addsr(udev.SrcMsgFromLn(loc), locsdesc, devgo.ShortenImPs(gp.Type)) }
 				}
 			}
 		default:
-			err = ugo.E("Unknown CodeIntel tool: " + req.Id)
-	}
+			err = ugo.E("Unknown Code Intel tool: " + req.Id)
+	} }
 	return
 }
 

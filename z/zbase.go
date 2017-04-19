@@ -17,8 +17,8 @@ type Base struct {
 	lintmutex			sync.Mutex
 	linttime			int64
 	zid					string
-	disabledToolsDiag	[]string
-	disabledToolsIntel	[]string
+	DisabledToolsDiag	[]string
+	DisabledToolsIntel	[]string
 }
 
 
@@ -73,17 +73,17 @@ func (me *Base) OpenFiles () []string {
 }
 
 func (me *Base) CfgDiagToolEnabled (cmdname string) bool {
-	return !uslice.StrHas(me.disabledToolsDiag, cmdname)
+	return !uslice.StrHas(me.DisabledToolsDiag, cmdname)
 }
 
 func (me *Base) CfgIntelToolEnabled (cmdname string) bool {
-	return !uslice.StrHas(me.disabledToolsIntel, cmdname)
+	return !uslice.StrHas(me.DisabledToolsIntel, cmdname)
 }
 
 func (me *Base) OnCfg (cfg map[string]interface{}) {
 	if cfg != nil {
-		if s,ok := cfg["diag.disabled"].(string)  ;  ok { me.disabledToolsDiag = ustr.Split(s, ",") }
-		if s,ok := cfg["intel.disabled"].(string)  ;  ok { me.disabledToolsIntel = ustr.Split(s, ",") }
+		if s,ok := cfg["diag.disabled"].(string)  ;  ok { me.DisabledToolsDiag = ustr.Split(s, ",") }
+		if s,ok := cfg["intel.disabled"].(string)  ;  ok { me.DisabledToolsIntel = ustr.Split(s, ",") }
 		me.lintmutex.Lock()  ;  defer me.lintmutex.Unlock()
 		me.lintdiags = nil  ;  me.livediags = nil  ;  newlivediags = true
 	}

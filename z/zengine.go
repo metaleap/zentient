@@ -20,7 +20,7 @@ type Zengine interface {
 	Caps (string) []*RespCmd
 	DoFmt (string, string, uint8) (*RespTxt, error)
 	DoRename (string, string, uint64, string, string, string, uint64, uint64) (map[string]udev.SrcMsgs, error)
-	Linters ([]string) []func()map[string]udev.SrcMsgs
+	Linters ([]string, ...string) []func()map[string]udev.SrcMsgs
 	ReadyToBuildAndLint () bool
 	BuildFrom ([]string) map[string]udev.SrcMsgs
 	OnCfg (map[string]interface{})
