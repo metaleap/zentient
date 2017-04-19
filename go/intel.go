@@ -160,11 +160,11 @@ func (me *zgo) IntelTool (req *z.ReqIntel) (srcrefs udev.SrcMsgs, err error) {
 				}
 			}
 		case "guru.pointsto":
-			for _,gpt := range devgo.QueryPointsto_Guru(req.Ffp, req.Src, p1, p2) {
+			gpts,e := devgo.QueryPointsto_Guru(req.Ffp, req.Src, p1, p2)  ;  if err=e  ;  e==nil { for _,gpt := range gpts {
 				if len(gpt.NamePos)==0 {  gpt.NamePos = req.Ffp + ":0:0"  }
 				addsr(udev.SrcMsgFromLn(gpt.NamePos), devgo.ShortenImPs(gpt.Type), fmt.Sprintf("Pointing to the following %v symbol(s) ➜", len(gpt.Labels)))
 				for _,gptl := range gpt.Labels { addsr(udev.SrcMsgFromLn(gptl.Pos), "➜ " + gptl.Desc, "") }
-			}
+			} }
 		case "guru.peers":
 			if gp := devgo.QueryPeers_Guru(req.Ffp, req.Src, p1, p2)  ;  gp!=nil {
 				for locsdesc,locslist := range map[string][]string { "Allocate": gp.Allocs, "Send": gp.Sends, "Receive": gp.Receives, "Close": gp.Closes } {
