@@ -74,6 +74,14 @@ func (me *zhs) OnCfg (cfg map[string]interface{}) {
 func (_ *zhs) OnFile (newfile *z.File) {
 }
 
+func (_ *zhs) QueryTools () []*z.RespPick {
+	return nil
+}
+
+func (_ *zhs) QueryTool (req *z.ReqIntel) *z.RespTxt {
+	return nil
+}
+
 func (_ *zhs) ReadyToBuildAndLint () bool {
 	return true
 }

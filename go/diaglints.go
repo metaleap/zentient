@@ -4,7 +4,6 @@ import (
 
 	"github.com/metaleap/go-devgo"
 	"github.com/metaleap/go-util-dev"
-	"github.com/metaleap/go-util-slice"
 
 	"github.com/metaleap/zentient/z"
 )
@@ -62,8 +61,7 @@ func (me *zgo) Linters (filerelpaths []string, forcelinters ...string) (linters 
 			pkgfiles[pkg] = append(pkgfiles[pkg], frp)
 		}
 	}
-	cfgok := me.Base.CfgDiagToolEnabled
-	if len(forcelinters)>0 { cfgok = func (cmdname string) bool { return uslice.StrHas(forcelinters, cmdname) } }
+	cfgok := me.Base.CfgDiagToolEnabled(forcelinters)
 	for fpkg,frps := range pkgfiles { dirrelpath := filepath.Dir(frps[0])
 		if cfgok("go vet")									{ linters = append(linters, linterGoVet(dirrelpath)) }
 		if devgo.Has_golint && cfgok("golint")				{ linters = append(linters, linterGolint(dirrelpath)) }

@@ -25,8 +25,10 @@ const (
 	REQ_INTEL_HILITES	= "II:"
 	REQ_INTEL_SYM		= "IS:"
 	REQ_INTEL_WSYM		= "IW:"
-	REQ_INTEL_TOOLS		= "Ix:"
-	REQ_INTEL_TOOL		= "IX:"
+	REQ_TOOLS_INTEL		= "Ti:"
+	REQ_TOOL_INTEL		= "TI:"
+	REQ_TOOLS_QUERY		= "Tq:"
+	REQ_TOOL_QUERY		= "TQ:"
 	REQ_DO_FMT			= "DF:"
 	REQ_DO_RENAME		= "DR:"
 	REQ_FILES_OPENED	= "FO:"
@@ -82,11 +84,16 @@ func HandleRequest (queryln string) (e error) {
 			e = out(Zengines[zid].IntelSymbols(&inint, false))
 		case REQ_INTEL_WSYM:
 			e = out(Zengines[zid].IntelSymbols(&inint, true))
-		case REQ_INTEL_TOOL:
-			if srcrefs,err := Zengines[zid].IntelTool(&inint)  ;  err!=nil && len(srcrefs)==0 {
-				e = out(err.Error()) } else { e = out(srcrefs) }
-		case REQ_INTEL_TOOLS:
-			e = out(Zengines[msgargs].IntelTools())
+		case REQ_TOOL_INTEL:
+			µ := Zengines[zid]  ;  if srcrefs,ran := µ.B().intelTool(µ, &inint)  ;  ran { e = out(srcrefs)
+			} else if srcrefs,err := µ.IntelTool(&inint)  ;  err!=nil && len(srcrefs)==0 { e = out(err.Error())
+			} else { e = out(srcrefs) }
+		case REQ_TOOLS_INTEL:
+			µ := Zengines[msgargs]  ;  e = out(append(µ.B().intelTools(µ), µ.IntelTools()...))
+		case REQ_TOOLS_QUERY:
+			e = out(Zengines[msgargs].QueryTools())
+		case REQ_TOOL_QUERY:
+			e = out(Zengines[zid].QueryTool(&inint))
 
 		case REQ_FILES_WRITTEN:
 			onFilesWritten(Zengines[zid], inlst)

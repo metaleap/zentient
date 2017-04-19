@@ -84,10 +84,6 @@ func (_ *zgo) Caps (cap string) (caps []*z.RespCmd) {
 	}
 	return caps
 }
-func capByName (caps []*z.RespCmd, name string) *z.RespCmd {
-	for _,cap := range caps { if cap.Title==name { return cap } }
-	return nil
-}
 
 func (me *zgo) DoFmt (src string, custcmd string, tabsize uint8) (*z.RespTxt, error) {
 	return me.Base.DoFmt(src, custcmd,

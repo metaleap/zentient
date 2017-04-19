@@ -35,6 +35,8 @@ type Zengine interface {
 	IntelRefs (*ReqIntel) udev.SrcMsgs
 	IntelTools () []*RespPick
 	IntelTool (*ReqIntel) (udev.SrcMsgs, error)
+	QueryTools () []*RespPick
+	QueryTool (*ReqIntel) *RespTxt
 }
 
 

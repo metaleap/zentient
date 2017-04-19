@@ -2,7 +2,6 @@ package zgo
 import (
 	"bytes"
 	"fmt"
-	"path/filepath"
 	"sort"
 	"strings"
 
@@ -105,13 +104,7 @@ var intelTools = []*z.RespPick {
 		&z.RespPick{ Label: "Channel Peers", Detail: "For this `<-` operation's channel, lists associated allocations, sends, receives and closes.", Desc: "guru.peers" },
 	}
 func (me *zgo) IntelTools () []*z.RespPick {
-	tools := intelTools  ;  dcaps := []*z.RespCmd{}  ;  cd := me.Caps("diag")
-	for _,dt := range me.B().DisabledToolsDiag { if cap := capByName(cd, dt)  ;  cap!=nil && cap.Exists { dcaps = append(dcaps, cap) } }
-	if len(dcaps)>0 {
-		var xs string  ;  for _,dc := range dcaps { xs = xs + "." + dc.Title }
-		tools = append(tools, &z.RespPick{ Label: "Additional Code Diagnostics", Detail: "Runs: " + ustr.Join(ustr.Split(xs[1:], "."), " · ") + " (all installed but disabled for on-the-fly diagnostics)", Desc: "__diags" + xs })
-	}
-	return tools
+	return intelTools
 }
 
 
@@ -120,17 +113,8 @@ func (me *zgo) IntelTool (req *z.ReqIntel) (srcrefs udev.SrcMsgs, err error) {
 	if ustr.Pref(req.Id, "guru.") {  if req.RunePosToBytePos()  ;  !(devgo.Has_guru) {
 		return nil , ugo.E("`guru` command not installed.")
 	} }
-	addsr := func (sr *udev.SrcMsg, label string, desc string) *udev.SrcMsg {
-		if sr!=nil { sr.Msg,sr.Misc = label,desc  ;  srcrefs = append(srcrefs, sr) }
-		return sr
-	}
-	if ustr.Pref(req.Id, "__diags.") {
-		var frp string  ;  tnames := ustr.Split(req.Id, ".")[1:]
-		if frp,err = filepath.Rel(srcDir, req.Ffp)  ;  err!=nil { return }
-		for _,linter := range me.Linters([]string{ frp }, tnames...) { if fdiags := linter()  ;  fdiags!=nil { for frp,fd := range fdiags { for _,sr := range fd {
-			addsr(sr, sr.Msg, sr.Ref).Ref = filepath.Join(srcDir, frp)
-		} } } }
-	} else { switch req.Id {
+	addsr := func (sr *udev.SrcMsg, label string, desc string) *udev.SrcMsg { return z.IntelToolAddResult(&srcrefs, sr, label, desc) }
+	switch req.Id {
 		case "guru.callees":
 			gcs,e := devgo.QueryCallees_Guru(req.Ffp, req.Src, p1, p2)  ;  err = e  ;  if gcs!=nil { for _,gc := range gcs.Callees {
 				addsr(udev.SrcMsgFromLn(gc.Pos), devgo.ShortenImPs(gc.Name), "Current selection: " + gcs.Desc)
@@ -145,7 +129,7 @@ func (me *zgo) IntelTool (req *z.ReqIntel) (srcrefs udev.SrcMsgs, err error) {
 			} }
 		case "guru.freevars":
 			gfvs,e := devgo.QueryFreevars_Guru(req.Ffp, req.Src, p1, p2)  ;  err = e  ;  for _,gfv := range gfvs {
-				addsr(udev.SrcMsgFromLn(gfv.Pos), gfv.Kind + " " + gfv.Ref, gfv.Type)
+				addsr(udev.SrcMsgFromLn(gfv.Pos), gfv.Kind + " " + gfv.Ref, devgo.ShortenImPs(gfv.Type))
 			}
 		case "guru.whicherrs":
 			gwe,e := devgo.QueryWhicherrs_Guru(req.Ffp, req.Src, p1, p2)  ;  err = e  ;  if gwe!=nil {
@@ -165,7 +149,7 @@ func (me *zgo) IntelTool (req *z.ReqIntel) (srcrefs udev.SrcMsgs, err error) {
 			}
 		default:
 			err = ugo.E("Unknown Code Intel tool: " + req.Id)
-	} }
+	}
 	if err!=nil { if errmsg,i := err.Error(),ustr.Idx(err.Error(), "guru: couldn't load packages due to errors: ")  ;  i>=0 {
 		/*guru: couldn't load packages due to errors: github.com/metaleap/go-opengl/cmd/gogl-minimal-app-glfw3, github.com/metaleap/go-opengl/util, github.com/metaleap/go-opengl/cmd/opengl-minimal-app-glfw3 and 7 more*/
 		l,errpkgs := len(devgo.GuruScopeExclPkgs) , uslice.StrMap(ustr.Split(errmsg[i+44:], ","), ustr.Trim)  ;  for i,epkg := range errpkgs { errpkgs[i] = ustr.Before(epkg, " ", false) }

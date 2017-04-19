@@ -1,5 +1,6 @@
 package z
 import (
+	"path/filepath"
 	"sync"
 	"strings"
 	"time"
@@ -17,10 +18,15 @@ type Base struct {
 	lintmutex			sync.Mutex
 	linttime			int64
 	zid					string
-	DisabledToolsDiag	[]string
-	DisabledToolsIntel	[]string
+	disabledToolsDiag	[]string
+	disabledToolsIntel	[]string
 }
 
+
+func capByName (caps []*RespCmd, name string) *RespCmd {
+	for _,cap := range caps { if cap.Title==name { return cap } }
+	return nil
+}
 
 
 func (me *Base) Init () {
@@ -72,18 +78,21 @@ func (me *Base) OpenFiles () []string {
 	return openFiles(Zengines[me.zId()])
 }
 
-func (me *Base) CfgDiagToolEnabled (cmdname string) bool {
-	return !uslice.StrHas(me.DisabledToolsDiag, cmdname)
+func (me *Base) CfgDiagToolEnabled (forcecmdnames []string) func(string)bool {
+	return func (cmdname string) bool {
+		if len(forcecmdnames)>0 { return uslice.StrHas(forcecmdnames, cmdname) }
+		return !uslice.StrHas(me.disabledToolsDiag, cmdname)
+	}
 }
 
 func (me *Base) CfgIntelToolEnabled (cmdname string) bool {
-	return !uslice.StrHas(me.DisabledToolsIntel, cmdname)
+	return !uslice.StrHas(me.disabledToolsIntel, cmdname)
 }
 
 func (me *Base) OnCfg (cfg map[string]interface{}) {
 	if cfg != nil {
-		if s,ok := cfg["diag.disabled"].(string)  ;  ok { me.DisabledToolsDiag = ustr.Split(s, ",") }
-		if s,ok := cfg["intel.disabled"].(string)  ;  ok { me.DisabledToolsIntel = ustr.Split(s, ",") }
+		if s,ok := cfg["diag.disabled"].(string)  ;  ok { me.disabledToolsDiag = ustr.Split(s, ",") }
+		if s,ok := cfg["intel.disabled"].(string)  ;  ok { me.disabledToolsIntel = ustr.Split(s, ",") }
 		me.lintmutex.Lock()  ;  defer me.lintmutex.Unlock()
 		me.lintdiags = nil  ;  me.livediags = nil  ;  newlivediags = true
 	}
@@ -95,6 +104,35 @@ func (me *Base) buildFrom (µ Zengine, filerelpaths []string) {
 		newlivediags = true  ;  me.livediags = nil  ;  me.lintdiags = nil
 		me.builddiags = µ.BuildFrom(filerelpaths)
 	}
+}
+
+
+func (me *Base) intelTools (µ Zengine) (tools []*RespPick) {
+	dcaps := []*RespCmd{}  ;  cd := µ.Caps("diag")
+	for _,dt := range me.disabledToolsDiag { if cap := capByName(cd, dt)  ;  cap!=nil && cap.Exists { dcaps = append(dcaps, cap) } }
+	if len(dcaps)>0 {
+		var xs, xn string  ;  for _,dc := range dcaps { xs = xs + "." + dc.Title }  ;  if len(dcaps)>1 {  xn = "all "  }
+		tools = append(tools, &RespPick{ Label: "Additional Code Diagnostics", Desc: "__diags" + xs, Detail: "Runs: " + ustr.Join(ustr.Split(xs[1:], "."), " · ") + " (" + xn + "disabled for on-the-fly diagnostics as per `settings.json`)" })
+	}
+	return
+}
+func (me *Base) intelTool (µ Zengine, req *ReqIntel) (srcrefs udev.SrcMsgs, ran bool) {
+	if ustr.Pref(req.Id, "__diags.") {
+		ran = true  ;  tnames := ustr.Split(req.Id, ".")[1:]  ;  frp,err := filepath.Rel(Ctx.SrcDir, req.Ffp)
+		if err==nil { for _,linter := range µ.Linters([]string{ frp }, tnames...) { if fdiags := linter()  ;  fdiags!=nil {
+			for frp,fd := range fdiags { for _,sr := range fd {
+				if sr.Data!=nil { if rf,ok := sr.Data["rf"].(string);ok { if rt,ok := sr.Data["rt"].(string);ok {
+					sr.Msg = sr.Ref + ": " + sr.Msg  ;  sr.Ref = "`" + rt + "` instead of `" + rf + "`"
+				} } }
+				IntelToolAddResult(&srcrefs, sr, sr.Msg, sr.Ref).Ref = filepath.Join(Ctx.SrcDir, frp)
+			} }
+		} } }
+	}
+	return
+}
+func IntelToolAddResult (tosrcrefs *udev.SrcMsgs, sr *udev.SrcMsg, label string, desc string) *udev.SrcMsg {
+	if sr!=nil { sr.Msg,sr.Misc = label,desc  ;  *tosrcrefs = append(*tosrcrefs, sr) }
+	return sr
 }
 
 
