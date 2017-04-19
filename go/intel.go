@@ -108,7 +108,7 @@ func (me *zgo) IntelTools () []*z.RespPick {
 	for _,dt := range me.B().DisabledToolsDiag { if cap := capByName(cd, dt)  ;  cap!=nil && cap.Exists { dcaps = append(dcaps, cap) } }
 	if len(dcaps)>0 {
 		var xs string  ;  for _,dc := range dcaps { xs = xs + "." + dc.Title }
-		tools = append(tools, &z.RespPick{ Label: "Run Disabled Code Diagnostics", Detail: "Runs: " + ustr.Join(ustr.Split(xs[1:], "."), " · ") + " (all installed but disabled for on-the-fly diagnostics)", Desc: "__diags" + xs })
+		tools = append(tools, &z.RespPick{ Label: "Additional Code Diagnostics", Detail: "Runs: " + ustr.Join(ustr.Split(xs[1:], "."), " · ") + " (all installed but disabled for on-the-fly diagnostics)", Desc: "__diags" + xs })
 	}
 	return tools
 }
