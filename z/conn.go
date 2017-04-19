@@ -83,8 +83,8 @@ func HandleRequest (queryln string) (e error) {
 		case REQ_INTEL_WSYM:
 			e = out(Zengines[zid].IntelSymbols(&inint, true))
 		case REQ_INTEL_TOOL:
-			if srcrefs,err := Zengines[zid].IntelTool(&inint)  ;  err==nil {
-				e = out(srcrefs) } else { e = out(err.Error()) }
+			if srcrefs,err := Zengines[zid].IntelTool(&inint)  ;  err!=nil && len(srcrefs)==0 {
+				e = out(err.Error()) } else { e = out(srcrefs) }
 		case REQ_INTEL_TOOLS:
 			e = out(Zengines[msgargs].IntelTools())
 

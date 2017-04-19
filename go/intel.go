@@ -11,6 +11,7 @@ import (
 	"github.com/metaleap/go-devgo"
 	"github.com/metaleap/go-util-dev"
 	"github.com/metaleap/go-util-misc"
+	"github.com/metaleap/go-util-slice"
 	"github.com/metaleap/go-util-str"
 	"github.com/metaleap/zentient/z"
 )
@@ -131,48 +132,47 @@ func (me *zgo) IntelTool (req *z.ReqIntel) (srcrefs udev.SrcMsgs, err error) {
 		} } } }
 	} else { switch req.Id {
 		case "guru.callees":
-			if gcs := devgo.QueryCallees_Guru(req.Ffp, req.Src, p1, p2)  ;  gcs!=nil {
-				for _,gc := range gcs.Callees {
-					addsr(udev.SrcMsgFromLn(gc.Pos), devgo.ShortenImPs(gc.Name), "Current selection: " + gcs.Desc)
-				}
-			}
+			gcs,e := devgo.QueryCallees_Guru(req.Ffp, req.Src, p1, p2)  ;  err = e  ;  if gcs!=nil { for _,gc := range gcs.Callees {
+				addsr(udev.SrcMsgFromLn(gc.Pos), devgo.ShortenImPs(gc.Name), "Current selection: " + gcs.Desc)
+			} }
 		case "guru.callers":
-			for _,gc := range devgo.QueryCallers_Guru(req.Ffp, req.Src, p1, p2) {
+			gcs,e := devgo.QueryCallers_Guru(req.Ffp, req.Src, p1, p2)  ;  err = e  ;  for _,gc := range gcs {
 				addsr(udev.SrcMsgFromLn(gc.Pos), devgo.ShortenImPs(gc.Caller), gc.Desc)
 			}
 		case "guru.callstack":
-			if gcs := devgo.QueryCallstack_Guru(req.Ffp, req.Src, p1, p2)  ;  gcs!=nil {
-				for _,gc := range gcs.Callers {
-					addsr(udev.SrcMsgFromLn(gc.Pos), devgo.ShortenImPs(gc.Caller), gc.Desc)
-				}
-			}
+			gcs,e := devgo.QueryCallstack_Guru(req.Ffp, req.Src, p1, p2)  ;  err = e  ;  if gcs!=nil { for _,gc := range gcs.Callers {
+				addsr(udev.SrcMsgFromLn(gc.Pos), devgo.ShortenImPs(gc.Caller), gc.Desc)
+			} }
 		case "guru.freevars":
-			for _,gfv := range devgo.QueryFreevars_Guru(req.Ffp, req.Src, p1, p2) {
+			gfvs,e := devgo.QueryFreevars_Guru(req.Ffp, req.Src, p1, p2)  ;  err = e  ;  for _,gfv := range gfvs {
 				addsr(udev.SrcMsgFromLn(gfv.Pos), gfv.Kind + " " + gfv.Ref, gfv.Type)
 			}
 		case "guru.whicherrs":
-			if gwe := devgo.QueryWhicherrs_Guru(req.Ffp, req.Src, p1, p2)  ;  gwe!=nil {
-				var desc string  ;  if lc,lg := len(gwe.Constants) , len(gwe.Globals)  ;  lc>0 || lg>0 {
-					desc = fmt.Sprintf("(NB. not listed: any one of %v constants and %v globals that may also appear in this `error` value.)", lc, lg)
-				}
-				for _,gwet := range gwe.Types {
-					addsr(udev.SrcMsgFromLn(gwet.Position), devgo.ShortenImPs(gwet.Type), desc)
-				}
+			gwe,e := devgo.QueryWhicherrs_Guru(req.Ffp, req.Src, p1, p2)  ;  err = e  ;  if gwe!=nil {
+				for _,gwet := range gwe.Types { addsr(udev.SrcMsgFromLn(gwet.Position), devgo.ShortenImPs(gwet.Type), "") }
 			}
 		case "guru.pointsto":
-			gpts,e := devgo.QueryPointsto_Guru(req.Ffp, req.Src, p1, p2)  ;  if err=e  ;  e==nil { for _,gpt := range gpts {
+			gpts,e := devgo.QueryPointsto_Guru(req.Ffp, req.Src, p1, p2)  ;  err = e  ;  for _,gpt := range gpts {
 				if len(gpt.NamePos)==0 {  gpt.NamePos = req.Ffp + ":0:0"  }
 				addsr(udev.SrcMsgFromLn(gpt.NamePos), devgo.ShortenImPs(gpt.Type), fmt.Sprintf("Pointing to the following %v symbol(s) ➜", len(gpt.Labels)))
 				for _,gptl := range gpt.Labels { addsr(udev.SrcMsgFromLn(gptl.Pos), "➜ " + gptl.Desc, "") }
-			} }
+			}
 		case "guru.peers":
-			if gp := devgo.QueryPeers_Guru(req.Ffp, req.Src, p1, p2)  ;  gp!=nil {
+			gp,e := devgo.QueryPeers_Guru(req.Ffp, req.Src, p1, p2)  ;  err = e  ;  if gp!=nil {
 				for locsdesc,locslist := range map[string][]string { "Allocate": gp.Allocs, "Send": gp.Sends, "Receive": gp.Receives, "Close": gp.Closes } {
 					for _,loc := range locslist { addsr(udev.SrcMsgFromLn(loc), locsdesc, devgo.ShortenImPs(gp.Type)) }
 				}
 			}
 		default:
 			err = ugo.E("Unknown Code Intel tool: " + req.Id)
+	} }
+	if err!=nil { if errmsg,i := err.Error(),ustr.Idx(err.Error(), "guru: couldn't load packages due to errors: ")  ;  i>=0 {
+		/*guru: couldn't load packages due to errors: github.com/metaleap/go-opengl/cmd/gogl-minimal-app-glfw3, github.com/metaleap/go-opengl/util, github.com/metaleap/go-opengl/cmd/opengl-minimal-app-glfw3 and 7 more*/
+		l,errpkgs := len(devgo.GuruScopeExclPkgs) , uslice.StrMap(ustr.Split(errmsg[i+44:], ","), ustr.Trim)  ;  for i,epkg := range errpkgs { errpkgs[i] = ustr.Before(epkg, " ", false) }
+		for _,epkg := range errpkgs { if !uslice.StrHas(devgo.GuruScopeExclPkgs, epkg) {
+			devgo.GuruScopeExclPkgs = append(devgo.GuruScopeExclPkgs, epkg)
+		} }
+		if len(devgo.GuruScopeExclPkgs)>l { return me.IntelTool(req) }
 	} }
 	return
 }

@@ -30,7 +30,7 @@ func buildPkg (pkgimppath string, fallbackfilerelpath string, diags map[string]u
 
 
 func (_ *zgo) BuildFrom (filerelpaths []string) (freshdiags map[string]udev.SrcMsgs) {
-	pkgimppaths := []string {}  ;  pkgimpimppaths := []string {}
+	pkgimppaths := []string {}  ;  pkgimpimppaths := []string {}  ;  devgo.GuruScopeExclPkgs = nil
 
 	for _,frp := range filerelpaths { if pkg := filePkg(frp)  ;  pkg!=nil {
 		if !(uslice.StrHas(pkgimppaths, pkg.ImportPath) || uslice.StrHas(pkgimpimppaths, pkg.ImportPath)) {
