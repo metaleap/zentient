@@ -95,12 +95,13 @@ func (me *zgo) IntelRefs(req *z.ReqIntel) (srcrefs udev.SrcMsgs) {
 
 func (me *zgo) IntelTools () []*z.RespPick {
 	return []*z.RespPick {
-		&z.RespPick{ Label: "Callees", Detail: "For this function / method call, finds the possible implementations to which it might dispatch.", Desc: "guru.callees" },
-		&z.RespPick{ Label: "Callers", Detail: "For this function / method implementation, finds its possible callers. ", Desc: "guru.callers" },
-		&z.RespPick{ Label: "Call Stack", Detail: "Shows an arbitrary path from the root of the call graph to this function / method.", Desc: "guru.callstack" },
-		&z.RespPick{ Label: "Free Variables", Detail: "For this selection, shows the variables referenced but not defined within it.", Desc: "guru.freevars" },
-		&z.RespPick{ Label: "Types of Errors", Detail: "For this `error` value, reports its possible concrete types.", Desc: "guru.whicherrs" },
-		&z.RespPick{ Label: "Points To", Detail: "For this pointer or reference-type expression, shows the possible contained types.", Desc: "guru.pointsto" },
+		&z.RespPick{ Label: "Callees", Detail: "For this function / method call, lists possible implementations to which it might dispatch.", Desc: "guru.callees" },
+		&z.RespPick{ Label: "Callers", Detail: "For this function / method implementation, lists possible callers. ", Desc: "guru.callers" },
+		&z.RespPick{ Label: "Call Stack", Detail: "For this function / method, shows an arbitrary path to the root of the call graph.", Desc: "guru.callstack" },
+		&z.RespPick{ Label: "Free Variables", Detail: "For this selection, lists variables referenced but not defined within it.", Desc: "guru.freevars" },
+		&z.RespPick{ Label: "Types of Errors", Detail: "For this `error` value, lists its possible types.", Desc: "guru.whicherrs" },
+		&z.RespPick{ Label: "Points To", Detail: "For this pointer or reference-type expression, lists possible associated types and symbols.", Desc: "guru.pointsto" },
+		&z.RespPick{ Label: "Channel Peers", Detail: "For this `<-` operation's channel, lists associated allocations, sends, receives and closes.", Desc: "guru.peers" },
 	}
 }
 
@@ -152,9 +153,14 @@ func (me *zgo) IntelTool (req *z.ReqIntel) (srcrefs udev.SrcMsgs, err error) {
 				addsr(false, udev.SrcMsgFromLn(gpt.NamePos), devgo.ShortenImPs(gpt.Type), fmt.Sprintf("Pointing to the following %v symbol(s) ➜", len(gpt.Labels)))
 				for _,gptl := range gpt.Labels { addsr(false, udev.SrcMsgFromLn(gptl.Pos), "➜ " + gptl.Desc, "") }
 			}
-
+		case "guru.peers":
+			if gp := devgo.QueryPeers_Guru(req.Ffp, req.Src, p1, p2)  ;  gp!=nil {
+				for locsdesc,locslist := range map[string][]string { "Allocate": gp.Allocs, "Send": gp.Sends, "Receive": gp.Receives, "Close": gp.Closes } {
+					for _,loc := range locslist { addsr(true, udev.SrcMsgFromLn(loc), locsdesc, devgo.ShortenImPs(gp.Type)) }
+				}
+			}
 		default:
-			err = ugo.E("Unknown Code Intel tool: " + req.Id)
+			err = ugo.E("Unknown CodeIntel tool: " + req.Id)
 	}
 	return
 }

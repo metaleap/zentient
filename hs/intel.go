@@ -14,7 +14,7 @@ func (_ *zhs) IntelImpls (req *z.ReqIntel) udev.SrcMsgs {
 }
 
 func (_ *zhs) IntelHovs (req *z.ReqIntel) (hovs []*z.RespHov) {
-	hovs = append(hovs, &z.RespHov { Txt: "No applicable Code Intel tools yet." })
+	hovs = append(hovs, &z.RespHov { Txt: "No applicable CodeIntel tools yet." })
 	return
 }
 
