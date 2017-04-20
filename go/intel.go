@@ -2,6 +2,7 @@ package zgo
 import (
 	"bytes"
 	"fmt"
+	"path/filepath"
 	"sort"
 	"strings"
 
@@ -260,7 +261,8 @@ func (me *zgo) IntelSymbols(req *z.ReqIntel, allfiles bool) (srcrefs udev.SrcMsg
 			}
 			return
 		}
-		fpathok := func (fpath string) bool {  return fpath==req.Ffp || (allfiles && ustr.Pref(fpath, srcDir))  }
+		ffpdir := filepath.Dir(req.Ffp)
+		fpathok := func (fpath string) bool {  return fpath==req.Ffp || (allfiles && ffpdir==filepath.Dir(fpath) )  }
 		for _,mem := range gd.Package.Members {
 			if srcref := udev.SrcMsgFromLn(mem.Pos)  ;  srcref!=nil {
 				if fpathok(srcref.Ref) {
@@ -298,7 +300,7 @@ func (me *zgo) IntelSymbols(req *z.ReqIntel, allfiles bool) (srcrefs udev.SrcMsg
 			}
 		}
 		if allfiles { sort.Sort(srcrefs)  ;  for _,srcref := range srcrefs {
-			srcref.Msg = "[ " + strings.TrimLeft(srcref.Ref[len(srcDir):], "/\\") + " ]\t\t" + srcref.Msg
+			srcref.Msg = "[ " + strings.TrimLeft(srcref.Ref[len(ffpdir):], "/\\") + " ]\t\t" + srcref.Msg
 		} }
 	} }
 	return
