@@ -40,7 +40,7 @@ func (me *zgo) B () *z.Base {
 
 
 var (
-	capsfmt, capsdiag, capsren, capsint []*z.RespCmd
+	capsfmt, capsdiag, capsren, capsint, capsext []*z.RespCmd
 	capsinit = false
 )
 func (_ *zgo) Caps (cap string) (caps []*z.RespCmd) {
@@ -66,6 +66,9 @@ func (_ *zgo) Caps (cap string) (caps []*z.RespCmd) {
 								}
 		capsren = []*z.RespCmd	{	{ Title: "gorename",	Exists: devgo.Has_gorename,		Hint: "golang.org/x/tools/cmd/gorename",	More: "(affected files will be formatted gofmt-style)" },
 								}
+		capsext = []*z.RespCmd	{	{ Title: "godoc",		Exists: devgo.Has_godoc,		Hint: "golang.org/x/tools/godoc",			More: "via <i>Query Extras</i>. (If `godoc` not present, will fall back to `go doc`.)" },
+									{ Title: "guru",		Exists: devgo.Has_guru,			Hint: "golang.org/x/tools/cmd/guru",		More: "via <i>Code Intel Extras</i>: Callees, Callers, Callstack, Free Variables, Types of Errors, Points-To, Channel Peers" },
+								}
 		capsint = []*z.RespCmd	{	{ Title: "gocode",		Exists: devgo.Has_gocode,		Hint: "github.com/nsf/gocode",				More: "Completion Suggest" },
 									{ Title: "guru",		Exists: devgo.Has_guru,			Hint: "golang.org/x/tools/cmd/guru",		More: "Go to Definition, Go to Type Definition, Go to Interfaces/Implementers, References Lookup, Symbols Lookup, Semantic Highlighting, Code Intel Extras" },
 									{ Title: "gogetdoc",	Exists: devgo.Has_gogetdoc,		Hint: "github.com/zmb3/gogetdoc",			More: "Hover Tips, Go to Definition, summaries for Completion Suggest" },
@@ -81,6 +84,8 @@ func (_ *zgo) Caps (cap string) (caps []*z.RespCmd) {
 		caps = capsren
 	case "intel":
 		caps = capsint
+	case "extra":
+		caps = capsext
 	}
 	return caps
 }
