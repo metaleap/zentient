@@ -12,8 +12,8 @@ import (
 )
 
 var queryTools = []*z.RespPick {
-		&z.RespPick{ Label: "go doc", Detail: "[package] [member name] – shows the specified item's summary description.", Desc: "go doc" },
 		&z.RespPick{ Label: "go run", Detail: "any expression – attempts to evaluate the specified expression given the current source context", Desc: "go run" },
+		&z.RespPick{ Label: "go doc", Detail: "[package] [member name] – shows the specified item's summary description.", Desc: "go doc" },
 	}
 func (me *zgo) QueryTools () []*z.RespPick {
 	return queryTools
@@ -33,9 +33,9 @@ func (_ *zgo) QueryTool (req *z.ReqIntel) (resp *z.RespTxt) {
 					lns[i] = "func " + pname + ln[9:]
 				}
 			}
-			src = ustr.Join(lns, "\n")  ;  if mln<0 {
-				src = "package main\n" + src
-			}
+			if mln<0 { mln = 0  ;  lns = append([]string {"package main"}, lns...)  }
+			src = ustr.Join(lns[mln:], "\n")
+			// if !ustr.Has(src, "fmt.") { src = lns[mln] + "\nimport \"fmt\"\n" + ustr.Join(lns[mln+1:], "\n") }
 			return src
 		}
 		req.EnsureSrc()
@@ -71,10 +71,14 @@ func (_ *zgo) QueryTool (req *z.ReqIntel) (resp *z.RespTxt) {
 			tryagain = false
 			cmdout,cmderr,_ := ugo.CmdExecStdin("", pdir, "go", cmdargs...)
 			resp.Warnings = append(resp.Warnings, ustr.Split(cmderr, "\n")...)
+			//	./stmt.go:80: undefined: fmt in fmt.Printf
 			resp.Result = cmdout
 		}
 		ufs.ClearDirectory(pdir)
 		ufs.ClearEmptyDirectories(filepath.Dir(pdir))
+		if len(resp.Warnings)>1 {
+			resp.Warnings = uslice.StrWithout(resp.Warnings, true, "# command-line-arguments")
+		}
 	case "go doc":
 		req.Sym2 = ustr.Trim(req.Sym2)
 		if i1,i2 := ustr.Idx(req.Sym2, ".") , ustr.Idx(req.Sym2, " ")  ;  i1>0 && (i2<0 || i2>i1) { req.Sym2 = req.Sym2[:i1] + " " + req.Sym2[i1+1:] }
