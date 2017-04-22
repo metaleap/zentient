@@ -29,13 +29,12 @@ func (_ *zgo) QueryTool (req *z.ReqIntel) (resp *z.RespTxt) {
 		srcmainify := func (src string) string {
 			mln,lns := -1, ustr.Split(src, "\n")  ;  for i,ln := range lns {
 				if mln<0 && ustr.Pref(ln, "package ") { mln = i  ;  lns[i] = "package main"  }
-				if ustr.HasAnyPrefix(ln, "func main(", "func main ") {
+				if ustr.HasAnyPrefix(ln, "func main(", "func main ") { // good enough for us
 					lns[i] = "func " + pname + ln[9:]
 				}
 			}
 			if mln<0 { mln = 0  ;  lns = append([]string {"package main"}, lns...)  }
 			src = ustr.Join(lns[mln:], "\n")
-			// if !ustr.Has(src, "fmt.") { src = lns[mln] + "\nimport \"fmt\"\n" + ustr.Join(lns[mln+1:], "\n") }
 			return src
 		}
 		req.EnsureSrc()
@@ -63,22 +62,47 @@ func (_ *zgo) QueryTool (req *z.ReqIntel) (resp *z.RespTxt) {
 			})...)
 		}
 
-		cmdargs := []string{ "run" }  ;  for frp,src := range srcfiles {
-			onerr(ufs.WriteTextFile(filepath.Join(pdir, frp), src))
-			cmdargs = append(cmdargs, frp)
+		fixupmissingimport := func (msg string) bool {
+			//	./stmt.go:80: undefined: fmt in fmt.Printf
+			if icol := ustr.Idx(msg, ".go:")  ;  icol>0 {
+				if iundef := ustr.Idx(msg, ": undefined: ")  ;  iundef>0 {
+					if iin := ustr.Idx(msg, " in ")  ;  iin>(iundef+13) {
+						frp := msg[:icol+3]  ;  for frp[0]=='.' || frp[0]=='/' || frp[0]=='\\' { frp = frp[1:] }
+						pkg := msg[:iin][iundef+13:]  ;  if _,ok := srcfiles[frp]  ;  ok {
+							if devgo.PkgsByImP!=nil {  for _,p := range devgo.PkgsByImP { if p.Name==pkg { pkg = p.ImportPath  ;  break } }  }
+							insert,src := "\nimport \"" + pkg + "\"\n" , srcfiles[frp]  ;  if iln := ustr.Idx(src, "\n")  ;  iln<0 {
+								src += insert
+							} else {
+								src = src[:iln] + insert + src[iln:]
+							}
+							srcfiles[frp] = src
+							return true
+						}
+					}
+				}
+			}
+			return false
 		}
 		tryagain := true  ;  for tryagain {
-			tryagain = false
+			warns := []string {}  ;  cmdargs := []string{ "run" }  ;  tryagain = false
+			for frp,src := range srcfiles {
+				onerr(ufs.WriteTextFile(filepath.Join(pdir, frp), src))
+				cmdargs = append(cmdargs, frp)
+			}
 			cmdout,cmderr,_ := ugo.CmdExecStdin("", pdir, "go", cmdargs...)
-			resp.Warnings = append(resp.Warnings, ustr.Split(cmderr, "\n")...)
-			//	./stmt.go:80: undefined: fmt in fmt.Printf
-			resp.Result = cmdout
+			warns = append(warns, ustr.Split(cmderr, "\n")...)
+			for _,warn := range warns {
+				if fixupmissingimport(warn) {  tryagain = true  ;  break  }
+			}
+			if !tryagain {
+				if len(warns)>1 {
+					warns = uslice.StrWithout(warns, true, "# command-line-arguments")
+				}
+				resp.Result,resp.Warnings = cmdout , append(resp.Warnings, warns...)
+			}
 		}
 		ufs.ClearDirectory(pdir)
 		ufs.ClearEmptyDirectories(filepath.Dir(pdir))
-		if len(resp.Warnings)>1 {
-			resp.Warnings = uslice.StrWithout(resp.Warnings, true, "# command-line-arguments")
-		}
 	case "go doc":
 		req.Sym2 = ustr.Trim(req.Sym2)
 		if i1,i2 := ustr.Idx(req.Sym2, ".") , ustr.Idx(req.Sym2, " ")  ;  i1>0 && (i2<0 || i2>i1) { req.Sym2 = req.Sym2[:i1] + " " + req.Sym2[i1+1:] }
