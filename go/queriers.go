@@ -37,12 +37,13 @@ func (_ *zgo) QueryTool (req *z.ReqIntel) (resp *z.RespTxt) {
 			src = ustr.Join(lns[mln:], "\n")
 			return src
 		}
-		req.EnsureSrc()
 		onerr(ufs.EnsureDirExists(pdir))
-		srcfiles := map[string]string {}
-		req.Src = srcmainify(req.Src) + "\n\nfunc main() {\n" +
-											"\tfmt.Printf(\"%v\", "+ req.Sym2 +")\n" +
-												"}"
+		srcfiles := map[string]string {}  ;  req.EnsureSrc()
+		numainfunc := "\nfunc main() { fmt.Printf(\"%v\", " + req.Sym2 + ") }\n"
+		isvoidcall := (len(req.Sym2)>0 && req.Sym2[0]==':')  ;  if isvoidcall {
+			numainfunc = "\nfunc main() { " + req.Sym2[1:] + " } \n"
+		}
+		req.Src = srcmainify(req.Src) + numainfunc
 		if !ufs.FileExists(req.Ffp) {
 			srcfiles ["main.go"] = req.Src
 		} else {
@@ -62,8 +63,8 @@ func (_ *zgo) QueryTool (req *z.ReqIntel) (resp *z.RespTxt) {
 			})...)
 		}
 
-		fixupmissingimport := func (msg string) bool {
-			//	./stmt.go:80: undefined: fmt in fmt.Printf
+		fixupmissingimport := func (msg string) string {
+			//	./file.go:80: undefined: fmt in fmt.Printf
 			if icol := ustr.Idx(msg, ".go:")  ;  icol>0 {
 				if iundef := ustr.Idx(msg, ": undefined: ")  ;  iundef>0 {
 					if iin := ustr.Idx(msg, " in ")  ;  iin>(iundef+13) {
@@ -76,29 +77,33 @@ func (_ *zgo) QueryTool (req *z.ReqIntel) (resp *z.RespTxt) {
 								src = src[:iln] + insert + src[iln:]
 							}
 							srcfiles[frp] = src
-							return true
+							return frp
 						}
 					}
 				}
 			}
-			return false
+			return ""
 		}
-		tryagain := true  ;  for tryagain {
-			warns := []string {}  ;  cmdargs := []string{ "run" }  ;  tryagain = false
+		fixeruppers := []func(string)string { fixupmissingimport }
+		frpmod := ""  ;  tryagain := true  ;  for tryagain {
+			tryagain = false  ;  warns := []string {}  ;  cmdargs := []string{ "run" }
 			for frp,src := range srcfiles {
-				onerr(ufs.WriteTextFile(filepath.Join(pdir, frp), src))
+				if len(frpmod)==0 || frp==frpmod { onerr(ufs.WriteTextFile(filepath.Join(pdir, frp), src)) }
 				cmdargs = append(cmdargs, frp)
 			}
-			cmdout,cmderr,_ := ugo.CmdExecStdin("", pdir, "go", cmdargs...)
-			warns = append(warns, ustr.Split(cmderr, "\n")...)
-			for _,warn := range warns {
-				if fixupmissingimport(warn) {  tryagain = true  ;  break  }
+			frpmod = ""  ;  cmdout,cmderr,_ := ugo.CmdExecStdin("", pdir, "go", cmdargs...)
+			warns = append(warns, ustr.Split(cmderr, "\n")...)  ;  for _,warn := range warns {
+				for _,fixup := range fixeruppers { if frpmod = fixup(warn)  ;  len(frpmod)>0 {  break  } }
+				if len(frpmod)>0 { tryagain = true  ;  break }
 			}
 			if !tryagain {
-				if len(warns)>1 {
-					warns = uslice.StrWithout(warns, true, "# command-line-arguments")
+				if len(warns)>1 { warns = uslice.StrWithout(warns, true, "# command-line-arguments") }
+				for i,w := range warns { if ustr.Suff(w, " used as value") {
+					warns[i] = w + " ➜ use a single colon prefix ❬:❭ to evaluate a `void` expression"
+				} }
+				if resp.Result,resp.Warnings = cmdout , append(resp.Warnings, warns...)  ;  len(ustr.Trim(resp.Result))==0 && isvoidcall && len(warns)==0 {
+					resp.Result = "❬Code ran but did not produce any output❭"
 				}
-				resp.Result,resp.Warnings = cmdout , append(resp.Warnings, warns...)
 			}
 		}
 		ufs.ClearDirectory(pdir)
