@@ -232,9 +232,12 @@ func (me *zgo) IntelHiLites(req *z.ReqIntel) (srcrefs udev.SrcMsgs) {
 				}
 				return false
 			}
-			if check(2, "defer statement", "return statement", "function literal", "function declaration") { return }
-			if check(1, "break statement", "range loop", "for loop", "select statement", "switch statement") { return }
-			if check(1, "continue statement", "range loop", "for loop") { return }
+			if check(2, "defer statement", "return statement",
+							"function literal", "function declaration") { return }
+			if check(1, "break statement",
+							"range loop", "for loop", "select statement", "switch statement") { return }
+			if check(1, "continue statement",
+							"range loop", "for loop") { return }
 		}
 	} }
 	return

@@ -127,27 +127,3 @@ func (_ *zgo) QueryTool (req *z.ReqIntel) (resp *z.RespTxt) {
 	if len(resp.Warnings)>1 { resp.Warnings = uslice.StrWithout(resp.Warnings, true, "exit status 1") }
 	return
 }
-
-
-
-
-		/*
-[00:30 rox ~/.../metaleap/tmpprog]$ go run *.go
-go run: cannot run non-main package
-[00:30 rox ~/.../metaleap/tmpprog]$ go run *.go
-go run: cannot run non-main package
-[00:31 rox ~/.../metaleap/tmpprog]$ go run *.go
-package main:
-buf.go:1:1: expected 'package', found 'import'
-buf.go:2:2: expected ';', found 'STRING' "bytes"
-[00:31 rox ~/.../metaleap/tmpprog]$ go run *.go
-102030
-[00:31 rox ~/.../metaleap/tmpprog]$ go run *.go
-# command-line-arguments
-runtime.main: call to external function main.main
-runtime.main: main.main: not defined
-runtime.main: undefined: main.main
-[00:32 rox ~/.../metaleap/tmpprog]$ go run *.go
-102030
-[00:32 rox ~/.../metaleap/tmpprog]$
-		*/

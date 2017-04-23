@@ -67,8 +67,8 @@ func (_ *zgo) Caps (cap string) (caps []*z.RespCmd) {
 		capsren = []*z.RespCmd	{	{ Title: "gorename",	Exists: devgo.Has_gorename,		Hint: "golang.org/x/tools/cmd/gorename",	More: "(affected files will be formatted gofmt-style)" },
 								}
 		capsext = []*z.RespCmd	{	{ Title: "guru",		Exists: devgo.Has_guru,			Hint: "golang.org/x/tools/cmd/guru",		More: "via <i>Code Intel Extras</i>: Callees, Callers, Callstack, Free Variables, Types of Errors, Points-To, Channel Peers" },
-									{ Title: "go doc",		Exists: true,																More: "via <i>Query Extras</i>" },
 									{ Title: "go run",		Exists: true,																More: "via <i>Query Extras</i>: attempt to evaluate the given expression in the current package context" },
+									{ Title: "go doc",		Exists: true,																More: "via <i>Query Extras</i>" },
 								}
 		capsint = []*z.RespCmd	{	{ Title: "gocode",		Exists: devgo.Has_gocode,		Hint: "github.com/nsf/gocode",				More: "Completion Suggest" },
 									{ Title: "guru",		Exists: devgo.Has_guru,			Hint: "golang.org/x/tools/cmd/guru",		More: "Go to Definition, Go to Type Definition, Go to Interfaces/Implementers, References Lookup, Symbols Lookup, Semantic Highlighting, Code Intel Extras" },
