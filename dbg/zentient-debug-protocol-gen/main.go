@@ -15,10 +15,11 @@ func main() {
 	jsonschemaraw := ufs.ReadTextFile(filepath.Join(gopath, "src/"+srcpath), true, "")
 
 	fromjsd.GoPkgDesc = "Package codegen'd from " + srcpath + " via github.com/metaleap/zentient/dbg/zentient-debug-protocol-gen"
-	gosrc, err := fromjsd.Generate("zdbgproto", jsonschemaraw)
+	jdefs, err := fromjsd.DefsFromJsonSchema(jsonschemaraw)
 	if err != nil {
 		panic(err)
 	}
+	gosrc := fromjsd.Generate("zdbgproto", jdefs)
 
 	ufs.WriteTextFile(filepath.Join(gopath, "src/github.com/metaleap/zentient/dbg/proto/proto.go"), gosrc)
 }
