@@ -7,6 +7,7 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/metaleap/go-util-fs"
 	"github.com/metaleap/go-util-misc"
 
 	"github.com/metaleap/zentient/z"
@@ -25,17 +26,19 @@ func main () {
 	err := z.Init(map[string]func()z.Zengine { "go": zgo.Init, "hs": zhs.Init })
 	if err!=nil { panic(err) }
 
-	logfilepath := filepath.Join(z.Ctx.ConfigDir, "log" + ugo.SPr(time.Now().UnixNano()) + ".log")
+	logdirpath := filepath.Join(z.Ctx.ConfigDir, "zdbglog")
+	ufs.EnsureDirExists(logdirpath)
+	logfilepath := filepath.Join(logdirpath, "log" + ugo.SPr(time.Now().UnixNano()) + ".log")
 	logfile,err := os.Create(logfilepath)  ;  if err!=nil { panic(err) } else { defer logfile.Close() }
 
 	stdin,rawOut,jOut = ugo.SetupJsonProtoPipes(1024*1024*4)
 	var reqln string
 	for stdin.Scan() {
 		reqln = stdin.Text()
-		logfile.WriteString(reqln+"\n")
+		logfile.WriteString("⟨" + reqln+"⟩")
 		logfile.Sync()
-		rawOut.WriteString(reqln+"\n")
-		rawOut.Flush()
+		// rawOut.WriteString(reqln)
+		// rawOut.Flush()
 	}
 
 }
