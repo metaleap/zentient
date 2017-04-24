@@ -27,7 +27,9 @@ func Init (zengineIniters map[string]func()Zengine) (err error) {
 	inits := []func() {}
 	for zid,zinit := range zengineIniters {
 		_zid,_zinit := zid,zinit
-		inits = append(inits, func() { regZ(_zid, _zinit()) })
+		inits = append(inits, func() {
+			if µ := _zinit()  ;  µ!=nil { Zengines[_zid] = µ }
+		})
 	}
 	ugo.WaitOn(inits...)
 	return
@@ -56,10 +58,4 @@ func ensureDataDirs () error {
 	}
 	Ctx.CacheDir = filepath.Join(Ctx.ConfigDir, subdir)
 	return ufs.EnsureDirExists(Ctx.CacheDir) //  this also creates ConfigDir
-}
-
-func regZ (zid string, µ Zengine) {
-	if µ != nil  {
-		Zengines[zid] = µ
-	}
 }

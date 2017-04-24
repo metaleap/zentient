@@ -26,8 +26,16 @@ func main () {
 	if err!=nil { panic(err) }
 
 	logfilepath := filepath.Join(z.Ctx.ConfigDir, "log" + ugo.SPr(time.Now().UnixNano()) + ".log")
-	panic(logfilepath)
 	logfile,err := os.Create(logfilepath)  ;  if err!=nil { panic(err) } else { defer logfile.Close() }
+
 	stdin,rawOut,jOut = ugo.SetupJsonProtoPipes(1024*1024*4)
+	var reqln string
+	for stdin.Scan() {
+		reqln = stdin.Text()
+		logfile.WriteString(reqln+"\n")
+		logfile.Sync()
+		rawOut.WriteString(reqln+"\n")
+		rawOut.Flush()
+	}
 
 }
