@@ -1,14 +1,8 @@
 package main
 import (
 	"bufio"
-	"encoding/json"
-	"os"
-	"path/filepath"
 	"runtime"
-	"strings"
 
-	"github.com/metaleap/go-util-dev"
-	"github.com/metaleap/go-util-fs"
 	"github.com/metaleap/go-util-misc"
 
 	"github.com/metaleap/zentient/z"
@@ -16,30 +10,14 @@ import (
 	"github.com/metaleap/zentient/hs"
 )
 
-const bufferCapacity = 1024*1024*4
-
 
 func main () {
 	runtime.GOMAXPROCS(runtime.NumCPU() * 2)
-	var err error
-	if z.Ctx.SrcDir,err = os.Getwd() ; err != nil { return }
-	udev.SrcDir = z.Ctx.SrcDir
-	if err = ensureDataDirs() ; err != nil { return }
+	err := z.Init(map[string]func()z.Zengine { "go": zgo.Init, "hs": zhs.Init })
+	if err!=nil { panic(err) }
 
-	//  get the IO stuff ready
-	stdin := bufio.NewScanner(os.Stdin)
-	stdin.Buffer(make([]byte, 1024*1024, bufferCapacity), bufferCapacity)
-	z.RawOut = bufio.NewWriterSize(os.Stdout, bufferCapacity)
-	z.Out = json.NewEncoder(z.RawOut)
-	z.Out.SetEscapeHTML(false)
-	z.Out.SetIndent("","")
-
-	z.Zengines = map[string]z.Zengine {}
-	ugo.WaitOn(
-		func() { regZ("go", zgo.Init()) },
-		func() { regZ("hs", zhs.Init()) },
-	)
-
+	var stdin *bufio.Scanner
+	stdin,z.RawOut,z.Out = ugo.SetupJsonProtoPipes(1024*1024*4)
 	for stdin.Scan() {
 		if err = z.HandleRequest(stdin.Text()) ; err == nil {
 			err = z.RawOut.Flush()
@@ -50,37 +28,4 @@ func main () {
 			break
 		}
 	}
-}
-
-
-func regZ (zid string, µ z.Zengine) {
-	if µ != nil  {
-		z.Zengines[zid] = µ
-	}
-}
-
-
-func ensureDataDirs () error {
-	var basedir, subdir string
-
-	//  coming from VScode?
-	if len(os.Args) > 1 && len(os.Args[1])>0 {
-		const sep = string(os.PathSeparator)
-		if editordatadir , index := os.Args[1] , strings.Index(os.Args[1], sep + "Code" + sep) ; index > 0 {
-			basedir = editordatadir[0 : index]
-		}
-	}
-	//  otherwise..
-	if len(basedir) == 0 || !ufs.DirExists(basedir) {
-		basedir = ugo.UserDataDirPath()
-	}
-
-	z.Ctx.ConfigDir = filepath.Join(basedir, "zentient")
-	if volname := filepath.VolumeName(z.Ctx.SrcDir) ; len(volname) > 0 {
-		subdir = strings.Replace(z.Ctx.SrcDir, volname, ufs.SanitizeFsName(volname), -1)
-	} else {
-		subdir = z.Ctx.SrcDir
-	}
-	z.Ctx.CacheDir = filepath.Join(z.Ctx.ConfigDir, subdir)
-	return ufs.EnsureDirExists(z.Ctx.CacheDir) //  this also creates ConfigDir
 }

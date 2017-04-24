@@ -2,15 +2,7 @@ package z
 import (
 	"github.com/metaleap/go-util-dev"
 	"github.com/metaleap/go-util-misc"
-	"github.com/metaleap/go-util-slice"
 )
-
-
-type Context struct {
-	SrcDir		string
-	CacheDir	string
-	ConfigDir	string
-}
 
 
 type Zengine interface {
@@ -40,12 +32,7 @@ type Zengine interface {
 }
 
 
-var (
-	Ctx			= &Context{}
-	AllFiles	= map[string]*File {}
-	OpenFiles	= []string {}
-	Zengines	= map[string]Zengine {}
-)
+var Zengines = map[string]Zengine {}
 
 
 func doFmt (zid string, reqsrc string, reqcmd string, reqtabsize uint8) (resp *RespTxt, err error) {
@@ -57,24 +44,4 @@ func doRename (zid string, reqcmd string, relfilepath string, offset uint64, new
 	µ := Zengines[zid]   ;  if µ==nil {  err = ugo.E("Bad zid: " + zid)  }  ;  if len(newname)==0 {  err = ugo.E("No newname given")  }
 	resp,err = µ.DoRename(reqcmd, relfilepath, offset, newname, eol, oldname, off1, off2)
 	return
-}
-
-func onFilesClosed (µ Zengine, relpaths []string) {
-	for i,_ := range relpaths { relpaths[i] = normalizeFilePath(relpaths[i]) }
-	OpenFiles = uslice.StrWithout(OpenFiles, false, relpaths...)
-}
-
-func onFilesOpened (µ Zengine, relpaths []string) {
-	for _,relpath := range relpaths {
-		relpath = normalizeFilePath(relpath)
-		file := AllFiles[relpath]  ;  if file == nil {
-			file = newFile(µ, relpath)  ;  µ.OnFile(file)  ;  AllFiles[relpath] = file
-		}
-		if isopened := !uslice.StrHas(OpenFiles, relpath) ; isopened {  OpenFiles = append(OpenFiles, relpath)  }
-	}
-}
-
-func onFilesWritten (µ Zengine, relpaths []string) {
-	for i,_ := range relpaths { relpaths[i] = normalizeFilePath(relpaths[i]) }
-	µ.B().buildFrom(µ, relpaths)
 }
