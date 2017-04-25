@@ -18,7 +18,7 @@ func main() {
 	fromjsd.GoPkgDesc = "Package codegen'd from " + srcpath + " with github.com/metaleap/zentient/dbg/zentient-debug-protocol-gen"
 	jdefs, err := fromjsd.DefsFromJsonSchema(jsonschemaraw)
 	if err != nil { panic(err) }
-	gosrc := fromjsd.Generate("zdbgproto", jdefs, map[string]string { "Request": "command" })
+	gosrc := fromjsd.Generate("zdbgproto", jdefs, map[string]string { "ProtocolMessage": "type", "Event": "event", "Request": "command" })
 
 	if err = ufs.WriteTextFile(filepath.Join(gopath, dstpath), gosrc); err != nil {
 		panic(err)
