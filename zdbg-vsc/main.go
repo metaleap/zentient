@@ -35,9 +35,15 @@ func main () {
 	logln := func(msg string) { logfile.WriteString(msg+"\n")  ;  logfile.Sync() }
 	logpanic := func(msg string) {  logln(msg)  ;  panic(msg)  }
 
-	stdin,rawOut,_ = ugo.SetupJsonProtoPipes(1024*1024*4, true, false)
 	bclen := []byte("Content-Length: ")  ;  bln := []byte("\r\n\r\n")
-	var jsonout []byte  ;  var req, resp interface{}  ;  var respbase *zdbgvscp.Response
+	send := func (item interface{}) {
+		jsonout,err := json.Marshal(item)  ;  if err!=nil { logpanic("json.Marshal: " + err.Error()) }
+		rawOut.Write(bclen)  ;  rawOut.Write([]byte(ugo.SPr(len(jsonout))))  ;  rawOut.Write(bln)  ;  rawOut.Write(jsonout)  ;  rawOut.Flush()
+		logfile.Write(bclen)  ;  logfile.Write([]byte(ugo.SPr(len(jsonout))))  ;  logfile.Write(bln)  ;  logfile.Write(jsonout)  ;  logfile.Sync()
+	}
+
+	stdin,rawOut,_ = ugo.SetupJsonProtoPipes(1024*1024*4, true, false)
+	var req, resp interface{}  ;  var respbase *zdbgvscp.Response
 	for stdin.Scan() {
 		jsonin := stdin.Text()
 		logfile.WriteString("\n\n\n\n\n"+jsonin)
@@ -45,9 +51,11 @@ func main () {
 		if resp,respbase,err = zdbgvscp.HandleRequest(req, makeNewRespBase)  ;  resp==nil {
 			logpanic("BUG: resp returned was nil")
 		} else if err!=nil { respbase.Success = false  ;  respbase.Message = err.Error() }
-		if jsonout,err = json.Marshal(resp)  ;  err!=nil { logpanic("json.Marshal: " + err.Error()) }
-		rawOut.Write(bclen)  ;  rawOut.Write([]byte(ugo.SPr(len(jsonout))))  ;  rawOut.Write(bln)  ;  rawOut.Write(jsonout)  ;  rawOut.Flush()
-		logfile.Write(bclen)  ;  logfile.Write([]byte(ugo.SPr(len(jsonout))))  ;  logfile.Write(bln)  ;  logfile.Write(jsonout)  ;  logfile.Sync()
+		send(resp)
+		switch respbase.Command {
+			case "initialize":
+				send(zdbgvscp.NewInitializedEvent())
+		}
 	}
 
 }

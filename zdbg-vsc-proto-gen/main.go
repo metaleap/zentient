@@ -24,7 +24,7 @@ func main() {
 
 	unmarshalHints := map[string]string { "ProtocolMessage": "type", "Event": "event", "Request": "command" }
 	handlerBaseTypes := map[string]string{ "Request": "Response" }
-	gosrc := jdefs.Generate("zdbgvscp", unmarshalHints, handlerBaseTypes)
+	gosrc := jdefs.Generate("zdbgvscp", unmarshalHints, handlerBaseTypes, "Event")
 
 	if err = ufs.WriteTextFile(filepath.Join(gopath, dstpath), gosrc); err != nil {
 		panic(err)
