@@ -26,8 +26,7 @@ var (
 
 func main () {
 	runtime.GOMAXPROCS(runtime.NumCPU() * 2)
-	err := z.Init(map[string]func()z.Zengine { "go": zgo.Init, "hs": zhs.Init })
-	if err!=nil { panic(err) }
+	if err := z.Init(map[string]func()z.Zengine { "go": zgo.Init, "hs": zhs.Init })  ;  err!=nil { panic(err) }
 
 	logdirpath := filepath.Join(z.Ctx.ConfigDir, "zdbglog")
 	ufs.EnsureDirExists(logdirpath)
@@ -37,43 +36,49 @@ func main () {
 	logpanic := func(msg string) {  logln(msg)  ;  panic(msg)  }
 
 	stdin,rawOut,_ = ugo.SetupJsonProtoPipes(1024*1024*4, true, false)
-	bclen := []byte("Content-Length: ")  ;  bln := []byte("\n\n")
+	bclen := []byte("Content-Length: ")  ;  bln := []byte("\r\n\r\n")
+	var jsonout []byte  ;  var req, resp interface{}  ;  var respbase *zdbgvscp.Response
 	for stdin.Scan() {
-		injson := stdin.Text()  ;  req,err := zdbgvscp.TryUnmarshalRequest(injson)
-		if err!=nil { logln(err.Error())  ;  panic(err) }
-		var resp interface{}  ;  switch r := req.(type) {
-			case *zdbgvscp.DisconnectRequest:
-				resp = onDisconnect(r)
-			case *zdbgvscp.InitializeRequest:
-				resp = onInitialize(r)
-			default:
-				logpanic(injson)
-		}
-		if resp==nil { logpanic("BUG: resp returned was nil") }
-		outjson,err := json.Marshal(resp)
-		if err!=nil { logpanic("json.Marshal: " + err.Error()) }
-		rawOut.Write(bclen)  ;  rawOut.Write([]byte(ugo.SPr(len(outjson))))  ;  rawOut.Write(bln)  ;  rawOut.Write(outjson)
+		jsonin := stdin.Text()
+		logfile.WriteString("\n\n\n\n\n"+jsonin)
+		if req,err = zdbgvscp.TryUnmarshalRequest(jsonin)  ;  err!=nil { logpanic("TryUnmarshalRequest: " + err.Error()) }
+		if resp,respbase,err = zdbgvscp.HandleRequest(req, makeNewRespBase)  ;  resp==nil {
+			logpanic("BUG: resp returned was nil")
+		} else if err!=nil { respbase.Success = false  ;  respbase.Message = err.Error() }
+		if jsonout,err = json.Marshal(resp)  ;  err!=nil { logpanic("json.Marshal: " + err.Error()) }
+		rawOut.Write(bclen)  ;  rawOut.Write([]byte(ugo.SPr(len(jsonout))))  ;  rawOut.Write(bln)  ;  rawOut.Write(jsonout)  ;  rawOut.Flush()
+		logfile.Write(bclen)  ;  logfile.Write([]byte(ugo.SPr(len(jsonout))))  ;  logfile.Write(bln)  ;  logfile.Write(jsonout)  ;  logfile.Sync()
 	}
 
 }
 
-func newRespBase (reqbase *zdbgvscp.Request) (respbase zdbgvscp.Response) {
-	respbase.ProtocolMessage.Seq = respseq  ;  respseq++
+func makeNewRespBase (reqbase *zdbgvscp.Request) (respbase zdbgvscp.Response) {
+	respseq++  ;  respbase.ProtocolMessage.Seq = respseq
 	respbase.ProtocolMessage.Type = "response"  ;  respbase.Type = "response"
 	respbase.Request_seq = reqbase.Seq  ;  respbase.Command = reqbase.Command
 	respbase.Success = true
 	return
 }
 
-func onDisconnect (r *zdbgvscp.DisconnectRequest) (resp *zdbgvscp.DisconnectResponse) {
-	resp = &zdbgvscp.DisconnectResponse { Response: newRespBase(&r.Request) }
-	// if r.Arguments.Restart {}
+func init () {
+	zdbgvscp.OnDisconnectRequest = onDisconnect
+	zdbgvscp.OnInitializeRequest = onInitialize
+	zdbgvscp.OnLaunchRequest = onLaunch
+}
+
+func onDisconnect (req *zdbgvscp.DisconnectRequest, resp *zdbgvscp.DisconnectResponse) (err error) {
+	if req.Arguments.Restart {
+	}
 	return
 }
 
-func onInitialize (r *zdbgvscp.InitializeRequest) (resp *zdbgvscp.InitializeResponse) {
-	vscLastInit = &r.Arguments
-	resp = &zdbgvscp.InitializeResponse { Response: newRespBase(&r.Request) }
+func onInitialize (req *zdbgvscp.InitializeRequest, resp *zdbgvscp.InitializeResponse) (err error) {
 	resp.Body.SupportsRestartRequest = true
+	vscLastInit = &req.Arguments
+	return
+}
+
+func onLaunch (req *zdbgvscp.LaunchRequest, resp *zdbgvscp.LaunchResponse) (err error) {
+	err = ugo.E("Nah NOT ON")  // :" + " C=" + r.Arguments.C + " W=" + r.Arguments.W + " F=" + r.Arguments.F
 	return
 }
