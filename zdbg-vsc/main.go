@@ -34,6 +34,7 @@ func main () {
 	stdin,rawOut,jOut = ugo.SetupJsonProtoPipes(1024*1024*4, true)
 	var reqln string
 	for stdin.Scan() {
+
 		reqln = stdin.Text()
 		logfile.WriteString(reqln+"\n")
 		logfile.Sync()
