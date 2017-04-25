@@ -17,7 +17,7 @@ func main () {
 	if err!=nil { panic(err) }
 
 	var stdin *bufio.Scanner
-	stdin,z.RawOut,z.Out = ugo.SetupJsonProtoPipes(1024*1024*4)
+	stdin,z.RawOut,z.Out = ugo.SetupJsonProtoPipes(1024*1024*4, false)
 	for stdin.Scan() {
 		if err = z.HandleRequest(stdin.Text()) ; err == nil {
 			err = z.RawOut.Flush()
