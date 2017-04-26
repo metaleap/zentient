@@ -16,221 +16,222 @@ github.com/metaleap/zentient/zdbg-vsc-proto-gen
 ```go
 var OnAttachRequest func(*AttachRequest, *AttachResponse) error
 ```
-Called by `HandleRequest` when unmarshaling `AttachRequest` to populate the
-given `AttachResponse` that it'll then return a pointer to (or discard and
-return `nil` in case this handler returns an `error`).
+Called by `HandleRequest` after unmarshaling the given `AttachRequest` to
+populate the given `AttachResponse` that it'll then return a pointer to (in
+addition to this handler's returned `error`, if any).
 
 ```go
 var OnCompletionsRequest func(*CompletionsRequest, *CompletionsResponse) error
 ```
-Called by `HandleRequest` when unmarshaling `CompletionsRequest` to populate the
-given `CompletionsResponse` that it'll then return a pointer to (or discard and
-return `nil` in case this handler returns an `error`).
+Called by `HandleRequest` after unmarshaling the given `CompletionsRequest` to
+populate the given `CompletionsResponse` that it'll then return a pointer to (in
+addition to this handler's returned `error`, if any).
 
 ```go
 var OnConfigurationDoneRequest func(*ConfigurationDoneRequest, *ConfigurationDoneResponse) error
 ```
-Called by `HandleRequest` when unmarshaling `ConfigurationDoneRequest` to
-populate the given `ConfigurationDoneResponse` that it'll then return a pointer
-to (or discard and return `nil` in case this handler returns an `error`).
+Called by `HandleRequest` after unmarshaling the given
+`ConfigurationDoneRequest` to populate the given `ConfigurationDoneResponse`
+that it'll then return a pointer to (in addition to this handler's returned
+`error`, if any).
 
 ```go
 var OnContinueRequest func(*ContinueRequest, *ContinueResponse) error
 ```
-Called by `HandleRequest` when unmarshaling `ContinueRequest` to populate the
-given `ContinueResponse` that it'll then return a pointer to (or discard and
-return `nil` in case this handler returns an `error`).
+Called by `HandleRequest` after unmarshaling the given `ContinueRequest` to
+populate the given `ContinueResponse` that it'll then return a pointer to (in
+addition to this handler's returned `error`, if any).
 
 ```go
 var OnDisconnectRequest func(*DisconnectRequest, *DisconnectResponse) error
 ```
-Called by `HandleRequest` when unmarshaling `DisconnectRequest` to populate the
-given `DisconnectResponse` that it'll then return a pointer to (or discard and
-return `nil` in case this handler returns an `error`).
+Called by `HandleRequest` after unmarshaling the given `DisconnectRequest` to
+populate the given `DisconnectResponse` that it'll then return a pointer to (in
+addition to this handler's returned `error`, if any).
 
 ```go
 var OnEvaluateRequest func(*EvaluateRequest, *EvaluateResponse) error
 ```
-Called by `HandleRequest` when unmarshaling `EvaluateRequest` to populate the
-given `EvaluateResponse` that it'll then return a pointer to (or discard and
-return `nil` in case this handler returns an `error`).
+Called by `HandleRequest` after unmarshaling the given `EvaluateRequest` to
+populate the given `EvaluateResponse` that it'll then return a pointer to (in
+addition to this handler's returned `error`, if any).
 
 ```go
 var OnExceptionInfoRequest func(*ExceptionInfoRequest, *ExceptionInfoResponse) error
 ```
-Called by `HandleRequest` when unmarshaling `ExceptionInfoRequest` to populate
-the given `ExceptionInfoResponse` that it'll then return a pointer to (or
-discard and return `nil` in case this handler returns an `error`).
+Called by `HandleRequest` after unmarshaling the given `ExceptionInfoRequest` to
+populate the given `ExceptionInfoResponse` that it'll then return a pointer to
+(in addition to this handler's returned `error`, if any).
 
 ```go
 var OnGotoRequest func(*GotoRequest, *GotoResponse) error
 ```
-Called by `HandleRequest` when unmarshaling `GotoRequest` to populate the given
-`GotoResponse` that it'll then return a pointer to (or discard and return `nil`
-in case this handler returns an `error`).
+Called by `HandleRequest` after unmarshaling the given `GotoRequest` to populate
+the given `GotoResponse` that it'll then return a pointer to (in addition to
+this handler's returned `error`, if any).
 
 ```go
 var OnGotoTargetsRequest func(*GotoTargetsRequest, *GotoTargetsResponse) error
 ```
-Called by `HandleRequest` when unmarshaling `GotoTargetsRequest` to populate the
-given `GotoTargetsResponse` that it'll then return a pointer to (or discard and
-return `nil` in case this handler returns an `error`).
+Called by `HandleRequest` after unmarshaling the given `GotoTargetsRequest` to
+populate the given `GotoTargetsResponse` that it'll then return a pointer to (in
+addition to this handler's returned `error`, if any).
 
 ```go
 var OnInitializeRequest func(*InitializeRequest, *InitializeResponse) error
 ```
-Called by `HandleRequest` when unmarshaling `InitializeRequest` to populate the
-given `InitializeResponse` that it'll then return a pointer to (or discard and
-return `nil` in case this handler returns an `error`).
+Called by `HandleRequest` after unmarshaling the given `InitializeRequest` to
+populate the given `InitializeResponse` that it'll then return a pointer to (in
+addition to this handler's returned `error`, if any).
 
 ```go
 var OnLaunchRequest func(*LaunchRequest, *LaunchResponse) error
 ```
-Called by `HandleRequest` when unmarshaling `LaunchRequest` to populate the
-given `LaunchResponse` that it'll then return a pointer to (or discard and
-return `nil` in case this handler returns an `error`).
+Called by `HandleRequest` after unmarshaling the given `LaunchRequest` to
+populate the given `LaunchResponse` that it'll then return a pointer to (in
+addition to this handler's returned `error`, if any).
 
 ```go
 var OnModulesRequest func(*ModulesRequest, *ModulesResponse) error
 ```
-Called by `HandleRequest` when unmarshaling `ModulesRequest` to populate the
-given `ModulesResponse` that it'll then return a pointer to (or discard and
-return `nil` in case this handler returns an `error`).
+Called by `HandleRequest` after unmarshaling the given `ModulesRequest` to
+populate the given `ModulesResponse` that it'll then return a pointer to (in
+addition to this handler's returned `error`, if any).
 
 ```go
 var OnNextRequest func(*NextRequest, *NextResponse) error
 ```
-Called by `HandleRequest` when unmarshaling `NextRequest` to populate the given
-`NextResponse` that it'll then return a pointer to (or discard and return `nil`
-in case this handler returns an `error`).
+Called by `HandleRequest` after unmarshaling the given `NextRequest` to populate
+the given `NextResponse` that it'll then return a pointer to (in addition to
+this handler's returned `error`, if any).
 
 ```go
 var OnPauseRequest func(*PauseRequest, *PauseResponse) error
 ```
-Called by `HandleRequest` when unmarshaling `PauseRequest` to populate the given
-`PauseResponse` that it'll then return a pointer to (or discard and return `nil`
-in case this handler returns an `error`).
+Called by `HandleRequest` after unmarshaling the given `PauseRequest` to
+populate the given `PauseResponse` that it'll then return a pointer to (in
+addition to this handler's returned `error`, if any).
 
 ```go
 var OnRestartFrameRequest func(*RestartFrameRequest, *RestartFrameResponse) error
 ```
-Called by `HandleRequest` when unmarshaling `RestartFrameRequest` to populate
-the given `RestartFrameResponse` that it'll then return a pointer to (or discard
-and return `nil` in case this handler returns an `error`).
+Called by `HandleRequest` after unmarshaling the given `RestartFrameRequest` to
+populate the given `RestartFrameResponse` that it'll then return a pointer to
+(in addition to this handler's returned `error`, if any).
 
 ```go
 var OnRestartRequest func(*RestartRequest, *RestartResponse) error
 ```
-Called by `HandleRequest` when unmarshaling `RestartRequest` to populate the
-given `RestartResponse` that it'll then return a pointer to (or discard and
-return `nil` in case this handler returns an `error`).
+Called by `HandleRequest` after unmarshaling the given `RestartRequest` to
+populate the given `RestartResponse` that it'll then return a pointer to (in
+addition to this handler's returned `error`, if any).
 
 ```go
 var OnReverseContinueRequest func(*ReverseContinueRequest, *ReverseContinueResponse) error
 ```
-Called by `HandleRequest` when unmarshaling `ReverseContinueRequest` to populate
-the given `ReverseContinueResponse` that it'll then return a pointer to (or
-discard and return `nil` in case this handler returns an `error`).
+Called by `HandleRequest` after unmarshaling the given `ReverseContinueRequest`
+to populate the given `ReverseContinueResponse` that it'll then return a pointer
+to (in addition to this handler's returned `error`, if any).
 
 ```go
 var OnRunInTerminalRequest func(*RunInTerminalRequest, *RunInTerminalResponse) error
 ```
-Called by `HandleRequest` when unmarshaling `RunInTerminalRequest` to populate
-the given `RunInTerminalResponse` that it'll then return a pointer to (or
-discard and return `nil` in case this handler returns an `error`).
+Called by `HandleRequest` after unmarshaling the given `RunInTerminalRequest` to
+populate the given `RunInTerminalResponse` that it'll then return a pointer to
+(in addition to this handler's returned `error`, if any).
 
 ```go
 var OnScopesRequest func(*ScopesRequest, *ScopesResponse) error
 ```
-Called by `HandleRequest` when unmarshaling `ScopesRequest` to populate the
-given `ScopesResponse` that it'll then return a pointer to (or discard and
-return `nil` in case this handler returns an `error`).
+Called by `HandleRequest` after unmarshaling the given `ScopesRequest` to
+populate the given `ScopesResponse` that it'll then return a pointer to (in
+addition to this handler's returned `error`, if any).
 
 ```go
 var OnSetBreakpointsRequest func(*SetBreakpointsRequest, *SetBreakpointsResponse) error
 ```
-Called by `HandleRequest` when unmarshaling `SetBreakpointsRequest` to populate
-the given `SetBreakpointsResponse` that it'll then return a pointer to (or
-discard and return `nil` in case this handler returns an `error`).
+Called by `HandleRequest` after unmarshaling the given `SetBreakpointsRequest`
+to populate the given `SetBreakpointsResponse` that it'll then return a pointer
+to (in addition to this handler's returned `error`, if any).
 
 ```go
 var OnSetExceptionBreakpointsRequest func(*SetExceptionBreakpointsRequest, *SetExceptionBreakpointsResponse) error
 ```
-Called by `HandleRequest` when unmarshaling `SetExceptionBreakpointsRequest` to
-populate the given `SetExceptionBreakpointsResponse` that it'll then return a
-pointer to (or discard and return `nil` in case this handler returns an
-`error`).
+Called by `HandleRequest` after unmarshaling the given
+`SetExceptionBreakpointsRequest` to populate the given
+`SetExceptionBreakpointsResponse` that it'll then return a pointer to (in
+addition to this handler's returned `error`, if any).
 
 ```go
 var OnSetFunctionBreakpointsRequest func(*SetFunctionBreakpointsRequest, *SetFunctionBreakpointsResponse) error
 ```
-Called by `HandleRequest` when unmarshaling `SetFunctionBreakpointsRequest` to
-populate the given `SetFunctionBreakpointsResponse` that it'll then return a
-pointer to (or discard and return `nil` in case this handler returns an
-`error`).
+Called by `HandleRequest` after unmarshaling the given
+`SetFunctionBreakpointsRequest` to populate the given
+`SetFunctionBreakpointsResponse` that it'll then return a pointer to (in
+addition to this handler's returned `error`, if any).
 
 ```go
 var OnSetVariableRequest func(*SetVariableRequest, *SetVariableResponse) error
 ```
-Called by `HandleRequest` when unmarshaling `SetVariableRequest` to populate the
-given `SetVariableResponse` that it'll then return a pointer to (or discard and
-return `nil` in case this handler returns an `error`).
+Called by `HandleRequest` after unmarshaling the given `SetVariableRequest` to
+populate the given `SetVariableResponse` that it'll then return a pointer to (in
+addition to this handler's returned `error`, if any).
 
 ```go
 var OnSourceRequest func(*SourceRequest, *SourceResponse) error
 ```
-Called by `HandleRequest` when unmarshaling `SourceRequest` to populate the
-given `SourceResponse` that it'll then return a pointer to (or discard and
-return `nil` in case this handler returns an `error`).
+Called by `HandleRequest` after unmarshaling the given `SourceRequest` to
+populate the given `SourceResponse` that it'll then return a pointer to (in
+addition to this handler's returned `error`, if any).
 
 ```go
 var OnStackTraceRequest func(*StackTraceRequest, *StackTraceResponse) error
 ```
-Called by `HandleRequest` when unmarshaling `StackTraceRequest` to populate the
-given `StackTraceResponse` that it'll then return a pointer to (or discard and
-return `nil` in case this handler returns an `error`).
+Called by `HandleRequest` after unmarshaling the given `StackTraceRequest` to
+populate the given `StackTraceResponse` that it'll then return a pointer to (in
+addition to this handler's returned `error`, if any).
 
 ```go
 var OnStepBackRequest func(*StepBackRequest, *StepBackResponse) error
 ```
-Called by `HandleRequest` when unmarshaling `StepBackRequest` to populate the
-given `StepBackResponse` that it'll then return a pointer to (or discard and
-return `nil` in case this handler returns an `error`).
+Called by `HandleRequest` after unmarshaling the given `StepBackRequest` to
+populate the given `StepBackResponse` that it'll then return a pointer to (in
+addition to this handler's returned `error`, if any).
 
 ```go
 var OnStepInRequest func(*StepInRequest, *StepInResponse) error
 ```
-Called by `HandleRequest` when unmarshaling `StepInRequest` to populate the
-given `StepInResponse` that it'll then return a pointer to (or discard and
-return `nil` in case this handler returns an `error`).
+Called by `HandleRequest` after unmarshaling the given `StepInRequest` to
+populate the given `StepInResponse` that it'll then return a pointer to (in
+addition to this handler's returned `error`, if any).
 
 ```go
 var OnStepInTargetsRequest func(*StepInTargetsRequest, *StepInTargetsResponse) error
 ```
-Called by `HandleRequest` when unmarshaling `StepInTargetsRequest` to populate
-the given `StepInTargetsResponse` that it'll then return a pointer to (or
-discard and return `nil` in case this handler returns an `error`).
+Called by `HandleRequest` after unmarshaling the given `StepInTargetsRequest` to
+populate the given `StepInTargetsResponse` that it'll then return a pointer to
+(in addition to this handler's returned `error`, if any).
 
 ```go
 var OnStepOutRequest func(*StepOutRequest, *StepOutResponse) error
 ```
-Called by `HandleRequest` when unmarshaling `StepOutRequest` to populate the
-given `StepOutResponse` that it'll then return a pointer to (or discard and
-return `nil` in case this handler returns an `error`).
+Called by `HandleRequest` after unmarshaling the given `StepOutRequest` to
+populate the given `StepOutResponse` that it'll then return a pointer to (in
+addition to this handler's returned `error`, if any).
 
 ```go
 var OnThreadsRequest func(*ThreadsRequest, *ThreadsResponse) error
 ```
-Called by `HandleRequest` when unmarshaling `ThreadsRequest` to populate the
-given `ThreadsResponse` that it'll then return a pointer to (or discard and
-return `nil` in case this handler returns an `error`).
+Called by `HandleRequest` after unmarshaling the given `ThreadsRequest` to
+populate the given `ThreadsResponse` that it'll then return a pointer to (in
+addition to this handler's returned `error`, if any).
 
 ```go
 var OnVariablesRequest func(*VariablesRequest, *VariablesResponse) error
 ```
-Called by `HandleRequest` when unmarshaling `VariablesRequest` to populate the
-given `VariablesResponse` that it'll then return a pointer to (or discard and
-return `nil` in case this handler returns an `error`).
+Called by `HandleRequest` after unmarshaling the given `VariablesRequest` to
+populate the given `VariablesResponse` that it'll then return a pointer to (in
+addition to this handler's returned `error`, if any).
 
 #### func  HandleRequest
 
@@ -251,19 +252,19 @@ func TryUnmarshalEvent(js string) (ptr interface{}, err error)
 TryUnmarshalEvent attempts to unmarshal JSON string `js` (if it starts with a
 `{` and ends with a `}`) into a `struct` based on `Event` as follows:
 
-If `js` contains `"event":"terminated"`, attempts to unmarshal into a new
-`TerminatedEvent`. If `js` contains `"event":"continued"`, attempts to unmarshal
-into a new `ContinuedEvent`. If `js` contains `"event":"stopped"`, attempts to
-unmarshal into a new `StoppedEvent`. If `js` contains `"event":"thread"`,
-attempts to unmarshal into a new `ThreadEvent`. If `js` contains
-`"event":"exited"`, attempts to unmarshal into a new `ExitedEvent`. If `js`
-contains `"event":"module"`, attempts to unmarshal into a new `ModuleEvent`. If
-`js` contains `"event":"output"`, attempts to unmarshal into a new
-`OutputEvent`. If `js` contains `"event":"initialized"`, attempts to unmarshal
-into a new `InitializedEvent`. If `js` contains `"event":"breakpoint"`, attempts
-to unmarshal into a new `BreakpointEvent`. Otherwise, `err`'s message will be:
-`Event: encountered unknown JSON value for event: ` followed by the `event`
-value encountered.
+If `js` contains `"event":"exited"`, attempts to unmarshal into a new
+`ExitedEvent`. If `js` contains `"event":"stopped"`, attempts to unmarshal into
+a new `StoppedEvent`. If `js` contains `"event":"initialized"`, attempts to
+unmarshal into a new `InitializedEvent`. If `js` contains
+`"event":"terminated"`, attempts to unmarshal into a new `TerminatedEvent`. If
+`js` contains `"event":"module"`, attempts to unmarshal into a new
+`ModuleEvent`. If `js` contains `"event":"output"`, attempts to unmarshal into a
+new `OutputEvent`. If `js` contains `"event":"thread"`, attempts to unmarshal
+into a new `ThreadEvent`. If `js` contains `"event":"breakpoint"`, attempts to
+unmarshal into a new `BreakpointEvent`. If `js` contains `"event":"continued"`,
+attempts to unmarshal into a new `ContinuedEvent`. Otherwise, `err`'s message
+will be: `Event: encountered unknown JSON value for event: ` followed by the
+`event` value encountered.
 
 In general: the `err` returned may be either `nil`, the above message, or an
 `encoding/json.Unmarshal()` return value. `ptr` will be a pointer to the
@@ -280,12 +281,12 @@ TryUnmarshalProtocolMessage attempts to unmarshal JSON string `js` (if it starts
 with a `{` and ends with a `}`) into a `struct` based on `ProtocolMessage` as
 follows:
 
-If `js` contains `"type":"response"`, attempts to unmarshal into a new
-`Response`. If `js` contains `"type":"request"`, attempts to unmarshal via
-`TryUnmarshalRequest` If `js` contains `"type":"event"`, attempts to unmarshal
-via `TryUnmarshalEvent` Otherwise, `err`'s message will be: `ProtocolMessage:
-encountered unknown JSON value for type: ` followed by the `type` value
-encountered.
+If `js` contains `"type":"request"`, attempts to unmarshal via
+`TryUnmarshalRequest` If `js` contains `"type":"response"`, attempts to
+unmarshal into a new `Response`. If `js` contains `"type":"event"`, attempts to
+unmarshal via `TryUnmarshalEvent` Otherwise, `err`'s message will be:
+`ProtocolMessage: encountered unknown JSON value for type: ` followed by the
+`type` value encountered.
 
 In general: the `err` returned may be either `nil`, the above message, or an
 `encoding/json.Unmarshal()` return value. `ptr` will be a pointer to the
@@ -301,51 +302,49 @@ func TryUnmarshalRequest(js string) (ptr interface{}, err error)
 TryUnmarshalRequest attempts to unmarshal JSON string `js` (if it starts with a
 `{` and ends with a `}`) into a `struct` based on `Request` as follows:
 
-If `js` contains `"command":"setExceptionBreakpoints"`, attempts to unmarshal
-into a new `SetExceptionBreakpointsRequest`. If `js` contains
-`"command":"continue"`, attempts to unmarshal into a new `ContinueRequest`. If
-`js` contains `"command":"stepBack"`, attempts to unmarshal into a new
-`StepBackRequest`. If `js` contains `"command":"disconnect"`, attempts to
-unmarshal into a new `DisconnectRequest`. If `js` contains
-`"command":"setBreakpoints"`, attempts to unmarshal into a new
-`SetBreakpointsRequest`. If `js` contains `"command":"source"`, attempts to
-unmarshal into a new `SourceRequest`. If `js` contains
-`"command":"completions"`, attempts to unmarshal into a new
-`CompletionsRequest`. If `js` contains `"command":"stepInTargets"`, attempts to
-unmarshal into a new `StepInTargetsRequest`. If `js` contains
-`"command":"next"`, attempts to unmarshal into a new `NextRequest`. If `js`
-contains `"command":"reverseContinue"`, attempts to unmarshal into a new
-`ReverseContinueRequest`. If `js` contains `"command":"gotoTargets"`, attempts
-to unmarshal into a new `GotoTargetsRequest`. If `js` contains
+If `js` contains `"command":"restart"`, attempts to unmarshal into a new
+`RestartRequest`. If `js` contains `"command":"launch"`, attempts to unmarshal
+into a new `LaunchRequest`. If `js` contains `"command":"reverseContinue"`,
+attempts to unmarshal into a new `ReverseContinueRequest`. If `js` contains
 `"command":"configurationDone"`, attempts to unmarshal into a new
-`ConfigurationDoneRequest`. If `js` contains `"command":"stackTrace"`, attempts
-to unmarshal into a new `StackTraceRequest`. If `js` contains
-`"command":"goto"`, attempts to unmarshal into a new `GotoRequest`. If `js`
-contains `"command":"launch"`, attempts to unmarshal into a new `LaunchRequest`.
-If `js` contains `"command":"attach"`, attempts to unmarshal into a new
-`AttachRequest`. If `js` contains `"command":"variables"`, attempts to unmarshal
-into a new `VariablesRequest`. If `js` contains `"command":"modules"`, attempts
-to unmarshal into a new `ModulesRequest`. If `js` contains
-`"command":"evaluate"`, attempts to unmarshal into a new `EvaluateRequest`. If
-`js` contains `"command":"restart"`, attempts to unmarshal into a new
-`RestartRequest`. If `js` contains `"command":"runInTerminal"`, attempts to
-unmarshal into a new `RunInTerminalRequest`. If `js` contains
-`"command":"initialize"`, attempts to unmarshal into a new `InitializeRequest`.
-If `js` contains `"command":"setVariable"`, attempts to unmarshal into a new
-`SetVariableRequest`. If `js` contains `"command":"stepIn"`, attempts to
-unmarshal into a new `StepInRequest`. If `js` contains `"command":"stepOut"`,
-attempts to unmarshal into a new `StepOutRequest`. If `js` contains
-`"command":"restartFrame"`, attempts to unmarshal into a new
-`RestartFrameRequest`. If `js` contains `"command":"threads"`, attempts to
-unmarshal into a new `ThreadsRequest`. If `js` contains
-`"command":"setFunctionBreakpoints"`, attempts to unmarshal into a new
-`SetFunctionBreakpointsRequest`. If `js` contains `"command":"scopes"`, attempts
-to unmarshal into a new `ScopesRequest`. If `js` contains `"command":"pause"`,
+`ConfigurationDoneRequest`. If `js` contains `"command":"next"`, attempts to
+unmarshal into a new `NextRequest`. If `js` contains `"command":"pause"`,
 attempts to unmarshal into a new `PauseRequest`. If `js` contains
 `"command":"exceptionInfo"`, attempts to unmarshal into a new
-`ExceptionInfoRequest`. Otherwise, `err`'s message will be: `Request:
-encountered unknown JSON value for command: ` followed by the `command` value
-encountered.
+`ExceptionInfoRequest`. If `js` contains `"command":"variables"`, attempts to
+unmarshal into a new `VariablesRequest`. If `js` contains `"command":"modules"`,
+attempts to unmarshal into a new `ModulesRequest`. If `js` contains
+`"command":"goto"`, attempts to unmarshal into a new `GotoRequest`. If `js`
+contains `"command":"source"`, attempts to unmarshal into a new `SourceRequest`.
+If `js` contains `"command":"initialize"`, attempts to unmarshal into a new
+`InitializeRequest`. If `js` contains `"command":"stepInTargets"`, attempts to
+unmarshal into a new `StepInTargetsRequest`. If `js` contains
+`"command":"completions"`, attempts to unmarshal into a new
+`CompletionsRequest`. If `js` contains `"command":"attach"`, attempts to
+unmarshal into a new `AttachRequest`. If `js` contains `"command":"stackTrace"`,
+attempts to unmarshal into a new `StackTraceRequest`. If `js` contains
+`"command":"scopes"`, attempts to unmarshal into a new `ScopesRequest`. If `js`
+contains `"command":"gotoTargets"`, attempts to unmarshal into a new
+`GotoTargetsRequest`. If `js` contains `"command":"evaluate"`, attempts to
+unmarshal into a new `EvaluateRequest`. If `js` contains `"command":"continue"`,
+attempts to unmarshal into a new `ContinueRequest`. If `js` contains
+`"command":"stepBack"`, attempts to unmarshal into a new `StepBackRequest`. If
+`js` contains `"command":"stepOut"`, attempts to unmarshal into a new
+`StepOutRequest`. If `js` contains `"command":"runInTerminal"`, attempts to
+unmarshal into a new `RunInTerminalRequest`. If `js` contains
+`"command":"threads"`, attempts to unmarshal into a new `ThreadsRequest`. If
+`js` contains `"command":"setExceptionBreakpoints"`, attempts to unmarshal into
+a new `SetExceptionBreakpointsRequest`. If `js` contains `"command":"stepIn"`,
+attempts to unmarshal into a new `StepInRequest`. If `js` contains
+`"command":"disconnect"`, attempts to unmarshal into a new `DisconnectRequest`.
+If `js` contains `"command":"setFunctionBreakpoints"`, attempts to unmarshal
+into a new `SetFunctionBreakpointsRequest`. If `js` contains
+`"command":"setVariable"`, attempts to unmarshal into a new
+`SetVariableRequest`. If `js` contains `"command":"setBreakpoints"`, attempts to
+unmarshal into a new `SetBreakpointsRequest`. If `js` contains
+`"command":"restartFrame"`, attempts to unmarshal into a new
+`RestartFrameRequest`. Otherwise, `err`'s message will be: `Request: encountered
+unknown JSON value for command: ` followed by the `command` value encountered.
 
 In general: the `err` returned may be either `nil`, the above message, or an
 `encoding/json.Unmarshal()` return value. `ptr` will be a pointer to the
@@ -413,6 +412,12 @@ Returns a new `AttachResponse` with the followings fields set: `type`
 ```go
 type Breakpoint struct {
 
+	// The start line of the actual range covered by the breakpoint.
+	Line int `json:"line,omitempty"`
+
+	// An optional start column of the actual range covered by the breakpoint.
+	Column int `json:"column,omitempty"`
+
 	// An optional end line of the actual range covered by the breakpoint.
 	EndLine int `json:"endLine,omitempty"`
 
@@ -430,12 +435,6 @@ type Breakpoint struct {
 
 	// The source where the breakpoint is located.
 	Source Source `json:"source,omitempty"`
-
-	// The start line of the actual range covered by the breakpoint.
-	Line int `json:"line,omitempty"`
-
-	// An optional start column of the actual range covered by the breakpoint.
-	Column int `json:"column,omitempty"`
 } // struct Breakpoint
 
 ```
@@ -450,9 +449,6 @@ type BreakpointEvent struct {
 	// Server-initiated event.
 	Event
 
-	// POSSIBLE VALUES: `breakpoint`
-	Event_ string `json:"event"`
-
 	Body struct {
 
 		// The reason for the event (such as: 'changed', 'new').
@@ -463,6 +459,9 @@ type BreakpointEvent struct {
 		// The breakpoint.
 		Breakpoint Breakpoint `json:"breakpoint"`
 	} `json:"body"`
+
+	// POSSIBLE VALUES: `breakpoint`
+	Event_ string `json:"event"`
 } // struct BreakpointEvent
 
 ```
@@ -482,65 +481,65 @@ Returns a new `BreakpointEvent` with the followings fields set: `event`, `type`
 ```go
 type Capabilities struct {
 
-	// The set of additional module information exposed by the debug adapter.
-	AdditionalModuleColumns []ColumnDescriptor `json:"additionalModuleColumns,omitempty"`
-
-	// The debug adapter supports 'exceptionOptions' on the setExceptionBreakpoints request.
-	SupportsExceptionOptions bool `json:"supportsExceptionOptions,omitempty"`
-
-	// The debug adapter supports a 'format' attribute on the stackTraceRequest, variablesRequest, and evaluateRequest.
-	SupportsValueFormattingOptions bool `json:"supportsValueFormattingOptions,omitempty"`
-
-	// The debug adapter supports the configurationDoneRequest.
-	SupportsConfigurationDoneRequest bool `json:"supportsConfigurationDoneRequest,omitempty"`
-
 	// The debug adapter supports breakpoints that break execution after a specified number of hits.
 	SupportsHitConditionalBreakpoints bool `json:"supportsHitConditionalBreakpoints,omitempty"`
-
-	// The debug adapter supports setting a variable to a value.
-	SupportsSetVariable bool `json:"supportsSetVariable,omitempty"`
-
-	// The debug adapter supports the gotoTargetsRequest.
-	SupportsGotoTargetsRequest bool `json:"supportsGotoTargetsRequest,omitempty"`
-
-	// The debug adapter supports the completionsRequest.
-	SupportsCompletionsRequest bool `json:"supportsCompletionsRequest,omitempty"`
-
-	// Checksum algorithms supported by the debug adapter.
-	SupportedChecksumAlgorithms []ChecksumAlgorithm `json:"supportedChecksumAlgorithms,omitempty"`
-
-	// The debug adapter supports function breakpoints.
-	SupportsFunctionBreakpoints bool `json:"supportsFunctionBreakpoints,omitempty"`
-
-	// Available filters or options for the setExceptionBreakpoints request.
-	ExceptionBreakpointFilters []ExceptionBreakpointsFilter `json:"exceptionBreakpointFilters,omitempty"`
-
-	// The debug adapter supports stepping back via the stepBack and reverseContinue requests.
-	SupportsStepBack bool `json:"supportsStepBack,omitempty"`
-
-	// The debug adapter supports restarting a frame.
-	SupportsRestartFrame bool `json:"supportsRestartFrame,omitempty"`
-
-	// The debug adapter supports the stepInTargetsRequest.
-	SupportsStepInTargetsRequest bool `json:"supportsStepInTargetsRequest,omitempty"`
-
-	// The debug adapter supports conditional breakpoints.
-	SupportsConditionalBreakpoints bool `json:"supportsConditionalBreakpoints,omitempty"`
 
 	// The debug adapter supports a (side effect free) evaluate request for data hovers.
 	SupportsEvaluateForHovers bool `json:"supportsEvaluateForHovers,omitempty"`
 
+	// The debug adapter supports the gotoTargetsRequest.
+	SupportsGotoTargetsRequest bool `json:"supportsGotoTargetsRequest,omitempty"`
+
+	// The debug adapter supports 'exceptionOptions' on the setExceptionBreakpoints request.
+	SupportsExceptionOptions bool `json:"supportsExceptionOptions,omitempty"`
+
+	// The debug adapter supports function breakpoints.
+	SupportsFunctionBreakpoints bool `json:"supportsFunctionBreakpoints,omitempty"`
+
+	// The debug adapter supports conditional breakpoints.
+	SupportsConditionalBreakpoints bool `json:"supportsConditionalBreakpoints,omitempty"`
+
+	// The debug adapter supports stepping back via the stepBack and reverseContinue requests.
+	SupportsStepBack bool `json:"supportsStepBack,omitempty"`
+
+	// The debug adapter supports the stepInTargetsRequest.
+	SupportsStepInTargetsRequest bool `json:"supportsStepInTargetsRequest,omitempty"`
+
+	// The debug adapter supports the configurationDoneRequest.
+	SupportsConfigurationDoneRequest bool `json:"supportsConfigurationDoneRequest,omitempty"`
+
+	// The debug adapter supports setting a variable to a value.
+	SupportsSetVariable bool `json:"supportsSetVariable,omitempty"`
+
+	// The debug adapter supports restarting a frame.
+	SupportsRestartFrame bool `json:"supportsRestartFrame,omitempty"`
+
+	// The debug adapter supports the completionsRequest.
+	SupportsCompletionsRequest bool `json:"supportsCompletionsRequest,omitempty"`
+
+	// The set of additional module information exposed by the debug adapter.
+	AdditionalModuleColumns []ColumnDescriptor `json:"additionalModuleColumns,omitempty"`
+
+	// Checksum algorithms supported by the debug adapter.
+	SupportedChecksumAlgorithms []ChecksumAlgorithm `json:"supportedChecksumAlgorithms,omitempty"`
+
 	// The debug adapter supports the 'terminateDebuggee' attribute on the 'disconnect' request.
 	SupportTerminateDebuggee bool `json:"supportTerminateDebuggee,omitempty"`
 
-	// The debug adapter supports the modules request.
-	SupportsModulesRequest bool `json:"supportsModulesRequest,omitempty"`
+	// Available filters or options for the setExceptionBreakpoints request.
+	ExceptionBreakpointFilters []ExceptionBreakpointsFilter `json:"exceptionBreakpointFilters,omitempty"`
 
 	// The debug adapter supports the RestartRequest. In this case a client should not implement 'restart' by terminating and relaunching the adapter but by calling the RestartRequest.
 	SupportsRestartRequest bool `json:"supportsRestartRequest,omitempty"`
 
+	// The debug adapter supports a 'format' attribute on the stackTraceRequest, variablesRequest, and evaluateRequest.
+	SupportsValueFormattingOptions bool `json:"supportsValueFormattingOptions,omitempty"`
+
 	// The debug adapter supports the exceptionInfo request.
 	SupportsExceptionInfoRequest bool `json:"supportsExceptionInfoRequest,omitempty"`
+
+	// The debug adapter supports the modules request.
+	SupportsModulesRequest bool `json:"supportsModulesRequest,omitempty"`
 } // struct Capabilities
 
 ```
@@ -578,6 +577,14 @@ POSSIBLE VALUES: `MD5`, `SHA1`, `SHA256`, `timestamp`
 ```go
 type ColumnDescriptor struct {
 
+	// Datatype of values in this column.  Defaults to 'string' if not specified.
+	//
+	// POSSIBLE VALUES: `string`, `number`, `boolean`, `unixTimestampUTC`
+	Type string `json:"type,omitempty"`
+
+	// Width of this column in characters (hint only).
+	Width int `json:"width,omitempty"`
+
 	// Name of the attribute rendered in this column.
 	AttributeName string `json:"attributeName"`
 
@@ -586,14 +593,6 @@ type ColumnDescriptor struct {
 
 	// Format to use for the rendered values in this column. TBD how the format strings looks like.
 	Format string `json:"format,omitempty"`
-
-	// Datatype of values in this column.  Defaults to 'string' if not specified.
-	//
-	// POSSIBLE VALUES: `string`, `number`, `boolean`, `unixTimestampUTC`
-	Type string `json:"type,omitempty"`
-
-	// Width of this column in characters (hint only).
-	Width int `json:"width,omitempty"`
 } // struct ColumnDescriptor
 
 ```
@@ -671,10 +670,10 @@ type CompletionsRequest struct {
 	// A client or server-initiated request.
 	Request
 
+	Arguments CompletionsArguments `json:"arguments"`
+
 	// POSSIBLE VALUES: `completions`
 	Command string `json:"command"`
-
-	Arguments CompletionsArguments `json:"arguments"`
 } // struct CompletionsRequest
 
 ```
@@ -879,13 +878,13 @@ Returns a new `ContinuedEvent` with the followings fields set: `event`, `type`
 ```go
 type DisconnectArguments struct {
 
-	// restart
-	Restart bool `json:"restart,omitempty"`
-
 	// Indicates whether the debuggee should be terminated when the debugger is disconnected.
 	// If unspecified, the debug adapter is free to do whatever it thinks is best.
 	// A client can only rely on this attribute being properly honored if a debug adapter returns true for the 'supportTerminateDebuggee' capability.
 	TerminateDebuggee bool `json:"terminateDebuggee,omitempty"`
+
+	// restart
+	Restart bool `json:"restart,omitempty"`
 } // struct DisconnectArguments
 
 ```
@@ -899,10 +898,10 @@ type DisconnectRequest struct {
 	// A client or server-initiated request.
 	Request
 
-	Arguments DisconnectArguments `json:"arguments,omitempty"`
-
 	// POSSIBLE VALUES: `disconnect`
 	Command string `json:"command"`
+
+	Arguments DisconnectArguments `json:"arguments,omitempty"`
 } // struct DisconnectRequest
 
 ```
@@ -967,9 +966,6 @@ Returns a new `ErrorResponse` with the followings fields set: `type`
 ```go
 type EvaluateArguments struct {
 
-	// Specifies details on how to format the Evaluate result.
-	Format ValueFormat `json:"format,omitempty"`
-
 	// The expression to evaluate.
 	Expression string `json:"expression"`
 
@@ -980,6 +976,9 @@ type EvaluateArguments struct {
 	//
 	// POSSIBLE VALUES: `watch`, `repl`, `hover`
 	Context string `json:"context,omitempty"`
+
+	// Specifies details on how to format the Evaluate result.
+	Format ValueFormat `json:"format,omitempty"`
 } // struct EvaluateArguments
 
 ```
@@ -1126,9 +1125,6 @@ how exceptions are dealt with.
 ```go
 type ExceptionDetails struct {
 
-	// Short type name of the exception object.
-	TypeName string `json:"typeName,omitempty"`
-
 	// Fully-qualified type name of the exception object.
 	FullTypeName string `json:"fullTypeName,omitempty"`
 
@@ -1143,6 +1139,9 @@ type ExceptionDetails struct {
 
 	// Message contained in the exception.
 	Message string `json:"message,omitempty"`
+
+	// Short type name of the exception object.
+	TypeName string `json:"typeName,omitempty"`
 } // struct ExceptionDetails
 
 ```
@@ -1198,6 +1197,9 @@ type ExceptionInfoResponse struct {
 
 	Body struct {
 
+		// ID of the exception that was thrown.
+		ExceptionId string `json:"exceptionId"`
+
 		// Descriptive text for the exception provided by the debug adapter.
 		Description string `json:"description,omitempty"`
 
@@ -1206,9 +1208,6 @@ type ExceptionInfoResponse struct {
 
 		// Detailed information about the exception.
 		Details ExceptionDetails `json:"details,omitempty"`
-
-		// ID of the exception that was thrown.
-		ExceptionId string `json:"exceptionId"`
 	} `json:"body"`
 } // struct ExceptionInfoResponse
 
@@ -1265,14 +1264,14 @@ type ExitedEvent struct {
 	// Server-initiated event.
 	Event
 
+	// POSSIBLE VALUES: `exited`
+	Event_ string `json:"event"`
+
 	Body struct {
 
 		// The exit code returned from the debuggee.
 		ExitCode int `json:"exitCode"`
 	} `json:"body"`
-
-	// POSSIBLE VALUES: `exited`
-	Event_ string `json:"event"`
 } // struct ExitedEvent
 
 ```
@@ -1292,14 +1291,14 @@ Returns a new `ExitedEvent` with the followings fields set: `event`, `type`
 ```go
 type FunctionBreakpoint struct {
 
-	// An optional expression that controls how many hits of the breakpoint are ignored. The backend is expected to interpret the expression as needed.
-	HitCondition string `json:"hitCondition,omitempty"`
-
 	// The name of the function.
 	Name string `json:"name"`
 
 	// An optional expression for conditional breakpoints.
 	Condition string `json:"condition,omitempty"`
+
+	// An optional expression that controls how many hits of the breakpoint are ignored. The backend is expected to interpret the expression as needed.
+	HitCondition string `json:"hitCondition,omitempty"`
 } // struct FunctionBreakpoint
 
 ```
@@ -1375,6 +1374,12 @@ Returns a new `GotoResponse` with the followings fields set: `type`
 ```go
 type GotoTarget struct {
 
+	// An optional column of the goto target.
+	Column int `json:"column,omitempty"`
+
+	// An optional end line of the range covered by the goto target.
+	EndLine int `json:"endLine,omitempty"`
+
 	// An optional end column of the range covered by the goto target.
 	EndColumn int `json:"endColumn,omitempty"`
 
@@ -1386,12 +1391,6 @@ type GotoTarget struct {
 
 	// The line of the goto target.
 	Line int `json:"line"`
-
-	// An optional column of the goto target.
-	Column int `json:"column,omitempty"`
-
-	// An optional end line of the range covered by the goto target.
-	EndLine int `json:"endLine,omitempty"`
 } // struct GotoTarget
 
 ```
@@ -1405,14 +1404,14 @@ A GotoTarget describes a code location that can be used as a target in the
 ```go
 type GotoTargetsArguments struct {
 
+	// The source location for which the goto targets are determined.
+	Source Source `json:"source"`
+
 	// The line location for which the goto targets are determined.
 	Line int `json:"line"`
 
 	// An optional column location for which the goto targets are determined.
 	Column int `json:"column,omitempty"`
-
-	// The source location for which the goto targets are determined.
-	Source Source `json:"source"`
 } // struct GotoTargetsArguments
 
 ```
@@ -1502,15 +1501,6 @@ Returns a new `InitializeRequest` with the followings fields set: `command`,
 ```go
 type InitializeRequestArguments struct {
 
-	// Client supports the optional type attribute for variables.
-	SupportsVariableType bool `json:"supportsVariableType,omitempty"`
-
-	// Client supports the paging of variables.
-	SupportsVariablePaging bool `json:"supportsVariablePaging,omitempty"`
-
-	// Client supports the runInTerminal request.
-	SupportsRunInTerminalRequest bool `json:"supportsRunInTerminalRequest,omitempty"`
-
 	// The ID of the (frontend) client using this adapter.
 	ClientID string `json:"clientID,omitempty"`
 
@@ -1527,6 +1517,15 @@ type InitializeRequestArguments struct {
 	//
 	// POSSIBLE VALUES: `path`, `uri`
 	PathFormat string `json:"pathFormat,omitempty"`
+
+	// Client supports the optional type attribute for variables.
+	SupportsVariableType bool `json:"supportsVariableType,omitempty"`
+
+	// Client supports the paging of variables.
+	SupportsVariablePaging bool `json:"supportsVariablePaging,omitempty"`
+
+	// Client supports the runInTerminal request.
+	SupportsRunInTerminalRequest bool `json:"supportsRunInTerminalRequest,omitempty"`
 } // struct InitializeRequestArguments
 
 ```
@@ -1617,17 +1616,17 @@ Returns a new `LaunchRequest` with the followings fields set: `command`, `type`
 ```go
 type LaunchRequestArguments struct {
 
-	// If noDebug is true the launch request should launch the program without enabling debugging.
-	NoDebug bool `json:"noDebug,omitempty"`
+	// c
+	C string `json:"c,omitempty"`
 
 	// f
 	F string `json:"f,omitempty"`
 
+	// If noDebug is true the launch request should launch the program without enabling debugging.
+	NoDebug bool `json:"noDebug,omitempty"`
+
 	// w
 	W string `json:"w,omitempty"`
-
-	// c
-	C string `json:"c,omitempty"`
 } // struct LaunchRequestArguments
 
 ```
@@ -1659,6 +1658,15 @@ Returns a new `LaunchResponse` with the followings fields set: `type`
 ```go
 type Message struct {
 
+	// If true send to telemetry.
+	SendTelemetry bool `json:"sendTelemetry,omitempty"`
+
+	// If true show user.
+	ShowUser bool `json:"showUser,omitempty"`
+
+	// An optional url where additional information about this message can be found.
+	Url string `json:"url,omitempty"`
+
 	// An optional label that is presented to the user as the UI for opening the url.
 	UrlLabel string `json:"urlLabel,omitempty"`
 
@@ -1671,15 +1679,6 @@ type Message struct {
 
 	// An object used as a dictionary for looking up the variables in the format string.
 	Variables map[string]string `json:"variables,omitempty"`
-
-	// If true send to telemetry.
-	SendTelemetry bool `json:"sendTelemetry,omitempty"`
-
-	// If true show user.
-	ShowUser bool `json:"showUser,omitempty"`
-
-	// An optional url where additional information about this message can be found.
-	Url string `json:"url,omitempty"`
 } // struct Message
 
 ```
@@ -1694,17 +1693,8 @@ type Module struct {
 	// A name of the module.
 	Name string `json:"name"`
 
-	// User understandable description of if symbols were found for the module (ex: 'Symbols Loaded', 'Symbols not found', etc.
-	SymbolStatus string `json:"symbolStatus,omitempty"`
-
-	// Logical full path to the symbol file. The exact definition is implementation defined.
-	SymbolFilePath string `json:"symbolFilePath,omitempty"`
-
-	// True if the module is considered 'user code' by a debugger that supports 'Just My Code'.
-	IsUserCode bool `json:"isUserCode,omitempty"`
-
-	// Version of Module.
-	Version string `json:"version,omitempty"`
+	// True if the module is optimized.
+	IsOptimized bool `json:"isOptimized,omitempty"`
 
 	// Module created or modified.
 	DateTimeStamp string `json:"dateTimeStamp,omitempty"`
@@ -1725,8 +1715,17 @@ type Module struct {
 	// Logical full path to the module. The exact definition is implementation defined, but usually this would be a full path to the on-disk file for the module.
 	Path string `json:"path,omitempty"`
 
-	// True if the module is optimized.
-	IsOptimized bool `json:"isOptimized,omitempty"`
+	// True if the module is considered 'user code' by a debugger that supports 'Just My Code'.
+	IsUserCode bool `json:"isUserCode,omitempty"`
+
+	// Version of Module.
+	Version string `json:"version,omitempty"`
+
+	// User understandable description of if symbols were found for the module (ex: 'Symbols Loaded', 'Symbols not found', etc.
+	SymbolStatus string `json:"symbolStatus,omitempty"`
+
+	// Logical full path to the symbol file. The exact definition is implementation defined.
+	SymbolFilePath string `json:"symbolFilePath,omitempty"`
 } // struct Module
 
 ```
@@ -1783,11 +1782,11 @@ Returns a new `ModuleEvent` with the followings fields set: `event`, `type`
 ```go
 type ModulesArguments struct {
 
-	// The index of the first module to return; if omitted modules start at 0.
-	StartModule int `json:"startModule,omitempty"`
-
 	// The number of modules to return. If moduleCount is not specified or 0, all modules are returned.
 	ModuleCount int `json:"moduleCount,omitempty"`
+
+	// The index of the first module to return; if omitted modules start at 0.
+	StartModule int `json:"startModule,omitempty"`
 } // struct ModulesArguments
 
 ```
@@ -1880,10 +1879,10 @@ type NextRequest struct {
 	// A client or server-initiated request.
 	Request
 
+	Arguments NextArguments `json:"arguments"`
+
 	// POSSIBLE VALUES: `next`
 	Command string `json:"command"`
-
-	Arguments NextArguments `json:"arguments"`
 } // struct NextRequest
 
 ```
@@ -2052,6 +2051,9 @@ type Request struct {
 	// Base class of requests, responses, and events.
 	ProtocolMessage
 
+	// POSSIBLE VALUES: `request`
+	Type string `json:"type"`
+
 	// The command to execute.
 	Command string `json:"command"`
 
@@ -2066,9 +2068,6 @@ type Request struct {
 	// - `map[string]interface{}` (for JSON `object`s)
 	// - `string` (for JSON `string`s)
 	Arguments interface{} `json:"arguments,omitempty"`
-
-	// POSSIBLE VALUES: `request`
-	Type string `json:"type"`
 } // struct Request
 
 ```
@@ -2088,18 +2087,6 @@ type Response struct {
 	// Base class of requests, responses, and events.
 	ProtocolMessage
 
-	// Sequence number of the corresponding request.
-	Request_seq int `json:"request_seq"`
-
-	// Outcome of the request.
-	Success bool `json:"success"`
-
-	// The command requested.
-	Command string `json:"command"`
-
-	// Contains error message if success == false.
-	Message string `json:"message,omitempty"`
-
 	// Contains request result if success is true and optional error details if success is false.
 	//
 	// POSSIBLE TYPES:
@@ -2114,6 +2101,18 @@ type Response struct {
 
 	// POSSIBLE VALUES: `response`
 	Type string `json:"type"`
+
+	// Sequence number of the corresponding request.
+	Request_seq int `json:"request_seq"`
+
+	// Outcome of the request.
+	Success bool `json:"success"`
+
+	// The command requested.
+	Command string `json:"command"`
+
+	// Contains error message if success == false.
+	Message string `json:"message,omitempty"`
 } // struct Response
 
 ```
@@ -2338,6 +2337,9 @@ Returns a new `RunInTerminalRequest` with the followings fields set: `command`,
 ```go
 type RunInTerminalRequestArguments struct {
 
+	// Environment key-value pairs that are added to the default environment.
+	Env map[string]string `json:"env,omitempty"`
+
 	// What kind of terminal to launch.
 	//
 	// POSSIBLE VALUES: `integrated`, `external`
@@ -2351,9 +2353,6 @@ type RunInTerminalRequestArguments struct {
 
 	// List of arguments. The first argument is the command to run.
 	Args []string `json:"args"`
-
-	// Environment key-value pairs that are added to the default environment.
-	Env map[string]string `json:"env,omitempty"`
 } // struct RunInTerminalRequestArguments
 
 ```
@@ -2390,37 +2389,37 @@ Returns a new `RunInTerminalResponse` with the followings fields set: `type`
 ```go
 type Scope struct {
 
+	// Optional start column of the range covered by this scope.
+	Column int `json:"column,omitempty"`
+
+	// The number of indexed variables in this scope.
+	// The client can use this optional information to present the variables in a paged UI and fetch them in chunks.
+	IndexedVariables int `json:"indexedVariables,omitempty"`
+
+	// Optional source for this scope.
+	Source Source `json:"source,omitempty"`
+
+	// Optional start line of the range covered by this scope.
+	Line int `json:"line,omitempty"`
+
+	// If true, the number of variables in this scope is large or expensive to retrieve.
+	Expensive bool `json:"expensive"`
+
+	// Optional end line of the range covered by this scope.
+	EndLine int `json:"endLine,omitempty"`
+
+	// Optional end column of the range covered by this scope.
+	EndColumn int `json:"endColumn,omitempty"`
+
+	// Name of the scope such as 'Arguments', 'Locals'.
+	Name string `json:"name"`
+
 	// The variables of this scope can be retrieved by passing the value of variablesReference to the VariablesRequest.
 	VariablesReference int `json:"variablesReference"`
 
 	// The number of named variables in this scope.
 	// The client can use this optional information to present the variables in a paged UI and fetch them in chunks.
 	NamedVariables int `json:"namedVariables,omitempty"`
-
-	// If true, the number of variables in this scope is large or expensive to retrieve.
-	Expensive bool `json:"expensive"`
-
-	// Optional source for this scope.
-	Source Source `json:"source,omitempty"`
-
-	// Optional start column of the range covered by this scope.
-	Column int `json:"column,omitempty"`
-
-	// Optional end line of the range covered by this scope.
-	EndLine int `json:"endLine,omitempty"`
-
-	// Name of the scope such as 'Arguments', 'Locals'.
-	Name string `json:"name"`
-
-	// The number of indexed variables in this scope.
-	// The client can use this optional information to present the variables in a paged UI and fetch them in chunks.
-	IndexedVariables int `json:"indexedVariables,omitempty"`
-
-	// Optional start line of the range covered by this scope.
-	Line int `json:"line,omitempty"`
-
-	// Optional end column of the range covered by this scope.
-	EndColumn int `json:"endColumn,omitempty"`
 } // struct Scope
 
 ```
@@ -2448,10 +2447,10 @@ type ScopesRequest struct {
 	// A client or server-initiated request.
 	Request
 
+	Arguments ScopesArguments `json:"arguments"`
+
 	// POSSIBLE VALUES: `scopes`
 	Command string `json:"command"`
-
-	Arguments ScopesArguments `json:"arguments"`
 } // struct ScopesRequest
 
 ```
@@ -2709,17 +2708,17 @@ Returns a new `SetFunctionBreakpointsResponse` with the followings fields set:
 ```go
 type SetVariableArguments struct {
 
-	// The value of the variable.
-	Value string `json:"value"`
-
-	// Specifies details on how to format the response value.
-	Format ValueFormat `json:"format,omitempty"`
-
 	// The reference of the variable container.
 	VariablesReference int `json:"variablesReference"`
 
 	// The name of the variable.
 	Name string `json:"name"`
+
+	// The value of the variable.
+	Value string `json:"value"`
+
+	// Specifies details on how to format the response value.
+	Format ValueFormat `json:"format,omitempty"`
 } // struct SetVariableArguments
 
 ```
@@ -2761,6 +2760,9 @@ type SetVariableResponse struct {
 
 	Body struct {
 
+		// If variablesReference is > 0, the new value is structured and its children can be retrieved by passing variablesReference to the VariablesRequest.
+		VariablesReference int64 `json:"variablesReference,omitempty"`
+
 		// The number of named child variables.
 		// The client can use this optional information to present the variables in a paged UI and fetch them in chunks.
 		NamedVariables int64 `json:"namedVariables,omitempty"`
@@ -2774,9 +2776,6 @@ type SetVariableResponse struct {
 
 		// The type of the new value. Typically shown in the UI when hovering over the value.
 		Type string `json:"type,omitempty"`
-
-		// If variablesReference is > 0, the new value is structured and its children can be retrieved by passing variablesReference to the VariablesRequest.
-		VariablesReference int64 `json:"variablesReference,omitempty"`
 	} `json:"body"`
 } // struct SetVariableResponse
 
@@ -2795,6 +2794,9 @@ Returns a new `SetVariableResponse` with the followings fields set: `type`
 
 ```go
 type Source struct {
+
+	// If sourceReference > 0 the contents of the source must be retrieved through the SourceRequest (even if a path is specified). A sourceReference is only valid for a session, so it must not be used to persist a source.
+	SourceReference int64 `json:"sourceReference,omitempty"`
 
 	// An optional hint for how to present the source in the UI. A value of 'deemphasize' can be used to indicate that the source is not available or that it is skipped on stepping.
 	//
@@ -2824,9 +2826,6 @@ type Source struct {
 
 	// The path of the source to be shown in the UI. It is only used to locate and load the content of the source if no sourceReference is specified (or its vaule is 0).
 	Path string `json:"path,omitempty"`
-
-	// If sourceReference > 0 the contents of the source must be retrieved through the SourceRequest (even if a path is specified). A sourceReference is only valid for a session, so it must not be used to persist a source.
-	SourceReference int64 `json:"sourceReference,omitempty"`
 } // struct Source
 
 ```
@@ -2839,11 +2838,11 @@ as part of a StackFrame and it is used by clients when specifying breakpoints.
 ```go
 type SourceArguments struct {
 
-	// The reference to the source. This is the same as source.sourceReference. This is provided for backward compatibility since old backends do not understand the 'source' attribute.
-	SourceReference int `json:"sourceReference"`
-
 	// Specifies the source content to load. Either source.path or source.sourceReference must be specified.
 	Source Source `json:"source,omitempty"`
+
+	// The reference to the source. This is the same as source.sourceReference. This is provided for backward compatibility since old backends do not understand the 'source' attribute.
+	SourceReference int `json:"sourceReference"`
 } // struct SourceArguments
 
 ```
@@ -2855,17 +2854,17 @@ Arguments for 'source' request.
 ```go
 type SourceBreakpoint struct {
 
-	// The source line of the breakpoint.
-	Line int `json:"line"`
-
-	// An optional source column of the breakpoint.
-	Column int `json:"column,omitempty"`
-
 	// An optional expression for conditional breakpoints.
 	Condition string `json:"condition,omitempty"`
 
 	// An optional expression that controls how many hits of the breakpoint are ignored. The backend is expected to interpret the expression as needed.
 	HitCondition string `json:"hitCondition,omitempty"`
+
+	// The source line of the breakpoint.
+	Line int `json:"line"`
+
+	// An optional source column of the breakpoint.
+	Column int `json:"column,omitempty"`
 } // struct SourceBreakpoint
 
 ```
@@ -2930,6 +2929,21 @@ Returns a new `SourceResponse` with the followings fields set: `type`
 ```go
 type StackFrame struct {
 
+	// The column within the line. If source is null or doesn't exist, column is 0 and must be ignored.
+	Column int `json:"column"`
+
+	// An identifier for the stack frame. It must be unique across all threads. This id can be used to retrieve the scopes of the frame with the 'scopesRequest' or to restart the execution of a stackframe.
+	Id int `json:"id"`
+
+	// The optional source of the frame.
+	Source Source `json:"source,omitempty"`
+
+	// An optional end line of the range covered by the stack frame.
+	EndLine int `json:"endLine,omitempty"`
+
+	// An optional end column of the range covered by the stack frame.
+	EndColumn int `json:"endColumn,omitempty"`
+
 	// The module associated with this frame, if any.
 	//
 	// POSSIBLE TYPES:
@@ -2942,26 +2956,11 @@ type StackFrame struct {
 	// POSSIBLE VALUES: `normal`, `label`
 	PresentationHint string `json:"presentationHint,omitempty"`
 
-	// The column within the line. If source is null or doesn't exist, column is 0 and must be ignored.
-	Column int `json:"column"`
-
 	// The name of the stack frame, typically a method name.
 	Name string `json:"name"`
 
-	// The optional source of the frame.
-	Source Source `json:"source,omitempty"`
-
 	// The line within the file of the frame. If source is null or doesn't exist, line is 0 and must be ignored.
 	Line int `json:"line"`
-
-	// An optional end line of the range covered by the stack frame.
-	EndLine int `json:"endLine,omitempty"`
-
-	// An optional end column of the range covered by the stack frame.
-	EndColumn int `json:"endColumn,omitempty"`
-
-	// An identifier for the stack frame. It must be unique across all threads. This id can be used to retrieve the scopes of the frame with the 'scopesRequest' or to restart the execution of a stackframe.
-	Id int `json:"id"`
 } // struct StackFrame
 
 ```
@@ -2974,6 +2973,9 @@ A Stackframe contains the source location.
 type StackFrameFormat struct {
 	// Provides formatting information for a value.
 	ValueFormat
+
+	// Displays the module of the stack frame.
+	Module bool `json:"module,omitempty"`
 
 	// Displays parameters for the stack frame.
 	Parameters bool `json:"parameters,omitempty"`
@@ -2989,9 +2991,6 @@ type StackFrameFormat struct {
 
 	// Displays the line number of the stack frame.
 	Line bool `json:"line,omitempty"`
-
-	// Displays the module of the stack frame.
-	Module bool `json:"module,omitempty"`
 } // struct StackFrameFormat
 
 ```
@@ -3003,6 +3002,9 @@ Provides formatting information for a stack frame.
 ```go
 type StackTraceArguments struct {
 
+	// Retrieve the stacktrace for this thread.
+	ThreadId int `json:"threadId"`
+
 	// The index of the first frame to return; if omitted frames start at 0.
 	StartFrame int `json:"startFrame,omitempty"`
 
@@ -3011,9 +3013,6 @@ type StackTraceArguments struct {
 
 	// Specifies details on how to format the stack frames.
 	Format StackFrameFormat `json:"format,omitempty"`
-
-	// Retrieve the stacktrace for this thread.
-	ThreadId int `json:"threadId"`
 } // struct StackTraceArguments
 
 ```
@@ -3307,10 +3306,10 @@ type StepOutRequest struct {
 	// A client or server-initiated request.
 	Request
 
+	Arguments StepOutArguments `json:"arguments"`
+
 	// POSSIBLE VALUES: `stepOut`
 	Command string `json:"command"`
-
-	Arguments StepOutArguments `json:"arguments"`
 } // struct StepOutRequest
 
 ```
@@ -3359,6 +3358,14 @@ type StoppedEvent struct {
 
 	Body struct {
 
+		// Additional information. E.g. if reason is 'exception', text contains the exception name. This string is shown in the UI.
+		Text string `json:"text,omitempty"`
+
+		// If allThreadsStopped is true, a debug adapter can announce that all threads have stopped.
+		// *  The client should use this information to enable that all threads can be expanded to access their stacktraces.
+		// *  If the attribute is missing or false, only the thread with the given threadId can be expanded.
+		AllThreadsStopped bool `json:"allThreadsStopped,omitempty"`
+
 		// The reason for the event (such as: 'step', 'breakpoint', 'exception', 'pause', 'entry').
 		// For backward compatibility this string is shown in the UI if the 'description' attribute is missing (but it must not be translated).
 		//
@@ -3370,14 +3377,6 @@ type StoppedEvent struct {
 
 		// The thread which was stopped.
 		ThreadId int `json:"threadId,omitempty"`
-
-		// Additional information. E.g. if reason is 'exception', text contains the exception name. This string is shown in the UI.
-		Text string `json:"text,omitempty"`
-
-		// If allThreadsStopped is true, a debug adapter can announce that all threads have stopped.
-		// *  The client should use this information to enable that all threads can be expanded to access their stacktraces.
-		// *  If the attribute is missing or false, only the thread with the given threadId can be expanded.
-		AllThreadsStopped bool `json:"allThreadsStopped,omitempty"`
 	} `json:"body"`
 } // struct StoppedEvent
 
@@ -3540,19 +3539,6 @@ Provides formatting information for a value.
 ```go
 type Variable struct {
 
-	// The number of indexed child variables.
-	// The client can use this optional information to present the children in a paged UI and fetch them in chunks.
-	IndexedVariables int `json:"indexedVariables,omitempty"`
-
-	// The variable's name.
-	Name string `json:"name"`
-
-	// The variable's value. This can be a multi-line text, e.g. for a function the body of a function.
-	Value string `json:"value"`
-
-	// The type of the variable's value. Typically shown in the UI when hovering over the value.
-	Type string `json:"type,omitempty"`
-
 	// Properties of a variable that can be used to determine how to render the variable in the UI. Format of the string value: TBD.
 	Kind string `json:"kind,omitempty"`
 
@@ -3565,6 +3551,19 @@ type Variable struct {
 	// The number of named child variables.
 	// The client can use this optional information to present the children in a paged UI and fetch them in chunks.
 	NamedVariables int `json:"namedVariables,omitempty"`
+
+	// The number of indexed child variables.
+	// The client can use this optional information to present the children in a paged UI and fetch them in chunks.
+	IndexedVariables int `json:"indexedVariables,omitempty"`
+
+	// The variable's name.
+	Name string `json:"name"`
+
+	// The variable's value. This can be a multi-line text, e.g. for a function the body of a function.
+	Value string `json:"value"`
+
+	// The type of the variable's value. Typically shown in the UI when hovering over the value.
+	Type string `json:"type,omitempty"`
 } // struct Variable
 
 ```
@@ -3584,6 +3583,14 @@ present the children in a paged UI and fetch them in chunks.
 ```go
 type VariablesArguments struct {
 
+	// The Variable reference.
+	VariablesReference int `json:"variablesReference"`
+
+	// Optional filter to limit the child variables to either named or indexed. If ommited, both types are fetched.
+	//
+	// POSSIBLE VALUES: `indexed`, `named`
+	Filter string `json:"filter,omitempty"`
+
 	// The index of the first variable to return; if omitted children start at 0.
 	Start int `json:"start,omitempty"`
 
@@ -3592,14 +3599,6 @@ type VariablesArguments struct {
 
 	// Specifies details on how to format the Variable values.
 	Format ValueFormat `json:"format,omitempty"`
-
-	// The Variable reference.
-	VariablesReference int `json:"variablesReference"`
-
-	// Optional filter to limit the child variables to either named or indexed. If ommited, both types are fetched.
-	//
-	// POSSIBLE VALUES: `indexed`, `named`
-	Filter string `json:"filter,omitempty"`
 } // struct VariablesArguments
 
 ```
