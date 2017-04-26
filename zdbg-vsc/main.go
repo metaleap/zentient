@@ -17,7 +17,7 @@ import (
 )
 
 var (
-	respseq int
+	sendseq int
 	stdin *bufio.Scanner
 	rawOut *bufio.Writer
 
@@ -37,6 +37,12 @@ func main () {
 
 	bclen := []byte("Content-Length: ")  ;  bln := []byte("\r\n\r\n")
 	send := func (item interface{}) {
+		sendseq++
+		if bresp := zdbgvscp.BaseResponse(item)  ;  bresp!=nil {
+			bresp.Seq = sendseq
+		} else if bevt := zdbgvscp.BaseEvent(item)  ;  bevt!=nil {
+			bevt.Seq = sendseq
+		}
 		jsonout,err := json.Marshal(item)  ;  if err!=nil { logpanic("json.Marshal: " + err.Error()) }
 		rawOut.Write(bclen)  ;  rawOut.Write([]byte(ugo.SPr(len(jsonout))))  ;  rawOut.Write(bln)  ;  rawOut.Write(jsonout)  ;  rawOut.Flush()
 		logfile.Write(bclen)  ;  logfile.Write([]byte(ugo.SPr(len(jsonout))))  ;  logfile.Write(bln)  ;  logfile.Write(jsonout)  ;  logfile.Sync()
@@ -48,7 +54,7 @@ func main () {
 		jsonin := stdin.Text()
 		logfile.WriteString("\n\n\n\n\n"+jsonin)
 		if req,err = zdbgvscp.TryUnmarshalRequest(jsonin)  ;  err!=nil { logpanic("TryUnmarshalRequest: " + err.Error()) }
-		if resp,respbase,err = zdbgvscp.HandleRequest(req, makeNewRespBase)  ;  resp==nil {
+		if resp,respbase,err = zdbgvscp.HandleRequest(req, initNewRespBase)  ;  resp==nil {
 			logpanic("BUG: resp returned was nil")
 		} else if err!=nil { respbase.Success = false  ;  respbase.Message = err.Error() }
 		send(resp)
@@ -60,12 +66,8 @@ func main () {
 
 }
 
-func makeNewRespBase (reqbase *zdbgvscp.Request) (respbase zdbgvscp.Response) {
-	respseq++  ;  respbase.ProtocolMessage.Seq = respseq
-	respbase.ProtocolMessage.Type = "response"  ;  respbase.Type = "response"
-	respbase.Request_seq = reqbase.Seq  ;  respbase.Command = reqbase.Command
-	respbase.Success = true
-	return
+func initNewRespBase (reqbase *zdbgvscp.Request, respbase *zdbgvscp.Response) {
+	respbase.Request_seq = reqbase.Seq  ;  respbase.Command = reqbase.Command  ;  respbase.Success = true
 }
 
 func init () {
