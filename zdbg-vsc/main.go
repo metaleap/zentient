@@ -21,33 +21,21 @@ var (
 	rawOut *bufio.Writer
 
 	vscLastInit *zdbgvscp.InitializeRequestArguments
+	sendseq = 0
+	bclen = []byte("Content-Length: ")
+	bln = []byte("\r\n\r\n")
+	logfile *os.File
 )
 
 func main () {
 	runtime.GOMAXPROCS(runtime.NumCPU() * 2)
-	if err := z.Init(map[string]func()z.Zengine { "go": zgo.Init, "hs": zhs.Init })  ;  err!=nil { panic(err) }
+	err := z.Init(map[string]func()z.Zengine { "go": zgo.Init, "hs": zhs.Init })  ;  if err!=nil { panic(err) }
 
 	logdirpath := filepath.Join(z.Ctx.ConfigDir, "zdbglog")
 	ufs.EnsureDirExists(logdirpath)
 	logfilepath := filepath.Join(logdirpath, "log" + ugo.SPr(time.Now().UnixNano()) + ".log")
-	logfile,err := os.Create(logfilepath)  ;  if err!=nil { panic(err) } else { defer logfile.Close() }
-	logln := func(msg string) { logfile.WriteString(msg+"\n")  ;  logfile.Sync() }
-	logpanic := func(msg string) {  logln(msg)  ;  panic(msg)  }
-
-	sendseq := 0  ;  bclen := []byte("Content-Length: ")  ;  bln := []byte("\r\n\r\n")
-	send := func (item interface{}) {
-		sendseq++
-		if bresp := zdbgvscp.BaseResponse(item)  ;  bresp!=nil {
-			bresp.Seq = sendseq
-		} else if bevt := zdbgvscp.BaseEvent(item)  ;  bevt!=nil {
-			bevt.Seq = sendseq
-		} else if breq := zdbgvscp.BaseRequest(item)  ;  breq!=nil {
-			breq.Seq = sendseq
-		}
-		jsonout,err := json.Marshal(item)  ;  if err!=nil { logpanic("json.Marshal: " + err.Error()) }
-		rawOut.Write(bclen)  ;  rawOut.Write([]byte(ugo.SPr(len(jsonout))))  ;  rawOut.Write(bln)  ;  rawOut.Write(jsonout)  ;  rawOut.Flush()
-		logfile.Write(bclen)  ;  logfile.Write([]byte(ugo.SPr(len(jsonout))))  ;  logfile.Write(bln)  ;  logfile.Write(jsonout)  ;  logfile.Sync()
-	}
+	logfile,err = os.Create(logfilepath)  ;  if err!=nil { panic(err) } else { defer logfile.Close() }
+	logpanic := func(msg string) {  logfile.WriteString(msg)  ;  panic(msg)  }
 
 	stdin,rawOut,_ = ugo.SetupJsonProtoPipes(1024*1024*4, true, false)
 	var req, resp interface{}  ;  var respbase *zdbgvscp.Response
@@ -63,8 +51,35 @@ func main () {
 				send(zdbgvscp.NewInitializedEvent())
 		}
 		send(resp)
+		switch respbase.Command{
+		case "launch":
+			oe := zdbgvscp.NewOutputEvent()
+			oe.Body.Output = "Testing stdout"  ;  oe.Body.Category = "stdout"
+			send(oe)
+			oe.Body.Output = "Testing stderr"  ;  oe.Body.Category = "stderr"
+			send(oe)
+			oe.Body.Output = "Testing conlog"  ;  oe.Body.Category = "console"
+			send(oe)
+		case "disconnect":
+			send(zdbgvscp.NewTerminatedEvent())
+			return
+		}
 	}
 
+}
+
+func send (item interface{}) {
+	sendseq++
+	if bresp := zdbgvscp.BaseResponse(item)  ;  bresp!=nil {
+		bresp.Seq = sendseq
+	} else if bevt := zdbgvscp.BaseEvent(item)  ;  bevt!=nil {
+		bevt.Seq = sendseq
+	} else if breq := zdbgvscp.BaseRequest(item)  ;  breq!=nil {
+		breq.Seq = sendseq
+	}
+	jsonout,err := json.Marshal(item)  ;  if err!=nil { panic("json.Marshal: " + err.Error()) }
+	rawOut.Write(bclen)  ;  rawOut.Write([]byte(ugo.SPr(len(jsonout))))  ;  rawOut.Write(bln)  ;  rawOut.Write(jsonout)  ;  rawOut.Flush()
+	logfile.Write(bclen)  ;  logfile.Write([]byte(ugo.SPr(len(jsonout))))  ;  logfile.Write(bln)  ;  logfile.Write(jsonout)  ;  logfile.Sync()
 }
 
 func initNewRespBase (reqbase *zdbgvscp.Request, respbase *zdbgvscp.Response) {
@@ -75,6 +90,7 @@ func init () {
 	zdbgvscp.OnDisconnectRequest = onDisconnect
 	zdbgvscp.OnInitializeRequest = onInitialize
 	zdbgvscp.OnLaunchRequest = onLaunch
+	zdbgvscp.OnThreadsRequest = onThreads
 }
 
 func onDisconnect (req *zdbgvscp.DisconnectRequest, resp *zdbgvscp.DisconnectResponse) (err error) {
@@ -91,8 +107,11 @@ func onInitialize (req *zdbgvscp.InitializeRequest, resp *zdbgvscp.InitializeRes
 }
 
 func onLaunch (req *zdbgvscp.LaunchRequest, resp *zdbgvscp.LaunchResponse) (err error) {
-	for i := 0; i <9999999;i++ {
-		err = ugo.E("Nah NOT ON " + ugo.SPr(i))
-	}  // :" + " C=" + r.Arguments.C + " W=" + r.Arguments.W + " F=" + r.Arguments.F
+	return
+}
+
+var dummyThread = []zdbgvscp.Thread { zdbgvscp.Thread { Id: 1, Name: "DummyThread" } }
+func onThreads (req *zdbgvscp.ThreadsRequest, resp *zdbgvscp.ThreadsResponse) (err error) {
+	resp.Body.Threads = dummyThread
 	return
 }
