@@ -16,15 +16,16 @@ func main() {
 	jsonschemaraw := ufs.ReadTextFile(filepath.Join(gopath, srcpath), true, "")
 
 	fromjsd.GoPkgDesc = "Package codegen'd from " + srcpath + " with github.com/metaleap/zentient/zdbg-vsc-proto-gen"
-	jdefs, err := fromjsd.NewJsonSchema(jsonschemaraw)
+	jsd, err := fromjsd.NewJsonSchema(jsonschemaraw)
 	if err != nil { panic(err) }
 
-	jdefs.Defs["DisconnectArguments"].EnsureProps(map[string]string { "restart": "boolean" })
-	jdefs.Defs["LaunchRequestArguments"].EnsureProps(map[string]string { "w": "string", "c": "string", "f": "string" })
+	jsd.Defs["DisconnectArguments"].EnsureProps(map[string]string { "restart": "boolean" })
+	jsd.Defs["LaunchRequestArguments"].EnsureProps(map[string]string { "w": "string", "c": "string", "f": "string" })
+	jsd.ForceCopyProps("Request", "Response", "command")
 
-	unmarshalHints := map[string]string { "ProtocolMessage": "type", "Event": "event", "Request": "command" }
+	unmarshalHints := map[string]string { "ProtocolMessage": "type", "Event": "event", "Request": "command", "Response": "command" }
 	handlerBaseTypes := map[string]string{ "Request": "Response" }
-	gosrc := jdefs.Generate("zdbgvscp", unmarshalHints, handlerBaseTypes, "Event", "Response", "Request")
+	gosrc := jsd.Generate("zdbgvscp", unmarshalHints, handlerBaseTypes, "Event", "Response", "Request")
 
 	if err = ufs.WriteTextFile(filepath.Join(gopath, dstpath), gosrc); err != nil {
 		panic(err)

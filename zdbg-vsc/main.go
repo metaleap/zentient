@@ -91,9 +91,8 @@ func onInitialize (req *zdbgvscp.InitializeRequest, resp *zdbgvscp.InitializeRes
 }
 
 func onLaunch (req *zdbgvscp.LaunchRequest, resp *zdbgvscp.LaunchResponse) (err error) {
-	resp.Message = "FOO"
-	// for i := 0; i <9999999;i++ {
-	// 	err = ugo.E("Nah NOT ON " + ugo.SPr(i))
-	// }  // :" + " C=" + r.Arguments.C + " W=" + r.Arguments.W + " F=" + r.Arguments.F
+	for i := 0; i <9999999;i++ {
+		err = ugo.E("Nah NOT ON " + ugo.SPr(i))
+	}  // :" + " C=" + r.Arguments.C + " W=" + r.Arguments.W + " F=" + r.Arguments.F
 	return
 }
