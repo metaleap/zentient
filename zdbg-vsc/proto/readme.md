@@ -257,32 +257,32 @@ func TryUnmarshalEvent(js string) (ptr interface{}, err error)
 TryUnmarshalEvent attempts to unmarshal JSON string `js` (if it starts with a
 `{` and ends with a `}`) into a `struct` based on `Event` as follows:
 
-If `js` contains `"event":"stopped"`, attempts to unmarshal into a new
-`StoppedEvent`.
-
-If `js` contains `"event":"output"`, attempts to unmarshal into a new
-`OutputEvent`.
+If `js` contains `"event":"initialized"`, attempts to unmarshal into a new
+`InitializedEvent`.
 
 If `js` contains `"event":"continued"`, attempts to unmarshal into a new
 `ContinuedEvent`.
 
-If `js` contains `"event":"module"`, attempts to unmarshal into a new
-`ModuleEvent`.
-
-If `js` contains `"event":"terminated"`, attempts to unmarshal into a new
-`TerminatedEvent`.
-
-If `js` contains `"event":"initialized"`, attempts to unmarshal into a new
-`InitializedEvent`.
+If `js` contains `"event":"output"`, attempts to unmarshal into a new
+`OutputEvent`.
 
 If `js` contains `"event":"exited"`, attempts to unmarshal into a new
 `ExitedEvent`.
 
-If `js` contains `"event":"breakpoint"`, attempts to unmarshal into a new
-`BreakpointEvent`.
+If `js` contains `"event":"terminated"`, attempts to unmarshal into a new
+`TerminatedEvent`.
 
 If `js` contains `"event":"thread"`, attempts to unmarshal into a new
 `ThreadEvent`.
+
+If `js` contains `"event":"module"`, attempts to unmarshal into a new
+`ModuleEvent`.
+
+If `js` contains `"event":"breakpoint"`, attempts to unmarshal into a new
+`BreakpointEvent`.
+
+If `js` contains `"event":"stopped"`, attempts to unmarshal into a new
+`StoppedEvent`.
 
 Otherwise, `err`'s message will be: `Event: encountered unknown JSON value for
 event: ` followed by the `event` value encountered.
@@ -302,13 +302,13 @@ TryUnmarshalProtocolMessage attempts to unmarshal JSON string `js` (if it starts
 with a `{` and ends with a `}`) into a `struct` based on `ProtocolMessage` as
 follows:
 
-If `js` contains `"type":"request"`, attempts to unmarshal via
-`TryUnmarshalRequest`
+If `js` contains `"type":"response"`, attempts to unmarshal via
+`TryUnmarshalResponse`
 
 If `js` contains `"type":"event"`, attempts to unmarshal via `TryUnmarshalEvent`
 
-If `js` contains `"type":"response"`, attempts to unmarshal via
-`TryUnmarshalResponse`
+If `js` contains `"type":"request"`, attempts to unmarshal via
+`TryUnmarshalRequest`
 
 Otherwise, `err`'s message will be: `ProtocolMessage: encountered unknown JSON
 value for type: ` followed by the `type` value encountered.
@@ -327,98 +327,98 @@ func TryUnmarshalRequest(js string) (ptr interface{}, err error)
 TryUnmarshalRequest attempts to unmarshal JSON string `js` (if it starts with a
 `{` and ends with a `}`) into a `struct` based on `Request` as follows:
 
-If `js` contains `"command":"setExceptionBreakpoints"`, attempts to unmarshal
-into a new `SetExceptionBreakpointsRequest`.
-
-If `js` contains `"command":"setVariable"`, attempts to unmarshal into a new
-`SetVariableRequest`.
-
-If `js` contains `"command":"stepIn"`, attempts to unmarshal into a new
-`StepInRequest`.
-
-If `js` contains `"command":"reverseContinue"`, attempts to unmarshal into a new
-`ReverseContinueRequest`.
-
-If `js` contains `"command":"pause"`, attempts to unmarshal into a new
-`PauseRequest`.
-
-If `js` contains `"command":"disconnect"`, attempts to unmarshal into a new
-`DisconnectRequest`.
-
-If `js` contains `"command":"continue"`, attempts to unmarshal into a new
-`ContinueRequest`.
-
-If `js` contains `"command":"variables"`, attempts to unmarshal into a new
-`VariablesRequest`.
-
-If `js` contains `"command":"configurationDone"`, attempts to unmarshal into a
-new `ConfigurationDoneRequest`.
-
-If `js` contains `"command":"evaluate"`, attempts to unmarshal into a new
-`EvaluateRequest`.
-
-If `js` contains `"command":"stepBack"`, attempts to unmarshal into a new
-`StepBackRequest`.
-
-If `js` contains `"command":"stepOut"`, attempts to unmarshal into a new
-`StepOutRequest`.
-
-If `js` contains `"command":"threads"`, attempts to unmarshal into a new
-`ThreadsRequest`.
-
-If `js` contains `"command":"next"`, attempts to unmarshal into a new
-`NextRequest`.
-
-If `js` contains `"command":"setBreakpoints"`, attempts to unmarshal into a new
-`SetBreakpointsRequest`.
-
-If `js` contains `"command":"modules"`, attempts to unmarshal into a new
-`ModulesRequest`.
-
-If `js` contains `"command":"attach"`, attempts to unmarshal into a new
-`AttachRequest`.
+If `js` contains `"command":"goto"`, attempts to unmarshal into a new
+`GotoRequest`.
 
 If `js` contains `"command":"scopes"`, attempts to unmarshal into a new
 `ScopesRequest`.
 
-If `js` contains `"command":"stackTrace"`, attempts to unmarshal into a new
-`StackTraceRequest`.
-
-If `js` contains `"command":"source"`, attempts to unmarshal into a new
-`SourceRequest`.
-
-If `js` contains `"command":"runInTerminal"`, attempts to unmarshal into a new
-`RunInTerminalRequest`.
-
-If `js` contains `"command":"initialize"`, attempts to unmarshal into a new
-`InitializeRequest`.
-
-If `js` contains `"command":"completions"`, attempts to unmarshal into a new
-`CompletionsRequest`.
-
-If `js` contains `"command":"goto"`, attempts to unmarshal into a new
-`GotoRequest`.
-
-If `js` contains `"command":"gotoTargets"`, attempts to unmarshal into a new
-`GotoTargetsRequest`.
-
-If `js` contains `"command":"launch"`, attempts to unmarshal into a new
-`LaunchRequest`.
-
-If `js` contains `"command":"exceptionInfo"`, attempts to unmarshal into a new
-`ExceptionInfoRequest`.
-
-If `js` contains `"command":"stepInTargets"`, attempts to unmarshal into a new
-`StepInTargetsRequest`.
-
 If `js` contains `"command":"restartFrame"`, attempts to unmarshal into a new
 `RestartFrameRequest`.
+
+If `js` contains `"command":"stepIn"`, attempts to unmarshal into a new
+`StepInRequest`.
+
+If `js` contains `"command":"setVariable"`, attempts to unmarshal into a new
+`SetVariableRequest`.
+
+If `js` contains `"command":"configurationDone"`, attempts to unmarshal into a
+new `ConfigurationDoneRequest`.
+
+If `js` contains `"command":"stepOut"`, attempts to unmarshal into a new
+`StepOutRequest`.
+
+If `js` contains `"command":"modules"`, attempts to unmarshal into a new
+`ModulesRequest`.
+
+If `js` contains `"command":"next"`, attempts to unmarshal into a new
+`NextRequest`.
+
+If `js` contains `"command":"variables"`, attempts to unmarshal into a new
+`VariablesRequest`.
 
 If `js` contains `"command":"setFunctionBreakpoints"`, attempts to unmarshal
 into a new `SetFunctionBreakpointsRequest`.
 
+If `js` contains `"command":"initialize"`, attempts to unmarshal into a new
+`InitializeRequest`.
+
+If `js` contains `"command":"continue"`, attempts to unmarshal into a new
+`ContinueRequest`.
+
+If `js` contains `"command":"reverseContinue"`, attempts to unmarshal into a new
+`ReverseContinueRequest`.
+
+If `js` contains `"command":"disconnect"`, attempts to unmarshal into a new
+`DisconnectRequest`.
+
+If `js` contains `"command":"stackTrace"`, attempts to unmarshal into a new
+`StackTraceRequest`.
+
+If `js` contains `"command":"attach"`, attempts to unmarshal into a new
+`AttachRequest`.
+
+If `js` contains `"command":"launch"`, attempts to unmarshal into a new
+`LaunchRequest`.
+
+If `js` contains `"command":"source"`, attempts to unmarshal into a new
+`SourceRequest`.
+
+If `js` contains `"command":"evaluate"`, attempts to unmarshal into a new
+`EvaluateRequest`.
+
+If `js` contains `"command":"setBreakpoints"`, attempts to unmarshal into a new
+`SetBreakpointsRequest`.
+
+If `js` contains `"command":"gotoTargets"`, attempts to unmarshal into a new
+`GotoTargetsRequest`.
+
+If `js` contains `"command":"stepInTargets"`, attempts to unmarshal into a new
+`StepInTargetsRequest`.
+
+If `js` contains `"command":"runInTerminal"`, attempts to unmarshal into a new
+`RunInTerminalRequest`.
+
+If `js` contains `"command":"pause"`, attempts to unmarshal into a new
+`PauseRequest`.
+
+If `js` contains `"command":"exceptionInfo"`, attempts to unmarshal into a new
+`ExceptionInfoRequest`.
+
+If `js` contains `"command":"threads"`, attempts to unmarshal into a new
+`ThreadsRequest`.
+
+If `js` contains `"command":"setExceptionBreakpoints"`, attempts to unmarshal
+into a new `SetExceptionBreakpointsRequest`.
+
+If `js` contains `"command":"completions"`, attempts to unmarshal into a new
+`CompletionsRequest`.
+
 If `js` contains `"command":"restart"`, attempts to unmarshal into a new
 `RestartRequest`.
+
+If `js` contains `"command":"stepBack"`, attempts to unmarshal into a new
+`StepBackRequest`.
 
 Otherwise, `err`'s message will be: `Request: encountered unknown JSON value for
 command: ` followed by the `command` value encountered.
@@ -437,98 +437,98 @@ func TryUnmarshalResponse(js string) (ptr interface{}, err error)
 TryUnmarshalResponse attempts to unmarshal JSON string `js` (if it starts with a
 `{` and ends with a `}`) into a `struct` based on `Response` as follows:
 
-If `js` contains `"command":"runInTerminal"`, attempts to unmarshal into a new
-`RunInTerminalResponse`.
-
-If `js` contains `"command":"next"`, attempts to unmarshal into a new
-`NextResponse`.
-
-If `js` contains `"command":"stackTrace"`, attempts to unmarshal into a new
-`StackTraceResponse`.
-
-If `js` contains `"command":"attach"`, attempts to unmarshal into a new
-`AttachResponse`.
-
-If `js` contains `"command":"source"`, attempts to unmarshal into a new
-`SourceResponse`.
-
-If `js` contains `"command":"scopes"`, attempts to unmarshal into a new
-`ScopesResponse`.
-
-If `js` contains `"command":"pause"`, attempts to unmarshal into a new
-`PauseResponse`.
-
-If `js` contains `"command":"completions"`, attempts to unmarshal into a new
-`CompletionsResponse`.
-
-If `js` contains `"command":"disconnect"`, attempts to unmarshal into a new
-`DisconnectResponse`.
-
-If `js` contains `"command":"modules"`, attempts to unmarshal into a new
-`ModulesResponse`.
-
-If `js` contains `"command":"launch"`, attempts to unmarshal into a new
-`LaunchResponse`.
-
-If `js` contains `"command":"stepInTargets"`, attempts to unmarshal into a new
-`StepInTargetsResponse`.
-
-If `js` contains `"command":"setFunctionBreakpoints"`, attempts to unmarshal
-into a new `SetFunctionBreakpointsResponse`.
-
-If `js` contains `"command":"variables"`, attempts to unmarshal into a new
-`VariablesResponse`.
-
-If `js` contains `"command":"threads"`, attempts to unmarshal into a new
-`ThreadsResponse`.
-
-If `js` contains `"command":"restart"`, attempts to unmarshal into a new
-`RestartResponse`.
-
-If `js` contains `"command":"setBreakpoints"`, attempts to unmarshal into a new
-`SetBreakpointsResponse`.
-
 If `js` contains `"command":"configurationDone"`, attempts to unmarshal into a
 new `ConfigurationDoneResponse`.
-
-If `js` contains `"command":"stepBack"`, attempts to unmarshal into a new
-`StepBackResponse`.
-
-If `js` contains `"command":"goto"`, attempts to unmarshal into a new
-`GotoResponse`.
 
 If `js` contains `"command":"gotoTargets"`, attempts to unmarshal into a new
 `GotoTargetsResponse`.
 
-If `js` contains `"command":"evaluate"`, attempts to unmarshal into a new
-`EvaluateResponse`.
-
 If `js` contains `"command":"continue"`, attempts to unmarshal into a new
 `ContinueResponse`.
+
+If `js` contains `"command":"threads"`, attempts to unmarshal into a new
+`ThreadsResponse`.
+
+If `js` contains `"command":"disconnect"`, attempts to unmarshal into a new
+`DisconnectResponse`.
+
+If `js` contains `"command":"setFunctionBreakpoints"`, attempts to unmarshal
+into a new `SetFunctionBreakpointsResponse`.
+
+If `js` contains `"command":"stepBack"`, attempts to unmarshal into a new
+`StepBackResponse`.
 
 If `js` contains `"command":"setVariable"`, attempts to unmarshal into a new
 `SetVariableResponse`.
 
-If `js` contains `"command":"restartFrame"`, attempts to unmarshal into a new
-`RestartFrameResponse`.
-
-If `js` contains `"command":"initialize"`, attempts to unmarshal into a new
-`InitializeResponse`.
-
-If `js` contains `"command":"stepIn"`, attempts to unmarshal into a new
-`StepInResponse`.
-
-If `js` contains `"command":"stepOut"`, attempts to unmarshal into a new
-`StepOutResponse`.
+If `js` contains `"command":"variables"`, attempts to unmarshal into a new
+`VariablesResponse`.
 
 If `js` contains `"command":"setExceptionBreakpoints"`, attempts to unmarshal
 into a new `SetExceptionBreakpointsResponse`.
 
-If `js` contains `"command":"exceptionInfo"`, attempts to unmarshal into a new
-`ExceptionInfoResponse`.
+If `js` contains `"command":"attach"`, attempts to unmarshal into a new
+`AttachResponse`.
+
+If `js` contains `"command":"runInTerminal"`, attempts to unmarshal into a new
+`RunInTerminalResponse`.
+
+If `js` contains `"command":"goto"`, attempts to unmarshal into a new
+`GotoResponse`.
+
+If `js` contains `"command":"stepInTargets"`, attempts to unmarshal into a new
+`StepInTargetsResponse`.
+
+If `js` contains `"command":"modules"`, attempts to unmarshal into a new
+`ModulesResponse`.
+
+If `js` contains `"command":"source"`, attempts to unmarshal into a new
+`SourceResponse`.
+
+If `js` contains `"command":"next"`, attempts to unmarshal into a new
+`NextResponse`.
+
+If `js` contains `"command":"initialize"`, attempts to unmarshal into a new
+`InitializeResponse`.
+
+If `js` contains `"command":"completions"`, attempts to unmarshal into a new
+`CompletionsResponse`.
+
+If `js` contains `"command":"setBreakpoints"`, attempts to unmarshal into a new
+`SetBreakpointsResponse`.
+
+If `js` contains `"command":"restartFrame"`, attempts to unmarshal into a new
+`RestartFrameResponse`.
+
+If `js` contains `"command":"launch"`, attempts to unmarshal into a new
+`LaunchResponse`.
 
 If `js` contains `"command":"reverseContinue"`, attempts to unmarshal into a new
 `ReverseContinueResponse`.
+
+If `js` contains `"command":"exceptionInfo"`, attempts to unmarshal into a new
+`ExceptionInfoResponse`.
+
+If `js` contains `"command":"stepIn"`, attempts to unmarshal into a new
+`StepInResponse`.
+
+If `js` contains `"command":"evaluate"`, attempts to unmarshal into a new
+`EvaluateResponse`.
+
+If `js` contains `"command":"stepOut"`, attempts to unmarshal into a new
+`StepOutResponse`.
+
+If `js` contains `"command":"restart"`, attempts to unmarshal into a new
+`RestartResponse`.
+
+If `js` contains `"command":"stackTrace"`, attempts to unmarshal into a new
+`StackTraceResponse`.
+
+If `js` contains `"command":"pause"`, attempts to unmarshal into a new
+`PauseResponse`.
+
+If `js` contains `"command":"scopes"`, attempts to unmarshal into a new
+`ScopesResponse`.
 
 Otherwise, `err`'s message will be: `Response: encountered unknown JSON value
 for command: ` followed by the `command` value encountered.
@@ -561,7 +561,7 @@ Attach request; value of command field is 'attach'.
 ```go
 func NewAttachRequest() *AttachRequest
 ```
-Returns a new `AttachRequest` with the followings fields set: `command`, `type`
+Returns a new `AttachRequest` with the following fields set: `Command`, `Type`
 
 #### type AttachRequestArguments
 
@@ -595,21 +595,12 @@ is required.
 ```go
 func NewAttachResponse() *AttachResponse
 ```
-Returns a new `AttachResponse` with the followings fields set: `command`, `type`
+Returns a new `AttachResponse` with the following fields set: `Command`, `Type`
 
 #### type Breakpoint
 
 ```go
 type Breakpoint struct {
-
-	// The source where the breakpoint is located.
-	Source Source `json:"source,omitempty"`
-
-	// The start line of the actual range covered by the breakpoint.
-	Line int `json:"line,omitempty"`
-
-	// An optional start column of the actual range covered by the breakpoint.
-	Column int `json:"column,omitempty"`
 
 	// An optional end line of the actual range covered by the breakpoint.
 	EndLine int `json:"endLine,omitempty"`
@@ -625,6 +616,15 @@ type Breakpoint struct {
 
 	// An optional message about the state of the breakpoint. This is shown to the user and can be used to explain why a breakpoint could not be verified.
 	Message string `json:"message,omitempty"`
+
+	// The source where the breakpoint is located.
+	Source Source `json:"source,omitempty"`
+
+	// The start line of the actual range covered by the breakpoint.
+	Line int `json:"line,omitempty"`
+
+	// An optional start column of the actual range covered by the breakpoint.
+	Column int `json:"column,omitempty"`
 } // struct Breakpoint
 
 ```
@@ -644,13 +644,13 @@ type BreakpointEvent struct {
 
 	Body struct {
 
-		// The breakpoint.
-		Breakpoint Breakpoint `json:"breakpoint"`
-
 		// The reason for the event (such as: 'changed', 'new').
 		//
 		// POSSIBLE VALUES: `changed`, `new`
 		Reason string `json:"reason"`
+
+		// The breakpoint.
+		Breakpoint Breakpoint `json:"breakpoint"`
 	} `json:"body"`
 } // struct BreakpointEvent
 
@@ -664,72 +664,72 @@ information about a breakpoint has changed.
 ```go
 func NewBreakpointEvent() *BreakpointEvent
 ```
-Returns a new `BreakpointEvent` with the followings fields set: `event`, `type`
+Returns a new `BreakpointEvent` with the following fields set: `Event_`, `Type`
 
 #### type Capabilities
 
 ```go
 type Capabilities struct {
 
-	// The debug adapter supports setting a variable to a value.
-	SupportsSetVariable bool `json:"supportsSetVariable,omitempty"`
-
-	// The debug adapter supports the RestartRequest. In this case a client should not implement 'restart' by terminating and relaunching the adapter but by calling the RestartRequest.
-	SupportsRestartRequest bool `json:"supportsRestartRequest,omitempty"`
-
-	// The debug adapter supports 'exceptionOptions' on the setExceptionBreakpoints request.
-	SupportsExceptionOptions bool `json:"supportsExceptionOptions,omitempty"`
-
-	// The debug adapter supports stepping back via the stepBack and reverseContinue requests.
-	SupportsStepBack bool `json:"supportsStepBack,omitempty"`
-
-	// The debug adapter supports restarting a frame.
-	SupportsRestartFrame bool `json:"supportsRestartFrame,omitempty"`
-
-	// The set of additional module information exposed by the debug adapter.
-	AdditionalModuleColumns []ColumnDescriptor `json:"additionalModuleColumns,omitempty"`
-
-	// Checksum algorithms supported by the debug adapter.
-	SupportedChecksumAlgorithms []ChecksumAlgorithm `json:"supportedChecksumAlgorithms,omitempty"`
-
-	// The debug adapter supports the exceptionInfo request.
-	SupportsExceptionInfoRequest bool `json:"supportsExceptionInfoRequest,omitempty"`
-
-	// The debug adapter supports the 'terminateDebuggee' attribute on the 'disconnect' request.
-	SupportTerminateDebuggee bool `json:"supportTerminateDebuggee,omitempty"`
-
-	// The debug adapter supports a (side effect free) evaluate request for data hovers.
-	SupportsEvaluateForHovers bool `json:"supportsEvaluateForHovers,omitempty"`
-
-	// The debug adapter supports breakpoints that break execution after a specified number of hits.
-	SupportsHitConditionalBreakpoints bool `json:"supportsHitConditionalBreakpoints,omitempty"`
-
-	// The debug adapter supports the stepInTargetsRequest.
-	SupportsStepInTargetsRequest bool `json:"supportsStepInTargetsRequest,omitempty"`
-
-	// The debug adapter supports the configurationDoneRequest.
-	SupportsConfigurationDoneRequest bool `json:"supportsConfigurationDoneRequest,omitempty"`
-
-	// The debug adapter supports conditional breakpoints.
-	SupportsConditionalBreakpoints bool `json:"supportsConditionalBreakpoints,omitempty"`
-
 	// Available filters or options for the setExceptionBreakpoints request.
 	ExceptionBreakpointFilters []ExceptionBreakpointsFilter `json:"exceptionBreakpointFilters,omitempty"`
-
-	// The debug adapter supports the gotoTargetsRequest.
-	SupportsGotoTargetsRequest bool `json:"supportsGotoTargetsRequest,omitempty"`
-
-	// The debug adapter supports the completionsRequest.
-	SupportsCompletionsRequest bool `json:"supportsCompletionsRequest,omitempty"`
-
-	// The debug adapter supports the modules request.
-	SupportsModulesRequest bool `json:"supportsModulesRequest,omitempty"`
 
 	// The debug adapter supports a 'format' attribute on the stackTraceRequest, variablesRequest, and evaluateRequest.
 	SupportsValueFormattingOptions bool `json:"supportsValueFormattingOptions,omitempty"`
 
+	// The debug adapter supports the configurationDoneRequest.
+	SupportsConfigurationDoneRequest bool `json:"supportsConfigurationDoneRequest,omitempty"`
+
 	// The debug adapter supports function breakpoints.
 	SupportsFunctionBreakpoints bool `json:"supportsFunctionBreakpoints,omitempty"`
+
+	// The debug adapter supports stepping back via the stepBack and reverseContinue requests.
+	SupportsStepBack bool `json:"supportsStepBack,omitempty"`
+
+	// The debug adapter supports the modules request.
+	SupportsModulesRequest bool `json:"supportsModulesRequest,omitempty"`
+
+	// The set of additional module information exposed by the debug adapter.
+	AdditionalModuleColumns []ColumnDescriptor `json:"additionalModuleColumns,omitempty"`
+
+	// The debug adapter supports breakpoints that break execution after a specified number of hits.
+	SupportsHitConditionalBreakpoints bool `json:"supportsHitConditionalBreakpoints,omitempty"`
+
+	// The debug adapter supports a (side effect free) evaluate request for data hovers.
+	SupportsEvaluateForHovers bool `json:"supportsEvaluateForHovers,omitempty"`
+
+	// The debug adapter supports setting a variable to a value.
+	SupportsSetVariable bool `json:"supportsSetVariable,omitempty"`
+
+	// The debug adapter supports restarting a frame.
+	SupportsRestartFrame bool `json:"supportsRestartFrame,omitempty"`
+
+	// The debug adapter supports the gotoTargetsRequest.
+	SupportsGotoTargetsRequest bool `json:"supportsGotoTargetsRequest,omitempty"`
+
+	// The debug adapter supports the stepInTargetsRequest.
+	SupportsStepInTargetsRequest bool `json:"supportsStepInTargetsRequest,omitempty"`
+
+	// The debug adapter supports the RestartRequest. In this case a client should not implement 'restart' by terminating and relaunching the adapter but by calling the RestartRequest.
+	SupportsRestartRequest bool `json:"supportsRestartRequest,omitempty"`
+
+	// The debug adapter supports the exceptionInfo request.
+	SupportsExceptionInfoRequest bool `json:"supportsExceptionInfoRequest,omitempty"`
+
+	// The debug adapter supports conditional breakpoints.
+	SupportsConditionalBreakpoints bool `json:"supportsConditionalBreakpoints,omitempty"`
+
+	// The debug adapter supports the completionsRequest.
+	SupportsCompletionsRequest bool `json:"supportsCompletionsRequest,omitempty"`
+
+	// Checksum algorithms supported by the debug adapter.
+	SupportedChecksumAlgorithms []ChecksumAlgorithm `json:"supportedChecksumAlgorithms,omitempty"`
+
+	// The debug adapter supports 'exceptionOptions' on the setExceptionBreakpoints request.
+	SupportsExceptionOptions bool `json:"supportsExceptionOptions,omitempty"`
+
+	// The debug adapter supports the 'terminateDebuggee' attribute on the 'disconnect' request.
+	SupportTerminateDebuggee bool `json:"supportTerminateDebuggee,omitempty"`
 } // struct Capabilities
 
 ```
@@ -796,6 +796,14 @@ used if the underlying UI actually supports this level of customization.
 ```go
 type CompletionItem struct {
 
+	// This value determines the location (in the CompletionsRequest's 'text' attribute) where the completion text is added.
+	// If missing the text is added at the location specified by the CompletionsRequest's 'column' attribute.
+	Start int `json:"start,omitempty"`
+
+	// This value determines how many characters are overwritten by the completion text.
+	// If missing the value 0 is assumed which results in the completion text being inserted.
+	Length int `json:"length,omitempty"`
+
 	// The label of this completion item. By default this is also the text that is inserted when selecting this completion.
 	Label string `json:"label"`
 
@@ -804,14 +812,6 @@ type CompletionItem struct {
 
 	// The item's type. Typically the client uses this information to render the item in the UI with an icon.
 	Type CompletionItemType `json:"type,omitempty"`
-
-	// This value determines the location (in the CompletionsRequest's 'text' attribute) where the completion text is added.
-	// If missing the text is added at the location specified by the CompletionsRequest's 'column' attribute.
-	Start int `json:"start,omitempty"`
-
-	// This value determines how many characters are overwritten by the completion text.
-	// If missing the value 0 is assumed which results in the completion text being inserted.
-	Length int `json:"length,omitempty"`
 } // struct CompletionItem
 
 ```
@@ -836,17 +836,17 @@ POSSIBLE VALUES: `method`, `function`, `constructor`, `field`, `variable`,
 ```go
 type CompletionsArguments struct {
 
-	// An optional line for which to determine the completion proposals. If missing the first line of the text is assumed.
-	Line int `json:"line,omitempty"`
-
-	// Returns completions in the scope of this stack frame. If not specified, the completions are returned for the global scope.
-	FrameId int `json:"frameId,omitempty"`
-
 	// One or more source lines. Typically this is the text a user has typed into the debug console before he asked for completion.
 	Text string `json:"text"`
 
 	// The character position for which to determine the completion proposals.
 	Column int `json:"column"`
+
+	// An optional line for which to determine the completion proposals. If missing the first line of the text is assumed.
+	Line int `json:"line,omitempty"`
+
+	// Returns completions in the scope of this stack frame. If not specified, the completions are returned for the global scope.
+	FrameId int `json:"frameId,omitempty"`
 } // struct CompletionsArguments
 
 ```
@@ -860,10 +860,10 @@ type CompletionsRequest struct {
 	// A client or server-initiated request.
 	Request
 
+	Arguments CompletionsArguments `json:"arguments"`
+
 	// POSSIBLE VALUES: `completions`
 	Command string `json:"command"`
-
-	Arguments CompletionsArguments `json:"arguments"`
 } // struct CompletionsRequest
 
 ```
@@ -878,8 +878,8 @@ capability exists and is true.
 ```go
 func NewCompletionsRequest() *CompletionsRequest
 ```
-Returns a new `CompletionsRequest` with the followings fields set: `command`,
-`type`
+Returns a new `CompletionsRequest` with the following fields set: `Command`,
+`Type`
 
 #### type CompletionsResponse
 
@@ -907,8 +907,8 @@ Response to 'completions' request.
 ```go
 func NewCompletionsResponse() *CompletionsResponse
 ```
-Returns a new `CompletionsResponse` with the followings fields set: `command`,
-`type`
+Returns a new `CompletionsResponse` with the following fields set: `Command`,
+`Type`
 
 #### type ConfigurationDoneArguments
 
@@ -945,8 +945,8 @@ of configuration requests (which was started by the InitializedEvent).
 ```go
 func NewConfigurationDoneRequest() *ConfigurationDoneRequest
 ```
-Returns a new `ConfigurationDoneRequest` with the followings fields set:
-`command`, `type`
+Returns a new `ConfigurationDoneRequest` with the following fields set:
+`Command`, `Type`
 
 #### type ConfigurationDoneResponse
 
@@ -969,8 +969,8 @@ body field is required.
 ```go
 func NewConfigurationDoneResponse() *ConfigurationDoneResponse
 ```
-Returns a new `ConfigurationDoneResponse` with the followings fields set:
-`command`, `type`
+Returns a new `ConfigurationDoneResponse` with the following fields set:
+`Command`, `Type`
 
 #### type ContinueArguments
 
@@ -1008,8 +1008,7 @@ debuggee to run again.
 ```go
 func NewContinueRequest() *ContinueRequest
 ```
-Returns a new `ContinueRequest` with the followings fields set: `command`,
-`type`
+Returns a new `ContinueRequest` with the following fields set: `Command`, `Type`
 
 #### type ContinueResponse
 
@@ -1037,8 +1036,8 @@ Response to 'continue' request.
 ```go
 func NewContinueResponse() *ContinueResponse
 ```
-Returns a new `ContinueResponse` with the followings fields set: `command`,
-`type`
+Returns a new `ContinueResponse` with the following fields set: `Command`,
+`Type`
 
 #### type ContinuedEvent
 
@@ -1073,7 +1072,7 @@ there was no previous request that implied this.
 ```go
 func NewContinuedEvent() *ContinuedEvent
 ```
-Returns a new `ContinuedEvent` with the followings fields set: `event`, `type`
+Returns a new `ContinuedEvent` with the following fields set: `Event_`, `Type`
 
 #### type DisconnectArguments
 
@@ -1115,8 +1114,8 @@ Disconnect request; value of command field is 'disconnect'.
 ```go
 func NewDisconnectRequest() *DisconnectRequest
 ```
-Returns a new `DisconnectRequest` with the followings fields set: `command`,
-`type`
+Returns a new `DisconnectRequest` with the following fields set: `Command`,
+`Type`
 
 #### type DisconnectResponse
 
@@ -1139,8 +1138,8 @@ field is required.
 ```go
 func NewDisconnectResponse() *DisconnectResponse
 ```
-Returns a new `DisconnectResponse` with the followings fields set: `command`,
-`type`
+Returns a new `DisconnectResponse` with the following fields set: `Command`,
+`Type`
 
 #### type ErrorResponse
 
@@ -1165,7 +1164,7 @@ On error that is whenever 'success' is false, the body can provide more details.
 ```go
 func NewErrorResponse() *ErrorResponse
 ```
-Returns a new `ErrorResponse` with the followings fields set: `type`
+Returns a new `ErrorResponse` with the following fields set: `Type`
 
 #### type EvaluateArguments
 
@@ -1198,10 +1197,10 @@ type EvaluateRequest struct {
 	// A client or server-initiated request.
 	Request
 
-	Arguments EvaluateArguments `json:"arguments"`
-
 	// POSSIBLE VALUES: `evaluate`
 	Command string `json:"command"`
+
+	Arguments EvaluateArguments `json:"arguments"`
 } // struct EvaluateRequest
 
 ```
@@ -1215,8 +1214,7 @@ to any variables and arguments that are in scope.
 ```go
 func NewEvaluateRequest() *EvaluateRequest
 ```
-Returns a new `EvaluateRequest` with the followings fields set: `command`,
-`type`
+Returns a new `EvaluateRequest` with the following fields set: `Command`, `Type`
 
 #### type EvaluateResponse
 
@@ -1258,8 +1256,8 @@ Response to 'evaluate' request.
 ```go
 func NewEvaluateResponse() *EvaluateResponse
 ```
-Returns a new `EvaluateResponse` with the followings fields set: `command`,
-`type`
+Returns a new `EvaluateResponse` with the following fields set: `Command`,
+`Type`
 
 #### type Event
 
@@ -1395,8 +1393,8 @@ raised.
 ```go
 func NewExceptionInfoRequest() *ExceptionInfoRequest
 ```
-Returns a new `ExceptionInfoRequest` with the followings fields set: `command`,
-`type`
+Returns a new `ExceptionInfoRequest` with the following fields set: `Command`,
+`Type`
 
 #### type ExceptionInfoResponse
 
@@ -1433,8 +1431,8 @@ Response to 'exceptionInfo' request.
 ```go
 func NewExceptionInfoResponse() *ExceptionInfoResponse
 ```
-Returns a new `ExceptionInfoResponse` with the followings fields set: `command`,
-`type`
+Returns a new `ExceptionInfoResponse` with the following fields set: `Command`,
+`Type`
 
 #### type ExceptionOptions
 
@@ -1457,11 +1455,11 @@ An ExceptionOptions assigns configuration options to a set of exceptions.
 ```go
 type ExceptionPathSegment struct {
 
-	// Depending on the value of 'negate' the names that should match or not match.
-	Names []string `json:"names"`
-
 	// If false or missing this segment matches the names provided, otherwise it matches anything except the names provided.
 	Negate bool `json:"negate,omitempty"`
+
+	// Depending on the value of 'negate' the names that should match or not match.
+	Names []string `json:"names"`
 } // struct ExceptionPathSegment
 
 ```
@@ -1498,7 +1496,7 @@ exited.
 ```go
 func NewExitedEvent() *ExitedEvent
 ```
-Returns a new `ExitedEvent` with the followings fields set: `event`, `type`
+Returns a new `ExitedEvent` with the following fields set: `Event_`, `Type`
 
 #### type FunctionBreakpoint
 
@@ -1542,10 +1540,10 @@ type GotoRequest struct {
 	// A client or server-initiated request.
 	Request
 
-	Arguments GotoArguments `json:"arguments"`
-
 	// POSSIBLE VALUES: `goto`
 	Command string `json:"command"`
+
+	Arguments GotoArguments `json:"arguments"`
 } // struct GotoRequest
 
 ```
@@ -1561,7 +1559,7 @@ first sends the GotoResponse and then a StoppedEvent (event type 'goto').
 ```go
 func NewGotoRequest() *GotoRequest
 ```
-Returns a new `GotoRequest` with the followings fields set: `command`, `type`
+Returns a new `GotoRequest` with the following fields set: `Command`, `Type`
 
 #### type GotoResponse
 
@@ -1584,12 +1582,18 @@ required.
 ```go
 func NewGotoResponse() *GotoResponse
 ```
-Returns a new `GotoResponse` with the followings fields set: `command`, `type`
+Returns a new `GotoResponse` with the following fields set: `Command`, `Type`
 
 #### type GotoTarget
 
 ```go
 type GotoTarget struct {
+
+	// An optional end line of the range covered by the goto target.
+	EndLine int `json:"endLine,omitempty"`
+
+	// An optional end column of the range covered by the goto target.
+	EndColumn int `json:"endColumn,omitempty"`
 
 	// Unique identifier for a goto target. This is used in the goto request.
 	Id int `json:"id"`
@@ -1602,12 +1606,6 @@ type GotoTarget struct {
 
 	// An optional column of the goto target.
 	Column int `json:"column,omitempty"`
-
-	// An optional end line of the range covered by the goto target.
-	EndLine int `json:"endLine,omitempty"`
-
-	// An optional end column of the range covered by the goto target.
-	EndColumn int `json:"endColumn,omitempty"`
 } // struct GotoTarget
 
 ```
@@ -1660,8 +1658,8 @@ called if the 'supportsGotoTargetsRequest' capability exists and is true.
 ```go
 func NewGotoTargetsRequest() *GotoTargetsRequest
 ```
-Returns a new `GotoTargetsRequest` with the followings fields set: `command`,
-`type`
+Returns a new `GotoTargetsRequest` with the following fields set: `Command`,
+`Type`
 
 #### type GotoTargetsResponse
 
@@ -1689,8 +1687,8 @@ Response to 'gotoTargets' request.
 ```go
 func NewGotoTargetsResponse() *GotoTargetsResponse
 ```
-Returns a new `GotoTargetsResponse` with the followings fields set: `command`,
-`type`
+Returns a new `GotoTargetsResponse` with the following fields set: `Command`,
+`Type`
 
 #### type InitializeRequest
 
@@ -1714,22 +1712,13 @@ Initialize request; value of command field is 'initialize'.
 ```go
 func NewInitializeRequest() *InitializeRequest
 ```
-Returns a new `InitializeRequest` with the followings fields set: `command`,
-`type`
+Returns a new `InitializeRequest` with the following fields set: `Command`,
+`Type`
 
 #### type InitializeRequestArguments
 
 ```go
 type InitializeRequestArguments struct {
-
-	// Client supports the paging of variables.
-	SupportsVariablePaging bool `json:"supportsVariablePaging,omitempty"`
-
-	// Client supports the runInTerminal request.
-	SupportsRunInTerminalRequest bool `json:"supportsRunInTerminalRequest,omitempty"`
-
-	// The ID of the (frontend) client using this adapter.
-	ClientID string `json:"clientID,omitempty"`
 
 	// The ID of the debug adapter.
 	AdapterID string `json:"adapterID"`
@@ -1747,6 +1736,15 @@ type InitializeRequestArguments struct {
 
 	// Client supports the optional type attribute for variables.
 	SupportsVariableType bool `json:"supportsVariableType,omitempty"`
+
+	// Client supports the paging of variables.
+	SupportsVariablePaging bool `json:"supportsVariablePaging,omitempty"`
+
+	// Client supports the runInTerminal request.
+	SupportsRunInTerminalRequest bool `json:"supportsRunInTerminalRequest,omitempty"`
+
+	// The ID of the (frontend) client using this adapter.
+	ClientID string `json:"clientID,omitempty"`
 } // struct InitializeRequestArguments
 
 ```
@@ -1776,8 +1774,8 @@ Response to 'initialize' request.
 ```go
 func NewInitializeResponse() *InitializeResponse
 ```
-Returns a new `InitializeResponse` with the followings fields set: `command`,
-`type`
+Returns a new `InitializeResponse` with the following fields set: `Command`,
+`Type`
 
 #### type InitializedEvent
 
@@ -1810,7 +1808,7 @@ indicate the end of the configuration
 ```go
 func NewInitializedEvent() *InitializedEvent
 ```
-Returns a new `InitializedEvent` with the followings fields set: `event`, `type`
+Returns a new `InitializedEvent` with the following fields set: `Event_`, `Type`
 
 #### type LaunchRequest
 
@@ -1834,7 +1832,7 @@ Launch request; value of command field is 'launch'.
 ```go
 func NewLaunchRequest() *LaunchRequest
 ```
-Returns a new `LaunchRequest` with the followings fields set: `command`, `type`
+Returns a new `LaunchRequest` with the following fields set: `Command`, `Type`
 
 #### type LaunchRequestArguments
 
@@ -1879,7 +1877,7 @@ is required.
 ```go
 func NewLaunchResponse() *LaunchResponse
 ```
-Returns a new `LaunchResponse` with the followings fields set: `command`, `type`
+Returns a new `LaunchResponse` with the following fields set: `Command`, `Type`
 
 #### type Message
 
@@ -1921,14 +1919,23 @@ type Module struct {
 	// True if the module is optimized.
 	IsOptimized bool `json:"isOptimized,omitempty"`
 
+	// Version of Module.
+	Version string `json:"version,omitempty"`
+
 	// Logical full path to the symbol file. The exact definition is implementation defined.
 	SymbolFilePath string `json:"symbolFilePath,omitempty"`
 
+	// A name of the module.
+	Name string `json:"name"`
+
+	// optional but recommended attributes.
+	// always try to use these first before introducing additional attributes.
+	//
+	// Logical full path to the module. The exact definition is implementation defined, but usually this would be a full path to the on-disk file for the module.
+	Path string `json:"path,omitempty"`
+
 	// True if the module is considered 'user code' by a debugger that supports 'Just My Code'.
 	IsUserCode bool `json:"isUserCode,omitempty"`
-
-	// Version of Module.
-	Version string `json:"version,omitempty"`
 
 	// User understandable description of if symbols were found for the module (ex: 'Symbols Loaded', 'Symbols not found', etc.
 	SymbolStatus string `json:"symbolStatus,omitempty"`
@@ -1945,15 +1952,6 @@ type Module struct {
 	// - `int` (for JSON `integer`s)
 	// - `string` (for JSON `string`s)
 	Id interface{} `json:"id"`
-
-	// A name of the module.
-	Name string `json:"name"`
-
-	// optional but recommended attributes.
-	// always try to use these first before introducing additional attributes.
-	//
-	// Logical full path to the module. The exact definition is implementation defined, but usually this would be a full path to the on-disk file for the module.
-	Path string `json:"path,omitempty"`
 } // struct Module
 
 ```
@@ -1983,13 +1981,13 @@ type ModuleEvent struct {
 
 	Body struct {
 
+		// The new, changed, or removed module. In case of 'removed' only the module id is used.
+		Module Module `json:"module"`
+
 		// The reason for the event.
 		//
 		// POSSIBLE VALUES: `new`, `changed`, `removed`
 		Reason string `json:"reason"`
-
-		// The new, changed, or removed module. In case of 'removed' only the module id is used.
-		Module Module `json:"module"`
 	} `json:"body"`
 } // struct ModuleEvent
 
@@ -2003,7 +2001,7 @@ about a module has changed.
 ```go
 func NewModuleEvent() *ModuleEvent
 ```
-Returns a new `ModuleEvent` with the followings fields set: `event`, `type`
+Returns a new `ModuleEvent` with the following fields set: `Event_`, `Type`
 
 #### type ModulesArguments
 
@@ -2044,7 +2042,7 @@ can either return all modules or a range of modules to support paging.
 ```go
 func NewModulesRequest() *ModulesRequest
 ```
-Returns a new `ModulesRequest` with the followings fields set: `command`, `type`
+Returns a new `ModulesRequest` with the following fields set: `Command`, `Type`
 
 #### type ModulesResponse
 
@@ -2055,11 +2053,11 @@ type ModulesResponse struct {
 
 	Body struct {
 
-		// The total number of modules available.
-		TotalModules int `json:"totalModules,omitempty"`
-
 		// All modules or range of modules.
 		Modules []Module `json:"modules"`
+
+		// The total number of modules available.
+		TotalModules int `json:"totalModules,omitempty"`
 	} `json:"body"`
 
 	// POSSIBLE VALUES: `modules`
@@ -2075,8 +2073,7 @@ Response to 'modules' request.
 ```go
 func NewModulesResponse() *ModulesResponse
 ```
-Returns a new `ModulesResponse` with the followings fields set: `command`,
-`type`
+Returns a new `ModulesResponse` with the following fields set: `Command`, `Type`
 
 #### type ModulesViewDescriptor
 
@@ -2128,7 +2125,7 @@ then a StoppedEvent (event type 'step') after the step has completed.
 ```go
 func NewNextRequest() *NextRequest
 ```
-Returns a new `NextRequest` with the followings fields set: `command`, `type`
+Returns a new `NextRequest` with the following fields set: `Command`, `Type`
 
 #### type NextResponse
 
@@ -2151,7 +2148,7 @@ required.
 ```go
 func NewNextResponse() *NextResponse
 ```
-Returns a new `NextResponse` with the followings fields set: `command`, `type`
+Returns a new `NextResponse` with the following fields set: `Command`, `Type`
 
 #### type OutputEvent
 
@@ -2200,7 +2197,7 @@ produced some output.
 ```go
 func NewOutputEvent() *OutputEvent
 ```
-Returns a new `OutputEvent` with the followings fields set: `event`, `type`
+Returns a new `OutputEvent` with the following fields set: `Event_`, `Type`
 
 #### type PauseArguments
 
@@ -2239,7 +2236,7 @@ StoppedEvent (event type 'pause') after the thread has been paused successfully.
 ```go
 func NewPauseRequest() *PauseRequest
 ```
-Returns a new `PauseRequest` with the followings fields set: `command`, `type`
+Returns a new `PauseRequest` with the following fields set: `Command`, `Type`
 
 #### type PauseResponse
 
@@ -2262,20 +2259,20 @@ is required.
 ```go
 func NewPauseResponse() *PauseResponse
 ```
-Returns a new `PauseResponse` with the followings fields set: `command`, `type`
+Returns a new `PauseResponse` with the following fields set: `Command`, `Type`
 
 #### type ProtocolMessage
 
 ```go
 type ProtocolMessage struct {
 
+	// Sequence number.
+	Seq int `json:"seq"`
+
 	// One of 'request', 'response', or 'event'.
 	//
 	// POSSIBLE VALUES: `request`, `response`, `event`
 	Type string `json:"type"`
-
-	// Sequence number.
-	Seq int `json:"seq"`
 } // struct ProtocolMessage
 
 ```
@@ -2289,12 +2286,6 @@ type Request struct {
 	// Base class of requests, responses, and events.
 	ProtocolMessage
 
-	// POSSIBLE VALUES: `request`
-	Type string `json:"type"`
-
-	// The command to execute.
-	Command string `json:"command"`
-
 	// Object containing arguments for the command.
 	//
 	// POSSIBLE TYPES:
@@ -2306,6 +2297,12 @@ type Request struct {
 	// - `map[string]interface{}` (for JSON `object`s)
 	// - `string` (for JSON `string`s)
 	Arguments interface{} `json:"arguments,omitempty"`
+
+	// POSSIBLE VALUES: `request`
+	Type string `json:"type"`
+
+	// The command to execute.
+	Command string `json:"command"`
 } // struct Request
 
 ```
@@ -2324,6 +2321,12 @@ func BaseRequest(someRequest interface{}) (baseRequest *Request)
 type Response struct {
 	// Base class of requests, responses, and events.
 	ProtocolMessage
+
+	// Outcome of the request.
+	Success bool `json:"success"`
+
+	// The command requested.
+	Command string `json:"command"`
 
 	// Contains error message if success == false.
 	Message string `json:"message,omitempty"`
@@ -2345,12 +2348,6 @@ type Response struct {
 
 	// Sequence number of the corresponding request.
 	Request_seq int `json:"request_seq"`
-
-	// Outcome of the request.
-	Success bool `json:"success"`
-
-	// The command requested.
-	Command string `json:"command"`
 } // struct Response
 
 ```
@@ -2394,10 +2391,10 @@ type RestartFrameRequest struct {
 	// A client or server-initiated request.
 	Request
 
-	Arguments RestartFrameArguments `json:"arguments"`
-
 	// POSSIBLE VALUES: `restartFrame`
 	Command string `json:"command"`
+
+	Arguments RestartFrameArguments `json:"arguments"`
 } // struct RestartFrameRequest
 
 ```
@@ -2412,8 +2409,8 @@ the restart has completed.
 ```go
 func NewRestartFrameRequest() *RestartFrameRequest
 ```
-Returns a new `RestartFrameRequest` with the followings fields set: `command`,
-`type`
+Returns a new `RestartFrameRequest` with the following fields set: `Command`,
+`Type`
 
 #### type RestartFrameResponse
 
@@ -2436,8 +2433,8 @@ field is required.
 ```go
 func NewRestartFrameResponse() *RestartFrameResponse
 ```
-Returns a new `RestartFrameResponse` with the followings fields set: `command`,
-`type`
+Returns a new `RestartFrameResponse` with the following fields set: `Command`,
+`Type`
 
 #### type RestartRequest
 
@@ -2466,7 +2463,7 @@ implementing a restart request and setting the capability
 ```go
 func NewRestartRequest() *RestartRequest
 ```
-Returns a new `RestartRequest` with the followings fields set: `command`, `type`
+Returns a new `RestartRequest` with the following fields set: `Command`, `Type`
 
 #### type RestartResponse
 
@@ -2489,8 +2486,7 @@ is required.
 ```go
 func NewRestartResponse() *RestartResponse
 ```
-Returns a new `RestartResponse` with the followings fields set: `command`,
-`type`
+Returns a new `RestartResponse` with the following fields set: `Command`, `Type`
 
 #### type ReverseContinueArguments
 
@@ -2529,8 +2525,8 @@ request if the capability supportsStepBack is true.
 ```go
 func NewReverseContinueRequest() *ReverseContinueRequest
 ```
-Returns a new `ReverseContinueRequest` with the followings fields set:
-`command`, `type`
+Returns a new `ReverseContinueRequest` with the following fields set: `Command`,
+`Type`
 
 #### type ReverseContinueResponse
 
@@ -2553,8 +2549,8 @@ body field is required.
 ```go
 func NewReverseContinueResponse() *ReverseContinueResponse
 ```
-Returns a new `ReverseContinueResponse` with the followings fields set:
-`command`, `type`
+Returns a new `ReverseContinueResponse` with the following fields set:
+`Command`, `Type`
 
 #### type RunInTerminalRequest
 
@@ -2579,8 +2575,8 @@ request a debug adapter can run a command in a terminal.
 ```go
 func NewRunInTerminalRequest() *RunInTerminalRequest
 ```
-Returns a new `RunInTerminalRequest` with the followings fields set: `command`,
-`type`
+Returns a new `RunInTerminalRequest` with the following fields set: `Command`,
+`Type`
 
 #### type RunInTerminalRequestArguments
 
@@ -2635,27 +2631,13 @@ Response to Initialize request.
 ```go
 func NewRunInTerminalResponse() *RunInTerminalResponse
 ```
-Returns a new `RunInTerminalResponse` with the followings fields set: `command`,
-`type`
+Returns a new `RunInTerminalResponse` with the following fields set: `Command`,
+`Type`
 
 #### type Scope
 
 ```go
 type Scope struct {
-
-	// Optional end column of the range covered by this scope.
-	EndColumn int `json:"endColumn,omitempty"`
-
-	// The number of named variables in this scope.
-	// The client can use this optional information to present the variables in a paged UI and fetch them in chunks.
-	NamedVariables int `json:"namedVariables,omitempty"`
-
-	// If true, the number of variables in this scope is large or expensive to retrieve.
-	Expensive bool `json:"expensive"`
-
-	// The number of indexed variables in this scope.
-	// The client can use this optional information to present the variables in a paged UI and fetch them in chunks.
-	IndexedVariables int `json:"indexedVariables,omitempty"`
 
 	// Optional source for this scope.
 	Source Source `json:"source,omitempty"`
@@ -2663,17 +2645,31 @@ type Scope struct {
 	// Optional start line of the range covered by this scope.
 	Line int `json:"line,omitempty"`
 
-	// Optional start column of the range covered by this scope.
-	Column int `json:"column,omitempty"`
-
-	// Optional end line of the range covered by this scope.
-	EndLine int `json:"endLine,omitempty"`
+	// Optional end column of the range covered by this scope.
+	EndColumn int `json:"endColumn,omitempty"`
 
 	// Name of the scope such as 'Arguments', 'Locals'.
 	Name string `json:"name"`
 
 	// The variables of this scope can be retrieved by passing the value of variablesReference to the VariablesRequest.
 	VariablesReference int `json:"variablesReference"`
+
+	// The number of named variables in this scope.
+	// The client can use this optional information to present the variables in a paged UI and fetch them in chunks.
+	NamedVariables int `json:"namedVariables,omitempty"`
+
+	// Optional end line of the range covered by this scope.
+	EndLine int `json:"endLine,omitempty"`
+
+	// The number of indexed variables in this scope.
+	// The client can use this optional information to present the variables in a paged UI and fetch them in chunks.
+	IndexedVariables int `json:"indexedVariables,omitempty"`
+
+	// If true, the number of variables in this scope is large or expensive to retrieve.
+	Expensive bool `json:"expensive"`
+
+	// Optional start column of the range covered by this scope.
+	Column int `json:"column,omitempty"`
 } // struct Scope
 
 ```
@@ -2717,7 +2713,7 @@ variable scopes for a given stackframe ID.
 ```go
 func NewScopesRequest() *ScopesRequest
 ```
-Returns a new `ScopesRequest` with the followings fields set: `command`, `type`
+Returns a new `ScopesRequest` with the following fields set: `Command`, `Type`
 
 #### type ScopesResponse
 
@@ -2745,15 +2741,12 @@ Response to 'scopes' request.
 ```go
 func NewScopesResponse() *ScopesResponse
 ```
-Returns a new `ScopesResponse` with the followings fields set: `command`, `type`
+Returns a new `ScopesResponse` with the following fields set: `Command`, `Type`
 
 #### type SetBreakpointsArguments
 
 ```go
 type SetBreakpointsArguments struct {
-
-	// A value of true indicates that the underlying source has been modified which results in new breakpoint locations.
-	SourceModified bool `json:"sourceModified,omitempty"`
 
 	// The source location of the breakpoints; either source.path or source.reference must be specified.
 	Source Source `json:"source"`
@@ -2763,6 +2756,9 @@ type SetBreakpointsArguments struct {
 
 	// Deprecated: The code locations of the breakpoints.
 	Lines []int `json:"lines,omitempty"`
+
+	// A value of true indicates that the underlying source has been modified which results in new breakpoint locations.
+	SourceModified bool `json:"sourceModified,omitempty"`
 } // struct SetBreakpointsArguments
 
 ```
@@ -2794,8 +2790,8 @@ a breakpoint is hit, a StoppedEvent (event type 'breakpoint') is generated.
 ```go
 func NewSetBreakpointsRequest() *SetBreakpointsRequest
 ```
-Returns a new `SetBreakpointsRequest` with the followings fields set: `command`,
-`type`
+Returns a new `SetBreakpointsRequest` with the following fields set: `Command`,
+`Type`
 
 #### type SetBreakpointsResponse
 
@@ -2827,8 +2823,8 @@ the SetBreakpointsArguments.
 ```go
 func NewSetBreakpointsResponse() *SetBreakpointsResponse
 ```
-Returns a new `SetBreakpointsResponse` with the followings fields set:
-`command`, `type`
+Returns a new `SetBreakpointsResponse` with the following fields set: `Command`,
+`Type`
 
 #### type SetExceptionBreakpointsArguments
 
@@ -2871,8 +2867,8 @@ fired (event type 'exception').
 ```go
 func NewSetExceptionBreakpointsRequest() *SetExceptionBreakpointsRequest
 ```
-Returns a new `SetExceptionBreakpointsRequest` with the followings fields set:
-`command`, `type`
+Returns a new `SetExceptionBreakpointsRequest` with the following fields set:
+`Command`, `Type`
 
 #### type SetExceptionBreakpointsResponse
 
@@ -2895,8 +2891,8 @@ so no body field is required.
 ```go
 func NewSetExceptionBreakpointsResponse() *SetExceptionBreakpointsResponse
 ```
-Returns a new `SetExceptionBreakpointsResponse` with the followings fields set:
-`command`, `type`
+Returns a new `SetExceptionBreakpointsResponse` with the following fields set:
+`Command`, `Type`
 
 #### type SetFunctionBreakpointsArguments
 
@@ -2937,8 +2933,8 @@ empty array. When a function breakpoint is hit, a StoppedEvent (event type
 ```go
 func NewSetFunctionBreakpointsRequest() *SetFunctionBreakpointsRequest
 ```
-Returns a new `SetFunctionBreakpointsRequest` with the followings fields set:
-`command`, `type`
+Returns a new `SetFunctionBreakpointsRequest` with the following fields set:
+`Command`, `Type`
 
 #### type SetFunctionBreakpointsResponse
 
@@ -2967,16 +2963,13 @@ breakpoint created by this request.
 ```go
 func NewSetFunctionBreakpointsResponse() *SetFunctionBreakpointsResponse
 ```
-Returns a new `SetFunctionBreakpointsResponse` with the followings fields set:
-`command`, `type`
+Returns a new `SetFunctionBreakpointsResponse` with the following fields set:
+`Command`, `Type`
 
 #### type SetVariableArguments
 
 ```go
 type SetVariableArguments struct {
-
-	// Specifies details on how to format the response value.
-	Format ValueFormat `json:"format,omitempty"`
 
 	// The reference of the variable container.
 	VariablesReference int `json:"variablesReference"`
@@ -2986,6 +2979,9 @@ type SetVariableArguments struct {
 
 	// The value of the variable.
 	Value string `json:"value"`
+
+	// Specifies details on how to format the response value.
+	Format ValueFormat `json:"format,omitempty"`
 } // struct SetVariableArguments
 
 ```
@@ -3015,8 +3011,8 @@ with the given name in the variable container to a new value.
 ```go
 func NewSetVariableRequest() *SetVariableRequest
 ```
-Returns a new `SetVariableRequest` with the followings fields set: `command`,
-`type`
+Returns a new `SetVariableRequest` with the following fields set: `Command`,
+`Type`
 
 #### type SetVariableResponse
 
@@ -3026,10 +3022,6 @@ type SetVariableResponse struct {
 	Response
 
 	Body struct {
-
-		// The number of indexed child variables.
-		// The client can use this optional information to present the variables in a paged UI and fetch them in chunks.
-		IndexedVariables int64 `json:"indexedVariables,omitempty"`
 
 		// The new value of the variable.
 		Value string `json:"value"`
@@ -3043,6 +3035,10 @@ type SetVariableResponse struct {
 		// The number of named child variables.
 		// The client can use this optional information to present the variables in a paged UI and fetch them in chunks.
 		NamedVariables int64 `json:"namedVariables,omitempty"`
+
+		// The number of indexed child variables.
+		// The client can use this optional information to present the variables in a paged UI and fetch them in chunks.
+		IndexedVariables int64 `json:"indexedVariables,omitempty"`
 	} `json:"body"`
 
 	// POSSIBLE VALUES: `setVariable`
@@ -3058,13 +3054,19 @@ Response to 'setVariable' request.
 ```go
 func NewSetVariableResponse() *SetVariableResponse
 ```
-Returns a new `SetVariableResponse` with the followings fields set: `command`,
-`type`
+Returns a new `SetVariableResponse` with the following fields set: `Command`,
+`Type`
 
 #### type Source
 
 ```go
 type Source struct {
+
+	// The short name of the source. Every source returned from the debug adapter has a name. When sending a source to the debug adapter this name is optional.
+	Name string `json:"name,omitempty"`
+
+	// The path of the source to be shown in the UI. It is only used to locate and load the content of the source if no sourceReference is specified (or its vaule is 0).
+	Path string `json:"path,omitempty"`
 
 	// If sourceReference > 0 the contents of the source must be retrieved through the SourceRequest (even if a path is specified). A sourceReference is only valid for a session, so it must not be used to persist a source.
 	SourceReference int64 `json:"sourceReference,omitempty"`
@@ -3091,12 +3093,6 @@ type Source struct {
 
 	// The checksums associated with this file.
 	Checksums []Checksum `json:"checksums,omitempty"`
-
-	// The short name of the source. Every source returned from the debug adapter has a name. When sending a source to the debug adapter this name is optional.
-	Name string `json:"name,omitempty"`
-
-	// The path of the source to be shown in the UI. It is only used to locate and load the content of the source if no sourceReference is specified (or its vaule is 0).
-	Path string `json:"path,omitempty"`
 } // struct Source
 
 ```
@@ -3125,9 +3121,6 @@ Arguments for 'source' request.
 ```go
 type SourceBreakpoint struct {
 
-	// The source line of the breakpoint.
-	Line int `json:"line"`
-
 	// An optional source column of the breakpoint.
 	Column int `json:"column,omitempty"`
 
@@ -3136,6 +3129,9 @@ type SourceBreakpoint struct {
 
 	// An optional expression that controls how many hits of the breakpoint are ignored. The backend is expected to interpret the expression as needed.
 	HitCondition string `json:"hitCondition,omitempty"`
+
+	// The source line of the breakpoint.
+	Line int `json:"line"`
 } // struct SourceBreakpoint
 
 ```
@@ -3165,7 +3161,7 @@ source code for a given source reference.
 ```go
 func NewSourceRequest() *SourceRequest
 ```
-Returns a new `SourceRequest` with the followings fields set: `command`, `type`
+Returns a new `SourceRequest` with the following fields set: `Command`, `Type`
 
 #### type SourceResponse
 
@@ -3176,11 +3172,11 @@ type SourceResponse struct {
 
 	Body struct {
 
-		// Content of the source reference.
-		Content string `json:"content"`
-
 		// Optional content type (mime type) of the source.
 		MimeType string `json:"mimeType,omitempty"`
+
+		// Content of the source reference.
+		Content string `json:"content"`
 	} `json:"body"`
 
 	// POSSIBLE VALUES: `source`
@@ -3196,15 +3192,24 @@ Response to 'source' request.
 ```go
 func NewSourceResponse() *SourceResponse
 ```
-Returns a new `SourceResponse` with the followings fields set: `command`, `type`
+Returns a new `SourceResponse` with the following fields set: `Command`, `Type`
 
 #### type StackFrame
 
 ```go
 type StackFrame struct {
 
-	// An optional end line of the range covered by the stack frame.
-	EndLine int `json:"endLine,omitempty"`
+	// The name of the stack frame, typically a method name.
+	Name string `json:"name"`
+
+	// The optional source of the frame.
+	Source Source `json:"source,omitempty"`
+
+	// The column within the line. If source is null or doesn't exist, column is 0 and must be ignored.
+	Column int `json:"column"`
+
+	// An optional end column of the range covered by the stack frame.
+	EndColumn int `json:"endColumn,omitempty"`
 
 	// The module associated with this frame, if any.
 	//
@@ -3221,20 +3226,11 @@ type StackFrame struct {
 	// An identifier for the stack frame. It must be unique across all threads. This id can be used to retrieve the scopes of the frame with the 'scopesRequest' or to restart the execution of a stackframe.
 	Id int `json:"id"`
 
-	// The name of the stack frame, typically a method name.
-	Name string `json:"name"`
-
-	// The optional source of the frame.
-	Source Source `json:"source,omitempty"`
+	// An optional end line of the range covered by the stack frame.
+	EndLine int `json:"endLine,omitempty"`
 
 	// The line within the file of the frame. If source is null or doesn't exist, line is 0 and must be ignored.
 	Line int `json:"line"`
-
-	// The column within the line. If source is null or doesn't exist, column is 0 and must be ignored.
-	Column int `json:"column"`
-
-	// An optional end column of the range covered by the stack frame.
-	EndColumn int `json:"endColumn,omitempty"`
 } // struct StackFrame
 
 ```
@@ -3248,12 +3244,6 @@ type StackFrameFormat struct {
 	// Provides formatting information for a value.
 	ValueFormat
 
-	// Displays the line number of the stack frame.
-	Line bool `json:"line,omitempty"`
-
-	// Displays the module of the stack frame.
-	Module bool `json:"module,omitempty"`
-
 	// Displays parameters for the stack frame.
 	Parameters bool `json:"parameters,omitempty"`
 
@@ -3265,6 +3255,12 @@ type StackFrameFormat struct {
 
 	// Displays the values of parameters for the stack frame.
 	ParameterValues bool `json:"parameterValues,omitempty"`
+
+	// Displays the line number of the stack frame.
+	Line bool `json:"line,omitempty"`
+
+	// Displays the module of the stack frame.
+	Module bool `json:"module,omitempty"`
 } // struct StackFrameFormat
 
 ```
@@ -3276,9 +3272,6 @@ Provides formatting information for a stack frame.
 ```go
 type StackTraceArguments struct {
 
-	// Specifies details on how to format the stack frames.
-	Format StackFrameFormat `json:"format,omitempty"`
-
 	// Retrieve the stacktrace for this thread.
 	ThreadId int `json:"threadId"`
 
@@ -3287,6 +3280,9 @@ type StackTraceArguments struct {
 
 	// The maximum number of frames to return. If levels is not specified or 0, all frames are returned.
 	Levels int `json:"levels,omitempty"`
+
+	// Specifies details on how to format the stack frames.
+	Format StackFrameFormat `json:"format,omitempty"`
 } // struct StackTraceArguments
 
 ```
@@ -3316,8 +3312,8 @@ a stacktrace from the current execution state.
 ```go
 func NewStackTraceRequest() *StackTraceRequest
 ```
-Returns a new `StackTraceRequest` with the followings fields set: `command`,
-`type`
+Returns a new `StackTraceRequest` with the following fields set: `Command`,
+`Type`
 
 #### type StackTraceResponse
 
@@ -3325,9 +3321,6 @@ Returns a new `StackTraceRequest` with the followings fields set: `command`,
 type StackTraceResponse struct {
 	// Response to a request.
 	Response
-
-	// POSSIBLE VALUES: `stackTrace`
-	Command string `json:"command,omitempty"`
 
 	Body struct {
 
@@ -3338,6 +3331,9 @@ type StackTraceResponse struct {
 		// The total number of frames available.
 		TotalFrames int `json:"totalFrames,omitempty"`
 	} `json:"body"`
+
+	// POSSIBLE VALUES: `stackTrace`
+	Command string `json:"command,omitempty"`
 } // struct StackTraceResponse
 
 ```
@@ -3349,8 +3345,8 @@ Response to 'stackTrace' request.
 ```go
 func NewStackTraceResponse() *StackTraceResponse
 ```
-Returns a new `StackTraceResponse` with the followings fields set: `command`,
-`type`
+Returns a new `StackTraceResponse` with the following fields set: `Command`,
+`Type`
 
 #### type StepBackArguments
 
@@ -3391,8 +3387,7 @@ supportsStepBack is true.
 ```go
 func NewStepBackRequest() *StepBackRequest
 ```
-Returns a new `StepBackRequest` with the followings fields set: `command`,
-`type`
+Returns a new `StepBackRequest` with the following fields set: `Command`, `Type`
 
 #### type StepBackResponse
 
@@ -3415,8 +3410,8 @@ field is required.
 ```go
 func NewStepBackResponse() *StepBackResponse
 ```
-Returns a new `StepBackResponse` with the followings fields set: `command`,
-`type`
+Returns a new `StepBackResponse` with the following fields set: `Command`,
+`Type`
 
 #### type StepInArguments
 
@@ -3463,7 +3458,7 @@ source line can be retrieved via the 'stepInTargets' request.
 ```go
 func NewStepInRequest() *StepInRequest
 ```
-Returns a new `StepInRequest` with the followings fields set: `command`, `type`
+Returns a new `StepInRequest` with the following fields set: `Command`, `Type`
 
 #### type StepInResponse
 
@@ -3486,7 +3481,7 @@ is required.
 ```go
 func NewStepInResponse() *StepInResponse
 ```
-Returns a new `StepInResponse` with the followings fields set: `command`, `type`
+Returns a new `StepInResponse` with the following fields set: `Command`, `Type`
 
 #### type StepInTarget
 
@@ -3525,10 +3520,10 @@ type StepInTargetsRequest struct {
 	// A client or server-initiated request.
 	Request
 
-	Arguments StepInTargetsArguments `json:"arguments"`
-
 	// POSSIBLE VALUES: `stepInTargets`
 	Command string `json:"command"`
+
+	Arguments StepInTargetsArguments `json:"arguments"`
 } // struct StepInTargetsRequest
 
 ```
@@ -3543,8 +3538,8 @@ called if the 'supportsStepInTargetsRequest' capability exists and is true.
 ```go
 func NewStepInTargetsRequest() *StepInTargetsRequest
 ```
-Returns a new `StepInTargetsRequest` with the followings fields set: `command`,
-`type`
+Returns a new `StepInTargetsRequest` with the following fields set: `Command`,
+`Type`
 
 #### type StepInTargetsResponse
 
@@ -3572,8 +3567,8 @@ Response to 'stepInTargets' request.
 ```go
 func NewStepInTargetsResponse() *StepInTargetsResponse
 ```
-Returns a new `StepInTargetsResponse` with the followings fields set: `command`,
-`type`
+Returns a new `StepInTargetsResponse` with the following fields set: `Command`,
+`Type`
 
 #### type StepOutArguments
 
@@ -3595,10 +3590,10 @@ type StepOutRequest struct {
 	// A client or server-initiated request.
 	Request
 
+	Arguments StepOutArguments `json:"arguments"`
+
 	// POSSIBLE VALUES: `stepOut`
 	Command string `json:"command"`
-
-	Arguments StepOutArguments `json:"arguments"`
 } // struct StepOutRequest
 
 ```
@@ -3613,7 +3608,7 @@ completed.
 ```go
 func NewStepOutRequest() *StepOutRequest
 ```
-Returns a new `StepOutRequest` with the followings fields set: `command`, `type`
+Returns a new `StepOutRequest` with the following fields set: `Command`, `Type`
 
 #### type StepOutResponse
 
@@ -3636,8 +3631,7 @@ is required.
 ```go
 func NewStepOutResponse() *StepOutResponse
 ```
-Returns a new `StepOutResponse` with the followings fields set: `command`,
-`type`
+Returns a new `StepOutResponse` with the following fields set: `Command`, `Type`
 
 #### type StoppedEvent
 
@@ -3651,6 +3645,14 @@ type StoppedEvent struct {
 
 	Body struct {
 
+		// Additional information. E.g. if reason is 'exception', text contains the exception name. This string is shown in the UI.
+		Text string `json:"text,omitempty"`
+
+		// If allThreadsStopped is true, a debug adapter can announce that all threads have stopped.
+		// *  The client should use this information to enable that all threads can be expanded to access their stacktraces.
+		// *  If the attribute is missing or false, only the thread with the given threadId can be expanded.
+		AllThreadsStopped bool `json:"allThreadsStopped,omitempty"`
+
 		// The reason for the event (such as: 'step', 'breakpoint', 'exception', 'pause', 'entry').
 		// For backward compatibility this string is shown in the UI if the 'description' attribute is missing (but it must not be translated).
 		//
@@ -3662,14 +3664,6 @@ type StoppedEvent struct {
 
 		// The thread which was stopped.
 		ThreadId int `json:"threadId,omitempty"`
-
-		// Additional information. E.g. if reason is 'exception', text contains the exception name. This string is shown in the UI.
-		Text string `json:"text,omitempty"`
-
-		// If allThreadsStopped is true, a debug adapter can announce that all threads have stopped.
-		// *  The client should use this information to enable that all threads can be expanded to access their stacktraces.
-		// *  If the attribute is missing or false, only the thread with the given threadId can be expanded.
-		AllThreadsStopped bool `json:"allThreadsStopped,omitempty"`
 	} `json:"body"`
 } // struct StoppedEvent
 
@@ -3685,7 +3679,7 @@ statement etc.
 ```go
 func NewStoppedEvent() *StoppedEvent
 ```
-Returns a new `StoppedEvent` with the followings fields set: `event`, `type`
+Returns a new `StoppedEvent` with the following fields set: `Event_`, `Type`
 
 #### type TerminatedEvent
 
@@ -3714,7 +3708,7 @@ of the debuggee has terminated.
 ```go
 func NewTerminatedEvent() *TerminatedEvent
 ```
-Returns a new `TerminatedEvent` with the followings fields set: `event`, `type`
+Returns a new `TerminatedEvent` with the following fields set: `Event_`, `Type`
 
 #### type Thread
 
@@ -3764,7 +3758,7 @@ started or exited.
 ```go
 func NewThreadEvent() *ThreadEvent
 ```
-Returns a new `ThreadEvent` with the followings fields set: `event`, `type`
+Returns a new `ThreadEvent` with the following fields set: `Event_`, `Type`
 
 #### type ThreadsRequest
 
@@ -3787,7 +3781,7 @@ list of all threads.
 ```go
 func NewThreadsRequest() *ThreadsRequest
 ```
-Returns a new `ThreadsRequest` with the followings fields set: `command`, `type`
+Returns a new `ThreadsRequest` with the following fields set: `Command`, `Type`
 
 #### type ThreadsResponse
 
@@ -3815,8 +3809,7 @@ Response to 'threads' request.
 ```go
 func NewThreadsResponse() *ThreadsResponse
 ```
-Returns a new `ThreadsResponse` with the followings fields set: `command`,
-`type`
+Returns a new `ThreadsResponse` with the following fields set: `Command`, `Type`
 
 #### type ValueFormat
 
@@ -3836,18 +3829,6 @@ Provides formatting information for a value.
 ```go
 type Variable struct {
 
-	// The type of the variable's value. Typically shown in the UI when hovering over the value.
-	Type string `json:"type,omitempty"`
-
-	// Properties of a variable that can be used to determine how to render the variable in the UI. Format of the string value: TBD.
-	Kind string `json:"kind,omitempty"`
-
-	// Optional evaluatable name of this variable which can be passed to the 'EvaluateRequest' to fetch the variable's value.
-	EvaluateName string `json:"evaluateName,omitempty"`
-
-	// If variablesReference is > 0, the variable is structured and its children can be retrieved by passing variablesReference to the VariablesRequest.
-	VariablesReference int `json:"variablesReference"`
-
 	// The number of named child variables.
 	// The client can use this optional information to present the children in a paged UI and fetch them in chunks.
 	NamedVariables int `json:"namedVariables,omitempty"`
@@ -3861,6 +3842,18 @@ type Variable struct {
 
 	// The variable's value. This can be a multi-line text, e.g. for a function the body of a function.
 	Value string `json:"value"`
+
+	// The type of the variable's value. Typically shown in the UI when hovering over the value.
+	Type string `json:"type,omitempty"`
+
+	// Properties of a variable that can be used to determine how to render the variable in the UI. Format of the string value: TBD.
+	Kind string `json:"kind,omitempty"`
+
+	// Optional evaluatable name of this variable which can be passed to the 'EvaluateRequest' to fetch the variable's value.
+	EvaluateName string `json:"evaluateName,omitempty"`
+
+	// If variablesReference is > 0, the variable is structured and its children can be retrieved by passing variablesReference to the VariablesRequest.
+	VariablesReference int `json:"variablesReference"`
 } // struct Variable
 
 ```
@@ -3926,8 +3919,8 @@ limit the fetched children to either named or indexed children.
 ```go
 func NewVariablesRequest() *VariablesRequest
 ```
-Returns a new `VariablesRequest` with the followings fields set: `command`,
-`type`
+Returns a new `VariablesRequest` with the following fields set: `Command`,
+`Type`
 
 #### type VariablesResponse
 
@@ -3936,14 +3929,14 @@ type VariablesResponse struct {
 	// Response to a request.
 	Response
 
-	// POSSIBLE VALUES: `variables`
-	Command string `json:"command,omitempty"`
-
 	Body struct {
 
 		// All (or a range) of variables for the given variable reference.
 		Variables []Variable `json:"variables"`
 	} `json:"body"`
+
+	// POSSIBLE VALUES: `variables`
+	Command string `json:"command,omitempty"`
 } // struct VariablesResponse
 
 ```
@@ -3955,5 +3948,5 @@ Response to 'variables' request.
 ```go
 func NewVariablesResponse() *VariablesResponse
 ```
-Returns a new `VariablesResponse` with the followings fields set: `command`,
-`type`
+Returns a new `VariablesResponse` with the following fields set: `Command`,
+`Type`
