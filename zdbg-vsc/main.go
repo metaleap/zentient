@@ -17,7 +17,6 @@ import (
 )
 
 var (
-	sendseq int
 	stdin *bufio.Scanner
 	rawOut *bufio.Writer
 
@@ -35,7 +34,7 @@ func main () {
 	logln := func(msg string) { logfile.WriteString(msg+"\n")  ;  logfile.Sync() }
 	logpanic := func(msg string) {  logln(msg)  ;  panic(msg)  }
 
-	bclen := []byte("Content-Length: ")  ;  bln := []byte("\r\n\r\n")
+	sendseq := 0  ;  bclen := []byte("Content-Length: ")  ;  bln := []byte("\r\n\r\n")
 	send := func (item interface{}) {
 		sendseq++
 		if bresp := zdbgvscp.BaseResponse(item)  ;  bresp!=nil {
@@ -61,6 +60,11 @@ func main () {
 		switch respbase.Command {
 			case "initialize":
 				send(zdbgvscp.NewInitializedEvent())
+				// runinterm := zdbgvscp.NewRunInTerminalRequest()
+				// runinterm.Arguments.Kind = "integrated"
+				// runinterm.Arguments.Cwd = "/home/rox/c/go/src/github.com/metaleap"
+				// runinterm.Arguments.Args = []string { "fortune" }
+				// send(runinterm)
 		}
 	}
 
@@ -84,11 +88,14 @@ func onDisconnect (req *zdbgvscp.DisconnectRequest, resp *zdbgvscp.DisconnectRes
 
 func onInitialize (req *zdbgvscp.InitializeRequest, resp *zdbgvscp.InitializeResponse) (err error) {
 	resp.Body.SupportsRestartRequest = true
+	resp.Body.SupportsConfigurationDoneRequest = true
 	vscLastInit = &req.Arguments
 	return
 }
 
 func onLaunch (req *zdbgvscp.LaunchRequest, resp *zdbgvscp.LaunchResponse) (err error) {
-	err = ugo.E("Nah NOT ON")  // :" + " C=" + r.Arguments.C + " W=" + r.Arguments.W + " F=" + r.Arguments.F
+	for i := 0; i <9999999;i++ {
+		err = ugo.E("Nah NOT ON " + ugo.SPr(i))
+	}  // :" + " C=" + r.Arguments.C + " W=" + r.Arguments.W + " F=" + r.Arguments.F
 	return
 }
