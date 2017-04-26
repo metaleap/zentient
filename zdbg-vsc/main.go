@@ -41,6 +41,8 @@ func main () {
 			bresp.Seq = sendseq
 		} else if bevt := zdbgvscp.BaseEvent(item)  ;  bevt!=nil {
 			bevt.Seq = sendseq
+		} else if breq := zdbgvscp.BaseRequest(item)  ;  breq!=nil {
+			breq.Seq = sendseq
 		}
 		jsonout,err := json.Marshal(item)  ;  if err!=nil { logpanic("json.Marshal: " + err.Error()) }
 		rawOut.Write(bclen)  ;  rawOut.Write([]byte(ugo.SPr(len(jsonout))))  ;  rawOut.Write(bln)  ;  rawOut.Write(jsonout)  ;  rawOut.Flush()
@@ -56,16 +58,11 @@ func main () {
 		if resp,respbase,err = zdbgvscp.HandleRequest(req, initNewRespBase)  ;  resp==nil {
 			logpanic("BUG: resp returned was nil")
 		} else if err!=nil { respbase.Success = false  ;  respbase.Message = err.Error() }
-		send(resp)
 		switch respbase.Command {
 			case "initialize":
 				send(zdbgvscp.NewInitializedEvent())
-				// runinterm := zdbgvscp.NewRunInTerminalRequest()
-				// runinterm.Arguments.Kind = "integrated"
-				// runinterm.Arguments.Cwd = "/home/rox/c/go/src/github.com/metaleap"
-				// runinterm.Arguments.Args = []string { "fortune" }
-				// send(runinterm)
 		}
+		send(resp)
 	}
 
 }
@@ -94,8 +91,9 @@ func onInitialize (req *zdbgvscp.InitializeRequest, resp *zdbgvscp.InitializeRes
 }
 
 func onLaunch (req *zdbgvscp.LaunchRequest, resp *zdbgvscp.LaunchResponse) (err error) {
-	for i := 0; i <9999999;i++ {
-		err = ugo.E("Nah NOT ON " + ugo.SPr(i))
-	}  // :" + " C=" + r.Arguments.C + " W=" + r.Arguments.W + " F=" + r.Arguments.F
+	resp.Message = "FOO"
+	// for i := 0; i <9999999;i++ {
+	// 	err = ugo.E("Nah NOT ON " + ugo.SPr(i))
+	// }  // :" + " C=" + r.Arguments.C + " W=" + r.Arguments.W + " F=" + r.Arguments.F
 	return
 }
