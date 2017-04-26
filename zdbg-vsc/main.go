@@ -68,7 +68,7 @@ func main () {
 }
 
 func initNewRespBase (reqbase *zdbgvscp.Request, respbase *zdbgvscp.Response) {
-	respbase.Request_seq = reqbase.Seq  ;  respbase.Command = reqbase.Command  ;  respbase.Success = true
+	respbase.Request_seq = reqbase.Seq  ;  respbase.Success = true
 }
 
 func init () {
