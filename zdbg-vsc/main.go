@@ -48,20 +48,16 @@ func main () {
 		} else if err!=nil { respbase.Success = false  ;  respbase.Message = err.Error() }
 		switch respbase.Command {
 			case "initialize":
-				send(zdbgvscp.NewInitializedEvent())
+				onServerEvt_Initialized()
 		}
 		send(resp)
 		switch respbase.Command{
 		case "launch":
-			oe := zdbgvscp.NewOutputEvent()
-			oe.Body.Output = "Testing stdout"  ;  oe.Body.Category = "stdout"
-			send(oe)
-			oe.Body.Output = "Testing stderr"  ;  oe.Body.Category = "stderr"
-			send(oe)
-			oe.Body.Output = "Testing conlog"  ;  oe.Body.Category = "console"
-			send(oe)
+			onServerEvt_Output("stdout", "Testing stdout")
+			onServerEvt_Output("stderr", "Testing stderr")
+			onServerEvt_Output("console", "Testing consl")
 		case "disconnect":
-			send(zdbgvscp.NewTerminatedEvent())
+			onServerEvt_Terminated()
 			return
 		}
 	}
@@ -84,45 +80,4 @@ func send (item interface{}) {
 
 func initNewRespBase (reqbase *zdbgvscp.Request, respbase *zdbgvscp.Response) {
 	respbase.Request_seq = reqbase.Seq  ;  respbase.Success = true
-}
-
-func init () {
-	zdbgvscp.OnDisconnectRequest = onClientReqDisconnect
-	zdbgvscp.OnInitializeRequest = onClientReqInitialize
-	zdbgvscp.OnLaunchRequest = onClientReqLaunch
-	zdbgvscp.OnThreadsRequest = onClientReqThreads
-	zdbgvscp.OnPauseRequest = onClientReqPause
-	zdbgvscp.OnRestartRequest = onClientReqRestart
-}
-
-func onClientReqDisconnect (req *zdbgvscp.DisconnectRequest, resp *zdbgvscp.DisconnectResponse) (err error) {
-	if req.Arguments.Restart {
-	}
-	return
-}
-
-func onClientReqInitialize (req *zdbgvscp.InitializeRequest, resp *zdbgvscp.InitializeResponse) (err error) {
-	resp.Body.SupportsRestartRequest = true
-	resp.Body.SupportsConfigurationDoneRequest = true
-	vscLastInit = &req.Arguments
-	return
-}
-
-func onClientReqLaunch (req *zdbgvscp.LaunchRequest, resp *zdbgvscp.LaunchResponse) (err error) {
-	return
-}
-
-var dummyThread = []zdbgvscp.Thread { zdbgvscp.Thread { Id: 1, Name: "DummyThread" } }
-func onClientReqThreads (req *zdbgvscp.ThreadsRequest, resp *zdbgvscp.ThreadsResponse) (err error) {
-	resp.Body.Threads = dummyThread
-	return
-}
-
-func onClientReqPause (req *zdbgvscp.PauseRequest, resp *zdbgvscp.PauseResponse) (err error) {
-	//	req.Arguments.ThreadId
-	return
-}
-
-func onClientReqRestart (req *zdbgvscp.RestartRequest, resp *zdbgvscp.RestartResponse) (err error) {
-	return
 }
