@@ -87,31 +87,42 @@ func initNewRespBase (reqbase *zdbgvscp.Request, respbase *zdbgvscp.Response) {
 }
 
 func init () {
-	zdbgvscp.OnDisconnectRequest = onDisconnect
-	zdbgvscp.OnInitializeRequest = onInitialize
-	zdbgvscp.OnLaunchRequest = onLaunch
-	zdbgvscp.OnThreadsRequest = onThreads
+	zdbgvscp.OnDisconnectRequest = onClientReqDisconnect
+	zdbgvscp.OnInitializeRequest = onClientReqInitialize
+	zdbgvscp.OnLaunchRequest = onClientReqLaunch
+	zdbgvscp.OnThreadsRequest = onClientReqThreads
+	zdbgvscp.OnPauseRequest = onClientReqPause
+	zdbgvscp.OnRestartRequest = onClientReqRestart
 }
 
-func onDisconnect (req *zdbgvscp.DisconnectRequest, resp *zdbgvscp.DisconnectResponse) (err error) {
+func onClientReqDisconnect (req *zdbgvscp.DisconnectRequest, resp *zdbgvscp.DisconnectResponse) (err error) {
 	if req.Arguments.Restart {
 	}
 	return
 }
 
-func onInitialize (req *zdbgvscp.InitializeRequest, resp *zdbgvscp.InitializeResponse) (err error) {
+func onClientReqInitialize (req *zdbgvscp.InitializeRequest, resp *zdbgvscp.InitializeResponse) (err error) {
 	resp.Body.SupportsRestartRequest = true
 	resp.Body.SupportsConfigurationDoneRequest = true
 	vscLastInit = &req.Arguments
 	return
 }
 
-func onLaunch (req *zdbgvscp.LaunchRequest, resp *zdbgvscp.LaunchResponse) (err error) {
+func onClientReqLaunch (req *zdbgvscp.LaunchRequest, resp *zdbgvscp.LaunchResponse) (err error) {
 	return
 }
 
 var dummyThread = []zdbgvscp.Thread { zdbgvscp.Thread { Id: 1, Name: "DummyThread" } }
-func onThreads (req *zdbgvscp.ThreadsRequest, resp *zdbgvscp.ThreadsResponse) (err error) {
+func onClientReqThreads (req *zdbgvscp.ThreadsRequest, resp *zdbgvscp.ThreadsResponse) (err error) {
 	resp.Body.Threads = dummyThread
+	return
+}
+
+func onClientReqPause (req *zdbgvscp.PauseRequest, resp *zdbgvscp.PauseResponse) (err error) {
+	//	req.Arguments.ThreadId
+	return
+}
+
+func onClientReqRestart (req *zdbgvscp.RestartRequest, resp *zdbgvscp.RestartResponse) (err error) {
 	return
 }
