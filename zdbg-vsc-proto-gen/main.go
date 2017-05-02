@@ -20,7 +20,7 @@ func main() {
 	if err != nil { panic(err) }
 
 	jsd.Defs["DisconnectArguments"].EnsureProps(map[string]string { "restart": "boolean" })
-	jsd.Defs["LaunchRequestArguments"].EnsureProps(map[string]string { "w": "string", "c": "string", "f": "string" })
+	jsd.Defs["LaunchRequestArguments"].EnsureProps(map[string]string { "w": "string", "c": "string", "f": "string", "s": "string" })
 	jsd.ForceCopyProps("Request", "Response", "command")
 
 	unmarshalHints := map[string]string { "ProtocolMessage": "type", "Event": "event", "Request": "command", "Response": "command" }

@@ -13,8 +13,7 @@ func init () {
 }
 
 func onClientReq_Disconnect (req *zdbgvscp.DisconnectRequest, resp *zdbgvscp.DisconnectResponse) (err error) {
-	if req.Arguments.Restart {
-	}
+	if req.Arguments.Restart {}
 	return
 }
 
@@ -26,6 +25,7 @@ func onClientReq_Initialize (req *zdbgvscp.InitializeRequest, resp *zdbgvscp.Ini
 }
 
 func onClientReq_Launch (req *zdbgvscp.LaunchRequest, resp *zdbgvscp.LaunchResponse) (err error) {
+	if req.Arguments.S==" " { req.Arguments.S = "" } // vsc would cancel debug session if we sent "" so we work-around on the client so we catch it on the server too, ugh
 	return
 }
 
