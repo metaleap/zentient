@@ -52,10 +52,6 @@ func main () {
 		}
 		send(resp)
 		switch respbase.Command{
-		case "launch":
-			onServerEvt_Output("stdout", "Testing stdout")
-			onServerEvt_Output("stderr", "Testing stderr")
-			onServerEvt_Output("console", "Testing consl")
 		case "disconnect":
 			onServerEvt_Terminated()
 			return

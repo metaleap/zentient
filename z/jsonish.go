@@ -112,7 +112,6 @@ type RespTxt struct {
 
 type RespHov struct {
 	Txt		string	`json:"value,omitempty"`
-	Lang	string	`json:"language,omitempty"`
 }
 
 type ReqIntel struct {

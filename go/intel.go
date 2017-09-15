@@ -173,7 +173,7 @@ func (me *zgo) IntelHovs (req *z.ReqIntel) (hovs []*z.RespHov) {
 	} }
 	if ggd!=nil && len(ggd.Decl)>0 { decl = ggd.Decl }
 	if len(decl)==0 && devgo.Has_godef && me.may("godef") { decl = devgo.QueryDefDecl_GoDef(req.Ffp, req.Src, req.Pos) }
-	if decl = ustr.Trim(decl)  ;  len(decl)>0 {  declhov := &z.RespHov { Lang: "go", Txt: decl }
+	if decl = ustr.Trim(decl)  ;  len(decl)>0 {  declhov := &z.RespHov { Txt: "```go\n" + decl + "\n```\n" }
 		if ustr.Has(decl, "\n") { hovs = append(hovs, declhov) } else {
 			hovs = append([]*z.RespHov{ declhov }, hovs...) } }
 	return

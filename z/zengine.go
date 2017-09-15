@@ -41,7 +41,9 @@ func doFmt (zid string, reqsrc string, reqcmd string, reqtabsize uint8) (resp *R
 }
 
 func doRename (zid string, reqcmd string, relfilepath string, offset uint64, newname string, eol string, oldname string, off1 uint64, off2 uint64) (resp map[string]udev.SrcMsgs, err error) {
-	µ := Zengines[zid]   ;  if µ==nil {  err = ugo.E("Bad zid: " + zid)  }  ;  if len(newname)==0 {  err = ugo.E("No newname given")  }
+	µ := Zengines[zid]
+	if µ==nil {  err = ugo.E("Bad zid: " + zid) ; return  }
+	if len(newname)==0 {  err = ugo.E("No newname given") ; return  }
 	resp,err = µ.DoRename(reqcmd, relfilepath, offset, newname, eol, oldname, off1, off2)
 	return
 }

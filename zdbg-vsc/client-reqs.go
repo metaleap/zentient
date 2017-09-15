@@ -10,6 +10,12 @@ func init () {
 	zdbgvscp.OnThreadsRequest = onClientReq_Threads
 	zdbgvscp.OnPauseRequest = onClientReq_Pause
 	zdbgvscp.OnRestartRequest = onClientReq_Restart
+	zdbgvscp.OnEvaluateRequest = onClientReq_Evaluate
+}
+
+func onClientReq_Evaluate (req *zdbgvscp.EvaluateRequest, resp *zdbgvscp.EvaluateResponse) (err error) {
+	cmdEval = append(cmdEval, []byte(req.Arguments.Expression)...)
+	return
 }
 
 func onClientReq_Disconnect (req *zdbgvscp.DisconnectRequest, resp *zdbgvscp.DisconnectResponse) (err error) {
@@ -26,6 +32,7 @@ func onClientReq_Initialize (req *zdbgvscp.InitializeRequest, resp *zdbgvscp.Ini
 
 func onClientReq_Launch (req *zdbgvscp.LaunchRequest, resp *zdbgvscp.LaunchResponse) (err error) {
 	if req.Arguments.S==" " { req.Arguments.S = "" } // vsc would cancel debug session if we sent "" so we work-around on the client so we catch it on the server too, ugh
+	err = launchProc(req)
 	return
 }
 
