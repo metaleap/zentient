@@ -16,15 +16,11 @@ func (me *ProcInOut) Write(p []byte) (n int, err error) {
 }
 
 func (me *ProcInOut) Read(p []byte) (n int, err error) {
-	if n>0 {
-		cmdeval := cmdEval
-		if n<len(cmdEval) {
-			cmdEval = cmdEval[n:]
-		} else {
-			cmdEval = []byte {}
-		}
-		for i:= 0; i<n && i<len(cmdeval); i++ {
-			p[i] = cmdeval[i]
+	if len(cmdExprs)>0 {
+		expr := []byte(cmdExprs[0] + "\n")
+		onServerEvt_Output("stderr", "HM_" + cmdExprs[0] + "_OK")
+		if cmdExprs,n = cmdExprs[1:] , len(expr)  ;  n>0 {
+			for i := 0 ; i<n ; i++ {  p[i] = expr[i]  }
 		}
 	}
 	return
@@ -32,7 +28,7 @@ func (me *ProcInOut) Read(p []byte) (n int, err error) {
 
 var (
 	cmd *exec.Cmd
-	cmdEval []byte = []byte("Test Dis Shite\nWut Da Heck\n")
+	cmdExprs []string = []string {}
 )
 
 func launchProc (req *zdbgvscp.LaunchRequest) (err error) {
@@ -46,13 +42,25 @@ func launchProc (req *zdbgvscp.LaunchRequest) (err error) {
 	cmd.Stdout = &ProcInOut { outcat: "stdout" }
 	cmd.Stderr = &ProcInOut { outcat: "stderr" }
 	cmd.Stdin = &ProcInOut {}
-	err = cmd.Start()
-	go listenProc()
+	if err = cmd.Start()  ;  err==nil {
+		go listenProc()
+	}
 	return
 }
 
 func listenProc () {
-	for cmd!=nil && cmd.ProcessState!=nil && !cmd.ProcessState.Exited() {
+	if cmd!=nil {
+		if err := cmd.Wait()  ;  err!=nil {
+			onServerEvt_Output("stderr", "ERR:" + err.Error())
+		}
+		onServerEvt_Terminated()
 	}
-	onServerEvt_Terminated()
+}
+
+func terminateProc () (err error) {
+	if cmd!=nil && cmd.Process!=nil {
+		err = cmd.Process.Kill()
+	}
+	cmd = nil
+	return
 }

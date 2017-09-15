@@ -14,12 +14,13 @@ func init () {
 }
 
 func onClientReq_Evaluate (req *zdbgvscp.EvaluateRequest, resp *zdbgvscp.EvaluateResponse) (err error) {
-	cmdEval = append(cmdEval, []byte(req.Arguments.Expression)...)
+	cmdExprs = append(cmdExprs, req.Arguments.Expression)
 	return
 }
 
 func onClientReq_Disconnect (req *zdbgvscp.DisconnectRequest, resp *zdbgvscp.DisconnectResponse) (err error) {
 	if req.Arguments.Restart {}
+	err = terminateProc()
 	return
 }
 
