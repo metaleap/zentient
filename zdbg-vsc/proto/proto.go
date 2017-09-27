@@ -1,14 +1,13 @@
 // VS Code Debug Protocol
-// 
+//
 // A json schema for the VS Code Debug Protocol
-// 
+//
 // Package codegen'd from github.com/metaleap/zentient/zdbg-vsc/_notes_misc_etc/vscdbgprotocol.json with github.com/metaleap/zentient/zdbg-vsc-proto-gen
 package zdbgvscp
+
 import "encoding/json"
 import "errors"
 import "strings"
-
-
 
 // Server-initiated event.
 type Event struct {
@@ -22,7 +21,7 @@ type Event struct {
 	Event string `json:"event"`
 
 	// Event-specific information.
-	// 
+	//
 	// POSSIBLE TYPES:
 	// - `[]interface{}` (for JSON `array`s)
 	// - `bool` (for JSON `boolean`s)
@@ -32,14 +31,11 @@ type Event struct {
 	// - `map[string]interface{}` (for JSON `object`s)
 	// - `string` (for JSON `string`s)
 	Body interface{} `json:"body,omitempty"`
-
 } // struct Event
 func (me *Event) propagateFieldsToBase() {
 	me.ProtocolMessage.Type = me.Type
 	me.ProtocolMessage.propagateFieldsToBase()
 }
-
-
 
 // Continue request; value of command field is 'continue'.
 // The request starts the debuggee to run again.
@@ -51,15 +47,12 @@ type ContinueRequest struct {
 	Command string `json:"command"`
 
 	Arguments ContinueArguments `json:"arguments"`
-
 } // struct ContinueRequest
 func (me *ContinueRequest) propagateFieldsToBase() {
 	me.Request.Command = me.Command
 	me.Request.Arguments = me.Arguments
 	me.Request.propagateFieldsToBase()
 }
-
-
 
 // Arguments for 'source' request.
 type SourceArguments struct {
@@ -69,12 +62,9 @@ type SourceArguments struct {
 
 	// The reference to the source. This is the same as source.sourceReference. This is provided for backward compatibility since old backends do not understand the 'source' attribute.
 	SourceReference int `json:"sourceReference"`
-
 } // struct SourceArguments
 func (me *SourceArguments) propagateFieldsToBase() {
 }
-
-
 
 // Properties of a breakpoint passed to the setFunctionBreakpoints request.
 type FunctionBreakpoint struct {
@@ -87,12 +77,9 @@ type FunctionBreakpoint struct {
 
 	// The name of the function.
 	Name string `json:"name"`
-
 } // struct FunctionBreakpoint
 func (me *FunctionBreakpoint) propagateFieldsToBase() {
 }
-
-
 
 // Disconnect request; value of command field is 'disconnect'.
 type DisconnectRequest struct {
@@ -103,15 +90,12 @@ type DisconnectRequest struct {
 	Command string `json:"command"`
 
 	Arguments DisconnectArguments `json:"arguments,omitempty"`
-
 } // struct DisconnectRequest
 func (me *DisconnectRequest) propagateFieldsToBase() {
 	me.Request.Arguments = me.Arguments
 	me.Request.Command = me.Command
 	me.Request.propagateFieldsToBase()
 }
-
-
 
 // Response to 'exceptionInfo' request.
 type ExceptionInfoResponse struct {
@@ -131,20 +115,16 @@ type ExceptionInfoResponse struct {
 
 		// Detailed information about the exception.
 		Details ExceptionDetails `json:"details,omitempty"`
-
 	} `json:"body"`
 
 	// POSSIBLE VALUES: `exceptionInfo`
 	Command string `json:"command,omitempty"`
-
 } // struct ExceptionInfoResponse
 func (me *ExceptionInfoResponse) propagateFieldsToBase() {
 	me.Response.Body = me.Body
 	me.Response.Command = me.Command
 	me.Response.propagateFieldsToBase()
 }
-
-
 
 // Response to 'disconnect' request. This is just an acknowledgement, so no body field is required.
 type DisconnectResponse struct {
@@ -153,26 +133,20 @@ type DisconnectResponse struct {
 
 	// POSSIBLE VALUES: `disconnect`
 	Command string `json:"command,omitempty"`
-
 } // struct DisconnectResponse
 func (me *DisconnectResponse) propagateFieldsToBase() {
 	me.Response.Command = me.Command
 	me.Response.propagateFieldsToBase()
 }
 
-
-
 // Arguments for 'stepOut' request.
 type StepOutArguments struct {
 
 	// Execute 'stepOut' for this thread.
 	ThreadId int `json:"threadId"`
-
 } // struct StepOutArguments
 func (me *StepOutArguments) propagateFieldsToBase() {
 }
-
-
 
 // Response to 'setBreakpoints' request.
 // Returned is information about each breakpoint created by this request.
@@ -187,12 +161,10 @@ type SetBreakpointsResponse struct {
 
 		// Information about the breakpoints. The array elements are in the same order as the elements of the 'breakpoints' (or the deprecated 'lines') in the SetBreakpointsArguments.
 		Breakpoints []Breakpoint `json:"breakpoints"`
-
 	} `json:"body"`
 
 	// POSSIBLE VALUES: `setBreakpoints`
 	Command string `json:"command,omitempty"`
-
 } // struct SetBreakpointsResponse
 func (me *SetBreakpointsResponse) propagateFieldsToBase() {
 	me.Response.Body = me.Body
@@ -200,19 +172,14 @@ func (me *SetBreakpointsResponse) propagateFieldsToBase() {
 	me.Response.propagateFieldsToBase()
 }
 
-
-
 // Provides formatting information for a value.
 type ValueFormat struct {
 
 	// Display the value in hex.
 	Hex bool `json:"hex,omitempty"`
-
 } // struct ValueFormat
 func (me *ValueFormat) propagateFieldsToBase() {
 }
-
-
 
 // CompletionItems are the suggestions returned from the CompletionsRequest.
 type CompletionItem struct {
@@ -233,12 +200,9 @@ type CompletionItem struct {
 	// This value determines how many characters are overwritten by the completion text.
 	// If missing the value 0 is assumed which results in the completion text being inserted.
 	Length int `json:"length,omitempty"`
-
 } // struct CompletionItem
 func (me *CompletionItem) propagateFieldsToBase() {
 }
-
-
 
 // A ColumnDescriptor specifies what module attribute to show in a column of the ModulesView, how to format it, and what the column's label should be.
 // It is only used if the underlying UI actually supports this level of customization.
@@ -251,7 +215,7 @@ type ColumnDescriptor struct {
 	Format string `json:"format,omitempty"`
 
 	// Datatype of values in this column.  Defaults to 'string' if not specified.
-	// 
+	//
 	// POSSIBLE VALUES: `string`, `number`, `boolean`, `unixTimestampUTC`
 	Type string `json:"type,omitempty"`
 
@@ -260,12 +224,9 @@ type ColumnDescriptor struct {
 
 	// Name of the attribute rendered in this column.
 	AttributeName string `json:"attributeName"`
-
 } // struct ColumnDescriptor
 func (me *ColumnDescriptor) propagateFieldsToBase() {
 }
-
-
 
 // Event message for 'module' event type.
 // The event indicates that some information about a module has changed.
@@ -279,23 +240,19 @@ type ModuleEvent struct {
 	Body struct {
 
 		// The reason for the event.
-		// 
+		//
 		// POSSIBLE VALUES: `new`, `changed`, `removed`
 		Reason string `json:"reason"`
 
 		// The new, changed, or removed module. In case of 'removed' only the module id is used.
 		Module Module `json:"module"`
-
 	} `json:"body"`
-
 } // struct ModuleEvent
 func (me *ModuleEvent) propagateFieldsToBase() {
 	me.Event.Event = me.Event_
 	me.Event.Body = me.Body
 	me.Event.propagateFieldsToBase()
 }
-
-
 
 // Arguments for 'runInTerminal' request.
 type RunInTerminalRequestArguments struct {
@@ -307,7 +264,7 @@ type RunInTerminalRequestArguments struct {
 	Env map[string]string `json:"env,omitempty"`
 
 	// What kind of terminal to launch.
-	// 
+	//
 	// POSSIBLE VALUES: `integrated`, `external`
 	Kind string `json:"kind,omitempty"`
 
@@ -316,12 +273,9 @@ type RunInTerminalRequestArguments struct {
 
 	// Working directory of the command.
 	Cwd string `json:"cwd"`
-
 } // struct RunInTerminalRequestArguments
 func (me *RunInTerminalRequestArguments) propagateFieldsToBase() {
 }
-
-
 
 // A structured message object. Used to return errors from requests.
 type Message struct {
@@ -347,12 +301,9 @@ type Message struct {
 
 	// An optional url where additional information about this message can be found.
 	Url string `json:"url,omitempty"`
-
 } // struct Message
 func (me *Message) propagateFieldsToBase() {
 }
-
-
 
 // An ExceptionBreakpointsFilter is shown in the UI as an option for configuring how exceptions are dealt with.
 type ExceptionBreakpointsFilter struct {
@@ -365,12 +316,9 @@ type ExceptionBreakpointsFilter struct {
 
 	// Initial value of the filter. If not specified a value 'false' is assumed.
 	Default bool `json:"default,omitempty"`
-
 } // struct ExceptionBreakpointsFilter
 func (me *ExceptionBreakpointsFilter) propagateFieldsToBase() {
 }
-
-
 
 // Arguments for 'initialize' request.
 type InitializeRequestArguments struct {
@@ -394,41 +342,33 @@ type InitializeRequestArguments struct {
 	ColumnsStartAt1 bool `json:"columnsStartAt1,omitempty"`
 
 	// Determines in what format paths are specified. The default is 'path', which is the native format.
-	// 
+	//
 	// POSSIBLE VALUES: `path`, `uri`
 	PathFormat string `json:"pathFormat,omitempty"`
 
 	// Client supports the optional type attribute for variables.
 	SupportsVariableType bool `json:"supportsVariableType,omitempty"`
-
 } // struct InitializeRequestArguments
 func (me *InitializeRequestArguments) propagateFieldsToBase() {
 }
-
-
 
 // This enumeration defines all possible conditions when a thrown exception should result in a break.
 // never: never breaks,
 // always: always breaks,
 // unhandled: breaks when excpetion unhandled,
 // userUnhandled: breaks if the exception is not handled by user code.
-// 
+//
 // POSSIBLE VALUES: `never`, `always`, `unhandled`, `userUnhandled`
 type ExceptionBreakMode string
-
-
 
 // Arguments for 'reverseContinue' request.
 type ReverseContinueArguments struct {
 
 	// Exceute 'reverseContinue' for this thread.
 	ThreadId int `json:"threadId"`
-
 } // struct ReverseContinueArguments
 func (me *ReverseContinueArguments) propagateFieldsToBase() {
 }
-
-
 
 // Response to 'scopes' request.
 type ScopesResponse struct {
@@ -439,20 +379,16 @@ type ScopesResponse struct {
 
 		// The scopes of the stackframe. If the array has length zero, there are no scopes available.
 		Scopes []Scope `json:"scopes"`
-
 	} `json:"body"`
 
 	// POSSIBLE VALUES: `scopes`
 	Command string `json:"command,omitempty"`
-
 } // struct ScopesResponse
 func (me *ScopesResponse) propagateFieldsToBase() {
 	me.Response.Body = me.Body
 	me.Response.Command = me.Command
 	me.Response.propagateFieldsToBase()
 }
-
-
 
 // StepIn request; value of command field is 'stepIn'.
 // The request starts the debuggee to step into a function/method if possible.
@@ -469,15 +405,12 @@ type StepInRequest struct {
 
 	// POSSIBLE VALUES: `stepIn`
 	Command string `json:"command"`
-
 } // struct StepInRequest
 func (me *StepInRequest) propagateFieldsToBase() {
 	me.Request.Command = me.Command
 	me.Request.Arguments = me.Arguments
 	me.Request.propagateFieldsToBase()
 }
-
-
 
 // Thread request; value of command field is 'threads'.
 // The request retrieves a list of all threads.
@@ -487,14 +420,11 @@ type ThreadsRequest struct {
 
 	// POSSIBLE VALUES: `threads`
 	Command string `json:"command"`
-
 } // struct ThreadsRequest
 func (me *ThreadsRequest) propagateFieldsToBase() {
 	me.Request.Command = me.Command
 	me.Request.propagateFieldsToBase()
 }
-
-
 
 // Response to 'next' request. This is just an acknowledgement, so no body field is required.
 type NextResponse struct {
@@ -503,14 +433,11 @@ type NextResponse struct {
 
 	// POSSIBLE VALUES: `next`
 	Command string `json:"command,omitempty"`
-
 } // struct NextResponse
 func (me *NextResponse) propagateFieldsToBase() {
 	me.Response.Command = me.Command
 	me.Response.propagateFieldsToBase()
 }
-
-
 
 // Arguments for 'gotoTargets' request.
 type GotoTargetsArguments struct {
@@ -523,12 +450,9 @@ type GotoTargetsArguments struct {
 
 	// An optional column location for which the goto targets are determined.
 	Column int `json:"column,omitempty"`
-
 } // struct GotoTargetsArguments
 func (me *GotoTargetsArguments) propagateFieldsToBase() {
 }
-
-
 
 // Event message for 'thread' event type.
 // The event indicates that a thread has started or exited.
@@ -545,20 +469,16 @@ type ThreadEvent struct {
 		ThreadId int `json:"threadId"`
 
 		// The reason for the event.
-		// 
+		//
 		// POSSIBLE VALUES: `started`, `exited`
 		Reason string `json:"reason"`
-
 	} `json:"body"`
-
 } // struct ThreadEvent
 func (me *ThreadEvent) propagateFieldsToBase() {
 	me.Event.Body = me.Body
 	me.Event.Event = me.Event_
 	me.Event.propagateFieldsToBase()
 }
-
-
 
 // Arguments for 'setBreakpoints' request.
 type SetBreakpointsArguments struct {
@@ -574,12 +494,9 @@ type SetBreakpointsArguments struct {
 
 	// A value of true indicates that the underlying source has been modified which results in new breakpoint locations.
 	SourceModified bool `json:"sourceModified,omitempty"`
-
 } // struct SetBreakpointsArguments
 func (me *SetBreakpointsArguments) propagateFieldsToBase() {
 }
-
-
 
 // Event message for 'loadedSource' event type.
 // The event indicates that some source has been added, changed, or removed from the set of all loaded sources.
@@ -593,23 +510,19 @@ type LoadedSourceEvent struct {
 	Body struct {
 
 		// The reason for the event.
-		// 
+		//
 		// POSSIBLE VALUES: `new`, `changed`, `removed`
 		Reason string `json:"reason"`
 
 		// The new, changed, or removed source.
 		Source Source `json:"source"`
-
 	} `json:"body"`
-
 } // struct LoadedSourceEvent
 func (me *LoadedSourceEvent) propagateFieldsToBase() {
 	me.Event.Event = me.Event_
 	me.Event.Body = me.Body
 	me.Event.propagateFieldsToBase()
 }
-
-
 
 // RestartFrame request; value of command field is 'restartFrame'.
 // The request restarts execution of the specified stackframe.
@@ -622,15 +535,12 @@ type RestartFrameRequest struct {
 	Command string `json:"command"`
 
 	Arguments RestartFrameArguments `json:"arguments"`
-
 } // struct RestartFrameRequest
 func (me *RestartFrameRequest) propagateFieldsToBase() {
 	me.Request.Command = me.Command
 	me.Request.Arguments = me.Arguments
 	me.Request.propagateFieldsToBase()
 }
-
-
 
 // A Source is a descriptor for source code. It is returned from the debug adapter as part of a StackFrame and it is used by clients when specifying breakpoints.
 type Source struct {
@@ -648,7 +558,7 @@ type Source struct {
 	SourceReference int64 `json:"sourceReference,omitempty"`
 
 	// An optional hint for how to present the source in the UI. A value of 'deemphasize' can be used to indicate that the source is not available or that it is skipped on stepping.
-	// 
+	//
 	// POSSIBLE VALUES: `normal`, `emphasize`, `deemphasize`
 	PresentationHint string `json:"presentationHint,omitempty"`
 
@@ -659,7 +569,7 @@ type Source struct {
 	Sources []Source `json:"sources,omitempty"`
 
 	// Optional data that a debug adapter might want to loop through the client. The client should leave the data intact and persist it across sessions. The client should not interpret the data.
-	// 
+	//
 	// POSSIBLE TYPES:
 	// - `[]interface{}` (for JSON `array`s)
 	// - `bool` (for JSON `boolean`s)
@@ -669,12 +579,9 @@ type Source struct {
 	// - `map[string]interface{}` (for JSON `object`s)
 	// - `string` (for JSON `string`s)
 	AdapterData interface{} `json:"adapterData,omitempty"`
-
 } // struct Source
 func (me *Source) propagateFieldsToBase() {
 }
-
-
 
 // Attach request; value of command field is 'attach'.
 type AttachRequest struct {
@@ -685,15 +592,12 @@ type AttachRequest struct {
 
 	// POSSIBLE VALUES: `attach`
 	Command string `json:"command"`
-
 } // struct AttachRequest
 func (me *AttachRequest) propagateFieldsToBase() {
 	me.Request.Command = me.Command
 	me.Request.Arguments = me.Arguments
 	me.Request.propagateFieldsToBase()
 }
-
-
 
 // Event message for 'stopped' event type.
 // The event indicates that the execution of the debuggee has stopped due to some condition.
@@ -717,7 +621,7 @@ type StoppedEvent struct {
 
 		// The reason for the event.
 		// For backward compatibility this string is shown in the UI if the 'description' attribute is missing (but it must not be translated).
-		// 
+		//
 		// POSSIBLE VALUES: `step`, `breakpoint`, `exception`, `pause`, `entry`
 		Reason string `json:"reason"`
 
@@ -726,9 +630,7 @@ type StoppedEvent struct {
 
 		// The thread which was stopped.
 		ThreadId int `json:"threadId,omitempty"`
-
 	} `json:"body"`
-
 } // struct StoppedEvent
 func (me *StoppedEvent) propagateFieldsToBase() {
 	me.Event.Event = me.Event_
@@ -736,14 +638,12 @@ func (me *StoppedEvent) propagateFieldsToBase() {
 	me.Event.propagateFieldsToBase()
 }
 
-
-
 // A Module object represents a row in the modules view.
 // Two attributes are mandatory: an id identifies a module in the modules view and is used in a ModuleEvent for identifying a module for adding, updating or deleting.
 // The name is used to minimally render the module in the UI.
-// 
+//
 // Additional attributes can be added to the module. They will show up in the module View if they have a corresponding ColumnDescriptor.
-// 
+//
 // To avoid an unnecessary proliferation of additional attributes with similar semantics but different names
 // we recommend to re-use attributes from the 'recommended' list below first, and only introduce new attributes if nothing appropriate could be found.
 type Module struct {
@@ -758,7 +658,7 @@ type Module struct {
 	SymbolFilePath string `json:"symbolFilePath,omitempty"`
 
 	// Unique identifier for the module.
-	// 
+	//
 	// POSSIBLE TYPES:
 	// - `int` (for JSON `integer`s)
 	// - `string` (for JSON `string`s)
@@ -778,18 +678,15 @@ type Module struct {
 
 	// optional but recommended attributes.
 	// always try to use these first before introducing additional attributes.
-	// 
+	//
 	// Logical full path to the module. The exact definition is implementation defined, but usually this would be a full path to the on-disk file for the module.
 	Path string `json:"path,omitempty"`
 
 	// True if the module is optimized.
 	IsOptimized bool `json:"isOptimized,omitempty"`
-
 } // struct Module
 func (me *Module) propagateFieldsToBase() {
 }
-
-
 
 // ReverseContinue request; value of command field is 'reverseContinue'.
 // The request starts the debuggee to run backward. Clients should only call this request if the capability supportsStepBack is true.
@@ -801,15 +698,12 @@ type ReverseContinueRequest struct {
 	Command string `json:"command"`
 
 	Arguments ReverseContinueArguments `json:"arguments"`
-
 } // struct ReverseContinueRequest
 func (me *ReverseContinueRequest) propagateFieldsToBase() {
 	me.Request.Command = me.Command
 	me.Request.Arguments = me.Arguments
 	me.Request.propagateFieldsToBase()
 }
-
-
 
 // SetBreakpoints request; value of command field is 'setBreakpoints'.
 // Sets multiple breakpoints for a single source and clears all previous breakpoints in that source.
@@ -823,15 +717,12 @@ type SetBreakpointsRequest struct {
 	Command string `json:"command"`
 
 	Arguments SetBreakpointsArguments `json:"arguments"`
-
 } // struct SetBreakpointsRequest
 func (me *SetBreakpointsRequest) propagateFieldsToBase() {
 	me.Request.Command = me.Command
 	me.Request.Arguments = me.Arguments
 	me.Request.propagateFieldsToBase()
 }
-
-
 
 // ExceptionInfoRequest request; value of command field is 'exceptionInfo'.
 // Retrieves the details of the exception that caused the StoppedEvent to be raised.
@@ -843,15 +734,12 @@ type ExceptionInfoRequest struct {
 	Command string `json:"command"`
 
 	Arguments ExceptionInfoArguments `json:"arguments"`
-
 } // struct ExceptionInfoRequest
 func (me *ExceptionInfoRequest) propagateFieldsToBase() {
 	me.Request.Command = me.Command
 	me.Request.Arguments = me.Arguments
 	me.Request.propagateFieldsToBase()
 }
-
-
 
 // Properties of a breakpoint passed to the setBreakpoints request.
 type SourceBreakpoint struct {
@@ -867,12 +755,9 @@ type SourceBreakpoint struct {
 
 	// The source line of the breakpoint.
 	Line int `json:"line"`
-
 } // struct SourceBreakpoint
 func (me *SourceBreakpoint) propagateFieldsToBase() {
 }
-
-
 
 // Response to 'modules' request.
 type ModulesResponse struct {
@@ -886,20 +771,16 @@ type ModulesResponse struct {
 
 		// The total number of modules available.
 		TotalModules int `json:"totalModules,omitempty"`
-
 	} `json:"body"`
 
 	// POSSIBLE VALUES: `modules`
 	Command string `json:"command,omitempty"`
-
 } // struct ModulesResponse
 func (me *ModulesResponse) propagateFieldsToBase() {
 	me.Response.Body = me.Body
 	me.Response.Command = me.Command
 	me.Response.propagateFieldsToBase()
 }
-
-
 
 // An ExceptionPathSegment represents a segment in a path that is used to match leafs or nodes in a tree of exceptions. If a segment consists of more than one name, it matches the names provided if 'negate' is false or missing or it matches anything except the names provided if 'negate' is true.
 type ExceptionPathSegment struct {
@@ -909,12 +790,9 @@ type ExceptionPathSegment struct {
 
 	// Depending on the value of 'negate' the names that should match or not match.
 	Names []string `json:"names"`
-
 } // struct ExceptionPathSegment
 func (me *ExceptionPathSegment) propagateFieldsToBase() {
 }
-
-
 
 // Arguments for 'evaluate' request.
 type EvaluateArguments struct {
@@ -923,7 +801,7 @@ type EvaluateArguments struct {
 	FrameId int `json:"frameId,omitempty"`
 
 	// The context in which the evaluate request is run.
-	// 
+	//
 	// POSSIBLE VALUES: `watch`, `repl`, `hover`
 	Context string `json:"context,omitempty"`
 
@@ -932,12 +810,9 @@ type EvaluateArguments struct {
 
 	// The expression to evaluate.
 	Expression string `json:"expression"`
-
 } // struct EvaluateArguments
 func (me *EvaluateArguments) propagateFieldsToBase() {
 }
-
-
 
 // Response to 'variables' request.
 type VariablesResponse struct {
@@ -948,20 +823,16 @@ type VariablesResponse struct {
 
 		// All (or a range) of variables for the given variable reference.
 		Variables []Variable `json:"variables"`
-
 	} `json:"body"`
 
 	// POSSIBLE VALUES: `variables`
 	Command string `json:"command,omitempty"`
-
 } // struct VariablesResponse
 func (me *VariablesResponse) propagateFieldsToBase() {
 	me.Response.Body = me.Body
 	me.Response.Command = me.Command
 	me.Response.propagateFieldsToBase()
 }
-
-
 
 // Arguments for 'disconnect' request.
 type DisconnectArguments struct {
@@ -973,12 +844,9 @@ type DisconnectArguments struct {
 	// If unspecified, the debug adapter is free to do whatever it thinks is best.
 	// A client can only rely on this attribute being properly honored if a debug adapter returns true for the 'supportTerminateDebuggee' capability.
 	TerminateDebuggee bool `json:"terminateDebuggee,omitempty"`
-
 } // struct DisconnectArguments
 func (me *DisconnectArguments) propagateFieldsToBase() {
 }
-
-
 
 // Arguments for 'completions' request.
 type CompletionsArguments struct {
@@ -994,12 +862,9 @@ type CompletionsArguments struct {
 
 	// An optional line for which to determine the completion proposals. If missing the first line of the text is assumed.
 	Line int `json:"line,omitempty"`
-
 } // struct CompletionsArguments
 func (me *CompletionsArguments) propagateFieldsToBase() {
 }
-
-
 
 // Response to 'stepOut' request. This is just an acknowledgement, so no body field is required.
 type StepOutResponse struct {
@@ -1008,14 +873,11 @@ type StepOutResponse struct {
 
 	// POSSIBLE VALUES: `stepOut`
 	Command string `json:"command,omitempty"`
-
 } // struct StepOutResponse
 func (me *StepOutResponse) propagateFieldsToBase() {
 	me.Response.Command = me.Command
 	me.Response.propagateFieldsToBase()
 }
-
-
 
 // Response to 'threads' request.
 type ThreadsResponse struct {
@@ -1026,20 +888,16 @@ type ThreadsResponse struct {
 
 		// All threads.
 		Threads []Thread `json:"threads"`
-
 	} `json:"body"`
 
 	// POSSIBLE VALUES: `threads`
 	Command string `json:"command,omitempty"`
-
 } // struct ThreadsResponse
 func (me *ThreadsResponse) propagateFieldsToBase() {
 	me.Response.Body = me.Body
 	me.Response.Command = me.Command
 	me.Response.propagateFieldsToBase()
 }
-
-
 
 // Response to 'source' request.
 type SourceResponse struct {
@@ -1053,20 +911,16 @@ type SourceResponse struct {
 
 		// Optional content type (mime type) of the source.
 		MimeType string `json:"mimeType,omitempty"`
-
 	} `json:"body"`
 
 	// POSSIBLE VALUES: `source`
 	Command string `json:"command,omitempty"`
-
 } // struct SourceResponse
 func (me *SourceResponse) propagateFieldsToBase() {
 	me.Response.Body = me.Body
 	me.Response.Command = me.Command
 	me.Response.propagateFieldsToBase()
 }
-
-
 
 // Initialize request; value of command field is 'initialize'.
 type InitializeRequest struct {
@@ -1077,15 +931,12 @@ type InitializeRequest struct {
 	Command string `json:"command"`
 
 	Arguments InitializeRequestArguments `json:"arguments"`
-
 } // struct InitializeRequest
 func (me *InitializeRequest) propagateFieldsToBase() {
 	me.Request.Arguments = me.Arguments
 	me.Request.Command = me.Command
 	me.Request.propagateFieldsToBase()
 }
-
-
 
 // StepInTargets request; value of command field is 'stepInTargets'.
 // This request retrieves the possible stepIn targets for the specified stack frame.
@@ -1099,15 +950,12 @@ type StepInTargetsRequest struct {
 	Command string `json:"command"`
 
 	Arguments StepInTargetsArguments `json:"arguments"`
-
 } // struct StepInTargetsRequest
 func (me *StepInTargetsRequest) propagateFieldsToBase() {
 	me.Request.Command = me.Command
 	me.Request.Arguments = me.Arguments
 	me.Request.propagateFieldsToBase()
 }
-
-
 
 // Response to 'goto' request. This is just an acknowledgement, so no body field is required.
 type GotoResponse struct {
@@ -1116,14 +964,11 @@ type GotoResponse struct {
 
 	// POSSIBLE VALUES: `goto`
 	Command string `json:"command,omitempty"`
-
 } // struct GotoResponse
 func (me *GotoResponse) propagateFieldsToBase() {
 	me.Response.Command = me.Command
 	me.Response.propagateFieldsToBase()
 }
-
-
 
 // On error that is whenever 'success' is false, the body can provide more details.
 type ErrorResponse struct {
@@ -1134,16 +979,12 @@ type ErrorResponse struct {
 
 		// An optional, structured error message.
 		Error Message `json:"error,omitempty"`
-
 	} `json:"body"`
-
 } // struct ErrorResponse
 func (me *ErrorResponse) propagateFieldsToBase() {
 	me.Response.Body = me.Body
 	me.Response.propagateFieldsToBase()
 }
-
-
 
 // Goto request; value of command field is 'goto'.
 // The request sets the location where the debuggee will continue to run.
@@ -1158,15 +999,12 @@ type GotoRequest struct {
 	Command string `json:"command"`
 
 	Arguments GotoArguments `json:"arguments"`
-
 } // struct GotoRequest
 func (me *GotoRequest) propagateFieldsToBase() {
 	me.Request.Command = me.Command
 	me.Request.Arguments = me.Arguments
 	me.Request.propagateFieldsToBase()
 }
-
-
 
 // Arguments for 'setExceptionBreakpoints' request.
 type SetExceptionBreakpointsArguments struct {
@@ -1176,12 +1014,9 @@ type SetExceptionBreakpointsArguments struct {
 
 	// Configuration options for selected exceptions.
 	ExceptionOptions []ExceptionOptions `json:"exceptionOptions,omitempty"`
-
 } // struct SetExceptionBreakpointsArguments
 func (me *SetExceptionBreakpointsArguments) propagateFieldsToBase() {
 }
-
-
 
 // Retrieves the set of all sources currently loaded by the debugged process.
 type LoadedSourcesRequest struct {
@@ -1192,15 +1027,12 @@ type LoadedSourcesRequest struct {
 	Command string `json:"command"`
 
 	Arguments LoadedSourcesArguments `json:"arguments,omitempty"`
-
 } // struct LoadedSourcesRequest
 func (me *LoadedSourcesRequest) propagateFieldsToBase() {
 	me.Request.Command = me.Command
 	me.Request.Arguments = me.Arguments
 	me.Request.propagateFieldsToBase()
 }
-
-
 
 // Response to 'pause' request. This is just an acknowledgement, so no body field is required.
 type PauseResponse struct {
@@ -1209,14 +1041,11 @@ type PauseResponse struct {
 
 	// POSSIBLE VALUES: `pause`
 	Command string `json:"command,omitempty"`
-
 } // struct PauseResponse
 func (me *PauseResponse) propagateFieldsToBase() {
 	me.Response.Command = me.Command
 	me.Response.propagateFieldsToBase()
 }
-
-
 
 // StepOut request; value of command field is 'stepOut'.
 // The request starts the debuggee to run again for one step.
@@ -1229,15 +1058,12 @@ type StepOutRequest struct {
 	Command string `json:"command"`
 
 	Arguments StepOutArguments `json:"arguments"`
-
 } // struct StepOutRequest
 func (me *StepOutRequest) propagateFieldsToBase() {
 	me.Request.Command = me.Command
 	me.Request.Arguments = me.Arguments
 	me.Request.propagateFieldsToBase()
 }
-
-
 
 // Restart request; value of command field is 'restart'.
 // Restarts a debug session. If the capability 'supportsRestartRequest' is missing or has the value false,
@@ -1252,15 +1078,12 @@ type RestartRequest struct {
 	Command string `json:"command"`
 
 	Arguments RestartArguments `json:"arguments,omitempty"`
-
 } // struct RestartRequest
 func (me *RestartRequest) propagateFieldsToBase() {
 	me.Request.Command = me.Command
 	me.Request.Arguments = me.Arguments
 	me.Request.propagateFieldsToBase()
 }
-
-
 
 // Source request; value of command field is 'source'.
 // The request retrieves the source code for a given source reference.
@@ -1272,15 +1095,12 @@ type SourceRequest struct {
 	Command string `json:"command"`
 
 	Arguments SourceArguments `json:"arguments"`
-
 } // struct SourceRequest
 func (me *SourceRequest) propagateFieldsToBase() {
 	me.Request.Command = me.Command
 	me.Request.Arguments = me.Arguments
 	me.Request.propagateFieldsToBase()
 }
-
-
 
 // Arguments for 'setVariable' request.
 type SetVariableArguments struct {
@@ -1296,12 +1116,9 @@ type SetVariableArguments struct {
 
 	// Specifies details on how to format the response value.
 	Format ValueFormat `json:"format,omitempty"`
-
 } // struct SetVariableArguments
 func (me *SetVariableArguments) propagateFieldsToBase() {
 }
-
-
 
 // Modules can be retrieved from the debug adapter with the ModulesRequest which can either return all modules or a range of modules to support paging.
 type ModulesRequest struct {
@@ -1312,15 +1129,12 @@ type ModulesRequest struct {
 	Command string `json:"command"`
 
 	Arguments ModulesArguments `json:"arguments"`
-
 } // struct ModulesRequest
 func (me *ModulesRequest) propagateFieldsToBase() {
 	me.Request.Command = me.Command
 	me.Request.Arguments = me.Arguments
 	me.Request.propagateFieldsToBase()
 }
-
-
 
 // A Scope is a named container for variables. Optionally a scope can map to a source or a range within a source.
 type Scope struct {
@@ -1356,24 +1170,17 @@ type Scope struct {
 
 	// Optional end line of the range covered by this scope.
 	EndLine int `json:"endLine,omitempty"`
-
 } // struct Scope
 func (me *Scope) propagateFieldsToBase() {
 }
-
-
 
 // Arguments for 'configurationDone' request.
 // The configurationDone request has no standardized attributes.
 type ConfigurationDoneArguments map[string]interface{}
 
-
-
 // Arguments for 'restart' request.
 // The restart request has no standardized attributes.
 type RestartArguments map[string]interface{}
-
-
 
 // A Variable is a name/value pair.
 // Optionally a variable can have a 'type' that is shown if space permits or when hovering over the variable's name.
@@ -1408,12 +1215,9 @@ type Variable struct {
 	// The number of named child variables.
 	// The client can use this optional information to present the children in a paged UI and fetch them in chunks.
 	NamedVariables int `json:"namedVariables,omitempty"`
-
 } // struct Variable
 func (me *Variable) propagateFieldsToBase() {
 }
-
-
 
 // Response to 'restart' request. This is just an acknowledgement, so no body field is required.
 type RestartResponse struct {
@@ -1422,14 +1226,11 @@ type RestartResponse struct {
 
 	// POSSIBLE VALUES: `restart`
 	Command string `json:"command,omitempty"`
-
 } // struct RestartResponse
 func (me *RestartResponse) propagateFieldsToBase() {
 	me.Response.Command = me.Command
 	me.Response.propagateFieldsToBase()
 }
-
-
 
 // A Stackframe contains the source location.
 type StackFrame struct {
@@ -1450,14 +1251,14 @@ type StackFrame struct {
 	Name string `json:"name"`
 
 	// The module associated with this frame, if any.
-	// 
+	//
 	// POSSIBLE TYPES:
 	// - `int` (for JSON `integer`s)
 	// - `string` (for JSON `string`s)
 	ModuleId interface{} `json:"moduleId,omitempty"`
 
 	// An optional hint for how to present this frame in the UI. A value of 'label' can be used to indicate that the frame is an artificial frame that is used as a visual label or separator. A value of 'subtle' can be used to change the appearance of a frame in a 'subtle' way.
-	// 
+	//
 	// POSSIBLE VALUES: `normal`, `label`, `subtle`
 	PresentationHint string `json:"presentationHint,omitempty"`
 
@@ -1466,12 +1267,9 @@ type StackFrame struct {
 
 	// An optional end line of the range covered by the stack frame.
 	EndLine int `json:"endLine,omitempty"`
-
 } // struct StackFrame
 func (me *StackFrame) propagateFieldsToBase() {
 }
-
-
 
 // Response to 'setFunctionBreakpoints' request.
 // Returned is information about each breakpoint created by this request.
@@ -1483,12 +1281,10 @@ type SetFunctionBreakpointsResponse struct {
 
 		// Information about the breakpoints. The array elements correspond to the elements of the 'breakpoints' array.
 		Breakpoints []Breakpoint `json:"breakpoints"`
-
 	} `json:"body"`
 
 	// POSSIBLE VALUES: `setFunctionBreakpoints`
 	Command string `json:"command,omitempty"`
-
 } // struct SetFunctionBreakpointsResponse
 func (me *SetFunctionBreakpointsResponse) propagateFieldsToBase() {
 	me.Response.Body = me.Body
@@ -1496,14 +1292,10 @@ func (me *SetFunctionBreakpointsResponse) propagateFieldsToBase() {
 	me.Response.propagateFieldsToBase()
 }
 
-
-
 // Names of checksum algorithms that may be supported by a debug adapter.
-// 
+//
 // POSSIBLE VALUES: `MD5`, `SHA1`, `SHA256`, `timestamp`
 type ChecksumAlgorithm string
-
-
 
 // Arguments for 'stepIn' request.
 type StepInArguments struct {
@@ -1513,12 +1305,9 @@ type StepInArguments struct {
 
 	// Optional id of the target to step into.
 	TargetId int `json:"targetId,omitempty"`
-
 } // struct StepInArguments
 func (me *StepInArguments) propagateFieldsToBase() {
 }
-
-
 
 // A GotoTarget describes a code location that can be used as a target in the 'goto' request.
 // The possible goto targets can be determined via the 'gotoTargets' request.
@@ -1541,12 +1330,9 @@ type GotoTarget struct {
 
 	// The line of the goto target.
 	Line int `json:"line"`
-
 } // struct GotoTarget
 func (me *GotoTarget) propagateFieldsToBase() {
 }
-
-
 
 // A client or server-initiated request.
 type Request struct {
@@ -1557,7 +1343,7 @@ type Request struct {
 	Command string `json:"command"`
 
 	// Object containing arguments for the command.
-	// 
+	//
 	// POSSIBLE TYPES:
 	// - `[]interface{}` (for JSON `array`s)
 	// - `bool` (for JSON `boolean`s)
@@ -1570,20 +1356,15 @@ type Request struct {
 
 	// POSSIBLE VALUES: `request`
 	Type string `json:"type"`
-
 } // struct Request
 func (me *Request) propagateFieldsToBase() {
 	me.ProtocolMessage.Type = me.Type
 	me.ProtocolMessage.propagateFieldsToBase()
 }
 
-
-
 // Arguments for 'attach' request.
 // The attach request has no standardized attributes.
 type AttachRequestArguments map[string]interface{}
-
-
 
 // The checksum of an item calculated by the specified algorithm.
 type Checksum struct {
@@ -1593,12 +1374,9 @@ type Checksum struct {
 
 	// Value of the checksum.
 	Checksum string `json:"checksum"`
-
 } // struct Checksum
 func (me *Checksum) propagateFieldsToBase() {
 }
-
-
 
 // Response to 'gotoTargets' request.
 type GotoTargetsResponse struct {
@@ -1609,20 +1387,16 @@ type GotoTargetsResponse struct {
 
 		// The possible goto targets of the specified location.
 		Targets []GotoTarget `json:"targets"`
-
 	} `json:"body"`
 
 	// POSSIBLE VALUES: `gotoTargets`
 	Command string `json:"command,omitempty"`
-
 } // struct GotoTargetsResponse
 func (me *GotoTargetsResponse) propagateFieldsToBase() {
 	me.Response.Command = me.Command
 	me.Response.Body = me.Body
 	me.Response.propagateFieldsToBase()
 }
-
-
 
 // Arguments for 'goto' request.
 type GotoArguments struct {
@@ -1632,12 +1406,9 @@ type GotoArguments struct {
 
 	// The location where the debuggee will continue to run.
 	TargetId int `json:"targetId"`
-
 } // struct GotoArguments
 func (me *GotoArguments) propagateFieldsToBase() {
 }
-
-
 
 // Pause request; value of command field is 'pause'.
 // The request suspenses the debuggee.
@@ -1650,15 +1421,12 @@ type PauseRequest struct {
 	Command string `json:"command"`
 
 	Arguments PauseArguments `json:"arguments"`
-
 } // struct PauseRequest
 func (me *PauseRequest) propagateFieldsToBase() {
 	me.Request.Command = me.Command
 	me.Request.Arguments = me.Arguments
 	me.Request.propagateFieldsToBase()
 }
-
-
 
 // Response to 'setExceptionBreakpoints' request. This is just an acknowledgement, so no body field is required.
 type SetExceptionBreakpointsResponse struct {
@@ -1667,26 +1435,20 @@ type SetExceptionBreakpointsResponse struct {
 
 	// POSSIBLE VALUES: `setExceptionBreakpoints`
 	Command string `json:"command,omitempty"`
-
 } // struct SetExceptionBreakpointsResponse
 func (me *SetExceptionBreakpointsResponse) propagateFieldsToBase() {
 	me.Response.Command = me.Command
 	me.Response.propagateFieldsToBase()
 }
 
-
-
 // Arguments for 'pause' request.
 type PauseArguments struct {
 
 	// Pause execution for this thread.
 	ThreadId int `json:"threadId"`
-
 } // struct PauseArguments
 func (me *PauseArguments) propagateFieldsToBase() {
 }
-
-
 
 // Variables request; value of command field is 'variables'.
 // Retrieves all child variables for the given variable reference.
@@ -1699,7 +1461,6 @@ type VariablesRequest struct {
 	Command string `json:"command"`
 
 	Arguments VariablesArguments `json:"arguments"`
-
 } // struct VariablesRequest
 func (me *VariablesRequest) propagateFieldsToBase() {
 	me.Request.Command = me.Command
@@ -1707,13 +1468,11 @@ func (me *VariablesRequest) propagateFieldsToBase() {
 	me.Request.propagateFieldsToBase()
 }
 
-
-
 // Optional properties of a variable that can be used to determine how to render the variable in the UI.
 type VariablePresentationHint struct {
 
 	// The kind of variable. Before introducing additional values, try to use the listed values.
-	// 
+	//
 	// POSSIBLE VALUES: `property`, `method`, `class`, `data`, `event`, `baseClass`, `innerClass`, `interface`, `mostDerivedClass`
 	Kind string `json:"kind,omitempty"`
 
@@ -1721,39 +1480,30 @@ type VariablePresentationHint struct {
 	Attributes []string `json:"attributes,omitempty"`
 
 	// Visibility of variable. Before introducing additional values, try to use the listed values.
-	// 
+	//
 	// POSSIBLE VALUES: `public`, `private`, `protected`, `internal`, `final`
 	Visibility string `json:"visibility,omitempty"`
-
 } // struct VariablePresentationHint
 func (me *VariablePresentationHint) propagateFieldsToBase() {
 }
-
-
 
 // Arguments for 'exceptionInfo' request.
 type ExceptionInfoArguments struct {
 
 	// Thread for which exception information should be retrieved.
 	ThreadId int `json:"threadId"`
-
 } // struct ExceptionInfoArguments
 func (me *ExceptionInfoArguments) propagateFieldsToBase() {
 }
-
-
 
 // Arguments for 'next' request.
 type NextArguments struct {
 
 	// Execute 'next' for this thread.
 	ThreadId int `json:"threadId"`
-
 } // struct NextArguments
 func (me *NextArguments) propagateFieldsToBase() {
 }
-
-
 
 // Provides formatting information for a stack frame.
 type StackFrameFormat struct {
@@ -1780,13 +1530,10 @@ type StackFrameFormat struct {
 
 	// Displays the names of parameters for the stack frame.
 	ParameterNames bool `json:"parameterNames,omitempty"`
-
 } // struct StackFrameFormat
 func (me *StackFrameFormat) propagateFieldsToBase() {
 	me.ValueFormat.propagateFieldsToBase()
 }
-
-
 
 // An ExceptionOptions assigns configuration options to a set of exceptions.
 type ExceptionOptions struct {
@@ -1796,12 +1543,9 @@ type ExceptionOptions struct {
 
 	// Condition when a thrown exception should result in a break.
 	BreakMode ExceptionBreakMode `json:"breakMode"`
-
 } // struct ExceptionOptions
 func (me *ExceptionOptions) propagateFieldsToBase() {
 }
-
-
 
 // Response to 'launch' request. This is just an acknowledgement, so no body field is required.
 type LaunchResponse struct {
@@ -1810,14 +1554,11 @@ type LaunchResponse struct {
 
 	// POSSIBLE VALUES: `launch`
 	Command string `json:"command,omitempty"`
-
 } // struct LaunchResponse
 func (me *LaunchResponse) propagateFieldsToBase() {
 	me.Response.Command = me.Command
 	me.Response.propagateFieldsToBase()
 }
-
-
 
 // Arguments for 'variables' request.
 type VariablesArguments struct {
@@ -1826,7 +1567,7 @@ type VariablesArguments struct {
 	VariablesReference int `json:"variablesReference"`
 
 	// Optional filter to limit the child variables to either named or indexed. If ommited, both types are fetched.
-	// 
+	//
 	// POSSIBLE VALUES: `indexed`, `named`
 	Filter string `json:"filter,omitempty"`
 
@@ -1838,12 +1579,9 @@ type VariablesArguments struct {
 
 	// Specifies details on how to format the Variable values.
 	Format ValueFormat `json:"format,omitempty"`
-
 } // struct VariablesArguments
 func (me *VariablesArguments) propagateFieldsToBase() {
 }
-
-
 
 // runInTerminal request; value of command field is 'runInTerminal'.
 // With this request a debug adapter can run a command in a terminal.
@@ -1855,15 +1593,12 @@ type RunInTerminalRequest struct {
 	Command string `json:"command"`
 
 	Arguments RunInTerminalRequestArguments `json:"arguments"`
-
 } // struct RunInTerminalRequest
 func (me *RunInTerminalRequest) propagateFieldsToBase() {
 	me.Request.Command = me.Command
 	me.Request.Arguments = me.Arguments
 	me.Request.propagateFieldsToBase()
 }
-
-
 
 // Response to 'attach' request. This is just an acknowledgement, so no body field is required.
 type AttachResponse struct {
@@ -1872,14 +1607,11 @@ type AttachResponse struct {
 
 	// POSSIBLE VALUES: `attach`
 	Command string `json:"command,omitempty"`
-
 } // struct AttachResponse
 func (me *AttachResponse) propagateFieldsToBase() {
 	me.Response.Command = me.Command
 	me.Response.propagateFieldsToBase()
 }
-
-
 
 // Response to 'stepBack' request. This is just an acknowledgement, so no body field is required.
 type StepBackResponse struct {
@@ -1888,14 +1620,11 @@ type StepBackResponse struct {
 
 	// POSSIBLE VALUES: `stepBack`
 	Command string `json:"command,omitempty"`
-
 } // struct StepBackResponse
 func (me *StepBackResponse) propagateFieldsToBase() {
 	me.Response.Command = me.Command
 	me.Response.propagateFieldsToBase()
 }
-
-
 
 // Next request; value of command field is 'next'.
 // The request starts the debuggee to run again for one step.
@@ -1908,15 +1637,12 @@ type NextRequest struct {
 	Command string `json:"command"`
 
 	Arguments NextArguments `json:"arguments"`
-
 } // struct NextRequest
 func (me *NextRequest) propagateFieldsToBase() {
 	me.Request.Command = me.Command
 	me.Request.Arguments = me.Arguments
 	me.Request.propagateFieldsToBase()
 }
-
-
 
 // Event message for 'continued' event type.
 // The event indicates that the execution of the debuggee has continued.
@@ -1936,17 +1662,13 @@ type ContinuedEvent struct {
 
 		// If allThreadsContinued is true, a debug adapter can announce that all threads have continued.
 		AllThreadsContinued bool `json:"allThreadsContinued,omitempty"`
-
 	} `json:"body"`
-
 } // struct ContinuedEvent
 func (me *ContinuedEvent) propagateFieldsToBase() {
 	me.Event.Event = me.Event_
 	me.Event.Body = me.Body
 	me.Event.propagateFieldsToBase()
 }
-
-
 
 // Response to a request.
 type Response struct {
@@ -1957,7 +1679,7 @@ type Response struct {
 	Message string `json:"message,omitempty"`
 
 	// Contains request result if success is true and optional error details if success is false.
-	// 
+	//
 	// POSSIBLE TYPES:
 	// - `[]interface{}` (for JSON `array`s)
 	// - `bool` (for JSON `boolean`s)
@@ -1979,14 +1701,11 @@ type Response struct {
 
 	// The command requested.
 	Command string `json:"command"`
-
 } // struct Response
 func (me *Response) propagateFieldsToBase() {
 	me.ProtocolMessage.Type = me.Type
 	me.ProtocolMessage.propagateFieldsToBase()
 }
-
-
 
 // Event message for 'process' event type.
 // The event indicates that the debugger has begun debugging a new process. Either one that it has launched, or one that it has attached to.
@@ -2000,7 +1719,7 @@ type ProcessEvent struct {
 	Body struct {
 
 		// Describes how the debug engine started debugging this process.
-		// 
+		//
 		// POSSIBLE VALUES: `launch`, `attach`, `attachForSuspendedLaunch`
 		StartMethod string `json:"startMethod,omitempty"`
 
@@ -2012,17 +1731,13 @@ type ProcessEvent struct {
 
 		// If true, the process is running on the same computer as the debug adapter.
 		IsLocalProcess bool `json:"isLocalProcess,omitempty"`
-
 	} `json:"body"`
-
 } // struct ProcessEvent
 func (me *ProcessEvent) propagateFieldsToBase() {
 	me.Event.Event = me.Event_
 	me.Event.Body = me.Body
 	me.Event.propagateFieldsToBase()
 }
-
-
 
 // Response to 'configurationDone' request. This is just an acknowledgement, so no body field is required.
 type ConfigurationDoneResponse struct {
@@ -2031,14 +1746,11 @@ type ConfigurationDoneResponse struct {
 
 	// POSSIBLE VALUES: `configurationDone`
 	Command string `json:"command,omitempty"`
-
 } // struct ConfigurationDoneResponse
 func (me *ConfigurationDoneResponse) propagateFieldsToBase() {
 	me.Response.Command = me.Command
 	me.Response.propagateFieldsToBase()
 }
-
-
 
 // Event message for 'initialized' event type.
 // This event indicates that the debug adapter is ready to accept configuration requests (e.g. SetBreakpointsRequest, SetExceptionBreakpointsRequest).
@@ -2056,14 +1768,11 @@ type InitializedEvent struct {
 
 	// POSSIBLE VALUES: `initialized`
 	Event_ string `json:"event"`
-
 } // struct InitializedEvent
 func (me *InitializedEvent) propagateFieldsToBase() {
 	me.Event.Event = me.Event_
 	me.Event.propagateFieldsToBase()
 }
-
-
 
 // Event message for 'exited' event type.
 // The event indicates that the debuggee has exited.
@@ -2075,20 +1784,16 @@ type ExitedEvent struct {
 
 		// The exit code returned from the debuggee.
 		ExitCode int `json:"exitCode"`
-
 	} `json:"body"`
 
 	// POSSIBLE VALUES: `exited`
 	Event_ string `json:"event"`
-
 } // struct ExitedEvent
 func (me *ExitedEvent) propagateFieldsToBase() {
 	me.Event.Event = me.Event_
 	me.Event.Body = me.Body
 	me.Event.propagateFieldsToBase()
 }
-
-
 
 // Event message for 'terminated' event types.
 // The event indicates that debugging of the debuggee has terminated.
@@ -2103,7 +1808,7 @@ type TerminatedEvent struct {
 
 		// A debug adapter may set 'restart' to true (or to an arbitrary object) to request that the front end restarts the session.
 		// The value is not interpreted by the client and passed unmodified as an attribute '__restart' to the launchRequest.
-		// 
+		//
 		// POSSIBLE TYPES:
 		// - `[]interface{}` (for JSON `array`s)
 		// - `bool` (for JSON `boolean`s)
@@ -2113,17 +1818,13 @@ type TerminatedEvent struct {
 		// - `map[string]interface{}` (for JSON `object`s)
 		// - `string` (for JSON `string`s)
 		Restart interface{} `json:"restart,omitempty"`
-
 	} `json:"body,omitempty"`
-
 } // struct TerminatedEvent
 func (me *TerminatedEvent) propagateFieldsToBase() {
 	me.Event.Event = me.Event_
 	me.Event.Body = me.Body
 	me.Event.propagateFieldsToBase()
 }
-
-
 
 // Response to 'reverseContinue' request. This is just an acknowledgement, so no body field is required.
 type ReverseContinueResponse struct {
@@ -2132,14 +1833,11 @@ type ReverseContinueResponse struct {
 
 	// POSSIBLE VALUES: `reverseContinue`
 	Command string `json:"command,omitempty"`
-
 } // struct ReverseContinueResponse
 func (me *ReverseContinueResponse) propagateFieldsToBase() {
 	me.Response.Command = me.Command
 	me.Response.propagateFieldsToBase()
 }
-
-
 
 // Response to 'continue' request.
 type ContinueResponse struct {
@@ -2150,20 +1848,16 @@ type ContinueResponse struct {
 
 		// If true, the continue request has ignored the specified thread and continued all threads instead. If this attribute is missing a value of 'true' is assumed for backward compatibility.
 		AllThreadsContinued bool `json:"allThreadsContinued,omitempty"`
-
 	} `json:"body"`
 
 	// POSSIBLE VALUES: `continue`
 	Command string `json:"command,omitempty"`
-
 } // struct ContinueResponse
 func (me *ContinueResponse) propagateFieldsToBase() {
 	me.Response.Body = me.Body
 	me.Response.Command = me.Command
 	me.Response.propagateFieldsToBase()
 }
-
-
 
 // Response to 'stepIn' request. This is just an acknowledgement, so no body field is required.
 type StepInResponse struct {
@@ -2172,14 +1866,11 @@ type StepInResponse struct {
 
 	// POSSIBLE VALUES: `stepIn`
 	Command string `json:"command,omitempty"`
-
 } // struct StepInResponse
 func (me *StepInResponse) propagateFieldsToBase() {
 	me.Response.Command = me.Command
 	me.Response.propagateFieldsToBase()
 }
-
-
 
 // Arguments for 'modules' request.
 type ModulesArguments struct {
@@ -2189,12 +1880,9 @@ type ModulesArguments struct {
 
 	// The number of modules to return. If moduleCount is not specified or 0, all modules are returned.
 	ModuleCount int `json:"moduleCount,omitempty"`
-
 } // struct ModulesArguments
 func (me *ModulesArguments) propagateFieldsToBase() {
 }
-
-
 
 // GotoTargets request; value of command field is 'gotoTargets'.
 // This request retrieves the possible goto targets for the specified source location.
@@ -2208,15 +1896,12 @@ type GotoTargetsRequest struct {
 	Command string `json:"command"`
 
 	Arguments GotoTargetsArguments `json:"arguments"`
-
 } // struct GotoTargetsRequest
 func (me *GotoTargetsRequest) propagateFieldsToBase() {
 	me.Request.Command = me.Command
 	me.Request.Arguments = me.Arguments
 	me.Request.propagateFieldsToBase()
 }
-
-
 
 // Base class of requests, responses, and events.
 type ProtocolMessage struct {
@@ -2225,15 +1910,12 @@ type ProtocolMessage struct {
 	Seq int `json:"seq"`
 
 	// Message type.
-	// 
+	//
 	// POSSIBLE VALUES: `request`, `response`, `event`
 	Type string `json:"type"`
-
 } // struct ProtocolMessage
 func (me *ProtocolMessage) propagateFieldsToBase() {
 }
-
-
 
 // Response to 'restartFrame' request. This is just an acknowledgement, so no body field is required.
 type RestartFrameResponse struct {
@@ -2242,14 +1924,11 @@ type RestartFrameResponse struct {
 
 	// POSSIBLE VALUES: `restartFrame`
 	Command string `json:"command,omitempty"`
-
 } // struct RestartFrameResponse
 func (me *RestartFrameResponse) propagateFieldsToBase() {
 	me.Response.Command = me.Command
 	me.Response.propagateFieldsToBase()
 }
-
-
 
 // Response to 'setVariable' request.
 type SetVariableResponse struct {
@@ -2274,12 +1953,10 @@ type SetVariableResponse struct {
 		// The number of indexed child variables.
 		// The client can use this optional information to present the variables in a paged UI and fetch them in chunks.
 		IndexedVariables int64 `json:"indexedVariables,omitempty"`
-
 	} `json:"body"`
 
 	// POSSIBLE VALUES: `setVariable`
 	Command string `json:"command,omitempty"`
-
 } // struct SetVariableResponse
 func (me *SetVariableResponse) propagateFieldsToBase() {
 	me.Response.Body = me.Body
@@ -2287,19 +1964,14 @@ func (me *SetVariableResponse) propagateFieldsToBase() {
 	me.Response.propagateFieldsToBase()
 }
 
-
-
 // Arguments for 'continue' request.
 type ContinueArguments struct {
 
 	// Continue execution for the specified thread (if possible). If the backend cannot continue on a single thread but will continue on all threads, it should set the allThreadsContinued attribute in the response to true.
 	ThreadId int `json:"threadId"`
-
 } // struct ContinueArguments
 func (me *ContinueArguments) propagateFieldsToBase() {
 }
-
-
 
 // Detailed information about an exception that has occurred.
 type ExceptionDetails struct {
@@ -2321,12 +1993,9 @@ type ExceptionDetails struct {
 
 	// Details of the exception contained by this exception, if any.
 	InnerException []ExceptionDetails `json:"innerException,omitempty"`
-
 } // struct ExceptionDetails
 func (me *ExceptionDetails) propagateFieldsToBase() {
 }
-
-
 
 // StepBack request; value of command field is 'stepBack'.
 // The request starts the debuggee to run one step backwards.
@@ -2339,15 +2008,12 @@ type StepBackRequest struct {
 	Command string `json:"command"`
 
 	Arguments StepBackArguments `json:"arguments"`
-
 } // struct StepBackRequest
 func (me *StepBackRequest) propagateFieldsToBase() {
 	me.Request.Command = me.Command
 	me.Request.Arguments = me.Arguments
 	me.Request.propagateFieldsToBase()
 }
-
-
 
 // Response to 'completions' request.
 type CompletionsResponse struct {
@@ -2358,20 +2024,16 @@ type CompletionsResponse struct {
 
 		// The possible completions for .
 		Targets []CompletionItem `json:"targets"`
-
 	} `json:"body"`
 
 	// POSSIBLE VALUES: `completions`
 	Command string `json:"command,omitempty"`
-
 } // struct CompletionsResponse
 func (me *CompletionsResponse) propagateFieldsToBase() {
 	me.Response.Command = me.Command
 	me.Response.Body = me.Body
 	me.Response.propagateFieldsToBase()
 }
-
-
 
 // setVariable request; value of command field is 'setVariable'.
 // Set the variable with the given name in the variable container to a new value.
@@ -2383,15 +2045,12 @@ type SetVariableRequest struct {
 	Command string `json:"command"`
 
 	Arguments SetVariableArguments `json:"arguments"`
-
 } // struct SetVariableRequest
 func (me *SetVariableRequest) propagateFieldsToBase() {
 	me.Request.Command = me.Command
 	me.Request.Arguments = me.Arguments
 	me.Request.propagateFieldsToBase()
 }
-
-
 
 // Arguments for 'stackTrace' request.
 type StackTraceArguments struct {
@@ -2407,12 +2066,9 @@ type StackTraceArguments struct {
 
 	// Specifies details on how to format the stack frames.
 	Format StackFrameFormat `json:"format,omitempty"`
-
 } // struct StackTraceArguments
 func (me *StackTraceArguments) propagateFieldsToBase() {
 }
-
-
 
 // Event message for 'output' event type.
 // The event indicates that the target has produced some output.
@@ -2426,7 +2082,7 @@ type OutputEvent struct {
 	Body struct {
 
 		// The output category. If not specified, 'console' is assumed.
-		// 
+		//
 		// POSSIBLE VALUES: `console`, `stdout`, `stderr`, `telemetry`
 		Category string `json:"category,omitempty"`
 
@@ -2446,7 +2102,7 @@ type OutputEvent struct {
 		Column int `json:"column,omitempty"`
 
 		// Optional data to report. For the 'telemetry' category the data will be sent to telemetry, for the other categories the data is shown in JSON format.
-		// 
+		//
 		// POSSIBLE TYPES:
 		// - `[]interface{}` (for JSON `array`s)
 		// - `bool` (for JSON `boolean`s)
@@ -2456,17 +2112,13 @@ type OutputEvent struct {
 		// - `map[string]interface{}` (for JSON `object`s)
 		// - `string` (for JSON `string`s)
 		Data interface{} `json:"data,omitempty"`
-
 	} `json:"body"`
-
 } // struct OutputEvent
 func (me *OutputEvent) propagateFieldsToBase() {
 	me.Event.Event = me.Event_
 	me.Event.Body = me.Body
 	me.Event.propagateFieldsToBase()
 }
-
-
 
 // Scopes request; value of command field is 'scopes'.
 // The request returns the variable scopes for a given stackframe ID.
@@ -2478,15 +2130,12 @@ type ScopesRequest struct {
 	Command string `json:"command"`
 
 	Arguments ScopesArguments `json:"arguments"`
-
 } // struct ScopesRequest
 func (me *ScopesRequest) propagateFieldsToBase() {
 	me.Request.Command = me.Command
 	me.Request.Arguments = me.Arguments
 	me.Request.propagateFieldsToBase()
 }
-
-
 
 // Response to Initialize request.
 type RunInTerminalResponse struct {
@@ -2497,12 +2146,10 @@ type RunInTerminalResponse struct {
 
 		// The process ID.
 		ProcessId int64 `json:"processId,omitempty"`
-
 	} `json:"body"`
 
 	// POSSIBLE VALUES: `runInTerminal`
 	Command string `json:"command,omitempty"`
-
 } // struct RunInTerminalResponse
 func (me *RunInTerminalResponse) propagateFieldsToBase() {
 	me.Response.Body = me.Body
@@ -2510,26 +2157,19 @@ func (me *RunInTerminalResponse) propagateFieldsToBase() {
 	me.Response.propagateFieldsToBase()
 }
 
-
-
 // Arguments for 'stepInTargets' request.
 type StepInTargetsArguments struct {
 
 	// The stack frame for which to retrieve the possible stepIn targets.
 	FrameId int `json:"frameId"`
-
 } // struct StepInTargetsArguments
 func (me *StepInTargetsArguments) propagateFieldsToBase() {
 }
 
-
-
 // Some predefined types for the CompletionItem. Please note that not all clients have specific icons for all of them.
-// 
+//
 // POSSIBLE VALUES: `method`, `function`, `constructor`, `field`, `variable`, `class`, `interface`, `module`, `property`, `unit`, `value`, `enum`, `keyword`, `snippet`, `text`, `color`, `file`, `reference`, `customcolor`
 type CompletionItemType string
-
-
 
 // Information about a Breakpoint created in setBreakpoints or setFunctionBreakpoints.
 type Breakpoint struct {
@@ -2557,12 +2197,9 @@ type Breakpoint struct {
 
 	// An optional start column of the actual range covered by the breakpoint.
 	Column int `json:"column,omitempty"`
-
 } // struct Breakpoint
 func (me *Breakpoint) propagateFieldsToBase() {
 }
-
-
 
 // Response to 'loadedSources' request.
 type LoadedSourcesResponse struct {
@@ -2573,12 +2210,10 @@ type LoadedSourcesResponse struct {
 
 		// Set of loaded sources.
 		Sources []Source `json:"sources"`
-
 	} `json:"body"`
 
 	// POSSIBLE VALUES: `loadedSources`
 	Command string `json:"command,omitempty"`
-
 } // struct LoadedSourcesResponse
 func (me *LoadedSourcesResponse) propagateFieldsToBase() {
 	me.Response.Body = me.Body
@@ -2586,19 +2221,14 @@ func (me *LoadedSourcesResponse) propagateFieldsToBase() {
 	me.Response.propagateFieldsToBase()
 }
 
-
-
 // Arguments for 'scopes' request.
 type ScopesArguments struct {
 
 	// Retrieve the scopes for this stackframe.
 	FrameId int `json:"frameId"`
-
 } // struct ScopesArguments
 func (me *ScopesArguments) propagateFieldsToBase() {
 }
-
-
 
 // Launch request; value of command field is 'launch'.
 type LaunchRequest struct {
@@ -2609,15 +2239,12 @@ type LaunchRequest struct {
 
 	// POSSIBLE VALUES: `launch`
 	Command string `json:"command"`
-
 } // struct LaunchRequest
 func (me *LaunchRequest) propagateFieldsToBase() {
 	me.Request.Command = me.Command
 	me.Request.Arguments = me.Arguments
 	me.Request.propagateFieldsToBase()
 }
-
-
 
 // Response to 'initialize' request.
 type InitializeResponse struct {
@@ -2629,15 +2256,12 @@ type InitializeResponse struct {
 
 	// POSSIBLE VALUES: `initialize`
 	Command string `json:"command,omitempty"`
-
 } // struct InitializeResponse
 func (me *InitializeResponse) propagateFieldsToBase() {
 	me.Response.Body = me.Body
 	me.Response.Command = me.Command
 	me.Response.propagateFieldsToBase()
 }
-
-
 
 // A Thread
 type Thread struct {
@@ -2647,18 +2271,13 @@ type Thread struct {
 
 	// A name of the thread.
 	Name string `json:"name"`
-
 } // struct Thread
 func (me *Thread) propagateFieldsToBase() {
 }
 
-
-
 // Arguments for 'loadedSources' request.
 // The 'loadedSources' request has no standardized arguments.
 type LoadedSourcesArguments map[string]interface{}
-
-
 
 // Evaluate request; value of command field is 'evaluate'.
 // Evaluates the given expression in the context of the top most stack frame.
@@ -2671,15 +2290,12 @@ type EvaluateRequest struct {
 
 	// POSSIBLE VALUES: `evaluate`
 	Command string `json:"command"`
-
 } // struct EvaluateRequest
 func (me *EvaluateRequest) propagateFieldsToBase() {
 	me.Request.Command = me.Command
 	me.Request.Arguments = me.Arguments
 	me.Request.propagateFieldsToBase()
 }
-
-
 
 // ConfigurationDone request; value of command field is 'configurationDone'.
 // The client of the debug protocol must send this request at the end of the sequence of configuration requests (which was started by the InitializedEvent).
@@ -2691,15 +2307,12 @@ type ConfigurationDoneRequest struct {
 	Command string `json:"command"`
 
 	Arguments ConfigurationDoneArguments `json:"arguments,omitempty"`
-
 } // struct ConfigurationDoneRequest
 func (me *ConfigurationDoneRequest) propagateFieldsToBase() {
 	me.Request.Command = me.Command
 	me.Request.Arguments = me.Arguments
 	me.Request.propagateFieldsToBase()
 }
-
-
 
 // Arguments for 'launch' request.
 type LaunchRequestArguments struct {
@@ -2718,24 +2331,17 @@ type LaunchRequestArguments struct {
 
 	// s
 	S string `json:"s,omitempty"`
-
 } // struct LaunchRequestArguments
 func (me *LaunchRequestArguments) propagateFieldsToBase() {
 }
 
-
-
 // The ModulesViewDescriptor is the container for all declarative configuration options of a ModuleView.
 // For now it only specifies the columns to be shown in the modules view.
 type ModulesViewDescriptor struct {
-
 	Columns []ColumnDescriptor `json:"columns"`
-
 } // struct ModulesViewDescriptor
 func (me *ModulesViewDescriptor) propagateFieldsToBase() {
 }
-
-
 
 // CompletionsRequest request; value of command field is 'completions'.
 // Returns a list of possible completions for a given caret position and text.
@@ -2748,7 +2354,6 @@ type CompletionsRequest struct {
 	Command string `json:"command"`
 
 	Arguments CompletionsArguments `json:"arguments"`
-
 } // struct CompletionsRequest
 func (me *CompletionsRequest) propagateFieldsToBase() {
 	me.Request.Command = me.Command
@@ -2756,19 +2361,14 @@ func (me *CompletionsRequest) propagateFieldsToBase() {
 	me.Request.propagateFieldsToBase()
 }
 
-
-
 // Arguments for 'setFunctionBreakpoints' request.
 type SetFunctionBreakpointsArguments struct {
 
 	// The function names of the breakpoints.
 	Breakpoints []FunctionBreakpoint `json:"breakpoints"`
-
 } // struct SetFunctionBreakpointsArguments
 func (me *SetFunctionBreakpointsArguments) propagateFieldsToBase() {
 }
-
-
 
 // Response to 'stackTrace' request.
 type StackTraceResponse struct {
@@ -2786,17 +2386,13 @@ type StackTraceResponse struct {
 
 		// The total number of frames available.
 		TotalFrames int `json:"totalFrames,omitempty"`
-
 	} `json:"body"`
-
 } // struct StackTraceResponse
 func (me *StackTraceResponse) propagateFieldsToBase() {
 	me.Response.Body = me.Body
 	me.Response.Command = me.Command
 	me.Response.propagateFieldsToBase()
 }
-
-
 
 // Response to 'stepInTargets' request.
 type StepInTargetsResponse struct {
@@ -2810,17 +2406,13 @@ type StepInTargetsResponse struct {
 
 		// The possible stepIn targets of the specified source location.
 		Targets []StepInTarget `json:"targets"`
-
 	} `json:"body"`
-
 } // struct StepInTargetsResponse
 func (me *StepInTargetsResponse) propagateFieldsToBase() {
 	me.Response.Command = me.Command
 	me.Response.Body = me.Body
 	me.Response.propagateFieldsToBase()
 }
-
-
 
 // StackTrace request; value of command field is 'stackTrace'. The request returns a stacktrace from the current execution state.
 type StackTraceRequest struct {
@@ -2831,15 +2423,12 @@ type StackTraceRequest struct {
 	Command string `json:"command"`
 
 	Arguments StackTraceArguments `json:"arguments"`
-
 } // struct StackTraceRequest
 func (me *StackTraceRequest) propagateFieldsToBase() {
 	me.Request.Command = me.Command
 	me.Request.Arguments = me.Arguments
 	me.Request.propagateFieldsToBase()
 }
-
-
 
 // A StepInTarget can be used in the 'stepIn' request and determines into which single target the stepIn request should step.
 type StepInTarget struct {
@@ -2849,12 +2438,9 @@ type StepInTarget struct {
 
 	// The name of the stepIn target (shown in the UI).
 	Label string `json:"label"`
-
 } // struct StepInTarget
 func (me *StepInTarget) propagateFieldsToBase() {
 }
-
-
 
 // Response to 'evaluate' request.
 type EvaluateResponse struct {
@@ -2882,12 +2468,10 @@ type EvaluateResponse struct {
 		// The number of indexed child variables.
 		// The client can use this optional information to present the variables in a paged UI and fetch them in chunks.
 		IndexedVariables int64 `json:"indexedVariables,omitempty"`
-
 	} `json:"body"`
 
 	// POSSIBLE VALUES: `evaluate`
 	Command string `json:"command,omitempty"`
-
 } // struct EvaluateResponse
 func (me *EvaluateResponse) propagateFieldsToBase() {
 	me.Response.Body = me.Body
@@ -2895,19 +2479,14 @@ func (me *EvaluateResponse) propagateFieldsToBase() {
 	me.Response.propagateFieldsToBase()
 }
 
-
-
 // Arguments for 'stepBack' request.
 type StepBackArguments struct {
 
 	// Exceute 'stepBack' for this thread.
 	ThreadId int `json:"threadId"`
-
 } // struct StepBackArguments
 func (me *StepBackArguments) propagateFieldsToBase() {
 }
-
-
 
 // Event message for 'breakpoint' event type.
 // The event indicates that some information about a breakpoint has changed.
@@ -2921,23 +2500,19 @@ type BreakpointEvent struct {
 	Body struct {
 
 		// The reason for the event.
-		// 
+		//
 		// POSSIBLE VALUES: `changed`, `new`
 		Reason string `json:"reason"`
 
 		// The breakpoint.
 		Breakpoint Breakpoint `json:"breakpoint"`
-
 	} `json:"body"`
-
 } // struct BreakpointEvent
 func (me *BreakpointEvent) propagateFieldsToBase() {
 	me.Event.Event = me.Event_
 	me.Event.Body = me.Body
 	me.Event.propagateFieldsToBase()
 }
-
-
 
 // SetFunctionBreakpoints request; value of command field is 'setFunctionBreakpoints'.
 // Sets multiple function breakpoints and clears all previous function breakpoints.
@@ -2951,15 +2526,12 @@ type SetFunctionBreakpointsRequest struct {
 	Command string `json:"command"`
 
 	Arguments SetFunctionBreakpointsArguments `json:"arguments"`
-
 } // struct SetFunctionBreakpointsRequest
 func (me *SetFunctionBreakpointsRequest) propagateFieldsToBase() {
 	me.Request.Command = me.Command
 	me.Request.Arguments = me.Arguments
 	me.Request.propagateFieldsToBase()
 }
-
-
 
 // Information about the capabilities of a debug adapter.
 type Capabilities struct {
@@ -3029,12 +2601,9 @@ type Capabilities struct {
 
 	// The debug adapter supports the exceptionInfo request.
 	SupportsExceptionInfoRequest bool `json:"supportsExceptionInfoRequest,omitempty"`
-
 } // struct Capabilities
 func (me *Capabilities) propagateFieldsToBase() {
 }
-
-
 
 // SetExceptionBreakpoints request; value of command field is 'setExceptionBreakpoints'.
 // The request configures the debuggers response to thrown exceptions. If an exception is configured to break, a StoppedEvent is fired (event type 'exception').
@@ -3046,7 +2615,6 @@ type SetExceptionBreakpointsRequest struct {
 	Command string `json:"command"`
 
 	Arguments SetExceptionBreakpointsArguments `json:"arguments"`
-
 } // struct SetExceptionBreakpointsRequest
 func (me *SetExceptionBreakpointsRequest) propagateFieldsToBase() {
 	me.Request.Command = me.Command
@@ -3054,114 +2622,187 @@ func (me *SetExceptionBreakpointsRequest) propagateFieldsToBase() {
 	me.Request.propagateFieldsToBase()
 }
 
-
-
 // Arguments for 'restartFrame' request.
 type RestartFrameArguments struct {
 
 	// Restart this stackframe.
 	FrameId int `json:"frameId"`
-
 } // struct RestartFrameArguments
 func (me *RestartFrameArguments) propagateFieldsToBase() {
 }
 
-func BaseEvent (someEvent interface{}) (baseEvent *Event) {
+func BaseEvent(someEvent interface{}) (baseEvent *Event) {
 	switch me := someEvent.(type) {
-	case *BreakpointEvent: baseEvent = &me.Event
-	case *ModuleEvent: baseEvent = &me.Event
-	case *ThreadEvent: baseEvent = &me.Event
-	case *LoadedSourceEvent: baseEvent = &me.Event
-	case *StoppedEvent: baseEvent = &me.Event
-	case *ContinuedEvent: baseEvent = &me.Event
-	case *ProcessEvent: baseEvent = &me.Event
-	case *InitializedEvent: baseEvent = &me.Event
-	case *ExitedEvent: baseEvent = &me.Event
-	case *TerminatedEvent: baseEvent = &me.Event
-	case *OutputEvent: baseEvent = &me.Event
+	case *BreakpointEvent:
+		baseEvent = &me.Event
+	case *ModuleEvent:
+		baseEvent = &me.Event
+	case *ThreadEvent:
+		baseEvent = &me.Event
+	case *LoadedSourceEvent:
+		baseEvent = &me.Event
+	case *StoppedEvent:
+		baseEvent = &me.Event
+	case *ContinuedEvent:
+		baseEvent = &me.Event
+	case *ProcessEvent:
+		baseEvent = &me.Event
+	case *InitializedEvent:
+		baseEvent = &me.Event
+	case *ExitedEvent:
+		baseEvent = &me.Event
+	case *TerminatedEvent:
+		baseEvent = &me.Event
+	case *OutputEvent:
+		baseEvent = &me.Event
 	}
 	return
 }
 
-func BaseResponse (someResponse interface{}) (baseResponse *Response) {
+func BaseResponse(someResponse interface{}) (baseResponse *Response) {
 	switch me := someResponse.(type) {
-	case *LoadedSourcesResponse: baseResponse = &me.Response
-	case *InitializeResponse: baseResponse = &me.Response
-	case *StepInTargetsResponse: baseResponse = &me.Response
-	case *StackTraceResponse: baseResponse = &me.Response
-	case *EvaluateResponse: baseResponse = &me.Response
-	case *ExceptionInfoResponse: baseResponse = &me.Response
-	case *DisconnectResponse: baseResponse = &me.Response
-	case *SetBreakpointsResponse: baseResponse = &me.Response
-	case *ScopesResponse: baseResponse = &me.Response
-	case *NextResponse: baseResponse = &me.Response
-	case *ModulesResponse: baseResponse = &me.Response
-	case *VariablesResponse: baseResponse = &me.Response
-	case *StepOutResponse: baseResponse = &me.Response
-	case *ThreadsResponse: baseResponse = &me.Response
-	case *SourceResponse: baseResponse = &me.Response
-	case *GotoResponse: baseResponse = &me.Response
-	case *ErrorResponse: baseResponse = &me.Response
-	case *PauseResponse: baseResponse = &me.Response
-	case *RestartResponse: baseResponse = &me.Response
-	case *SetFunctionBreakpointsResponse: baseResponse = &me.Response
-	case *GotoTargetsResponse: baseResponse = &me.Response
-	case *SetExceptionBreakpointsResponse: baseResponse = &me.Response
-	case *LaunchResponse: baseResponse = &me.Response
-	case *AttachResponse: baseResponse = &me.Response
-	case *StepBackResponse: baseResponse = &me.Response
-	case *ConfigurationDoneResponse: baseResponse = &me.Response
-	case *ReverseContinueResponse: baseResponse = &me.Response
-	case *ContinueResponse: baseResponse = &me.Response
-	case *StepInResponse: baseResponse = &me.Response
-	case *CompletionsResponse: baseResponse = &me.Response
-	case *RestartFrameResponse: baseResponse = &me.Response
-	case *SetVariableResponse: baseResponse = &me.Response
-	case *RunInTerminalResponse: baseResponse = &me.Response
+	case *LoadedSourcesResponse:
+		baseResponse = &me.Response
+	case *InitializeResponse:
+		baseResponse = &me.Response
+	case *StepInTargetsResponse:
+		baseResponse = &me.Response
+	case *StackTraceResponse:
+		baseResponse = &me.Response
+	case *EvaluateResponse:
+		baseResponse = &me.Response
+	case *ExceptionInfoResponse:
+		baseResponse = &me.Response
+	case *DisconnectResponse:
+		baseResponse = &me.Response
+	case *SetBreakpointsResponse:
+		baseResponse = &me.Response
+	case *ScopesResponse:
+		baseResponse = &me.Response
+	case *NextResponse:
+		baseResponse = &me.Response
+	case *ModulesResponse:
+		baseResponse = &me.Response
+	case *VariablesResponse:
+		baseResponse = &me.Response
+	case *StepOutResponse:
+		baseResponse = &me.Response
+	case *ThreadsResponse:
+		baseResponse = &me.Response
+	case *SourceResponse:
+		baseResponse = &me.Response
+	case *GotoResponse:
+		baseResponse = &me.Response
+	case *ErrorResponse:
+		baseResponse = &me.Response
+	case *PauseResponse:
+		baseResponse = &me.Response
+	case *RestartResponse:
+		baseResponse = &me.Response
+	case *SetFunctionBreakpointsResponse:
+		baseResponse = &me.Response
+	case *GotoTargetsResponse:
+		baseResponse = &me.Response
+	case *SetExceptionBreakpointsResponse:
+		baseResponse = &me.Response
+	case *LaunchResponse:
+		baseResponse = &me.Response
+	case *AttachResponse:
+		baseResponse = &me.Response
+	case *StepBackResponse:
+		baseResponse = &me.Response
+	case *ConfigurationDoneResponse:
+		baseResponse = &me.Response
+	case *ReverseContinueResponse:
+		baseResponse = &me.Response
+	case *ContinueResponse:
+		baseResponse = &me.Response
+	case *StepInResponse:
+		baseResponse = &me.Response
+	case *CompletionsResponse:
+		baseResponse = &me.Response
+	case *RestartFrameResponse:
+		baseResponse = &me.Response
+	case *SetVariableResponse:
+		baseResponse = &me.Response
+	case *RunInTerminalResponse:
+		baseResponse = &me.Response
 	}
 	return
 }
 
-func BaseRequest (someRequest interface{}) (baseRequest *Request) {
+func BaseRequest(someRequest interface{}) (baseRequest *Request) {
 	switch me := someRequest.(type) {
-	case *SetExceptionBreakpointsRequest: baseRequest = &me.Request
-	case *SetFunctionBreakpointsRequest: baseRequest = &me.Request
-	case *DisconnectRequest: baseRequest = &me.Request
-	case *ContinueRequest: baseRequest = &me.Request
-	case *StepInRequest: baseRequest = &me.Request
-	case *ThreadsRequest: baseRequest = &me.Request
-	case *RestartFrameRequest: baseRequest = &me.Request
-	case *ReverseContinueRequest: baseRequest = &me.Request
-	case *SetBreakpointsRequest: baseRequest = &me.Request
-	case *AttachRequest: baseRequest = &me.Request
-	case *ExceptionInfoRequest: baseRequest = &me.Request
-	case *InitializeRequest: baseRequest = &me.Request
-	case *StepInTargetsRequest: baseRequest = &me.Request
-	case *LoadedSourcesRequest: baseRequest = &me.Request
-	case *StepOutRequest: baseRequest = &me.Request
-	case *GotoRequest: baseRequest = &me.Request
-	case *RestartRequest: baseRequest = &me.Request
-	case *SourceRequest: baseRequest = &me.Request
-	case *ModulesRequest: baseRequest = &me.Request
-	case *VariablesRequest: baseRequest = &me.Request
-	case *PauseRequest: baseRequest = &me.Request
-	case *RunInTerminalRequest: baseRequest = &me.Request
-	case *NextRequest: baseRequest = &me.Request
-	case *GotoTargetsRequest: baseRequest = &me.Request
-	case *StepBackRequest: baseRequest = &me.Request
-	case *ScopesRequest: baseRequest = &me.Request
-	case *SetVariableRequest: baseRequest = &me.Request
-	case *LaunchRequest: baseRequest = &me.Request
-	case *CompletionsRequest: baseRequest = &me.Request
-	case *EvaluateRequest: baseRequest = &me.Request
-	case *ConfigurationDoneRequest: baseRequest = &me.Request
-	case *StackTraceRequest: baseRequest = &me.Request
+	case *SetExceptionBreakpointsRequest:
+		baseRequest = &me.Request
+	case *SetFunctionBreakpointsRequest:
+		baseRequest = &me.Request
+	case *DisconnectRequest:
+		baseRequest = &me.Request
+	case *ContinueRequest:
+		baseRequest = &me.Request
+	case *StepInRequest:
+		baseRequest = &me.Request
+	case *ThreadsRequest:
+		baseRequest = &me.Request
+	case *RestartFrameRequest:
+		baseRequest = &me.Request
+	case *ReverseContinueRequest:
+		baseRequest = &me.Request
+	case *SetBreakpointsRequest:
+		baseRequest = &me.Request
+	case *AttachRequest:
+		baseRequest = &me.Request
+	case *ExceptionInfoRequest:
+		baseRequest = &me.Request
+	case *InitializeRequest:
+		baseRequest = &me.Request
+	case *StepInTargetsRequest:
+		baseRequest = &me.Request
+	case *LoadedSourcesRequest:
+		baseRequest = &me.Request
+	case *StepOutRequest:
+		baseRequest = &me.Request
+	case *GotoRequest:
+		baseRequest = &me.Request
+	case *RestartRequest:
+		baseRequest = &me.Request
+	case *SourceRequest:
+		baseRequest = &me.Request
+	case *ModulesRequest:
+		baseRequest = &me.Request
+	case *VariablesRequest:
+		baseRequest = &me.Request
+	case *PauseRequest:
+		baseRequest = &me.Request
+	case *RunInTerminalRequest:
+		baseRequest = &me.Request
+	case *NextRequest:
+		baseRequest = &me.Request
+	case *GotoTargetsRequest:
+		baseRequest = &me.Request
+	case *StepBackRequest:
+		baseRequest = &me.Request
+	case *ScopesRequest:
+		baseRequest = &me.Request
+	case *SetVariableRequest:
+		baseRequest = &me.Request
+	case *LaunchRequest:
+		baseRequest = &me.Request
+	case *CompletionsRequest:
+		baseRequest = &me.Request
+	case *EvaluateRequest:
+		baseRequest = &me.Request
+	case *ConfigurationDoneRequest:
+		baseRequest = &me.Request
+	case *StackTraceRequest:
+		baseRequest = &me.Request
 	}
 	return
 }
 
 // Returns a new `AttachResponse` with the following fields set: `Command`, `Type`
-func NewAttachResponse () *AttachResponse {
+func NewAttachResponse() *AttachResponse {
 	newAttachResponse := AttachResponse{}
 	newAttachResponse.Command = "attach"
 	newAttachResponse.Type = "response"
@@ -3170,7 +2811,7 @@ func NewAttachResponse () *AttachResponse {
 }
 
 // Returns a new `ProcessEvent` with the following fields set: `Event_`, `Type`
-func NewProcessEvent () *ProcessEvent {
+func NewProcessEvent() *ProcessEvent {
 	newProcessEvent := ProcessEvent{}
 	newProcessEvent.Event_ = "process"
 	newProcessEvent.Type = "event"
@@ -3179,7 +2820,7 @@ func NewProcessEvent () *ProcessEvent {
 }
 
 // Returns a new `SourceRequest` with the following fields set: `Command`, `Type`
-func NewSourceRequest () *SourceRequest {
+func NewSourceRequest() *SourceRequest {
 	newSourceRequest := SourceRequest{}
 	newSourceRequest.Command = "source"
 	newSourceRequest.Type = "request"
@@ -3188,7 +2829,7 @@ func NewSourceRequest () *SourceRequest {
 }
 
 // Returns a new `NextResponse` with the following fields set: `Command`, `Type`
-func NewNextResponse () *NextResponse {
+func NewNextResponse() *NextResponse {
 	newNextResponse := NextResponse{}
 	newNextResponse.Command = "next"
 	newNextResponse.Type = "response"
@@ -3197,7 +2838,7 @@ func NewNextResponse () *NextResponse {
 }
 
 // Returns a new `StepOutRequest` with the following fields set: `Command`, `Type`
-func NewStepOutRequest () *StepOutRequest {
+func NewStepOutRequest() *StepOutRequest {
 	newStepOutRequest := StepOutRequest{}
 	newStepOutRequest.Command = "stepOut"
 	newStepOutRequest.Type = "request"
@@ -3206,7 +2847,7 @@ func NewStepOutRequest () *StepOutRequest {
 }
 
 // Returns a new `TerminatedEvent` with the following fields set: `Event_`, `Type`
-func NewTerminatedEvent () *TerminatedEvent {
+func NewTerminatedEvent() *TerminatedEvent {
 	newTerminatedEvent := TerminatedEvent{}
 	newTerminatedEvent.Event_ = "terminated"
 	newTerminatedEvent.Type = "event"
@@ -3215,7 +2856,7 @@ func NewTerminatedEvent () *TerminatedEvent {
 }
 
 // Returns a new `SetVariableRequest` with the following fields set: `Command`, `Type`
-func NewSetVariableRequest () *SetVariableRequest {
+func NewSetVariableRequest() *SetVariableRequest {
 	newSetVariableRequest := SetVariableRequest{}
 	newSetVariableRequest.Command = "setVariable"
 	newSetVariableRequest.Type = "request"
@@ -3224,7 +2865,7 @@ func NewSetVariableRequest () *SetVariableRequest {
 }
 
 // Returns a new `OutputEvent` with the following fields set: `Event_`, `Type`
-func NewOutputEvent () *OutputEvent {
+func NewOutputEvent() *OutputEvent {
 	newOutputEvent := OutputEvent{}
 	newOutputEvent.Event_ = "output"
 	newOutputEvent.Type = "event"
@@ -3233,7 +2874,7 @@ func NewOutputEvent () *OutputEvent {
 }
 
 // Returns a new `RunInTerminalResponse` with the following fields set: `Command`, `Type`
-func NewRunInTerminalResponse () *RunInTerminalResponse {
+func NewRunInTerminalResponse() *RunInTerminalResponse {
 	newRunInTerminalResponse := RunInTerminalResponse{}
 	newRunInTerminalResponse.Command = "runInTerminal"
 	newRunInTerminalResponse.Type = "response"
@@ -3242,7 +2883,7 @@ func NewRunInTerminalResponse () *RunInTerminalResponse {
 }
 
 // Returns a new `ConfigurationDoneRequest` with the following fields set: `Command`, `Type`
-func NewConfigurationDoneRequest () *ConfigurationDoneRequest {
+func NewConfigurationDoneRequest() *ConfigurationDoneRequest {
 	newConfigurationDoneRequest := ConfigurationDoneRequest{}
 	newConfigurationDoneRequest.Command = "configurationDone"
 	newConfigurationDoneRequest.Type = "request"
@@ -3251,7 +2892,7 @@ func NewConfigurationDoneRequest () *ConfigurationDoneRequest {
 }
 
 // Returns a new `ModuleEvent` with the following fields set: `Event_`, `Type`
-func NewModuleEvent () *ModuleEvent {
+func NewModuleEvent() *ModuleEvent {
 	newModuleEvent := ModuleEvent{}
 	newModuleEvent.Event_ = "module"
 	newModuleEvent.Type = "event"
@@ -3260,7 +2901,7 @@ func NewModuleEvent () *ModuleEvent {
 }
 
 // Returns a new `ReverseContinueResponse` with the following fields set: `Command`, `Type`
-func NewReverseContinueResponse () *ReverseContinueResponse {
+func NewReverseContinueResponse() *ReverseContinueResponse {
 	newReverseContinueResponse := ReverseContinueResponse{}
 	newReverseContinueResponse.Command = "reverseContinue"
 	newReverseContinueResponse.Type = "response"
@@ -3269,7 +2910,7 @@ func NewReverseContinueResponse () *ReverseContinueResponse {
 }
 
 // Returns a new `CompletionsRequest` with the following fields set: `Command`, `Type`
-func NewCompletionsRequest () *CompletionsRequest {
+func NewCompletionsRequest() *CompletionsRequest {
 	newCompletionsRequest := CompletionsRequest{}
 	newCompletionsRequest.Command = "completions"
 	newCompletionsRequest.Type = "request"
@@ -3278,7 +2919,7 @@ func NewCompletionsRequest () *CompletionsRequest {
 }
 
 // Returns a new `ErrorResponse` with the following fields set: `Type`
-func NewErrorResponse () *ErrorResponse {
+func NewErrorResponse() *ErrorResponse {
 	newErrorResponse := ErrorResponse{}
 	newErrorResponse.Type = "response"
 	newErrorResponse.propagateFieldsToBase()
@@ -3286,7 +2927,7 @@ func NewErrorResponse () *ErrorResponse {
 }
 
 // Returns a new `LoadedSourceEvent` with the following fields set: `Event_`, `Type`
-func NewLoadedSourceEvent () *LoadedSourceEvent {
+func NewLoadedSourceEvent() *LoadedSourceEvent {
 	newLoadedSourceEvent := LoadedSourceEvent{}
 	newLoadedSourceEvent.Event_ = "loadedSource"
 	newLoadedSourceEvent.Type = "event"
@@ -3295,7 +2936,7 @@ func NewLoadedSourceEvent () *LoadedSourceEvent {
 }
 
 // Returns a new `PauseRequest` with the following fields set: `Command`, `Type`
-func NewPauseRequest () *PauseRequest {
+func NewPauseRequest() *PauseRequest {
 	newPauseRequest := PauseRequest{}
 	newPauseRequest.Command = "pause"
 	newPauseRequest.Type = "request"
@@ -3304,7 +2945,7 @@ func NewPauseRequest () *PauseRequest {
 }
 
 // Returns a new `StackTraceRequest` with the following fields set: `Command`, `Type`
-func NewStackTraceRequest () *StackTraceRequest {
+func NewStackTraceRequest() *StackTraceRequest {
 	newStackTraceRequest := StackTraceRequest{}
 	newStackTraceRequest.Command = "stackTrace"
 	newStackTraceRequest.Type = "request"
@@ -3313,7 +2954,7 @@ func NewStackTraceRequest () *StackTraceRequest {
 }
 
 // Returns a new `ThreadEvent` with the following fields set: `Event_`, `Type`
-func NewThreadEvent () *ThreadEvent {
+func NewThreadEvent() *ThreadEvent {
 	newThreadEvent := ThreadEvent{}
 	newThreadEvent.Event_ = "thread"
 	newThreadEvent.Type = "event"
@@ -3322,7 +2963,7 @@ func NewThreadEvent () *ThreadEvent {
 }
 
 // Returns a new `ReverseContinueRequest` with the following fields set: `Command`, `Type`
-func NewReverseContinueRequest () *ReverseContinueRequest {
+func NewReverseContinueRequest() *ReverseContinueRequest {
 	newReverseContinueRequest := ReverseContinueRequest{}
 	newReverseContinueRequest.Command = "reverseContinue"
 	newReverseContinueRequest.Type = "request"
@@ -3331,7 +2972,7 @@ func NewReverseContinueRequest () *ReverseContinueRequest {
 }
 
 // Returns a new `ExceptionInfoRequest` with the following fields set: `Command`, `Type`
-func NewExceptionInfoRequest () *ExceptionInfoRequest {
+func NewExceptionInfoRequest() *ExceptionInfoRequest {
 	newExceptionInfoRequest := ExceptionInfoRequest{}
 	newExceptionInfoRequest.Command = "exceptionInfo"
 	newExceptionInfoRequest.Type = "request"
@@ -3340,7 +2981,7 @@ func NewExceptionInfoRequest () *ExceptionInfoRequest {
 }
 
 // Returns a new `VariablesResponse` with the following fields set: `Command`, `Type`
-func NewVariablesResponse () *VariablesResponse {
+func NewVariablesResponse() *VariablesResponse {
 	newVariablesResponse := VariablesResponse{}
 	newVariablesResponse.Command = "variables"
 	newVariablesResponse.Type = "response"
@@ -3349,7 +2990,7 @@ func NewVariablesResponse () *VariablesResponse {
 }
 
 // Returns a new `ModulesRequest` with the following fields set: `Command`, `Type`
-func NewModulesRequest () *ModulesRequest {
+func NewModulesRequest() *ModulesRequest {
 	newModulesRequest := ModulesRequest{}
 	newModulesRequest.Command = "modules"
 	newModulesRequest.Type = "request"
@@ -3358,7 +2999,7 @@ func NewModulesRequest () *ModulesRequest {
 }
 
 // Returns a new `StepBackResponse` with the following fields set: `Command`, `Type`
-func NewStepBackResponse () *StepBackResponse {
+func NewStepBackResponse() *StepBackResponse {
 	newStepBackResponse := StepBackResponse{}
 	newStepBackResponse.Command = "stepBack"
 	newStepBackResponse.Type = "response"
@@ -3367,7 +3008,7 @@ func NewStepBackResponse () *StepBackResponse {
 }
 
 // Returns a new `InitializedEvent` with the following fields set: `Event_`, `Type`
-func NewInitializedEvent () *InitializedEvent {
+func NewInitializedEvent() *InitializedEvent {
 	newInitializedEvent := InitializedEvent{}
 	newInitializedEvent.Event_ = "initialized"
 	newInitializedEvent.Type = "event"
@@ -3376,7 +3017,7 @@ func NewInitializedEvent () *InitializedEvent {
 }
 
 // Returns a new `GotoTargetsRequest` with the following fields set: `Command`, `Type`
-func NewGotoTargetsRequest () *GotoTargetsRequest {
+func NewGotoTargetsRequest() *GotoTargetsRequest {
 	newGotoTargetsRequest := GotoTargetsRequest{}
 	newGotoTargetsRequest.Command = "gotoTargets"
 	newGotoTargetsRequest.Type = "request"
@@ -3385,7 +3026,7 @@ func NewGotoTargetsRequest () *GotoTargetsRequest {
 }
 
 // Returns a new `DisconnectRequest` with the following fields set: `Command`, `Type`
-func NewDisconnectRequest () *DisconnectRequest {
+func NewDisconnectRequest() *DisconnectRequest {
 	newDisconnectRequest := DisconnectRequest{}
 	newDisconnectRequest.Command = "disconnect"
 	newDisconnectRequest.Type = "request"
@@ -3394,7 +3035,7 @@ func NewDisconnectRequest () *DisconnectRequest {
 }
 
 // Returns a new `SetFunctionBreakpointsRequest` with the following fields set: `Command`, `Type`
-func NewSetFunctionBreakpointsRequest () *SetFunctionBreakpointsRequest {
+func NewSetFunctionBreakpointsRequest() *SetFunctionBreakpointsRequest {
 	newSetFunctionBreakpointsRequest := SetFunctionBreakpointsRequest{}
 	newSetFunctionBreakpointsRequest.Command = "setFunctionBreakpoints"
 	newSetFunctionBreakpointsRequest.Type = "request"
@@ -3403,7 +3044,7 @@ func NewSetFunctionBreakpointsRequest () *SetFunctionBreakpointsRequest {
 }
 
 // Returns a new `EvaluateRequest` with the following fields set: `Command`, `Type`
-func NewEvaluateRequest () *EvaluateRequest {
+func NewEvaluateRequest() *EvaluateRequest {
 	newEvaluateRequest := EvaluateRequest{}
 	newEvaluateRequest.Command = "evaluate"
 	newEvaluateRequest.Type = "request"
@@ -3412,7 +3053,7 @@ func NewEvaluateRequest () *EvaluateRequest {
 }
 
 // Returns a new `AttachRequest` with the following fields set: `Command`, `Type`
-func NewAttachRequest () *AttachRequest {
+func NewAttachRequest() *AttachRequest {
 	newAttachRequest := AttachRequest{}
 	newAttachRequest.Command = "attach"
 	newAttachRequest.Type = "request"
@@ -3421,7 +3062,7 @@ func NewAttachRequest () *AttachRequest {
 }
 
 // Returns a new `StepInRequest` with the following fields set: `Command`, `Type`
-func NewStepInRequest () *StepInRequest {
+func NewStepInRequest() *StepInRequest {
 	newStepInRequest := StepInRequest{}
 	newStepInRequest.Command = "stepIn"
 	newStepInRequest.Type = "request"
@@ -3430,7 +3071,7 @@ func NewStepInRequest () *StepInRequest {
 }
 
 // Returns a new `InitializeRequest` with the following fields set: `Command`, `Type`
-func NewInitializeRequest () *InitializeRequest {
+func NewInitializeRequest() *InitializeRequest {
 	newInitializeRequest := InitializeRequest{}
 	newInitializeRequest.Command = "initialize"
 	newInitializeRequest.Type = "request"
@@ -3439,7 +3080,7 @@ func NewInitializeRequest () *InitializeRequest {
 }
 
 // Returns a new `RestartFrameRequest` with the following fields set: `Command`, `Type`
-func NewRestartFrameRequest () *RestartFrameRequest {
+func NewRestartFrameRequest() *RestartFrameRequest {
 	newRestartFrameRequest := RestartFrameRequest{}
 	newRestartFrameRequest.Command = "restartFrame"
 	newRestartFrameRequest.Type = "request"
@@ -3448,7 +3089,7 @@ func NewRestartFrameRequest () *RestartFrameRequest {
 }
 
 // Returns a new `SourceResponse` with the following fields set: `Command`, `Type`
-func NewSourceResponse () *SourceResponse {
+func NewSourceResponse() *SourceResponse {
 	newSourceResponse := SourceResponse{}
 	newSourceResponse.Command = "source"
 	newSourceResponse.Type = "response"
@@ -3457,7 +3098,7 @@ func NewSourceResponse () *SourceResponse {
 }
 
 // Returns a new `NextRequest` with the following fields set: `Command`, `Type`
-func NewNextRequest () *NextRequest {
+func NewNextRequest() *NextRequest {
 	newNextRequest := NextRequest{}
 	newNextRequest.Command = "next"
 	newNextRequest.Type = "request"
@@ -3466,7 +3107,7 @@ func NewNextRequest () *NextRequest {
 }
 
 // Returns a new `ExitedEvent` with the following fields set: `Event_`, `Type`
-func NewExitedEvent () *ExitedEvent {
+func NewExitedEvent() *ExitedEvent {
 	newExitedEvent := ExitedEvent{}
 	newExitedEvent.Event_ = "exited"
 	newExitedEvent.Type = "event"
@@ -3475,7 +3116,7 @@ func NewExitedEvent () *ExitedEvent {
 }
 
 // Returns a new `SetVariableResponse` with the following fields set: `Command`, `Type`
-func NewSetVariableResponse () *SetVariableResponse {
+func NewSetVariableResponse() *SetVariableResponse {
 	newSetVariableResponse := SetVariableResponse{}
 	newSetVariableResponse.Command = "setVariable"
 	newSetVariableResponse.Type = "response"
@@ -3484,7 +3125,7 @@ func NewSetVariableResponse () *SetVariableResponse {
 }
 
 // Returns a new `CompletionsResponse` with the following fields set: `Command`, `Type`
-func NewCompletionsResponse () *CompletionsResponse {
+func NewCompletionsResponse() *CompletionsResponse {
 	newCompletionsResponse := CompletionsResponse{}
 	newCompletionsResponse.Command = "completions"
 	newCompletionsResponse.Type = "response"
@@ -3493,7 +3134,7 @@ func NewCompletionsResponse () *CompletionsResponse {
 }
 
 // Returns a new `SetExceptionBreakpointsRequest` with the following fields set: `Command`, `Type`
-func NewSetExceptionBreakpointsRequest () *SetExceptionBreakpointsRequest {
+func NewSetExceptionBreakpointsRequest() *SetExceptionBreakpointsRequest {
 	newSetExceptionBreakpointsRequest := SetExceptionBreakpointsRequest{}
 	newSetExceptionBreakpointsRequest.Command = "setExceptionBreakpoints"
 	newSetExceptionBreakpointsRequest.Type = "request"
@@ -3502,7 +3143,7 @@ func NewSetExceptionBreakpointsRequest () *SetExceptionBreakpointsRequest {
 }
 
 // Returns a new `StepOutResponse` with the following fields set: `Command`, `Type`
-func NewStepOutResponse () *StepOutResponse {
+func NewStepOutResponse() *StepOutResponse {
 	newStepOutResponse := StepOutResponse{}
 	newStepOutResponse.Command = "stepOut"
 	newStepOutResponse.Type = "response"
@@ -3511,7 +3152,7 @@ func NewStepOutResponse () *StepOutResponse {
 }
 
 // Returns a new `StoppedEvent` with the following fields set: `Event_`, `Type`
-func NewStoppedEvent () *StoppedEvent {
+func NewStoppedEvent() *StoppedEvent {
 	newStoppedEvent := StoppedEvent{}
 	newStoppedEvent.Event_ = "stopped"
 	newStoppedEvent.Type = "event"
@@ -3520,7 +3161,7 @@ func NewStoppedEvent () *StoppedEvent {
 }
 
 // Returns a new `GotoRequest` with the following fields set: `Command`, `Type`
-func NewGotoRequest () *GotoRequest {
+func NewGotoRequest() *GotoRequest {
 	newGotoRequest := GotoRequest{}
 	newGotoRequest.Command = "goto"
 	newGotoRequest.Type = "request"
@@ -3529,7 +3170,7 @@ func NewGotoRequest () *GotoRequest {
 }
 
 // Returns a new `BreakpointEvent` with the following fields set: `Event_`, `Type`
-func NewBreakpointEvent () *BreakpointEvent {
+func NewBreakpointEvent() *BreakpointEvent {
 	newBreakpointEvent := BreakpointEvent{}
 	newBreakpointEvent.Event_ = "breakpoint"
 	newBreakpointEvent.Type = "event"
@@ -3538,7 +3179,7 @@ func NewBreakpointEvent () *BreakpointEvent {
 }
 
 // Returns a new `ScopesResponse` with the following fields set: `Command`, `Type`
-func NewScopesResponse () *ScopesResponse {
+func NewScopesResponse() *ScopesResponse {
 	newScopesResponse := ScopesResponse{}
 	newScopesResponse.Command = "scopes"
 	newScopesResponse.Type = "response"
@@ -3547,7 +3188,7 @@ func NewScopesResponse () *ScopesResponse {
 }
 
 // Returns a new `SetFunctionBreakpointsResponse` with the following fields set: `Command`, `Type`
-func NewSetFunctionBreakpointsResponse () *SetFunctionBreakpointsResponse {
+func NewSetFunctionBreakpointsResponse() *SetFunctionBreakpointsResponse {
 	newSetFunctionBreakpointsResponse := SetFunctionBreakpointsResponse{}
 	newSetFunctionBreakpointsResponse.Command = "setFunctionBreakpoints"
 	newSetFunctionBreakpointsResponse.Type = "response"
@@ -3556,7 +3197,7 @@ func NewSetFunctionBreakpointsResponse () *SetFunctionBreakpointsResponse {
 }
 
 // Returns a new `ContinueResponse` with the following fields set: `Command`, `Type`
-func NewContinueResponse () *ContinueResponse {
+func NewContinueResponse() *ContinueResponse {
 	newContinueResponse := ContinueResponse{}
 	newContinueResponse.Command = "continue"
 	newContinueResponse.Type = "response"
@@ -3565,7 +3206,7 @@ func NewContinueResponse () *ContinueResponse {
 }
 
 // Returns a new `RestartFrameResponse` with the following fields set: `Command`, `Type`
-func NewRestartFrameResponse () *RestartFrameResponse {
+func NewRestartFrameResponse() *RestartFrameResponse {
 	newRestartFrameResponse := RestartFrameResponse{}
 	newRestartFrameResponse.Command = "restartFrame"
 	newRestartFrameResponse.Type = "response"
@@ -3574,7 +3215,7 @@ func NewRestartFrameResponse () *RestartFrameResponse {
 }
 
 // Returns a new `LaunchRequest` with the following fields set: `Command`, `Type`
-func NewLaunchRequest () *LaunchRequest {
+func NewLaunchRequest() *LaunchRequest {
 	newLaunchRequest := LaunchRequest{}
 	newLaunchRequest.Command = "launch"
 	newLaunchRequest.Type = "request"
@@ -3583,7 +3224,7 @@ func NewLaunchRequest () *LaunchRequest {
 }
 
 // Returns a new `StepInTargetsResponse` with the following fields set: `Command`, `Type`
-func NewStepInTargetsResponse () *StepInTargetsResponse {
+func NewStepInTargetsResponse() *StepInTargetsResponse {
 	newStepInTargetsResponse := StepInTargetsResponse{}
 	newStepInTargetsResponse.Command = "stepInTargets"
 	newStepInTargetsResponse.Type = "response"
@@ -3592,7 +3233,7 @@ func NewStepInTargetsResponse () *StepInTargetsResponse {
 }
 
 // Returns a new `LoadedSourcesRequest` with the following fields set: `Command`, `Type`
-func NewLoadedSourcesRequest () *LoadedSourcesRequest {
+func NewLoadedSourcesRequest() *LoadedSourcesRequest {
 	newLoadedSourcesRequest := LoadedSourcesRequest{}
 	newLoadedSourcesRequest.Command = "loadedSources"
 	newLoadedSourcesRequest.Type = "request"
@@ -3601,7 +3242,7 @@ func NewLoadedSourcesRequest () *LoadedSourcesRequest {
 }
 
 // Returns a new `StepInTargetsRequest` with the following fields set: `Command`, `Type`
-func NewStepInTargetsRequest () *StepInTargetsRequest {
+func NewStepInTargetsRequest() *StepInTargetsRequest {
 	newStepInTargetsRequest := StepInTargetsRequest{}
 	newStepInTargetsRequest.Command = "stepInTargets"
 	newStepInTargetsRequest.Type = "request"
@@ -3610,7 +3251,7 @@ func NewStepInTargetsRequest () *StepInTargetsRequest {
 }
 
 // Returns a new `RestartResponse` with the following fields set: `Command`, `Type`
-func NewRestartResponse () *RestartResponse {
+func NewRestartResponse() *RestartResponse {
 	newRestartResponse := RestartResponse{}
 	newRestartResponse.Command = "restart"
 	newRestartResponse.Type = "response"
@@ -3619,7 +3260,7 @@ func NewRestartResponse () *RestartResponse {
 }
 
 // Returns a new `GotoTargetsResponse` with the following fields set: `Command`, `Type`
-func NewGotoTargetsResponse () *GotoTargetsResponse {
+func NewGotoTargetsResponse() *GotoTargetsResponse {
 	newGotoTargetsResponse := GotoTargetsResponse{}
 	newGotoTargetsResponse.Command = "gotoTargets"
 	newGotoTargetsResponse.Type = "response"
@@ -3628,7 +3269,7 @@ func NewGotoTargetsResponse () *GotoTargetsResponse {
 }
 
 // Returns a new `StepInResponse` with the following fields set: `Command`, `Type`
-func NewStepInResponse () *StepInResponse {
+func NewStepInResponse() *StepInResponse {
 	newStepInResponse := StepInResponse{}
 	newStepInResponse.Command = "stepIn"
 	newStepInResponse.Type = "response"
@@ -3637,7 +3278,7 @@ func NewStepInResponse () *StepInResponse {
 }
 
 // Returns a new `EvaluateResponse` with the following fields set: `Command`, `Type`
-func NewEvaluateResponse () *EvaluateResponse {
+func NewEvaluateResponse() *EvaluateResponse {
 	newEvaluateResponse := EvaluateResponse{}
 	newEvaluateResponse.Command = "evaluate"
 	newEvaluateResponse.Type = "response"
@@ -3646,7 +3287,7 @@ func NewEvaluateResponse () *EvaluateResponse {
 }
 
 // Returns a new `SetBreakpointsRequest` with the following fields set: `Command`, `Type`
-func NewSetBreakpointsRequest () *SetBreakpointsRequest {
+func NewSetBreakpointsRequest() *SetBreakpointsRequest {
 	newSetBreakpointsRequest := SetBreakpointsRequest{}
 	newSetBreakpointsRequest.Command = "setBreakpoints"
 	newSetBreakpointsRequest.Type = "request"
@@ -3655,7 +3296,7 @@ func NewSetBreakpointsRequest () *SetBreakpointsRequest {
 }
 
 // Returns a new `RestartRequest` with the following fields set: `Command`, `Type`
-func NewRestartRequest () *RestartRequest {
+func NewRestartRequest() *RestartRequest {
 	newRestartRequest := RestartRequest{}
 	newRestartRequest.Command = "restart"
 	newRestartRequest.Type = "request"
@@ -3664,7 +3305,7 @@ func NewRestartRequest () *RestartRequest {
 }
 
 // Returns a new `RunInTerminalRequest` with the following fields set: `Command`, `Type`
-func NewRunInTerminalRequest () *RunInTerminalRequest {
+func NewRunInTerminalRequest() *RunInTerminalRequest {
 	newRunInTerminalRequest := RunInTerminalRequest{}
 	newRunInTerminalRequest.Command = "runInTerminal"
 	newRunInTerminalRequest.Type = "request"
@@ -3673,7 +3314,7 @@ func NewRunInTerminalRequest () *RunInTerminalRequest {
 }
 
 // Returns a new `InitializeResponse` with the following fields set: `Command`, `Type`
-func NewInitializeResponse () *InitializeResponse {
+func NewInitializeResponse() *InitializeResponse {
 	newInitializeResponse := InitializeResponse{}
 	newInitializeResponse.Command = "initialize"
 	newInitializeResponse.Type = "response"
@@ -3682,7 +3323,7 @@ func NewInitializeResponse () *InitializeResponse {
 }
 
 // Returns a new `ContinueRequest` with the following fields set: `Command`, `Type`
-func NewContinueRequest () *ContinueRequest {
+func NewContinueRequest() *ContinueRequest {
 	newContinueRequest := ContinueRequest{}
 	newContinueRequest.Command = "continue"
 	newContinueRequest.Type = "request"
@@ -3691,7 +3332,7 @@ func NewContinueRequest () *ContinueRequest {
 }
 
 // Returns a new `LoadedSourcesResponse` with the following fields set: `Command`, `Type`
-func NewLoadedSourcesResponse () *LoadedSourcesResponse {
+func NewLoadedSourcesResponse() *LoadedSourcesResponse {
 	newLoadedSourcesResponse := LoadedSourcesResponse{}
 	newLoadedSourcesResponse.Command = "loadedSources"
 	newLoadedSourcesResponse.Type = "response"
@@ -3700,7 +3341,7 @@ func NewLoadedSourcesResponse () *LoadedSourcesResponse {
 }
 
 // Returns a new `StackTraceResponse` with the following fields set: `Command`, `Type`
-func NewStackTraceResponse () *StackTraceResponse {
+func NewStackTraceResponse() *StackTraceResponse {
 	newStackTraceResponse := StackTraceResponse{}
 	newStackTraceResponse.Command = "stackTrace"
 	newStackTraceResponse.Type = "response"
@@ -3709,7 +3350,7 @@ func NewStackTraceResponse () *StackTraceResponse {
 }
 
 // Returns a new `VariablesRequest` with the following fields set: `Command`, `Type`
-func NewVariablesRequest () *VariablesRequest {
+func NewVariablesRequest() *VariablesRequest {
 	newVariablesRequest := VariablesRequest{}
 	newVariablesRequest.Command = "variables"
 	newVariablesRequest.Type = "request"
@@ -3718,7 +3359,7 @@ func NewVariablesRequest () *VariablesRequest {
 }
 
 // Returns a new `ThreadsRequest` with the following fields set: `Command`, `Type`
-func NewThreadsRequest () *ThreadsRequest {
+func NewThreadsRequest() *ThreadsRequest {
 	newThreadsRequest := ThreadsRequest{}
 	newThreadsRequest.Command = "threads"
 	newThreadsRequest.Type = "request"
@@ -3727,7 +3368,7 @@ func NewThreadsRequest () *ThreadsRequest {
 }
 
 // Returns a new `ModulesResponse` with the following fields set: `Command`, `Type`
-func NewModulesResponse () *ModulesResponse {
+func NewModulesResponse() *ModulesResponse {
 	newModulesResponse := ModulesResponse{}
 	newModulesResponse.Command = "modules"
 	newModulesResponse.Type = "response"
@@ -3736,7 +3377,7 @@ func NewModulesResponse () *ModulesResponse {
 }
 
 // Returns a new `ThreadsResponse` with the following fields set: `Command`, `Type`
-func NewThreadsResponse () *ThreadsResponse {
+func NewThreadsResponse() *ThreadsResponse {
 	newThreadsResponse := ThreadsResponse{}
 	newThreadsResponse.Command = "threads"
 	newThreadsResponse.Type = "response"
@@ -3745,7 +3386,7 @@ func NewThreadsResponse () *ThreadsResponse {
 }
 
 // Returns a new `PauseResponse` with the following fields set: `Command`, `Type`
-func NewPauseResponse () *PauseResponse {
+func NewPauseResponse() *PauseResponse {
 	newPauseResponse := PauseResponse{}
 	newPauseResponse.Command = "pause"
 	newPauseResponse.Type = "response"
@@ -3754,7 +3395,7 @@ func NewPauseResponse () *PauseResponse {
 }
 
 // Returns a new `SetExceptionBreakpointsResponse` with the following fields set: `Command`, `Type`
-func NewSetExceptionBreakpointsResponse () *SetExceptionBreakpointsResponse {
+func NewSetExceptionBreakpointsResponse() *SetExceptionBreakpointsResponse {
 	newSetExceptionBreakpointsResponse := SetExceptionBreakpointsResponse{}
 	newSetExceptionBreakpointsResponse.Command = "setExceptionBreakpoints"
 	newSetExceptionBreakpointsResponse.Type = "response"
@@ -3763,7 +3404,7 @@ func NewSetExceptionBreakpointsResponse () *SetExceptionBreakpointsResponse {
 }
 
 // Returns a new `ExceptionInfoResponse` with the following fields set: `Command`, `Type`
-func NewExceptionInfoResponse () *ExceptionInfoResponse {
+func NewExceptionInfoResponse() *ExceptionInfoResponse {
 	newExceptionInfoResponse := ExceptionInfoResponse{}
 	newExceptionInfoResponse.Command = "exceptionInfo"
 	newExceptionInfoResponse.Type = "response"
@@ -3772,7 +3413,7 @@ func NewExceptionInfoResponse () *ExceptionInfoResponse {
 }
 
 // Returns a new `SetBreakpointsResponse` with the following fields set: `Command`, `Type`
-func NewSetBreakpointsResponse () *SetBreakpointsResponse {
+func NewSetBreakpointsResponse() *SetBreakpointsResponse {
 	newSetBreakpointsResponse := SetBreakpointsResponse{}
 	newSetBreakpointsResponse.Command = "setBreakpoints"
 	newSetBreakpointsResponse.Type = "response"
@@ -3781,7 +3422,7 @@ func NewSetBreakpointsResponse () *SetBreakpointsResponse {
 }
 
 // Returns a new `LaunchResponse` with the following fields set: `Command`, `Type`
-func NewLaunchResponse () *LaunchResponse {
+func NewLaunchResponse() *LaunchResponse {
 	newLaunchResponse := LaunchResponse{}
 	newLaunchResponse.Command = "launch"
 	newLaunchResponse.Type = "response"
@@ -3790,7 +3431,7 @@ func NewLaunchResponse () *LaunchResponse {
 }
 
 // Returns a new `ConfigurationDoneResponse` with the following fields set: `Command`, `Type`
-func NewConfigurationDoneResponse () *ConfigurationDoneResponse {
+func NewConfigurationDoneResponse() *ConfigurationDoneResponse {
 	newConfigurationDoneResponse := ConfigurationDoneResponse{}
 	newConfigurationDoneResponse.Command = "configurationDone"
 	newConfigurationDoneResponse.Type = "response"
@@ -3799,7 +3440,7 @@ func NewConfigurationDoneResponse () *ConfigurationDoneResponse {
 }
 
 // Returns a new `ScopesRequest` with the following fields set: `Command`, `Type`
-func NewScopesRequest () *ScopesRequest {
+func NewScopesRequest() *ScopesRequest {
 	newScopesRequest := ScopesRequest{}
 	newScopesRequest.Command = "scopes"
 	newScopesRequest.Type = "request"
@@ -3808,7 +3449,7 @@ func NewScopesRequest () *ScopesRequest {
 }
 
 // Returns a new `DisconnectResponse` with the following fields set: `Command`, `Type`
-func NewDisconnectResponse () *DisconnectResponse {
+func NewDisconnectResponse() *DisconnectResponse {
 	newDisconnectResponse := DisconnectResponse{}
 	newDisconnectResponse.Command = "disconnect"
 	newDisconnectResponse.Type = "response"
@@ -3817,7 +3458,7 @@ func NewDisconnectResponse () *DisconnectResponse {
 }
 
 // Returns a new `ContinuedEvent` with the following fields set: `Event_`, `Type`
-func NewContinuedEvent () *ContinuedEvent {
+func NewContinuedEvent() *ContinuedEvent {
 	newContinuedEvent := ContinuedEvent{}
 	newContinuedEvent.Event_ = "continued"
 	newContinuedEvent.Type = "event"
@@ -3826,7 +3467,7 @@ func NewContinuedEvent () *ContinuedEvent {
 }
 
 // Returns a new `StepBackRequest` with the following fields set: `Command`, `Type`
-func NewStepBackRequest () *StepBackRequest {
+func NewStepBackRequest() *StepBackRequest {
 	newStepBackRequest := StepBackRequest{}
 	newStepBackRequest.Command = "stepBack"
 	newStepBackRequest.Type = "request"
@@ -3835,7 +3476,7 @@ func NewStepBackRequest () *StepBackRequest {
 }
 
 // Returns a new `GotoResponse` with the following fields set: `Command`, `Type`
-func NewGotoResponse () *GotoResponse {
+func NewGotoResponse() *GotoResponse {
 	newGotoResponse := GotoResponse{}
 	newGotoResponse.Command = "goto"
 	newGotoResponse.Type = "response"
@@ -3843,575 +3484,1181 @@ func NewGotoResponse () *GotoResponse {
 	return &newGotoResponse
 }
 
-
 // TryUnmarshalProtocolMessage attempts to unmarshal JSON string `js` (if it starts with a `{` and ends with a `}`) into a `struct` based on `ProtocolMessage` as follows:
-// 
+//
 // If `js` contains `"type":"request"`, attempts to unmarshal via `TryUnmarshalRequest`
-// 
+//
 // If `js` contains `"type":"response"`, attempts to unmarshal via `TryUnmarshalResponse`
-// 
+//
 // If `js` contains `"type":"event"`, attempts to unmarshal via `TryUnmarshalEvent`
-// 
+//
 // Otherwise, `err`'s message will be: `ProtocolMessage: encountered unknown JSON value for type: ` followed by the `type` value encountered.
-// 
+//
 // In general: the `err` returned may be either `nil`, the above message, or an `encoding/json.Unmarshal()` return value.
 // `ptr` will be a pointer to the unmarshaled `struct` value if that succeeded, else `nil`.
 // Both `err` and `ptr` will be `nil` if `js` doesn't: start with `{` and end with `}` and contain `"type":"` followed by a subsequent `"`.
-func TryUnmarshalProtocolMessage (js string) (ptr interface{}, err error) {
-	if len(js)==0 || js[0]!='{' || js[len(js)-1]!='}' { return }
-	i1 := strings.Index(js, "\"type\":\"")  ;  if i1<1 { return }
+func TryUnmarshalProtocolMessage(js string) (ptr interface{}, err error) {
+	if len(js) == 0 || js[0] != '{' || js[len(js)-1] != '}' {
+		return
+	}
+	i1 := strings.Index(js, "\"type\":\"")
+	if i1 < 1 {
+		return
+	}
 	subjs := js[i1+4+4:]
-	i2 := strings.Index(subjs, "\"")  ;  if i2<1 { return }
-	type_of_ProtocolMessage := subjs[:i2]  ;  switch type_of_ProtocolMessage {
-	case "request":  ptr,err = TryUnmarshalRequest(js)
-	case "response":  ptr,err = TryUnmarshalResponse(js)
-	case "event":  ptr,err = TryUnmarshalEvent(js)
-	default: err = errors.New("ProtocolMessage: encountered unknown JSON value for type: " + type_of_ProtocolMessage)
+	i2 := strings.Index(subjs, "\"")
+	if i2 < 1 {
+		return
+	}
+	type_of_ProtocolMessage := subjs[:i2]
+	switch type_of_ProtocolMessage {
+	case "request":
+		ptr, err = TryUnmarshalRequest(js)
+	case "response":
+		ptr, err = TryUnmarshalResponse(js)
+	case "event":
+		ptr, err = TryUnmarshalEvent(js)
+	default:
+		err = errors.New("ProtocolMessage: encountered unknown JSON value for type: " + type_of_ProtocolMessage)
 	}
 	return
 }
 
-
 // TryUnmarshalEvent attempts to unmarshal JSON string `js` (if it starts with a `{` and ends with a `}`) into a `struct` based on `Event` as follows:
-// 
+//
 // If `js` contains `"event":"exited"`, attempts to unmarshal into a new `ExitedEvent`.
-// 
+//
 // If `js` contains `"event":"breakpoint"`, attempts to unmarshal into a new `BreakpointEvent`.
-// 
+//
 // If `js` contains `"event":"thread"`, attempts to unmarshal into a new `ThreadEvent`.
-// 
+//
 // If `js` contains `"event":"stopped"`, attempts to unmarshal into a new `StoppedEvent`.
-// 
+//
 // If `js` contains `"event":"terminated"`, attempts to unmarshal into a new `TerminatedEvent`.
-// 
+//
 // If `js` contains `"event":"process"`, attempts to unmarshal into a new `ProcessEvent`.
-// 
+//
 // If `js` contains `"event":"initialized"`, attempts to unmarshal into a new `InitializedEvent`.
-// 
+//
 // If `js` contains `"event":"output"`, attempts to unmarshal into a new `OutputEvent`.
-// 
+//
 // If `js` contains `"event":"module"`, attempts to unmarshal into a new `ModuleEvent`.
-// 
+//
 // If `js` contains `"event":"loadedSource"`, attempts to unmarshal into a new `LoadedSourceEvent`.
-// 
+//
 // If `js` contains `"event":"continued"`, attempts to unmarshal into a new `ContinuedEvent`.
-// 
+//
 // Otherwise, `err`'s message will be: `Event: encountered unknown JSON value for event: ` followed by the `event` value encountered.
-// 
+//
 // In general: the `err` returned may be either `nil`, the above message, or an `encoding/json.Unmarshal()` return value.
 // `ptr` will be a pointer to the unmarshaled `struct` value if that succeeded, else `nil`.
 // Both `err` and `ptr` will be `nil` if `js` doesn't: start with `{` and end with `}` and contain `"event":"` followed by a subsequent `"`.
-func TryUnmarshalEvent (js string) (ptr interface{}, err error) {
-	if len(js)==0 || js[0]!='{' || js[len(js)-1]!='}' { return }
-	i1 := strings.Index(js, "\"event\":\"")  ;  if i1<1 { return }
+func TryUnmarshalEvent(js string) (ptr interface{}, err error) {
+	if len(js) == 0 || js[0] != '{' || js[len(js)-1] != '}' {
+		return
+	}
+	i1 := strings.Index(js, "\"event\":\"")
+	if i1 < 1 {
+		return
+	}
 	subjs := js[i1+4+5:]
-	i2 := strings.Index(subjs, "\"")  ;  if i2<1 { return }
-	event_of_Event := subjs[:i2]  ;  switch event_of_Event {
-	case "breakpoint":  var val BreakpointEvent  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "thread":  var val ThreadEvent  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "stopped":  var val StoppedEvent  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "terminated":  var val TerminatedEvent  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "exited":  var val ExitedEvent  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "initialized":  var val InitializedEvent  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "output":  var val OutputEvent  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "module":  var val ModuleEvent  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "loadedSource":  var val LoadedSourceEvent  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "continued":  var val ContinuedEvent  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "process":  var val ProcessEvent  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	default: err = errors.New("Event: encountered unknown JSON value for event: " + event_of_Event)
+	i2 := strings.Index(subjs, "\"")
+	if i2 < 1 {
+		return
+	}
+	event_of_Event := subjs[:i2]
+	switch event_of_Event {
+	case "breakpoint":
+		var val BreakpointEvent
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "thread":
+		var val ThreadEvent
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "stopped":
+		var val StoppedEvent
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "terminated":
+		var val TerminatedEvent
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "exited":
+		var val ExitedEvent
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "initialized":
+		var val InitializedEvent
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "output":
+		var val OutputEvent
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "module":
+		var val ModuleEvent
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "loadedSource":
+		var val LoadedSourceEvent
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "continued":
+		var val ContinuedEvent
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "process":
+		var val ProcessEvent
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	default:
+		err = errors.New("Event: encountered unknown JSON value for event: " + event_of_Event)
 	}
 	return
 }
-
 
 // TryUnmarshalRequest attempts to unmarshal JSON string `js` (if it starts with a `{` and ends with a `}`) into a `struct` based on `Request` as follows:
-// 
+//
 // If `js` contains `"command":"reverseContinue"`, attempts to unmarshal into a new `ReverseContinueRequest`.
-// 
+//
 // If `js` contains `"command":"source"`, attempts to unmarshal into a new `SourceRequest`.
-// 
+//
 // If `js` contains `"command":"modules"`, attempts to unmarshal into a new `ModulesRequest`.
-// 
+//
 // If `js` contains `"command":"runInTerminal"`, attempts to unmarshal into a new `RunInTerminalRequest`.
-// 
+//
 // If `js` contains `"command":"stepInTargets"`, attempts to unmarshal into a new `StepInTargetsRequest`.
-// 
+//
 // If `js` contains `"command":"restart"`, attempts to unmarshal into a new `RestartRequest`.
-// 
+//
 // If `js` contains `"command":"restartFrame"`, attempts to unmarshal into a new `RestartFrameRequest`.
-// 
+//
 // If `js` contains `"command":"initialize"`, attempts to unmarshal into a new `InitializeRequest`.
-// 
+//
 // If `js` contains `"command":"evaluate"`, attempts to unmarshal into a new `EvaluateRequest`.
-// 
+//
 // If `js` contains `"command":"continue"`, attempts to unmarshal into a new `ContinueRequest`.
-// 
+//
 // If `js` contains `"command":"stackTrace"`, attempts to unmarshal into a new `StackTraceRequest`.
-// 
+//
 // If `js` contains `"command":"disconnect"`, attempts to unmarshal into a new `DisconnectRequest`.
-// 
+//
 // If `js` contains `"command":"attach"`, attempts to unmarshal into a new `AttachRequest`.
-// 
+//
 // If `js` contains `"command":"loadedSources"`, attempts to unmarshal into a new `LoadedSourcesRequest`.
-// 
+//
 // If `js` contains `"command":"stepOut"`, attempts to unmarshal into a new `StepOutRequest`.
-// 
+//
 // If `js` contains `"command":"setVariable"`, attempts to unmarshal into a new `SetVariableRequest`.
-// 
+//
 // If `js` contains `"command":"gotoTargets"`, attempts to unmarshal into a new `GotoTargetsRequest`.
-// 
+//
 // If `js` contains `"command":"launch"`, attempts to unmarshal into a new `LaunchRequest`.
-// 
+//
 // If `js` contains `"command":"configurationDone"`, attempts to unmarshal into a new `ConfigurationDoneRequest`.
-// 
+//
 // If `js` contains `"command":"setFunctionBreakpoints"`, attempts to unmarshal into a new `SetFunctionBreakpointsRequest`.
-// 
+//
 // If `js` contains `"command":"setExceptionBreakpoints"`, attempts to unmarshal into a new `SetExceptionBreakpointsRequest`.
-// 
+//
 // If `js` contains `"command":"stepIn"`, attempts to unmarshal into a new `StepInRequest`.
-// 
+//
 // If `js` contains `"command":"setBreakpoints"`, attempts to unmarshal into a new `SetBreakpointsRequest`.
-// 
+//
 // If `js` contains `"command":"goto"`, attempts to unmarshal into a new `GotoRequest`.
-// 
+//
 // If `js` contains `"command":"variables"`, attempts to unmarshal into a new `VariablesRequest`.
-// 
+//
 // If `js` contains `"command":"completions"`, attempts to unmarshal into a new `CompletionsRequest`.
-// 
+//
 // If `js` contains `"command":"threads"`, attempts to unmarshal into a new `ThreadsRequest`.
-// 
+//
 // If `js` contains `"command":"exceptionInfo"`, attempts to unmarshal into a new `ExceptionInfoRequest`.
-// 
+//
 // If `js` contains `"command":"next"`, attempts to unmarshal into a new `NextRequest`.
-// 
+//
 // If `js` contains `"command":"scopes"`, attempts to unmarshal into a new `ScopesRequest`.
-// 
+//
 // If `js` contains `"command":"pause"`, attempts to unmarshal into a new `PauseRequest`.
-// 
+//
 // If `js` contains `"command":"stepBack"`, attempts to unmarshal into a new `StepBackRequest`.
-// 
+//
 // Otherwise, `err`'s message will be: `Request: encountered unknown JSON value for command: ` followed by the `command` value encountered.
-// 
+//
 // In general: the `err` returned may be either `nil`, the above message, or an `encoding/json.Unmarshal()` return value.
 // `ptr` will be a pointer to the unmarshaled `struct` value if that succeeded, else `nil`.
 // Both `err` and `ptr` will be `nil` if `js` doesn't: start with `{` and end with `}` and contain `"command":"` followed by a subsequent `"`.
-func TryUnmarshalRequest (js string) (ptr interface{}, err error) {
-	if len(js)==0 || js[0]!='{' || js[len(js)-1]!='}' { return }
-	i1 := strings.Index(js, "\"command\":\"")  ;  if i1<1 { return }
+func TryUnmarshalRequest(js string) (ptr interface{}, err error) {
+	if len(js) == 0 || js[0] != '{' || js[len(js)-1] != '}' {
+		return
+	}
+	i1 := strings.Index(js, "\"command\":\"")
+	if i1 < 1 {
+		return
+	}
 	subjs := js[i1+4+7:]
-	i2 := strings.Index(subjs, "\"")  ;  if i2<1 { return }
-	command_of_Request := subjs[:i2]  ;  switch command_of_Request {
-	case "reverseContinue":  var val ReverseContinueRequest  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "source":  var val SourceRequest  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "modules":  var val ModulesRequest  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "runInTerminal":  var val RunInTerminalRequest  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "stepInTargets":  var val StepInTargetsRequest  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "restart":  var val RestartRequest  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "restartFrame":  var val RestartFrameRequest  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "initialize":  var val InitializeRequest  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "evaluate":  var val EvaluateRequest  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "continue":  var val ContinueRequest  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "attach":  var val AttachRequest  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "loadedSources":  var val LoadedSourcesRequest  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "stepOut":  var val StepOutRequest  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "setVariable":  var val SetVariableRequest  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "stackTrace":  var val StackTraceRequest  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "disconnect":  var val DisconnectRequest  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "gotoTargets":  var val GotoTargetsRequest  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "launch":  var val LaunchRequest  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "stepIn":  var val StepInRequest  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "setBreakpoints":  var val SetBreakpointsRequest  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "goto":  var val GotoRequest  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "variables":  var val VariablesRequest  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "configurationDone":  var val ConfigurationDoneRequest  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "setFunctionBreakpoints":  var val SetFunctionBreakpointsRequest  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "setExceptionBreakpoints":  var val SetExceptionBreakpointsRequest  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "threads":  var val ThreadsRequest  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "exceptionInfo":  var val ExceptionInfoRequest  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "next":  var val NextRequest  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "scopes":  var val ScopesRequest  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "completions":  var val CompletionsRequest  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "pause":  var val PauseRequest  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "stepBack":  var val StepBackRequest  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	default: err = errors.New("Request: encountered unknown JSON value for command: " + command_of_Request)
+	i2 := strings.Index(subjs, "\"")
+	if i2 < 1 {
+		return
+	}
+	command_of_Request := subjs[:i2]
+	switch command_of_Request {
+	case "reverseContinue":
+		var val ReverseContinueRequest
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "source":
+		var val SourceRequest
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "modules":
+		var val ModulesRequest
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "runInTerminal":
+		var val RunInTerminalRequest
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "stepInTargets":
+		var val StepInTargetsRequest
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "restart":
+		var val RestartRequest
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "restartFrame":
+		var val RestartFrameRequest
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "initialize":
+		var val InitializeRequest
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "evaluate":
+		var val EvaluateRequest
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "continue":
+		var val ContinueRequest
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "attach":
+		var val AttachRequest
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "loadedSources":
+		var val LoadedSourcesRequest
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "stepOut":
+		var val StepOutRequest
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "setVariable":
+		var val SetVariableRequest
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "stackTrace":
+		var val StackTraceRequest
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "disconnect":
+		var val DisconnectRequest
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "gotoTargets":
+		var val GotoTargetsRequest
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "launch":
+		var val LaunchRequest
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "stepIn":
+		var val StepInRequest
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "setBreakpoints":
+		var val SetBreakpointsRequest
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "goto":
+		var val GotoRequest
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "variables":
+		var val VariablesRequest
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "configurationDone":
+		var val ConfigurationDoneRequest
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "setFunctionBreakpoints":
+		var val SetFunctionBreakpointsRequest
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "setExceptionBreakpoints":
+		var val SetExceptionBreakpointsRequest
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "threads":
+		var val ThreadsRequest
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "exceptionInfo":
+		var val ExceptionInfoRequest
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "next":
+		var val NextRequest
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "scopes":
+		var val ScopesRequest
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "completions":
+		var val CompletionsRequest
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "pause":
+		var val PauseRequest
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "stepBack":
+		var val StepBackRequest
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	default:
+		err = errors.New("Request: encountered unknown JSON value for command: " + command_of_Request)
 	}
 	return
 }
 
-
 // TryUnmarshalResponse attempts to unmarshal JSON string `js` (if it starts with a `{` and ends with a `}`) into a `struct` based on `Response` as follows:
-// 
+//
 // If `js` contains `"command":"scopes"`, attempts to unmarshal into a new `ScopesResponse`.
-// 
+//
 // If `js` contains `"command":"continue"`, attempts to unmarshal into a new `ContinueResponse`.
-// 
+//
 // If `js` contains `"command":"attach"`, attempts to unmarshal into a new `AttachResponse`.
-// 
+//
 // If `js` contains `"command":"reverseContinue"`, attempts to unmarshal into a new `ReverseContinueResponse`.
-// 
+//
 // If `js` contains `"command":"disconnect"`, attempts to unmarshal into a new `DisconnectResponse`.
-// 
+//
 // If `js` contains `"command":"configurationDone"`, attempts to unmarshal into a new `ConfigurationDoneResponse`.
-// 
+//
 // If `js` contains `"command":"stepOut"`, attempts to unmarshal into a new `StepOutResponse`.
-// 
+//
 // If `js` contains `"command":"source"`, attempts to unmarshal into a new `SourceResponse`.
-// 
+//
 // If `js` contains `"command":"setFunctionBreakpoints"`, attempts to unmarshal into a new `SetFunctionBreakpointsResponse`.
-// 
+//
 // If `js` contains `"command":"launch"`, attempts to unmarshal into a new `LaunchResponse`.
-// 
+//
 // If `js` contains `"command":"runInTerminal"`, attempts to unmarshal into a new `RunInTerminalResponse`.
-// 
+//
 // If `js` contains `"command":"loadedSources"`, attempts to unmarshal into a new `LoadedSourcesResponse`.
-// 
+//
 // If `js` contains `"command":"next"`, attempts to unmarshal into a new `NextResponse`.
-// 
+//
 // If `js` contains `"command":"exceptionInfo"`, attempts to unmarshal into a new `ExceptionInfoResponse`.
-// 
+//
 // If `js` contains `"command":"stepIn"`, attempts to unmarshal into a new `StepInResponse`.
-// 
+//
 // If `js` contains `"command":"goto"`, attempts to unmarshal into a new `GotoResponse`.
-// 
+//
 // If `js` contains `"command":"restart"`, attempts to unmarshal into a new `RestartResponse`.
-// 
+//
 // If `js` contains `"command":"setExceptionBreakpoints"`, attempts to unmarshal into a new `SetExceptionBreakpointsResponse`.
-// 
+//
 // If `js` contains `"command":"completions"`, attempts to unmarshal into a new `CompletionsResponse`.
-// 
+//
 // If `js` contains `"command":"variables"`, attempts to unmarshal into a new `VariablesResponse`.
-// 
+//
 // If `js` contains `"command":"restartFrame"`, attempts to unmarshal into a new `RestartFrameResponse`.
-// 
+//
 // If `js` contains `"command":"evaluate"`, attempts to unmarshal into a new `EvaluateResponse`.
-// 
+//
 // If `js` contains `"command":"setBreakpoints"`, attempts to unmarshal into a new `SetBreakpointsResponse`.
-// 
+//
 // If `js` contains `"command":"pause"`, attempts to unmarshal into a new `PauseResponse`.
-// 
+//
 // If `js` contains `"command":"setVariable"`, attempts to unmarshal into a new `SetVariableResponse`.
-// 
+//
 // If `js` contains `"command":"initialize"`, attempts to unmarshal into a new `InitializeResponse`.
-// 
+//
 // If `js` contains `"command":"stackTrace"`, attempts to unmarshal into a new `StackTraceResponse`.
-// 
+//
 // If `js` contains `"command":"stepInTargets"`, attempts to unmarshal into a new `StepInTargetsResponse`.
-// 
+//
 // If `js` contains `"command":"threads"`, attempts to unmarshal into a new `ThreadsResponse`.
-// 
+//
 // If `js` contains `"command":"gotoTargets"`, attempts to unmarshal into a new `GotoTargetsResponse`.
-// 
+//
 // If `js` contains `"command":"stepBack"`, attempts to unmarshal into a new `StepBackResponse`.
-// 
+//
 // If `js` contains `"command":"modules"`, attempts to unmarshal into a new `ModulesResponse`.
-// 
+//
 // Otherwise, `err`'s message will be: `Response: encountered unknown JSON value for command: ` followed by the `command` value encountered.
-// 
+//
 // In general: the `err` returned may be either `nil`, the above message, or an `encoding/json.Unmarshal()` return value.
 // `ptr` will be a pointer to the unmarshaled `struct` value if that succeeded, else `nil`.
 // Both `err` and `ptr` will be `nil` if `js` doesn't: start with `{` and end with `}` and contain `"command":"` followed by a subsequent `"`.
-func TryUnmarshalResponse (js string) (ptr interface{}, err error) {
-	if len(js)==0 || js[0]!='{' || js[len(js)-1]!='}' { return }
-	i1 := strings.Index(js, "\"command\":\"")  ;  if i1<1 { return }
+func TryUnmarshalResponse(js string) (ptr interface{}, err error) {
+	if len(js) == 0 || js[0] != '{' || js[len(js)-1] != '}' {
+		return
+	}
+	i1 := strings.Index(js, "\"command\":\"")
+	if i1 < 1 {
+		return
+	}
 	subjs := js[i1+4+7:]
-	i2 := strings.Index(subjs, "\"")  ;  if i2<1 { return }
-	command_of_Response := subjs[:i2]  ;  switch command_of_Response {
-	case "setBreakpoints":  var val SetBreakpointsResponse  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "pause":  var val PauseResponse  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "restartFrame":  var val RestartFrameResponse  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "evaluate":  var val EvaluateResponse  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "stackTrace":  var val StackTraceResponse  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "stepInTargets":  var val StepInTargetsResponse  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "threads":  var val ThreadsResponse  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "setVariable":  var val SetVariableResponse  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "initialize":  var val InitializeResponse  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "modules":  var val ModulesResponse  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "gotoTargets":  var val GotoTargetsResponse  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "stepBack":  var val StepBackResponse  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "continue":  var val ContinueResponse  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "scopes":  var val ScopesResponse  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "disconnect":  var val DisconnectResponse  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "configurationDone":  var val ConfigurationDoneResponse  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "attach":  var val AttachResponse  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "reverseContinue":  var val ReverseContinueResponse  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "setFunctionBreakpoints":  var val SetFunctionBreakpointsResponse  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "launch":  var val LaunchResponse  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "runInTerminal":  var val RunInTerminalResponse  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "loadedSources":  var val LoadedSourcesResponse  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "next":  var val NextResponse  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "stepOut":  var val StepOutResponse  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "source":  var val SourceResponse  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "stepIn":  var val StepInResponse  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "exceptionInfo":  var val ExceptionInfoResponse  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "setExceptionBreakpoints":  var val SetExceptionBreakpointsResponse  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "completions":  var val CompletionsResponse  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "variables":  var val VariablesResponse  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "goto":  var val GotoResponse  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	case "restart":  var val RestartResponse  ;  if err = json.Unmarshal([]byte(js), &val); err==nil { val.propagateFieldsToBase()  ;  ptr = &val }
-	default: err = errors.New("Response: encountered unknown JSON value for command: " + command_of_Response)
+	i2 := strings.Index(subjs, "\"")
+	if i2 < 1 {
+		return
+	}
+	command_of_Response := subjs[:i2]
+	switch command_of_Response {
+	case "setBreakpoints":
+		var val SetBreakpointsResponse
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "pause":
+		var val PauseResponse
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "restartFrame":
+		var val RestartFrameResponse
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "evaluate":
+		var val EvaluateResponse
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "stackTrace":
+		var val StackTraceResponse
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "stepInTargets":
+		var val StepInTargetsResponse
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "threads":
+		var val ThreadsResponse
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "setVariable":
+		var val SetVariableResponse
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "initialize":
+		var val InitializeResponse
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "modules":
+		var val ModulesResponse
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "gotoTargets":
+		var val GotoTargetsResponse
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "stepBack":
+		var val StepBackResponse
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "continue":
+		var val ContinueResponse
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "scopes":
+		var val ScopesResponse
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "disconnect":
+		var val DisconnectResponse
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "configurationDone":
+		var val ConfigurationDoneResponse
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "attach":
+		var val AttachResponse
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "reverseContinue":
+		var val ReverseContinueResponse
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "setFunctionBreakpoints":
+		var val SetFunctionBreakpointsResponse
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "launch":
+		var val LaunchResponse
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "runInTerminal":
+		var val RunInTerminalResponse
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "loadedSources":
+		var val LoadedSourcesResponse
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "next":
+		var val NextResponse
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "stepOut":
+		var val StepOutResponse
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "source":
+		var val SourceResponse
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "stepIn":
+		var val StepInResponse
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "exceptionInfo":
+		var val ExceptionInfoResponse
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "setExceptionBreakpoints":
+		var val SetExceptionBreakpointsResponse
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "completions":
+		var val CompletionsResponse
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "variables":
+		var val VariablesResponse
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "goto":
+		var val GotoResponse
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	case "restart":
+		var val RestartResponse
+		if err = json.Unmarshal([]byte(js), &val); err == nil {
+			val.propagateFieldsToBase()
+			ptr = &val
+		}
+	default:
+		err = errors.New("Response: encountered unknown JSON value for command: " + command_of_Response)
 	}
 	return
 }
 
 // Called by `HandleRequest` (after it unmarshaled the given `AttachRequest`) to further populate the given `AttachResponse` before returning it to its caller (in addition to this handler's returned `error`).
-var OnAttachRequest func(*AttachRequest, *AttachResponse)error
+var OnAttachRequest func(*AttachRequest, *AttachResponse) error
 
 // Called by `HandleRequest` (after it unmarshaled the given `StepBackRequest`) to further populate the given `StepBackResponse` before returning it to its caller (in addition to this handler's returned `error`).
-var OnStepBackRequest func(*StepBackRequest, *StepBackResponse)error
+var OnStepBackRequest func(*StepBackRequest, *StepBackResponse) error
 
 // Called by `HandleRequest` (after it unmarshaled the given `RestartFrameRequest`) to further populate the given `RestartFrameResponse` before returning it to its caller (in addition to this handler's returned `error`).
-var OnRestartFrameRequest func(*RestartFrameRequest, *RestartFrameResponse)error
+var OnRestartFrameRequest func(*RestartFrameRequest, *RestartFrameResponse) error
 
 // Called by `HandleRequest` (after it unmarshaled the given `InitializeRequest`) to further populate the given `InitializeResponse` before returning it to its caller (in addition to this handler's returned `error`).
-var OnInitializeRequest func(*InitializeRequest, *InitializeResponse)error
+var OnInitializeRequest func(*InitializeRequest, *InitializeResponse) error
 
 // Called by `HandleRequest` (after it unmarshaled the given `StackTraceRequest`) to further populate the given `StackTraceResponse` before returning it to its caller (in addition to this handler's returned `error`).
-var OnStackTraceRequest func(*StackTraceRequest, *StackTraceResponse)error
+var OnStackTraceRequest func(*StackTraceRequest, *StackTraceResponse) error
 
 // Called by `HandleRequest` (after it unmarshaled the given `DisconnectRequest`) to further populate the given `DisconnectResponse` before returning it to its caller (in addition to this handler's returned `error`).
-var OnDisconnectRequest func(*DisconnectRequest, *DisconnectResponse)error
+var OnDisconnectRequest func(*DisconnectRequest, *DisconnectResponse) error
 
 // Called by `HandleRequest` (after it unmarshaled the given `ConfigurationDoneRequest`) to further populate the given `ConfigurationDoneResponse` before returning it to its caller (in addition to this handler's returned `error`).
-var OnConfigurationDoneRequest func(*ConfigurationDoneRequest, *ConfigurationDoneResponse)error
+var OnConfigurationDoneRequest func(*ConfigurationDoneRequest, *ConfigurationDoneResponse) error
 
 // Called by `HandleRequest` (after it unmarshaled the given `PauseRequest`) to further populate the given `PauseResponse` before returning it to its caller (in addition to this handler's returned `error`).
-var OnPauseRequest func(*PauseRequest, *PauseResponse)error
+var OnPauseRequest func(*PauseRequest, *PauseResponse) error
 
 // Called by `HandleRequest` (after it unmarshaled the given `SetExceptionBreakpointsRequest`) to further populate the given `SetExceptionBreakpointsResponse` before returning it to its caller (in addition to this handler's returned `error`).
-var OnSetExceptionBreakpointsRequest func(*SetExceptionBreakpointsRequest, *SetExceptionBreakpointsResponse)error
+var OnSetExceptionBreakpointsRequest func(*SetExceptionBreakpointsRequest, *SetExceptionBreakpointsResponse) error
 
 // Called by `HandleRequest` (after it unmarshaled the given `ReverseContinueRequest`) to further populate the given `ReverseContinueResponse` before returning it to its caller (in addition to this handler's returned `error`).
-var OnReverseContinueRequest func(*ReverseContinueRequest, *ReverseContinueResponse)error
+var OnReverseContinueRequest func(*ReverseContinueRequest, *ReverseContinueResponse) error
 
 // Called by `HandleRequest` (after it unmarshaled the given `SetFunctionBreakpointsRequest`) to further populate the given `SetFunctionBreakpointsResponse` before returning it to its caller (in addition to this handler's returned `error`).
-var OnSetFunctionBreakpointsRequest func(*SetFunctionBreakpointsRequest, *SetFunctionBreakpointsResponse)error
+var OnSetFunctionBreakpointsRequest func(*SetFunctionBreakpointsRequest, *SetFunctionBreakpointsResponse) error
 
 // Called by `HandleRequest` (after it unmarshaled the given `ContinueRequest`) to further populate the given `ContinueResponse` before returning it to its caller (in addition to this handler's returned `error`).
-var OnContinueRequest func(*ContinueRequest, *ContinueResponse)error
+var OnContinueRequest func(*ContinueRequest, *ContinueResponse) error
 
 // Called by `HandleRequest` (after it unmarshaled the given `RunInTerminalRequest`) to further populate the given `RunInTerminalResponse` before returning it to its caller (in addition to this handler's returned `error`).
-var OnRunInTerminalRequest func(*RunInTerminalRequest, *RunInTerminalResponse)error
+var OnRunInTerminalRequest func(*RunInTerminalRequest, *RunInTerminalResponse) error
 
 // Called by `HandleRequest` (after it unmarshaled the given `LoadedSourcesRequest`) to further populate the given `LoadedSourcesResponse` before returning it to its caller (in addition to this handler's returned `error`).
-var OnLoadedSourcesRequest func(*LoadedSourcesRequest, *LoadedSourcesResponse)error
+var OnLoadedSourcesRequest func(*LoadedSourcesRequest, *LoadedSourcesResponse) error
 
 // Called by `HandleRequest` (after it unmarshaled the given `VariablesRequest`) to further populate the given `VariablesResponse` before returning it to its caller (in addition to this handler's returned `error`).
-var OnVariablesRequest func(*VariablesRequest, *VariablesResponse)error
+var OnVariablesRequest func(*VariablesRequest, *VariablesResponse) error
 
 // Called by `HandleRequest` (after it unmarshaled the given `SourceRequest`) to further populate the given `SourceResponse` before returning it to its caller (in addition to this handler's returned `error`).
-var OnSourceRequest func(*SourceRequest, *SourceResponse)error
+var OnSourceRequest func(*SourceRequest, *SourceResponse) error
 
 // Called by `HandleRequest` (after it unmarshaled the given `RestartRequest`) to further populate the given `RestartResponse` before returning it to its caller (in addition to this handler's returned `error`).
-var OnRestartRequest func(*RestartRequest, *RestartResponse)error
+var OnRestartRequest func(*RestartRequest, *RestartResponse) error
 
 // Called by `HandleRequest` (after it unmarshaled the given `SetVariableRequest`) to further populate the given `SetVariableResponse` before returning it to its caller (in addition to this handler's returned `error`).
-var OnSetVariableRequest func(*SetVariableRequest, *SetVariableResponse)error
+var OnSetVariableRequest func(*SetVariableRequest, *SetVariableResponse) error
 
 // Called by `HandleRequest` (after it unmarshaled the given `SetBreakpointsRequest`) to further populate the given `SetBreakpointsResponse` before returning it to its caller (in addition to this handler's returned `error`).
-var OnSetBreakpointsRequest func(*SetBreakpointsRequest, *SetBreakpointsResponse)error
+var OnSetBreakpointsRequest func(*SetBreakpointsRequest, *SetBreakpointsResponse) error
 
 // Called by `HandleRequest` (after it unmarshaled the given `ScopesRequest`) to further populate the given `ScopesResponse` before returning it to its caller (in addition to this handler's returned `error`).
-var OnScopesRequest func(*ScopesRequest, *ScopesResponse)error
+var OnScopesRequest func(*ScopesRequest, *ScopesResponse) error
 
 // Called by `HandleRequest` (after it unmarshaled the given `ModulesRequest`) to further populate the given `ModulesResponse` before returning it to its caller (in addition to this handler's returned `error`).
-var OnModulesRequest func(*ModulesRequest, *ModulesResponse)error
+var OnModulesRequest func(*ModulesRequest, *ModulesResponse) error
 
 // Called by `HandleRequest` (after it unmarshaled the given `GotoTargetsRequest`) to further populate the given `GotoTargetsResponse` before returning it to its caller (in addition to this handler's returned `error`).
-var OnGotoTargetsRequest func(*GotoTargetsRequest, *GotoTargetsResponse)error
+var OnGotoTargetsRequest func(*GotoTargetsRequest, *GotoTargetsResponse) error
 
 // Called by `HandleRequest` (after it unmarshaled the given `StepInTargetsRequest`) to further populate the given `StepInTargetsResponse` before returning it to its caller (in addition to this handler's returned `error`).
-var OnStepInTargetsRequest func(*StepInTargetsRequest, *StepInTargetsResponse)error
+var OnStepInTargetsRequest func(*StepInTargetsRequest, *StepInTargetsResponse) error
 
 // Called by `HandleRequest` (after it unmarshaled the given `StepOutRequest`) to further populate the given `StepOutResponse` before returning it to its caller (in addition to this handler's returned `error`).
-var OnStepOutRequest func(*StepOutRequest, *StepOutResponse)error
+var OnStepOutRequest func(*StepOutRequest, *StepOutResponse) error
 
 // Called by `HandleRequest` (after it unmarshaled the given `GotoRequest`) to further populate the given `GotoResponse` before returning it to its caller (in addition to this handler's returned `error`).
-var OnGotoRequest func(*GotoRequest, *GotoResponse)error
+var OnGotoRequest func(*GotoRequest, *GotoResponse) error
 
 // Called by `HandleRequest` (after it unmarshaled the given `CompletionsRequest`) to further populate the given `CompletionsResponse` before returning it to its caller (in addition to this handler's returned `error`).
-var OnCompletionsRequest func(*CompletionsRequest, *CompletionsResponse)error
+var OnCompletionsRequest func(*CompletionsRequest, *CompletionsResponse) error
 
 // Called by `HandleRequest` (after it unmarshaled the given `NextRequest`) to further populate the given `NextResponse` before returning it to its caller (in addition to this handler's returned `error`).
-var OnNextRequest func(*NextRequest, *NextResponse)error
+var OnNextRequest func(*NextRequest, *NextResponse) error
 
 // Called by `HandleRequest` (after it unmarshaled the given `ThreadsRequest`) to further populate the given `ThreadsResponse` before returning it to its caller (in addition to this handler's returned `error`).
-var OnThreadsRequest func(*ThreadsRequest, *ThreadsResponse)error
+var OnThreadsRequest func(*ThreadsRequest, *ThreadsResponse) error
 
 // Called by `HandleRequest` (after it unmarshaled the given `StepInRequest`) to further populate the given `StepInResponse` before returning it to its caller (in addition to this handler's returned `error`).
-var OnStepInRequest func(*StepInRequest, *StepInResponse)error
+var OnStepInRequest func(*StepInRequest, *StepInResponse) error
 
 // Called by `HandleRequest` (after it unmarshaled the given `EvaluateRequest`) to further populate the given `EvaluateResponse` before returning it to its caller (in addition to this handler's returned `error`).
-var OnEvaluateRequest func(*EvaluateRequest, *EvaluateResponse)error
+var OnEvaluateRequest func(*EvaluateRequest, *EvaluateResponse) error
 
 // Called by `HandleRequest` (after it unmarshaled the given `ExceptionInfoRequest`) to further populate the given `ExceptionInfoResponse` before returning it to its caller (in addition to this handler's returned `error`).
-var OnExceptionInfoRequest func(*ExceptionInfoRequest, *ExceptionInfoResponse)error
+var OnExceptionInfoRequest func(*ExceptionInfoRequest, *ExceptionInfoResponse) error
 
 // Called by `HandleRequest` (after it unmarshaled the given `LaunchRequest`) to further populate the given `LaunchResponse` before returning it to its caller (in addition to this handler's returned `error`).
-var OnLaunchRequest func(*LaunchRequest, *LaunchResponse)error
+var OnLaunchRequest func(*LaunchRequest, *LaunchResponse) error
 
 // If a type-switch on `inRequest` succeeds, `outResponse` points to a `Response`-based `struct` value containing the `Response` initialized by the specified `initNewResponse` and further populated by the `OnFooRequest` handler corresponding to the concrete type of `inRequest` (if any). The only `err` returned, if any, is that returned by the specialized `OnFooRequest` handler.
-func HandleRequest (inRequest interface{}, initNewResponse func(*Request, *Response)) (outResponse interface{}, baseResponse *Response, err error) {
+func HandleRequest(inRequest interface{}, initNewResponse func(*Request, *Response)) (outResponse interface{}, baseResponse *Response, err error) {
 	switch input := inRequest.(type) {
 	case *SetVariableRequest:
 		o := NewSetVariableResponse()
-		if initNewResponse!=nil { initNewResponse(&input.Request, &o.Response)  ;  o.propagateFieldsToBase() }
-		if OnSetVariableRequest!=nil { err = OnSetVariableRequest(input, o)  ;  o.propagateFieldsToBase() }
-		outResponse , baseResponse = o , &o.Response
+		if initNewResponse != nil {
+			initNewResponse(&input.Request, &o.Response)
+			o.propagateFieldsToBase()
+		}
+		if OnSetVariableRequest != nil {
+			err = OnSetVariableRequest(input, o)
+			o.propagateFieldsToBase()
+		}
+		outResponse, baseResponse = o, &o.Response
 	case *SetBreakpointsRequest:
 		o := NewSetBreakpointsResponse()
-		if initNewResponse!=nil { initNewResponse(&input.Request, &o.Response)  ;  o.propagateFieldsToBase() }
-		if OnSetBreakpointsRequest!=nil { err = OnSetBreakpointsRequest(input, o)  ;  o.propagateFieldsToBase() }
-		outResponse , baseResponse = o , &o.Response
+		if initNewResponse != nil {
+			initNewResponse(&input.Request, &o.Response)
+			o.propagateFieldsToBase()
+		}
+		if OnSetBreakpointsRequest != nil {
+			err = OnSetBreakpointsRequest(input, o)
+			o.propagateFieldsToBase()
+		}
+		outResponse, baseResponse = o, &o.Response
 	case *ScopesRequest:
 		o := NewScopesResponse()
-		if initNewResponse!=nil { initNewResponse(&input.Request, &o.Response)  ;  o.propagateFieldsToBase() }
-		if OnScopesRequest!=nil { err = OnScopesRequest(input, o)  ;  o.propagateFieldsToBase() }
-		outResponse , baseResponse = o , &o.Response
+		if initNewResponse != nil {
+			initNewResponse(&input.Request, &o.Response)
+			o.propagateFieldsToBase()
+		}
+		if OnScopesRequest != nil {
+			err = OnScopesRequest(input, o)
+			o.propagateFieldsToBase()
+		}
+		outResponse, baseResponse = o, &o.Response
 	case *ModulesRequest:
 		o := NewModulesResponse()
-		if initNewResponse!=nil { initNewResponse(&input.Request, &o.Response)  ;  o.propagateFieldsToBase() }
-		if OnModulesRequest!=nil { err = OnModulesRequest(input, o)  ;  o.propagateFieldsToBase() }
-		outResponse , baseResponse = o , &o.Response
+		if initNewResponse != nil {
+			initNewResponse(&input.Request, &o.Response)
+			o.propagateFieldsToBase()
+		}
+		if OnModulesRequest != nil {
+			err = OnModulesRequest(input, o)
+			o.propagateFieldsToBase()
+		}
+		outResponse, baseResponse = o, &o.Response
 	case *GotoTargetsRequest:
 		o := NewGotoTargetsResponse()
-		if initNewResponse!=nil { initNewResponse(&input.Request, &o.Response)  ;  o.propagateFieldsToBase() }
-		if OnGotoTargetsRequest!=nil { err = OnGotoTargetsRequest(input, o)  ;  o.propagateFieldsToBase() }
-		outResponse , baseResponse = o , &o.Response
+		if initNewResponse != nil {
+			initNewResponse(&input.Request, &o.Response)
+			o.propagateFieldsToBase()
+		}
+		if OnGotoTargetsRequest != nil {
+			err = OnGotoTargetsRequest(input, o)
+			o.propagateFieldsToBase()
+		}
+		outResponse, baseResponse = o, &o.Response
 	case *StepInTargetsRequest:
 		o := NewStepInTargetsResponse()
-		if initNewResponse!=nil { initNewResponse(&input.Request, &o.Response)  ;  o.propagateFieldsToBase() }
-		if OnStepInTargetsRequest!=nil { err = OnStepInTargetsRequest(input, o)  ;  o.propagateFieldsToBase() }
-		outResponse , baseResponse = o , &o.Response
+		if initNewResponse != nil {
+			initNewResponse(&input.Request, &o.Response)
+			o.propagateFieldsToBase()
+		}
+		if OnStepInTargetsRequest != nil {
+			err = OnStepInTargetsRequest(input, o)
+			o.propagateFieldsToBase()
+		}
+		outResponse, baseResponse = o, &o.Response
 	case *StepOutRequest:
 		o := NewStepOutResponse()
-		if initNewResponse!=nil { initNewResponse(&input.Request, &o.Response)  ;  o.propagateFieldsToBase() }
-		if OnStepOutRequest!=nil { err = OnStepOutRequest(input, o)  ;  o.propagateFieldsToBase() }
-		outResponse , baseResponse = o , &o.Response
+		if initNewResponse != nil {
+			initNewResponse(&input.Request, &o.Response)
+			o.propagateFieldsToBase()
+		}
+		if OnStepOutRequest != nil {
+			err = OnStepOutRequest(input, o)
+			o.propagateFieldsToBase()
+		}
+		outResponse, baseResponse = o, &o.Response
 	case *GotoRequest:
 		o := NewGotoResponse()
-		if initNewResponse!=nil { initNewResponse(&input.Request, &o.Response)  ;  o.propagateFieldsToBase() }
-		if OnGotoRequest!=nil { err = OnGotoRequest(input, o)  ;  o.propagateFieldsToBase() }
-		outResponse , baseResponse = o , &o.Response
+		if initNewResponse != nil {
+			initNewResponse(&input.Request, &o.Response)
+			o.propagateFieldsToBase()
+		}
+		if OnGotoRequest != nil {
+			err = OnGotoRequest(input, o)
+			o.propagateFieldsToBase()
+		}
+		outResponse, baseResponse = o, &o.Response
 	case *CompletionsRequest:
 		o := NewCompletionsResponse()
-		if initNewResponse!=nil { initNewResponse(&input.Request, &o.Response)  ;  o.propagateFieldsToBase() }
-		if OnCompletionsRequest!=nil { err = OnCompletionsRequest(input, o)  ;  o.propagateFieldsToBase() }
-		outResponse , baseResponse = o , &o.Response
+		if initNewResponse != nil {
+			initNewResponse(&input.Request, &o.Response)
+			o.propagateFieldsToBase()
+		}
+		if OnCompletionsRequest != nil {
+			err = OnCompletionsRequest(input, o)
+			o.propagateFieldsToBase()
+		}
+		outResponse, baseResponse = o, &o.Response
 	case *NextRequest:
 		o := NewNextResponse()
-		if initNewResponse!=nil { initNewResponse(&input.Request, &o.Response)  ;  o.propagateFieldsToBase() }
-		if OnNextRequest!=nil { err = OnNextRequest(input, o)  ;  o.propagateFieldsToBase() }
-		outResponse , baseResponse = o , &o.Response
+		if initNewResponse != nil {
+			initNewResponse(&input.Request, &o.Response)
+			o.propagateFieldsToBase()
+		}
+		if OnNextRequest != nil {
+			err = OnNextRequest(input, o)
+			o.propagateFieldsToBase()
+		}
+		outResponse, baseResponse = o, &o.Response
 	case *ThreadsRequest:
 		o := NewThreadsResponse()
-		if initNewResponse!=nil { initNewResponse(&input.Request, &o.Response)  ;  o.propagateFieldsToBase() }
-		if OnThreadsRequest!=nil { err = OnThreadsRequest(input, o)  ;  o.propagateFieldsToBase() }
-		outResponse , baseResponse = o , &o.Response
+		if initNewResponse != nil {
+			initNewResponse(&input.Request, &o.Response)
+			o.propagateFieldsToBase()
+		}
+		if OnThreadsRequest != nil {
+			err = OnThreadsRequest(input, o)
+			o.propagateFieldsToBase()
+		}
+		outResponse, baseResponse = o, &o.Response
 	case *StepInRequest:
 		o := NewStepInResponse()
-		if initNewResponse!=nil { initNewResponse(&input.Request, &o.Response)  ;  o.propagateFieldsToBase() }
-		if OnStepInRequest!=nil { err = OnStepInRequest(input, o)  ;  o.propagateFieldsToBase() }
-		outResponse , baseResponse = o , &o.Response
+		if initNewResponse != nil {
+			initNewResponse(&input.Request, &o.Response)
+			o.propagateFieldsToBase()
+		}
+		if OnStepInRequest != nil {
+			err = OnStepInRequest(input, o)
+			o.propagateFieldsToBase()
+		}
+		outResponse, baseResponse = o, &o.Response
 	case *EvaluateRequest:
 		o := NewEvaluateResponse()
-		if initNewResponse!=nil { initNewResponse(&input.Request, &o.Response)  ;  o.propagateFieldsToBase() }
-		if OnEvaluateRequest!=nil { err = OnEvaluateRequest(input, o)  ;  o.propagateFieldsToBase() }
-		outResponse , baseResponse = o , &o.Response
+		if initNewResponse != nil {
+			initNewResponse(&input.Request, &o.Response)
+			o.propagateFieldsToBase()
+		}
+		if OnEvaluateRequest != nil {
+			err = OnEvaluateRequest(input, o)
+			o.propagateFieldsToBase()
+		}
+		outResponse, baseResponse = o, &o.Response
 	case *ExceptionInfoRequest:
 		o := NewExceptionInfoResponse()
-		if initNewResponse!=nil { initNewResponse(&input.Request, &o.Response)  ;  o.propagateFieldsToBase() }
-		if OnExceptionInfoRequest!=nil { err = OnExceptionInfoRequest(input, o)  ;  o.propagateFieldsToBase() }
-		outResponse , baseResponse = o , &o.Response
+		if initNewResponse != nil {
+			initNewResponse(&input.Request, &o.Response)
+			o.propagateFieldsToBase()
+		}
+		if OnExceptionInfoRequest != nil {
+			err = OnExceptionInfoRequest(input, o)
+			o.propagateFieldsToBase()
+		}
+		outResponse, baseResponse = o, &o.Response
 	case *LaunchRequest:
 		o := NewLaunchResponse()
-		if initNewResponse!=nil { initNewResponse(&input.Request, &o.Response)  ;  o.propagateFieldsToBase() }
-		if OnLaunchRequest!=nil { err = OnLaunchRequest(input, o)  ;  o.propagateFieldsToBase() }
-		outResponse , baseResponse = o , &o.Response
+		if initNewResponse != nil {
+			initNewResponse(&input.Request, &o.Response)
+			o.propagateFieldsToBase()
+		}
+		if OnLaunchRequest != nil {
+			err = OnLaunchRequest(input, o)
+			o.propagateFieldsToBase()
+		}
+		outResponse, baseResponse = o, &o.Response
 	case *RestartFrameRequest:
 		o := NewRestartFrameResponse()
-		if initNewResponse!=nil { initNewResponse(&input.Request, &o.Response)  ;  o.propagateFieldsToBase() }
-		if OnRestartFrameRequest!=nil { err = OnRestartFrameRequest(input, o)  ;  o.propagateFieldsToBase() }
-		outResponse , baseResponse = o , &o.Response
+		if initNewResponse != nil {
+			initNewResponse(&input.Request, &o.Response)
+			o.propagateFieldsToBase()
+		}
+		if OnRestartFrameRequest != nil {
+			err = OnRestartFrameRequest(input, o)
+			o.propagateFieldsToBase()
+		}
+		outResponse, baseResponse = o, &o.Response
 	case *InitializeRequest:
 		o := NewInitializeResponse()
-		if initNewResponse!=nil { initNewResponse(&input.Request, &o.Response)  ;  o.propagateFieldsToBase() }
-		if OnInitializeRequest!=nil { err = OnInitializeRequest(input, o)  ;  o.propagateFieldsToBase() }
-		outResponse , baseResponse = o , &o.Response
+		if initNewResponse != nil {
+			initNewResponse(&input.Request, &o.Response)
+			o.propagateFieldsToBase()
+		}
+		if OnInitializeRequest != nil {
+			err = OnInitializeRequest(input, o)
+			o.propagateFieldsToBase()
+		}
+		outResponse, baseResponse = o, &o.Response
 	case *StackTraceRequest:
 		o := NewStackTraceResponse()
-		if initNewResponse!=nil { initNewResponse(&input.Request, &o.Response)  ;  o.propagateFieldsToBase() }
-		if OnStackTraceRequest!=nil { err = OnStackTraceRequest(input, o)  ;  o.propagateFieldsToBase() }
-		outResponse , baseResponse = o , &o.Response
+		if initNewResponse != nil {
+			initNewResponse(&input.Request, &o.Response)
+			o.propagateFieldsToBase()
+		}
+		if OnStackTraceRequest != nil {
+			err = OnStackTraceRequest(input, o)
+			o.propagateFieldsToBase()
+		}
+		outResponse, baseResponse = o, &o.Response
 	case *DisconnectRequest:
 		o := NewDisconnectResponse()
-		if initNewResponse!=nil { initNewResponse(&input.Request, &o.Response)  ;  o.propagateFieldsToBase() }
-		if OnDisconnectRequest!=nil { err = OnDisconnectRequest(input, o)  ;  o.propagateFieldsToBase() }
-		outResponse , baseResponse = o , &o.Response
+		if initNewResponse != nil {
+			initNewResponse(&input.Request, &o.Response)
+			o.propagateFieldsToBase()
+		}
+		if OnDisconnectRequest != nil {
+			err = OnDisconnectRequest(input, o)
+			o.propagateFieldsToBase()
+		}
+		outResponse, baseResponse = o, &o.Response
 	case *ConfigurationDoneRequest:
 		o := NewConfigurationDoneResponse()
-		if initNewResponse!=nil { initNewResponse(&input.Request, &o.Response)  ;  o.propagateFieldsToBase() }
-		if OnConfigurationDoneRequest!=nil { err = OnConfigurationDoneRequest(input, o)  ;  o.propagateFieldsToBase() }
-		outResponse , baseResponse = o , &o.Response
+		if initNewResponse != nil {
+			initNewResponse(&input.Request, &o.Response)
+			o.propagateFieldsToBase()
+		}
+		if OnConfigurationDoneRequest != nil {
+			err = OnConfigurationDoneRequest(input, o)
+			o.propagateFieldsToBase()
+		}
+		outResponse, baseResponse = o, &o.Response
 	case *AttachRequest:
 		o := NewAttachResponse()
-		if initNewResponse!=nil { initNewResponse(&input.Request, &o.Response)  ;  o.propagateFieldsToBase() }
-		if OnAttachRequest!=nil { err = OnAttachRequest(input, o)  ;  o.propagateFieldsToBase() }
-		outResponse , baseResponse = o , &o.Response
+		if initNewResponse != nil {
+			initNewResponse(&input.Request, &o.Response)
+			o.propagateFieldsToBase()
+		}
+		if OnAttachRequest != nil {
+			err = OnAttachRequest(input, o)
+			o.propagateFieldsToBase()
+		}
+		outResponse, baseResponse = o, &o.Response
 	case *StepBackRequest:
 		o := NewStepBackResponse()
-		if initNewResponse!=nil { initNewResponse(&input.Request, &o.Response)  ;  o.propagateFieldsToBase() }
-		if OnStepBackRequest!=nil { err = OnStepBackRequest(input, o)  ;  o.propagateFieldsToBase() }
-		outResponse , baseResponse = o , &o.Response
+		if initNewResponse != nil {
+			initNewResponse(&input.Request, &o.Response)
+			o.propagateFieldsToBase()
+		}
+		if OnStepBackRequest != nil {
+			err = OnStepBackRequest(input, o)
+			o.propagateFieldsToBase()
+		}
+		outResponse, baseResponse = o, &o.Response
 	case *PauseRequest:
 		o := NewPauseResponse()
-		if initNewResponse!=nil { initNewResponse(&input.Request, &o.Response)  ;  o.propagateFieldsToBase() }
-		if OnPauseRequest!=nil { err = OnPauseRequest(input, o)  ;  o.propagateFieldsToBase() }
-		outResponse , baseResponse = o , &o.Response
+		if initNewResponse != nil {
+			initNewResponse(&input.Request, &o.Response)
+			o.propagateFieldsToBase()
+		}
+		if OnPauseRequest != nil {
+			err = OnPauseRequest(input, o)
+			o.propagateFieldsToBase()
+		}
+		outResponse, baseResponse = o, &o.Response
 	case *SetExceptionBreakpointsRequest:
 		o := NewSetExceptionBreakpointsResponse()
-		if initNewResponse!=nil { initNewResponse(&input.Request, &o.Response)  ;  o.propagateFieldsToBase() }
-		if OnSetExceptionBreakpointsRequest!=nil { err = OnSetExceptionBreakpointsRequest(input, o)  ;  o.propagateFieldsToBase() }
-		outResponse , baseResponse = o , &o.Response
+		if initNewResponse != nil {
+			initNewResponse(&input.Request, &o.Response)
+			o.propagateFieldsToBase()
+		}
+		if OnSetExceptionBreakpointsRequest != nil {
+			err = OnSetExceptionBreakpointsRequest(input, o)
+			o.propagateFieldsToBase()
+		}
+		outResponse, baseResponse = o, &o.Response
 	case *ReverseContinueRequest:
 		o := NewReverseContinueResponse()
-		if initNewResponse!=nil { initNewResponse(&input.Request, &o.Response)  ;  o.propagateFieldsToBase() }
-		if OnReverseContinueRequest!=nil { err = OnReverseContinueRequest(input, o)  ;  o.propagateFieldsToBase() }
-		outResponse , baseResponse = o , &o.Response
+		if initNewResponse != nil {
+			initNewResponse(&input.Request, &o.Response)
+			o.propagateFieldsToBase()
+		}
+		if OnReverseContinueRequest != nil {
+			err = OnReverseContinueRequest(input, o)
+			o.propagateFieldsToBase()
+		}
+		outResponse, baseResponse = o, &o.Response
 	case *RunInTerminalRequest:
 		o := NewRunInTerminalResponse()
-		if initNewResponse!=nil { initNewResponse(&input.Request, &o.Response)  ;  o.propagateFieldsToBase() }
-		if OnRunInTerminalRequest!=nil { err = OnRunInTerminalRequest(input, o)  ;  o.propagateFieldsToBase() }
-		outResponse , baseResponse = o , &o.Response
+		if initNewResponse != nil {
+			initNewResponse(&input.Request, &o.Response)
+			o.propagateFieldsToBase()
+		}
+		if OnRunInTerminalRequest != nil {
+			err = OnRunInTerminalRequest(input, o)
+			o.propagateFieldsToBase()
+		}
+		outResponse, baseResponse = o, &o.Response
 	case *LoadedSourcesRequest:
 		o := NewLoadedSourcesResponse()
-		if initNewResponse!=nil { initNewResponse(&input.Request, &o.Response)  ;  o.propagateFieldsToBase() }
-		if OnLoadedSourcesRequest!=nil { err = OnLoadedSourcesRequest(input, o)  ;  o.propagateFieldsToBase() }
-		outResponse , baseResponse = o , &o.Response
+		if initNewResponse != nil {
+			initNewResponse(&input.Request, &o.Response)
+			o.propagateFieldsToBase()
+		}
+		if OnLoadedSourcesRequest != nil {
+			err = OnLoadedSourcesRequest(input, o)
+			o.propagateFieldsToBase()
+		}
+		outResponse, baseResponse = o, &o.Response
 	case *VariablesRequest:
 		o := NewVariablesResponse()
-		if initNewResponse!=nil { initNewResponse(&input.Request, &o.Response)  ;  o.propagateFieldsToBase() }
-		if OnVariablesRequest!=nil { err = OnVariablesRequest(input, o)  ;  o.propagateFieldsToBase() }
-		outResponse , baseResponse = o , &o.Response
+		if initNewResponse != nil {
+			initNewResponse(&input.Request, &o.Response)
+			o.propagateFieldsToBase()
+		}
+		if OnVariablesRequest != nil {
+			err = OnVariablesRequest(input, o)
+			o.propagateFieldsToBase()
+		}
+		outResponse, baseResponse = o, &o.Response
 	case *SourceRequest:
 		o := NewSourceResponse()
-		if initNewResponse!=nil { initNewResponse(&input.Request, &o.Response)  ;  o.propagateFieldsToBase() }
-		if OnSourceRequest!=nil { err = OnSourceRequest(input, o)  ;  o.propagateFieldsToBase() }
-		outResponse , baseResponse = o , &o.Response
+		if initNewResponse != nil {
+			initNewResponse(&input.Request, &o.Response)
+			o.propagateFieldsToBase()
+		}
+		if OnSourceRequest != nil {
+			err = OnSourceRequest(input, o)
+			o.propagateFieldsToBase()
+		}
+		outResponse, baseResponse = o, &o.Response
 	case *RestartRequest:
 		o := NewRestartResponse()
-		if initNewResponse!=nil { initNewResponse(&input.Request, &o.Response)  ;  o.propagateFieldsToBase() }
-		if OnRestartRequest!=nil { err = OnRestartRequest(input, o)  ;  o.propagateFieldsToBase() }
-		outResponse , baseResponse = o , &o.Response
+		if initNewResponse != nil {
+			initNewResponse(&input.Request, &o.Response)
+			o.propagateFieldsToBase()
+		}
+		if OnRestartRequest != nil {
+			err = OnRestartRequest(input, o)
+			o.propagateFieldsToBase()
+		}
+		outResponse, baseResponse = o, &o.Response
 	case *SetFunctionBreakpointsRequest:
 		o := NewSetFunctionBreakpointsResponse()
-		if initNewResponse!=nil { initNewResponse(&input.Request, &o.Response)  ;  o.propagateFieldsToBase() }
-		if OnSetFunctionBreakpointsRequest!=nil { err = OnSetFunctionBreakpointsRequest(input, o)  ;  o.propagateFieldsToBase() }
-		outResponse , baseResponse = o , &o.Response
+		if initNewResponse != nil {
+			initNewResponse(&input.Request, &o.Response)
+			o.propagateFieldsToBase()
+		}
+		if OnSetFunctionBreakpointsRequest != nil {
+			err = OnSetFunctionBreakpointsRequest(input, o)
+			o.propagateFieldsToBase()
+		}
+		outResponse, baseResponse = o, &o.Response
 	case *ContinueRequest:
 		o := NewContinueResponse()
-		if initNewResponse!=nil { initNewResponse(&input.Request, &o.Response)  ;  o.propagateFieldsToBase() }
-		if OnContinueRequest!=nil { err = OnContinueRequest(input, o)  ;  o.propagateFieldsToBase() }
-		outResponse , baseResponse = o , &o.Response
+		if initNewResponse != nil {
+			initNewResponse(&input.Request, &o.Response)
+			o.propagateFieldsToBase()
+		}
+		if OnContinueRequest != nil {
+			err = OnContinueRequest(input, o)
+			o.propagateFieldsToBase()
+		}
+		outResponse, baseResponse = o, &o.Response
 	}
 	return
 }
