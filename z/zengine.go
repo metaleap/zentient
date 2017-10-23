@@ -1,8 +1,8 @@
 package z
 
 import (
-	"github.com/metaleap/go-util-dev"
-	"github.com/metaleap/go-util-misc"
+	"github.com/metaleap/go-util"
+	"github.com/metaleap/go-util/dev"
 )
 
 type Zengine interface {
@@ -35,7 +35,7 @@ var Zengines = map[string]Zengine{}
 
 func doFmt(zid string, reqsrc string, reqcmd string, reqtabsize uint8) (resp *RespTxt, err error) {
 	if µ := Zengines[zid]; µ == nil || len(reqsrc) == 0 {
-		err = ugo.E("Bad zid or input src")
+		err = umisc.E("Bad zid or input src")
 	} else {
 		resp, err = µ.DoFmt(reqsrc, reqcmd, reqtabsize)
 	}
@@ -45,11 +45,11 @@ func doFmt(zid string, reqsrc string, reqcmd string, reqtabsize uint8) (resp *Re
 func doRename(zid string, reqcmd string, relfilepath string, offset uint64, newname string, eol string, oldname string, off1 uint64, off2 uint64) (resp map[string]udev.SrcMsgs, err error) {
 	µ := Zengines[zid]
 	if µ == nil {
-		err = ugo.E("Bad zid: " + zid)
+		err = umisc.E("Bad zid: " + zid)
 		return
 	}
 	if len(newname) == 0 {
-		err = ugo.E("No newname given")
+		err = umisc.E("No newname given")
 		return
 	}
 	resp, err = µ.DoRename(reqcmd, relfilepath, offset, newname, eol, oldname, off1, off2)

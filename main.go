@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"runtime"
 
-	"github.com/metaleap/go-util-misc"
+	"github.com/metaleap/go-util/run"
 
 	"github.com/metaleap/zentient/go"
 	"github.com/metaleap/zentient/hs"
@@ -19,7 +19,7 @@ func main() {
 	}
 
 	var stdin *bufio.Scanner
-	stdin, z.RawOut, z.Out = ugo.SetupJsonProtoPipes(1024*1024*4, false, true)
+	stdin, z.RawOut, z.Out = urun.SetupJsonProtoPipes(1024*1024*4, false, true)
 	for stdin.Scan() {
 		if err = z.HandleRequest(stdin.Text()); err == nil {
 			err = z.RawOut.Flush()
