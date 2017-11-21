@@ -68,7 +68,7 @@ func (_ *zgo) QueryTool(req *z.ReqIntel) (resp *z.RespTxt) {
 			srcdir := filepath.Dir(req.Ffp)
 			curfrp := filepath.Base(req.Ffp)
 			onerr(ufs.WalkFilesIn(srcdir, func(ffp string) bool {
-				if frp := filepath.Base(ffp); ustr.Suff(frp, ".go") {
+				if frp := filepath.Base(ffp); ustr.Suff(frp, ".go") && !ustr.Suff(frp, "_test.go") {
 					magicval := pname + umisc.Str(time.Now().UnixNano()) + pname
 					if frp == curfrp {
 						srcfiles[frp] = req.Src
