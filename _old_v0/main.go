@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"runtime"
 
 	"github.com/metaleap/go-util/run"
 
@@ -12,7 +11,6 @@ import (
 )
 
 func main() {
-	runtime.GOMAXPROCS(runtime.NumCPU() * 2)
 	err := z.Init(map[string]func() z.Zengine{"go": zgo.Init, "hs": zhs.Init})
 	if err != nil {
 		panic(err)
