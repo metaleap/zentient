@@ -50,8 +50,8 @@ func Serve() (err error) {
 		resp = handleReq(stdin.Text())
 		if respjson, err = resp.encode(); err != nil {
 			return
-		} else {
-			println(respjson)
+		} else if _, err = fmt.Println(respjson); err != nil {
+			return
 		}
 	}
 	return

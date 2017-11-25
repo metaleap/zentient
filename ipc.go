@@ -16,7 +16,7 @@ type MsgReq struct {
 }
 
 type MsgResp struct {
-	ReqID int64
+	ReqID int64  `json:"i"`
 	Err   string `json:"e"`
 }
 
