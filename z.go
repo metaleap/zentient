@@ -3,6 +3,7 @@ package z
 import (
 	"bufio"
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -11,23 +12,21 @@ import (
 	"github.com/metaleap/go-util/sys"
 )
 
-type Context struct {
+var (
+	strf = fmt.Sprintf
+
 	LangID   string
 	CacheDir string
-}
-
-var (
-	Ctx    Context
-	PipeIO struct {
+	PipeIO   struct {
 		Out    *json.Encoder
 		RawOut *bufio.Writer
 	}
 )
 
 func Init(langID string) (err error) {
-	Ctx.LangID = langID
-	Ctx.CacheDir = filepath.Join(usys.UserDataDirPath(), os.Args[0])
-	err = ufs.EnsureDirExists(Ctx.CacheDir)
+	LangID = langID
+	CacheDir = filepath.Join(usys.UserDataDirPath(), os.Args[0])
+	err = ufs.EnsureDirExists(CacheDir)
 	return
 }
 
