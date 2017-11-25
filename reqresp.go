@@ -6,7 +6,7 @@ import (
 
 type MsgReq struct {
 	ReqID int64  `json:"i"`
-	MsgID string `json:"m"`
+	MsgID MsgIDs `json:"m"`
 }
 
 type MsgResp struct {
@@ -22,18 +22,20 @@ func (me *MsgResp) encode() (jsonresp string, err error) {
 	return
 }
 
+type MsgIDs uint8
+
 const (
-	REQ_DO_FMT = "DF:"
+	REQ_CMDS_LIST MsgIDs = 1
 )
 
-func handleReq(jsonreq string) (resp *MsgResp) {
-	resp = &MsgResp{}
+func handleReq(jsonreq string) *MsgResp {
+	var resp MsgResp
 	if req, err := reqDecode(jsonreq); err == nil {
 		resp.ReqID = req.ReqID
 	} else {
 		resp.Err = err.Error()
 	}
-	return
+	return &resp
 }
 
 func reqDecode(jsonreq string) (*MsgReq, error) {
