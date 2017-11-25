@@ -42,15 +42,15 @@ func InitAndServeOrPanic(langID string) {
 
 func Serve() (err error) {
 	var resp *MsgResp
-	var respjson string
+	var jsonresp string
 	var stdin *bufio.Scanner
 
 	stdin, PipeIO.RawOut, PipeIO.Out = urun.SetupJsonProtoPipes(1024*1024*4, false, true)
 	for stdin.Scan() {
-		resp = handleReq(stdin.Text())
-		if respjson, err = resp.encode(); err != nil {
+		resp = reqDecodeAndHandle(stdin.Text())
+		if jsonresp, err = resp.encode(); err != nil {
 			return
-		} else if _, err = fmt.Println(respjson); err != nil {
+		} else if _, err = fmt.Println(jsonresp); err != nil {
 			return
 		}
 	}
