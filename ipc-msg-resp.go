@@ -22,7 +22,7 @@ func (me *MsgResp) encode() (jsonresp string, err error) {
 func (resp *MsgResp) to(req *MsgReq) {
 	switch req.MsgID {
 	case REQ_META_CMDS_LISTALL:
-		handleMetaCmdsListAll(req, resp)
+		metaCmdsHandleListAll(req, resp)
 	default:
 		resp.ErrMsg = strf("Invalid MsgID %d", req.MsgID)
 	}

@@ -28,7 +28,7 @@ func metaCmdsProvidersUpdate() {
 	}
 }
 
-func handleMetaCmdsListAll(req *MsgReq, resp *MsgResp) {
+func metaCmdsHandleListAll(req *MsgReq, resp *MsgResp) {
 	m := MetaCmdsMenu{Desc: "Choose wisely, mister:"}
 	for _, cmds := range Lang.cmdProviders {
 		for _, cmd := range cmds.Cmds() {
