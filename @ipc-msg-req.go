@@ -12,20 +12,21 @@ const (
 
 	msgID_coreCmds_ListAll
 
-	msgID_codeFmt_ListAll
+	msgID_srcFmt_ListAll
+	msgID_srcFmt_InfoLink
 )
 
 type msgReq struct {
-	ReqID int64  `json:"i"`
-	MsgID msgIDs `json:"m"`
+	ReqID   int64       `json:"i"`
+	MsgID   msgIDs      `json:"m"`
+	MsgArgs interface{} `json:"a"`
 
-	FilePath string                 `json:"fp"`
-	SrcFull  string                 `json:"sf"`
-	SrcSel   string                 `json:"ss"`
-	PosOff   int                    `json:"po"`
-	PosLn    int                    `json:"pl"`
-	PosCol   int                    `json:"pc"`
-	Args     map[string]interface{} `json:"a"`
+	FilePath string `json:"fp"`
+	SrcFull  string `json:"sf"`
+	SrcSel   string `json:"ss"`
+	PosOff   int    `json:"po"`
+	PosLn    int    `json:"pl"`
+	PosCol   int    `json:"pc"`
 }
 
 func reqDecodeAndRespond(jsonreq string) *msgResp {

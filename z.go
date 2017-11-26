@@ -13,18 +13,18 @@ import (
 )
 
 var (
-	strf     = fmt.Sprintf
-	handlers = []iResponder{
-		&coreCmds{},
+	strf = fmt.Sprintf
+
+	handlers = []iHandler{
+		&coreCmdsHandler{},
 	}
+	cmdProviders []iCoreCmds
 
 	Lang struct {
 		Enabled bool
 		ID      string
 		Title   string
-		CodeFmt iCodeFormatting
-
-		cmdProviders []iCoreCmds
+		SrcFmt  iSrcFormatting
 	}
 
 	prog struct {

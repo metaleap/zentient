@@ -9,7 +9,9 @@ func OnPreInit() {
 	l := &z.Lang
 	l.ID = "haskell"
 	l.Title = "Haskell"
-	l.Enabled = udevhs.HasHsDevEnv()
+	if l.Enabled = udevhs.HasHsDevEnv(); l.Enabled {
+		srcFmt.onPreInit()
+	}
 }
 
 func OnPostInit() {
