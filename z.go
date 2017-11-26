@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/metaleap/go-util/fs"
 	"github.com/metaleap/go-util/run"
@@ -31,28 +32,26 @@ func Init(langID string) (err error) {
 }
 
 func InitAndServeOrPanic(langID string) {
-	err := Init("go")
-	if err == nil {
-		err = Serve()
-	}
-	if err != nil {
+	if err := Init("go"); err != nil {
 		panic(err)
+	}
+	Serve()
+}
+
+func Serve() {
+	var stdin *bufio.Scanner
+	stdin, PipeIO.RawOut, PipeIO.Out = urun.SetupJsonProtoPipes(1024*1024*4, false, true)
+	for stdin.Scan() {
+		go Handle(stdin.Text())
 	}
 }
 
-func Serve() (err error) {
-	var resp *MsgResp
-	var jsonresp string
-	var stdin *bufio.Scanner
-
-	stdin, PipeIO.RawOut, PipeIO.Out = urun.SetupJsonProtoPipes(1024*1024*4, false, true)
-	for stdin.Scan() {
-		resp = reqDecodeAndHandle(stdin.Text())
-		if jsonresp, err = resp.encode(); err != nil {
-			return
-		} else if _, err = fmt.Println(jsonresp); err != nil {
-			return
-		}
+func Handle(jsonreq string) {
+	resp := reqDecodeAndRespond(jsonreq)
+	time.Sleep(time.Millisecond * 444)
+	if jsonresp, err := resp.encode(); err != nil {
+		panic(err)
+	} else if _, err = fmt.Println(jsonresp); err != nil {
+		panic(err)
 	}
-	return
 }
