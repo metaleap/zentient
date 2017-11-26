@@ -10,7 +10,7 @@ import (
 type iCoreCmds interface {
 	iHandler
 
-	Cmds() []*coreCmd
+	Cmds(srcLoc *SrcLoc) []*coreCmd
 	CmdsCategory() string
 }
 
@@ -21,8 +21,8 @@ type coreCmdsMenu struct {
 }
 
 type coreCmd struct {
-	MsgID    msgIDs      `json:"m,omitempty"`
-	MsgArgs  interface{} `json:"a,omitempty"`
+	MsgID    msgIDs      `json:"mi,omitempty"`
+	MsgArgs  interface{} `json:"ma,omitempty"`
 	Category string      `json:"c,omitempty"`
 	Title    string      `json:"t"`
 	Desc     string      `json:"d,omitempty"`
@@ -46,7 +46,7 @@ func (me *coreCmdsHandler) handle_ListAll(req *msgReq, resp *msgResp) {
 	var cats sort.StringSlice
 	m := coreCmdsMenu{Desc: "Showing categories: ", TopLevel: true}
 	for _, cmds := range cmdProviders {
-		for _, cmd := range cmds.Cmds() {
+		for _, cmd := range cmds.Cmds(req.SrcLoc) {
 			if cmd.Category = cmds.CmdsCategory(); !uslice.StrHas(cats, cmd.Category) {
 				cats = append(cats, cmd.Category)
 			}

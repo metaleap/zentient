@@ -6,7 +6,7 @@ type iHandler interface {
 }
 
 type msgResp struct {
-	ReqID  int64  `json:"i"`
+	ReqID  int64  `json:"ri"`
 	ErrMsg string `json:"e,omitempty"`
 
 	CoreCmdsMenu *coreCmdsMenu `json:"menu,omitempty"`

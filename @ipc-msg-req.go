@@ -14,19 +14,17 @@ const (
 
 	msgID_srcFmt_ListAll
 	msgID_srcFmt_InfoLink
+	msgID_srcFmt_SetDef
+	msgID_srcFmt_RunOnFile
+	msgID_srcFmt_RunOnSel
 )
 
 type msgReq struct {
-	ReqID   int64       `json:"i"`
-	MsgID   msgIDs      `json:"m"`
-	MsgArgs interface{} `json:"a"`
+	ReqID   int64       `json:"ri"`
+	MsgID   msgIDs      `json:"mi"`
+	MsgArgs interface{} `json:"ma"`
 
-	FilePath string `json:"fp"`
-	SrcFull  string `json:"sf"`
-	SrcSel   string `json:"ss"`
-	PosOff   int    `json:"po"`
-	PosLn    int    `json:"pl"`
-	PosCol   int    `json:"pc"`
+	SrcLoc *SrcLoc `json:"sl"`
 }
 
 func reqDecodeAndRespond(jsonreq string) *msgResp {

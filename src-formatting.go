@@ -10,16 +10,19 @@ type iSrcFormatting interface {
 	KnownFormatters() []*SrcFormatterDesc
 }
 
-type SrcFormattingBase struct {
-	cmdListAll *coreCmd
-
-	Self iSrcFormatting
-}
-
 type SrcFormatterDesc struct {
 	Name      string
 	Link      string
 	Installed bool
+}
+
+type SrcFormattingBase struct {
+	cmdListAll   *coreCmd
+	cmdSetDef    *coreCmd
+	cmdRunOnFile *coreCmd
+	cmdRunOnSel  *coreCmd
+
+	Self iSrcFormatting
 }
 
 func (me *SrcFormattingBase) Init() {
@@ -28,9 +31,23 @@ func (me *SrcFormattingBase) Init() {
 		Title: "List All Known Formatters",
 		Desc:  "Lists all known " + Lang.Title + " formatters and their installation info / status",
 	}
+	me.cmdSetDef = &coreCmd{
+		MsgID: msgID_srcFmt_SetDef,
+		Title: "Change Default Formatter",
+		Desc:  strf("Specify your preferred default %s source formatter", Lang.Title),
+		Hint:  "Current: (none)",
+	}
+	me.cmdRunOnFile = &coreCmd{
+		MsgID: msgID_srcFmt_RunOnFile,
+		Title: "Format Document",
+	}
+	me.cmdRunOnSel = &coreCmd{
+		MsgID: msgID_srcFmt_RunOnSel,
+		Title: "Format Selection",
+	}
 }
 
-func (me *SrcFormattingBase) Cmds() (cmds []*coreCmd) {
+func (me *SrcFormattingBase) Cmds(srcLoc *SrcLoc) (cmds []*coreCmd) {
 	if me.cmdListAll.Hint == "" {
 		kfnames := []string{}
 		for _, kf := range me.Self.KnownFormatters() {
@@ -38,7 +55,15 @@ func (me *SrcFormattingBase) Cmds() (cmds []*coreCmd) {
 		}
 		me.cmdListAll.Hint = strings.Join(kfnames, " · ")
 	}
-	cmds = append(cmds, me.cmdListAll)
+	if srcLoc != nil {
+		if srcLoc.FilePath != "" || srcLoc.SrcFull != "" {
+			cmds = append(cmds, me.cmdRunOnFile)
+		}
+		if srcLoc.SrcSel != "" {
+			cmds = append(cmds, me.cmdRunOnSel)
+		}
+	}
+	cmds = append(cmds, me.cmdSetDef, me.cmdListAll)
 	return
 }
 
@@ -62,7 +87,9 @@ func (me *SrcFormattingBase) handle_InfoLink(req *msgReq, resp *msgResp) {
 	fmtname := req.MsgArgs.(string)
 	for _, kf := range me.Self.KnownFormatters() {
 		if kf.Name == fmtname {
-			resp.Note = strf("After installing '%s', reload Zentient to recognize it.", kf.Name)
+			if !kf.Installed {
+				resp.Note = strf("After installing '%s', reload Zentient to recognize it.", kf.Name)
+			}
 			resp.WebsiteURL = kf.Link
 			return
 		}
@@ -74,14 +101,12 @@ func (me *SrcFormattingBase) handle_ListAll(req *msgReq, resp *msgResp) {
 	cfmt := Lang.SrcFmt // need the interface impl, not the embedded base!
 	m := coreCmdsMenu{Desc: strf("❬%s❭ · %s:", cfmt.CmdsCategory(), me.cmdListAll.Title)}
 	for _, kf := range cfmt.KnownFormatters() {
-		var cmd = coreCmd{Title: kf.Name, MsgArgs: kf.Name}
+		var cmd = coreCmd{Title: kf.Name, MsgArgs: kf.Name, MsgID: msgID_srcFmt_InfoLink}
+		cmd.Desc = "➜ Open website at " + kf.Link
 		if !kf.Installed {
-			cmd.MsgID = msgID_srcFmt_InfoLink
 			cmd.Hint = "Not installed"
-			cmd.Desc = "➜ Open installation infos at " + kf.Link
 		} else {
 			cmd.Hint = "Installed"
-			cmd.Desc = "➜ Set as default formatter"
 		}
 		m.Choices = append(m.Choices, &cmd)
 	}
