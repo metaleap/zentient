@@ -7,18 +7,19 @@ import (
 	"github.com/metaleap/go-util/slice"
 )
 
-type iMetaCmds interface {
-	Cmds() []*metaCmd
+type iCoreCmds interface {
+	iResponder
+
+	Cmds() []*coreCmd
 	CmdsCategory() string
-	Init()
 }
 
-type metaCmdsMenu struct {
+type coreCmdsMenu struct {
 	Desc    string     `json:"d"`
-	Choices []*metaCmd `json:"c"`
+	Choices []*coreCmd `json:"c"`
 }
 
-type metaCmd struct {
+type coreCmd struct {
 	ID       string `json:"i"`
 	MsgID    msgIDs `json:"m,omitempty"`
 	Category string `json:"c"`
@@ -27,31 +28,22 @@ type metaCmd struct {
 	Hint     string `json:"h,omitempty"`
 }
 
-func metaCmdsProvidersInit() { // assumes Lang.cmdProviders is empty
-	l := &Lang
-
-	if l.CodeFmt != nil {
-		l.cmdProviders = append(l.cmdProviders, l.CodeFmt)
-	}
-
-	for _, cmds := range l.cmdProviders {
-		cmds.Init()
-	}
+type coreCmds struct {
 }
 
-func metaCmdsHandle(req *msgReq, resp *msgResp) bool {
+func (me *coreCmds) handle(req *msgReq, resp *msgResp) bool {
 	switch req.MsgID {
-	case msgID_metaCmds_ListAll:
-		metaCmdsHandleListAll(req, resp)
+	case msgID_coreCmds_ListAll:
+		me.handle_ListAll(req, resp)
 	default:
 		return false
 	}
 	return true
 }
 
-func metaCmdsHandleListAll(req *msgReq, resp *msgResp) {
+func (me *coreCmds) handle_ListAll(req *msgReq, resp *msgResp) {
 	var cats sort.StringSlice
-	m := metaCmdsMenu{Desc: "Categories: "}
+	m := coreCmdsMenu{Desc: "Categories: "}
 	for _, cmds := range Lang.cmdProviders {
 		for _, cmd := range cmds.Cmds() {
 			if cmd.Category = cmds.CmdsCategory(); !uslice.StrHas(cats, cmd.Category) {
@@ -62,5 +54,18 @@ func metaCmdsHandleListAll(req *msgReq, resp *msgResp) {
 	}
 	sort.Sort(cats)
 	m.Desc += strings.Join(cats, " · ")
-	resp.MetaCmdsMenu = &m
+	resp.CoreCmdsMenu = &m
+}
+
+func (me *coreCmds) Init() {
+	l := &Lang
+
+	if l.CodeFmt != nil {
+		l.cmdProviders = append(l.cmdProviders, l.CodeFmt)
+	}
+
+	for _, cmds := range l.cmdProviders {
+		cmds.Init()
+		handlers = append(handlers, cmds)
+	}
 }

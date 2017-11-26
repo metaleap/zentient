@@ -10,7 +10,7 @@ type msgIDs uint8
 const (
 	_ msgIDs = iota
 
-	msgID_metaCmds_ListAll
+	msgID_coreCmds_ListAll
 
 	msgID_codeFmt_ListAll
 )

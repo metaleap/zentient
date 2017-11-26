@@ -5,28 +5,27 @@ import (
 )
 
 type iCodeFormatting interface {
-	iResponder
-	iMetaCmds
+	iCoreCmds
 
 	IsInstalled(string) bool
 	KnownFormatters() []string
 }
 
 type CodeFormattingBase struct {
-	cmdListAll *metaCmd
+	cmdListAll *coreCmd
 
 	Self iCodeFormatting
 }
 
 func (me *CodeFormattingBase) Init() {
-	me.cmdListAll = &metaCmd{
+	me.cmdListAll = &coreCmd{
 		ID: "lkf", MsgID: msgID_codeFmt_ListAll,
 		Title: "List Known Formatters",
 		Desc:  "Lists all known " + Lang.Title + " formatters and their installation info",
 	}
 }
 
-func (me *CodeFormattingBase) Cmds() (cmds []*metaCmd) {
+func (me *CodeFormattingBase) Cmds() (cmds []*coreCmd) {
 	if me.cmdListAll.Hint == "" {
 		me.cmdListAll.Hint = strings.Join(me.Self.KnownFormatters(), " · ")
 	}
@@ -48,12 +47,11 @@ func (me *CodeFormattingBase) handle(req *msgReq, resp *msgResp) bool {
 	return true
 }
 
-func (CodeFormattingBase) handle_ListAll(req *msgReq, resp *msgResp) {
-	m := metaCmdsMenu{Desc: "List of formatters:"}
+func (me *CodeFormattingBase) handle_ListAll(req *msgReq, resp *msgResp) {
 	cfmt := Lang.CodeFmt // need the interface impl, not the embedded base!
-	cat := cfmt.CmdsCategory()
+	m := coreCmdsMenu{Desc: strf("❬%s❭ · %s:", cfmt.CmdsCategory(), me.cmdListAll.Title)}
 	for _, fmtname := range cfmt.KnownFormatters() {
-		var cmd = metaCmd{Category: cat, Title: fmtname}
+		var cmd = coreCmd{Title: fmtname}
 		if !cfmt.IsInstalled(fmtname) {
 			cmd.Hint = "Not installed"
 			cmd.Desc = "Click to open installation instructions"
@@ -63,5 +61,5 @@ func (CodeFormattingBase) handle_ListAll(req *msgReq, resp *msgResp) {
 		}
 		m.Choices = append(m.Choices, &cmd)
 	}
-	resp.MetaCmdsMenu = &m
+	resp.CoreCmdsMenu = &m
 }

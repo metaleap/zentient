@@ -13,7 +13,10 @@ import (
 )
 
 var (
-	strf = fmt.Sprintf
+	strf     = fmt.Sprintf
+	handlers = []iResponder{
+		&coreCmds{},
+	}
 
 	Lang struct {
 		Enabled bool
@@ -21,35 +24,37 @@ var (
 		Title   string
 		CodeFmt iCodeFormatting
 
-		cmdProviders []iMetaCmds
+		cmdProviders []iCoreCmds
 	}
 
-	Prog struct {
-		Name     string
-		CacheDir string
+	prog struct {
+		name     string
+		cacheDir string
 	}
 
-	PipeIO struct {
-		OutEncoder *json.Encoder
-		OutWriter  *bufio.Writer
+	pipeIO struct {
+		outEncoder *json.Encoder
+		outWriter  *bufio.Writer
 	}
 )
 
 func Bad(what, which string) {
-	panic(strf("%s: bad %s %s '%s'", Prog.Name, Lang.Title, what, which))
+	panic(strf("%s: invalid %s %s '%s'", prog.name, Lang.Title, what, which))
 }
 
 func Init() (err error) {
-	Prog.CacheDir = filepath.Join(usys.UserDataDirPath(), os.Args[0])
-	err = ufs.EnsureDirExists(Prog.CacheDir)
+	prog.cacheDir = filepath.Join(usys.UserDataDirPath(), os.Args[0])
+	err = ufs.EnsureDirExists(prog.cacheDir)
 
-	metaCmdsProvidersInit()
+	for _, preDefinedHandler := range handlers {
+		preDefinedHandler.Init()
+	}
 	return
 }
 
 func InitAndServeOrPanic(onPreInit func(), onPostInit func()) {
 	// note to self: don't ADD any further logic in here, either in Init() or in Serve()
-	Prog.Name = os.Args[0]
+	prog.name = os.Args[0]
 	onPreInit()
 	err := Init()
 	if err == nil {
@@ -73,28 +78,30 @@ func catch(err *error) {
 
 func Serve() (err error) {
 	var stdin *bufio.Scanner
-	stdin, PipeIO.OutWriter, PipeIO.OutEncoder = urun.SetupJsonProtoPipes(1024*1024*4, false, true)
+	stdin, pipeIO.outWriter, pipeIO.outEncoder = urun.SetupJsonProtoPipes(1024*1024*4, false, true)
 	// we don't directly wire up a json.Decoder to stdin but read individual lines in as strings first:
 	// - this enforces our line-based protocol
 	// - allows decoding in separate go-routine
 	// - bad lines are simply reported without decoder in confused/error state or needing to quit
 	defer catch(&err)
 	for stdin.Scan() {
-		if err = stdin.Err(); err != nil {
+		if err = stdin.Err(); err == nil {
+			go serveIncomingReq(stdin.Text())
+		} else {
 			return
 		}
-		go serveIncomingReq(stdin.Text())
 	}
 	return
 }
 
 func serveIncomingReq(jsonreq string) {
-	// err only covers: either resp couldn't be encoded, or stdout problem
-	// all other errors are captured in resp.ErrMsg
+	// err only covers: either resp couldn't be encoded, or stdout write/flush problem
+	// (both would indicate bigger problems --- still recovered in Serve() though)
+	// any other kind of error, reqDecodeAndRespond will record into resp.ErrMsg to report it back to the client
 	resp := reqDecodeAndRespond(jsonreq)
-	err := PipeIO.OutEncoder.Encode(resp)
+	err := pipeIO.outEncoder.Encode(resp)
 	if err == nil {
-		err = PipeIO.OutWriter.Flush()
+		err = pipeIO.outWriter.Flush()
 	}
 	if err != nil {
 		panic(err)
