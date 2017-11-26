@@ -8,20 +8,7 @@ type MsgResp struct {
 	ReqID  int64  `json:"i"`
 	ErrMsg string `json:"e,omitempty"`
 
-	Menu *MsgRespMenu `json:"m,omitempty"`
-}
-
-type MsgRespMenu struct {
-	Desc    string         `json:"d"`
-	Choices []*MsgRespPick `json:"c"`
-}
-
-type MsgRespPick struct {
-	ID     int    `json:"i"`
-	MsgID  MsgIDs `json:"m,omitempty"`
-	Title  string `json:"t"`
-	Desc   string `json:"d1,omitempty"`
-	Detail string `json:"d2,omitempty"`
+	MetaCmdsMenu *MetaCmdsMenu `json:"mcM,omitempty"`
 }
 
 func (me *MsgResp) encode() (jsonresp string, err error) {

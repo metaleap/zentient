@@ -1,10 +1,40 @@
 package z
 
+type IMetaCmds interface {
+	Cmds() []*MetaCmd
+	CmdsCategory() string
+}
+
+type MetaCmdsMenu struct {
+	Desc    string     `json:"d"`
+	Choices []*MetaCmd `json:"c"`
+}
+
+type MetaCmd struct {
+	ID       string `json:"i"`
+	MsgID    MsgIDs `json:"m,omitempty"`
+	Category string `json:"c"`
+	Title    string `json:"t"`
+	Desc     string `json:"d1,omitempty"`
+	Detail   string `json:"d2,omitempty"`
+}
+
+func metaCmdsProvidersUpdate() {
+	l := &Lang
+	l.cmdProviders = []IMetaCmds{}
+
+	if l.CodeFmt != nil {
+		l.cmdProviders = append(l.cmdProviders, l.CodeFmt)
+	}
+}
+
 func handleMetaCmdsListAll(req *MsgReq, resp *MsgResp) {
-	resp.Menu = &MsgRespMenu{Desc: "Choose wisely, mister:"}
-	menu := resp.Menu.Choices
-	menu = append(menu, &MsgRespPick{ID: 1, Title: "Choice One", Desc: "First choice.. First choice.. First choice.. First choice.. First choice.. First choice.. First choice.. ", Detail: "1 detail, 1 detail, 1 detail, 1 detail, 1 detail, 1 detail, 1 detail, 1 detail, "})
-	menu = append(menu, &MsgRespPick{ID: 2, Title: "Choice Two", Desc: "Second choice.. Second choice.. Second choice.. Second choice.. Second choice.. Second choice.. Second choice.. ", Detail: "2 details, 2 details, 2 details, 2 details, 2 details, 2 details, 2 details, 2 details, "})
-	menu = append(menu, &MsgRespPick{ID: 3, Title: "Choice Tri", Desc: "Third choice.. Third choice.. Third choice.. Third choice.. Third choice.. Third choice.. Third choice.. Third choice.. ", Detail: "3 details, 3 details, 3 details, 3 details, 3 details, 3 details, 3 details, 3 details, "})
-	resp.Menu.Choices = menu
+	m := MetaCmdsMenu{Desc: "Choose wisely, mister:"}
+	for _, cmds := range Lang.cmdProviders {
+		for _, cmd := range cmds.Cmds() {
+			cmd.Category = cmds.CmdsCategory()
+			m.Choices = append(m.Choices, cmd)
+		}
+	}
+	resp.MetaCmdsMenu = &m
 }

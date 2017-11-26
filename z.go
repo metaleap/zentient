@@ -16,7 +16,12 @@ import (
 var (
 	strf = fmt.Sprintf
 
-	LangID   string
+	Lang struct {
+		cmdProviders []IMetaCmds
+
+		CodeFmt ICodeFormatting
+	}
+
 	CacheDir string
 	PipeIO   struct {
 		Out    *json.Encoder
@@ -24,17 +29,18 @@ var (
 	}
 )
 
-func Init(langID string) (err error) {
-	LangID = langID
+func Init() (err error) {
 	CacheDir = filepath.Join(usys.UserDataDirPath(), os.Args[0])
 	err = ufs.EnsureDirExists(CacheDir)
 	return
 }
 
-func InitAndServeOrPanic(langID string) {
-	if err := Init("go"); err != nil {
+func InitAndServeOrPanic(onPostInit func()) {
+	if err := Init(); err != nil {
 		panic(err)
 	}
+	onPostInit()
+	metaCmdsProvidersUpdate()
 	Serve()
 }
 
