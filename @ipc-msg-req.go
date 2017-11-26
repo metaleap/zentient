@@ -2,6 +2,7 @@ package z
 
 import (
 	"encoding/json"
+	"strings"
 )
 
 type msgIDs uint8
@@ -30,7 +31,9 @@ type msgReq struct {
 func reqDecodeAndRespond(jsonreq string) *msgResp {
 	var req msgReq
 	var resp msgResp
-	if err := json.Unmarshal([]byte(jsonreq), &req); err == nil {
+	if !Lang.Enabled {
+		resp.ErrMsg = strf("%s does not appear to be installed on this machine.", Lang.Title)
+	} else if err := json.NewDecoder(strings.NewReader(jsonreq)).Decode(&req); err == nil {
 		resp.ReqID = req.ReqID
 		resp.to(&req)
 	} else {
