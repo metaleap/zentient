@@ -44,7 +44,7 @@ func (me *coreCmdsHandler) handle(req *msgReq, resp *msgResp) bool {
 
 func (me *coreCmdsHandler) handle_ListAll(req *msgReq, resp *msgResp) {
 	var cats sort.StringSlice
-	m := coreCmdsMenu{Desc: "Showing categories: ", TopLevel: true}
+	m := coreCmdsMenu{Desc: "Showing: ", TopLevel: true}
 	for _, cmds := range cmdProviders {
 		for _, cmd := range cmds.Cmds(req.SrcLoc) {
 			if cmd.Category = cmds.CmdsCategory(); !uslice.StrHas(cats, cmd.Category) {

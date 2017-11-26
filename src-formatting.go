@@ -57,9 +57,15 @@ func (me *SrcFormattingBase) Cmds(srcLoc *SrcLoc) (cmds []*coreCmd) {
 	}
 	if srcLoc != nil {
 		if srcLoc.FilePath != "" || srcLoc.SrcFull != "" {
+			me.cmdRunOnFile.Desc = "using muh_default_formatter"
+			if me.cmdRunOnFile.Hint = srcLoc.FilePath; me.cmdRunOnFile.Hint == "" {
+				me.cmdRunOnFile.Hint = srcLoc.SrcFull
+			}
 			cmds = append(cmds, me.cmdRunOnFile)
 		}
 		if srcLoc.SrcSel != "" {
+			me.cmdRunOnSel.Desc = "using muh_default_formatter"
+			me.cmdRunOnSel.Hint = srcLoc.SrcSel
 			cmds = append(cmds, me.cmdRunOnSel)
 		}
 	}
