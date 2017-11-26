@@ -4,12 +4,10 @@ import (
 	"github.com/metaleap/zentient"
 )
 
-var (
-	CodeFmt CodeFormatting
-)
-
 func OnPreInit() {
-	z.Lang.CodeFmt = &CodeFmt
+	l := &z.Lang
+	l.ID = "go"
+	l.Title = "Go"
 }
 
 func OnPostInit() {

@@ -6,6 +6,5 @@ import (
 )
 
 func main() {
-	zhs.OnPreInit()
-	z.InitAndServeOrPanic(zhs.OnPostInit)
+	z.InitAndServeOrPanic(zhs.OnPreInit, zhs.OnPostInit)
 }

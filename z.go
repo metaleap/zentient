@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/metaleap/go-util/fs"
 	"github.com/metaleap/go-util/run"
@@ -17,47 +16,58 @@ var (
 	strf = fmt.Sprintf
 
 	Lang struct {
-		cmdProviders []IMetaCmds
+		ID      string
+		Title   string
+		CodeFmt iCodeFormatting
 
-		CodeFmt ICodeFormatting
+		cmdProviders []iMetaCmds
 	}
 
-	CacheDir string
-	PipeIO   struct {
-		Out    *json.Encoder
-		RawOut *bufio.Writer
+	Prog struct {
+		Name     string
+		CacheDir string
+	}
+
+	PipeIO struct {
+		OutEncoder *json.Encoder
+		OutWriter  *bufio.Writer
 	}
 )
 
 func Init() (err error) {
-	CacheDir = filepath.Join(usys.UserDataDirPath(), os.Args[0])
-	err = ufs.EnsureDirExists(CacheDir)
+	Prog.CacheDir = filepath.Join(usys.UserDataDirPath(), os.Args[0])
+	err = ufs.EnsureDirExists(Prog.CacheDir)
+
+	metaCmdsProvidersInit()
 	return
 }
 
-func InitAndServeOrPanic(onPostInit func()) {
+func InitAndServeOrPanic(onPreInit func(), onPostInit func()) {
+	// note to self: don't ADD any further logic in here, either in Init() or in Serve()
+	Prog.Name = os.Args[0]
+	onPreInit()
 	if err := Init(); err != nil {
 		panic(err)
 	}
 	onPostInit()
-	metaCmdsProvidersUpdate()
 	Serve()
 }
 
 func Serve() {
 	var stdin *bufio.Scanner
-	stdin, PipeIO.RawOut, PipeIO.Out = urun.SetupJsonProtoPipes(1024*1024*4, false, true)
+	stdin, PipeIO.OutWriter, PipeIO.OutEncoder = urun.SetupJsonProtoPipes(1024*1024*4, false, true)
 	for stdin.Scan() {
-		go Handle(stdin.Text())
+		go serveIncomingReq(stdin.Text())
 	}
 }
 
-func Handle(jsonreq string) {
+func serveIncomingReq(jsonreq string) {
 	resp := reqDecodeAndRespond(jsonreq)
-	time.Sleep(time.Millisecond * 444)
-	if jsonresp, err := resp.encode(); err != nil {
-		panic(err)
-	} else if _, err = fmt.Println(jsonresp); err != nil {
+	err := PipeIO.OutEncoder.Encode(resp)
+	if err == nil {
+		err = PipeIO.OutWriter.Flush()
+	}
+	if err != nil {
 		panic(err)
 	}
 }

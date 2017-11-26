@@ -1,4 +1,4 @@
-package zgo
+package zhs
 
 import (
 	"github.com/metaleap/zentient"

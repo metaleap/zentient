@@ -4,16 +4,19 @@ import (
 	"encoding/json"
 )
 
-type MsgIDs uint8
+type msgIDs uint8
 
 const (
-	_ MsgIDs = iota
-	REQ_META_CMDS_LISTALL
+	_ msgIDs = iota
+
+	msgID_metaCmds_ListAll
+
+	msgID_codeFmt_ListAll
 )
 
-type MsgReq struct {
+type msgReq struct {
 	ReqID int64  `json:"i"`
-	MsgID MsgIDs `json:"m"`
+	MsgID msgIDs `json:"m"`
 
 	FilePath string                 `json:"fp"`
 	SrcFull  string                 `json:"sf"`
@@ -24,9 +27,9 @@ type MsgReq struct {
 	Args     map[string]interface{} `json:"a"`
 }
 
-func reqDecodeAndRespond(jsonreq string) *MsgResp {
-	var req MsgReq
-	var resp MsgResp
+func reqDecodeAndRespond(jsonreq string) *msgResp {
+	var req msgReq
+	var resp msgResp
 	if err := json.Unmarshal([]byte(jsonreq), &req); err == nil {
 		resp.ReqID = req.ReqID
 		resp.to(&req)

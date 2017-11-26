@@ -6,6 +6,5 @@ import (
 )
 
 func main() {
-	zgo.OnPreInit()
-	z.InitAndServeOrPanic(zgo.OnPostInit)
+	z.InitAndServeOrPanic(zgo.OnPreInit, zgo.OnPostInit)
 }

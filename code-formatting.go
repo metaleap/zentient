@@ -1,19 +1,49 @@
 package z
 
-type ICodeFormatting interface {
-	IMetaCmds
+type iCodeFormatting interface {
+	iMetaCmds
+
+	KnownFormatters() []string
 }
 
 type CodeFormattingBase struct {
+	cmdListAll *metaCmd
 }
 
-func (me *CodeFormattingBase) Cmds() (cmds []*MetaCmd) {
-	cmds = append(cmds, &MetaCmd{ID: "1", Title: "Choice One", Desc: "First choice.. First choice.. First choice.. First choice.. First choice.. First choice.. First choice.. ", Detail: "1 detail, 1 detail, 1 detail, 1 detail, 1 detail, 1 detail, 1 detail, 1 detail, "})
-	cmds = append(cmds, &MetaCmd{ID: "2", Title: "Choice Two", Desc: "Second choice.. Second choice.. Second choice.. Second choice.. Second choice.. Second choice.. Second choice.. ", Detail: "2 details, 2 details, 2 details, 2 details, 2 details, 2 details, 2 details, 2 details, "})
-	cmds = append(cmds, &MetaCmd{ID: "3", Title: "Choice Tri", Desc: "Third choice.. Third choice.. Third choice.. Third choice.. Third choice.. Third choice.. Third choice.. Third choice.. ", Detail: "3 details, 3 details, 3 details, 3 details, 3 details, 3 details, 3 details, 3 details, "})
+func (me *CodeFormattingBase) Init() {
+	me.cmdListAll = &metaCmd{
+		ID: "lkf", MsgID: msgID_codeFmt_ListAll,
+		Title: "List Known Formatters",
+		Hint:  "gofmt goreturns etc",
+		Desc:  "Lists all known " + Lang.Title + " formatters and their installation info",
+	}
+}
+
+func (me *CodeFormattingBase) Cmds() (cmds []*metaCmd) {
+	cmds = append(cmds, me.cmdListAll)
 	return
 }
 
 func (me *CodeFormattingBase) CmdsCategory() string {
 	return "Formatting"
+}
+
+func (me *CodeFormattingBase) KnownFormatters() []string {
+	return nil
+}
+
+func codeFmtHandle(req *msgReq, resp *msgResp) bool {
+	switch req.MsgID {
+	case msgID_codeFmt_ListAll:
+		codeFmtHandleListAll(req, resp)
+	default:
+		return false
+	}
+	return true
+}
+
+func codeFmtHandleListAll(req *msgReq, resp *msgResp) {
+	m := metaCmdsMenu{Desc: "List of formatters:"}
+	m.Choices = append(m.Choices, &metaCmd{Title: "Foo Title", Category: "Foo Cat"})
+	resp.MetaCmdsMenu = &m
 }
