@@ -7,13 +7,7 @@ import (
 type iSrcFormatting interface {
 	iCoreCmds
 
-	KnownFormatters() []*SrcFormatterDesc
-}
-
-type SrcFormatterDesc struct {
-	Name      string
-	Link      string
-	Installed bool
+	KnownFormatters() []*Tool
 }
 
 type SrcFormattingBase struct {
@@ -55,16 +49,25 @@ func (me *SrcFormattingBase) Cmds(srcLoc *SrcLoc) (cmds []*coreCmd) {
 		}
 		me.cmdListAll.Hint = strings.Join(kfnames, " · ")
 	}
+
 	if srcLoc != nil {
+		desc := "(" + me.cmdSetDef.Desc + " first)"
+		if Prog.Cfg.FormatterName != "" {
+			if desc = "using "; Prog.Cfg.FormatterProg != "" && Prog.Cfg.FormatterProg != Prog.Cfg.FormatterName {
+				desc += "'" + Prog.Cfg.FormatterProg + "' in place of "
+			}
+			desc += "'" + Prog.Cfg.FormatterName + "'"
+		}
+
 		if srcLoc.FilePath != "" || srcLoc.SrcFull != "" {
-			me.cmdRunOnFile.Desc = "using muh_default_formatter"
+			me.cmdRunOnFile.Desc = desc
 			if me.cmdRunOnFile.Hint = srcLoc.FilePath; me.cmdRunOnFile.Hint == "" {
 				me.cmdRunOnFile.Hint = srcLoc.SrcFull
 			}
 			cmds = append(cmds, me.cmdRunOnFile)
 		}
 		if srcLoc.SrcSel != "" {
-			me.cmdRunOnSel.Desc = "using muh_default_formatter"
+			me.cmdRunOnSel.Desc = desc
 			me.cmdRunOnSel.Hint = srcLoc.SrcSel
 			cmds = append(cmds, me.cmdRunOnSel)
 		}
@@ -96,7 +99,7 @@ func (me *SrcFormattingBase) handle_InfoLink(req *msgReq, resp *msgResp) {
 			if !kf.Installed {
 				resp.Note = strf("After installing '%s', reload Zentient to recognize it.", kf.Name)
 			}
-			resp.WebsiteURL = kf.Link
+			resp.WebsiteURL = kf.Website
 			return
 		}
 	}
@@ -108,7 +111,7 @@ func (me *SrcFormattingBase) handle_ListAll(req *msgReq, resp *msgResp) {
 	m := coreCmdsMenu{Desc: strf("❬%s❭ · %s:", cfmt.CmdsCategory(), me.cmdListAll.Title)}
 	for _, kf := range cfmt.KnownFormatters() {
 		var cmd = coreCmd{Title: kf.Name, MsgArgs: kf.Name, MsgID: msgID_srcFmt_InfoLink}
-		cmd.Desc = "➜ Open website at " + kf.Link
+		cmd.Desc = "➜ Open website at " + kf.Website
 		if !kf.Installed {
 			cmd.Hint = "Not installed"
 		} else {

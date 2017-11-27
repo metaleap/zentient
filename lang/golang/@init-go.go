@@ -11,6 +11,7 @@ func OnPreInit() {
 	l.Title = "Go"
 	if l.Enabled = udevgo.HasGoDevEnv(); l.Enabled {
 		go udevgo.RefreshPkgs()
+		toolsInit()
 		srcFmt.onPreInit()
 	}
 }

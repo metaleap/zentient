@@ -1,14 +1,13 @@
 package zhs
 
 import (
-	"github.com/metaleap/go-util/dev/hs"
 	"github.com/metaleap/zentient"
 )
 
 type srcFormatting struct {
 	z.SrcFormattingBase
 
-	knownFormatters []*z.SrcFormatterDesc
+	knownFormatters []*z.Tool
 }
 
 var (
@@ -21,13 +20,11 @@ func init() {
 }
 
 func (me *srcFormatting) onPreInit() {
-	srcFmt.knownFormatters = []*z.SrcFormatterDesc{
-		&z.SrcFormatterDesc{Name: "stylish-haskell", Link: "http://github.com/jaspervdj/stylish-haskell#readme", Installed: udevhs.Has_stylish_haskell},
-		&z.SrcFormatterDesc{Name: "hindent", Link: "http://github.com/commercialhaskell/hindent#readme", Installed: udevhs.Has_hindent},
-		&z.SrcFormatterDesc{Name: "brittany", Link: "http://github.com/lspitzner/brittany#readme", Installed: udevhs.Has_brittany},
+	srcFmt.knownFormatters = []*z.Tool{
+		tools.hindent, tools.stylishhaskell, tools.brittany,
 	}
 }
 
-func (me *srcFormatting) KnownFormatters() []*z.SrcFormatterDesc {
+func (me *srcFormatting) KnownFormatters() []*z.Tool {
 	return me.knownFormatters
 }

@@ -15,10 +15,10 @@ import (
 var (
 	strf = fmt.Sprintf
 
-	handlers = []iHandler{
+	cmdProviders []iCoreCmds
+	handlers     = []iHandler{
 		&coreCmdsHandler{},
 	}
-	cmdProviders []iCoreCmds
 
 	Lang struct {
 		Enabled bool
@@ -26,12 +26,14 @@ var (
 		Title   string
 		SrcFmt  iSrcFormatting
 	}
-
-	prog struct {
-		name     string
-		cacheDir string
+	Prog struct {
+		Cfg  Config
+		name string
+		dir  struct {
+			cache  string
+			config string
+		}
 	}
-
 	pipeIO struct {
 		outEncoder *json.Encoder
 		outWriter  *bufio.Writer
@@ -39,22 +41,28 @@ var (
 )
 
 func Bad(what, which string) {
-	panic(strf("%s: invalid %s %s '%s'", prog.name, Lang.Title, what, which))
+	panic(strf("%s: invalid %s %s '%s'", Prog.name, Lang.Title, what, which))
 }
 
 func Init() (err error) {
-	prog.cacheDir = filepath.Join(usys.UserDataDirPath(), os.Args[0])
-	err = ufs.EnsureDirExists(prog.cacheDir)
-
-	for _, preDefinedHandler := range handlers {
-		preDefinedHandler.Init()
+	Prog.name = os.Args[0]
+	Prog.dir.config = filepath.Join(usys.UserDataDirPath(false), Prog.name)
+	Prog.dir.cache = filepath.Join(usys.UserDataDirPath(true), Prog.name)
+	if err = ufs.EnsureDirExists(Prog.dir.config); err != nil {
+		return
+	} else if err = ufs.EnsureDirExists(Prog.dir.cache); err != nil {
+		return
+	}
+	if Prog.Cfg.reload(); Prog.Cfg.err == nil {
+		for _, preDefinedHandler := range handlers {
+			preDefinedHandler.Init()
+		}
 	}
 	return
 }
 
 func InitAndServeOrPanic(onPreInit func(), onPostInit func()) {
 	// note to self: don't ADD any further logic in here, either in Init() or in Serve()
-	prog.name = os.Args[0]
 	onPreInit()
 	err := Init()
 	if err == nil {
@@ -82,7 +90,7 @@ func Serve() (err error) {
 	// we don't directly wire up a json.Decoder to stdin but read individual lines in as strings first:
 	// - this enforces our line-based protocol
 	// - allows decoding in separate go-routine
-	// - bad lines are simply reported without decoder in confused/error state or needing to quit
+	// - bad lines are simply reported without decoder in confused/error state; and without needing to exit
 	defer catch(&err)
 	for stdin.Scan() {
 		if err = stdin.Err(); err == nil {
@@ -95,8 +103,8 @@ func Serve() (err error) {
 }
 
 func serveIncomingReq(jsonreq string) {
-	// err only covers: either resp couldn't be encoded, or stdout write/flush problem
-	// (both would indicate bigger problems --- still recovered in Serve() though)
+	// err only covers: either resp couldn't be json-encoded, or stdout write/flush problem
+	// (both would indicate bigger problems --- still recover()ed in Serve() though)
 	// any other kind of error, reqDecodeAndRespond will record into resp.ErrMsg to report it back to the client
 	resp := reqDecodeAndRespond(jsonreq)
 	err := pipeIO.outEncoder.Encode(resp)
