@@ -14,7 +14,8 @@ const (
 
 	msgID_srcFmt_ListAll
 	msgID_srcFmt_InfoLink
-	msgID_srcFmt_SetDef
+	msgID_srcFmt_SetDefMenu
+	msgID_srcFmt_SetDefPick
 	msgID_srcFmt_RunOnFile
 	msgID_srcFmt_RunOnSel
 )

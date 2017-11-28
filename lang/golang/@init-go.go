@@ -17,4 +17,5 @@ func OnPreInit() {
 }
 
 func OnPostInit() {
+	srcFmt.onPostInit()
 }

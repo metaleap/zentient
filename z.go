@@ -6,10 +6,16 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/metaleap/go-util/fs"
 	"github.com/metaleap/go-util/run"
 	"github.com/metaleap/go-util/sys"
+)
+
+const (
+	// ℤ = "⟨ℤ⟩"
+	pretendSlow = true
 )
 
 var (
@@ -88,25 +94,29 @@ func Serve() (err error) {
 	var stdin *bufio.Scanner
 	stdin, pipeIO.outWriter, pipeIO.outEncoder = urun.SetupJsonProtoPipes(1024*1024*4, false, true)
 	// we don't directly wire up a json.Decoder to stdin but read individual lines in as strings first:
-	// - this enforces our line-based protocol
+	// - this enforces our line-delimited (rather than 'json-delimited') protocol
 	// - allows decoding in separate go-routine
-	// - bad lines are simply reported without decoder in confused/error state; and without needing to exit
+	// - bad lines are simply reported to client without having decoder in confused/error state; and without needing to exit
 	defer catch(&err)
 	for stdin.Scan() {
-		if err = stdin.Err(); err == nil {
-			go serveIncomingReq(stdin.Text())
-		} else {
+		if err = stdin.Err(); err != nil {
 			return
+		} else {
+			go serveIncomingReq(stdin.Text())
 		}
 	}
 	return
 }
 
 func serveIncomingReq(jsonreq string) {
+	if pretendSlow {
+		time.Sleep(time.Millisecond * 555) // temporary artificial delay to briefly see client-side progress-bars etc
+	}
+	resp := reqDecodeAndRespond(jsonreq)
+
 	// err only covers: either resp couldn't be json-encoded, or stdout write/flush problem
 	// (both would indicate bigger problems --- still recover()ed in Serve() though)
 	// any other kind of error, reqDecodeAndRespond will record into resp.ErrMsg to report it back to the client
-	resp := reqDecodeAndRespond(jsonreq)
 	err := pipeIO.outEncoder.Encode(resp)
 	if err == nil {
 		err = pipeIO.outWriter.Flush()

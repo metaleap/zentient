@@ -14,6 +14,12 @@ type msgResp struct {
 	Note         string        `json:"note,omitempty"`
 }
 
+type msgArgPrompt struct {
+	Prompt      string `json:"prompt,omitempty"`
+	Placeholder string `json:"placeHolder,omitempty"`
+	Value       string `json:"value,omitempty"`
+}
+
 func (me *msgResp) catch() {
 	if except := recover(); except != nil {
 		me.ErrMsg = strf("%v", except)

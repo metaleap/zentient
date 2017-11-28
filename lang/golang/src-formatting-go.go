@@ -25,6 +25,12 @@ func (me *srcFormatting) onPreInit() {
 	}
 }
 
+func (me *srcFormatting) onPostInit() {
+	if z.Prog.Cfg.FormatterName == "" && tools.gofmt.Installed {
+		z.Prog.Cfg.FormatterName = "gofmt"
+	}
+}
+
 func (me *srcFormatting) KnownFormatters() []*z.Tool {
 	return me.knownFormatters
 }
