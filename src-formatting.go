@@ -1,9 +1,14 @@
 package z
 
+import (
+	"github.com/metaleap/go-util/fs"
+)
+
 type iSrcFormatting interface {
 	iCoreCmds
 
-	KnownFormatters() []*Tool
+	KnownFormatters() Tools
+	RunFormatter(*Tool, string, string, string) (string, error)
 }
 
 type SrcFormattingBase struct {
@@ -18,7 +23,7 @@ func (me *SrcFormattingBase) Init() {
 	me.cmdSetDef = &coreCmd{
 		MsgID: msgID_srcFmt_SetDefMenu,
 		Title: "Change Default Formatter",
-		Desc:  strf("Specify your preferred default %s source formatter", Lang.Title),
+		Desc:  Strf("Specify your preferred default %s source formatter", Lang.Title),
 	}
 	me.cmdRunOnFile = &coreCmd{
 		MsgID: msgID_srcFmt_RunOnFile,
@@ -35,9 +40,9 @@ func (me *SrcFormattingBase) Cmds(srcLoc *SrcLoc) (cmds []*coreCmd) {
 		desc := "(" + me.cmdSetDef.Desc + " first)"
 		if me.hasFormatter() {
 			if desc = "➜ using "; me.isFormatterCustom() {
-				desc += "'" + Prog.Cfg.FormatterProg + "' as a "
+				desc += "'" + Prog.Cfg.FormatterProg + "' like "
 			}
-			desc += "'" + Prog.Cfg.FormatterName + "' equivalent"
+			desc += "'" + Prog.Cfg.FormatterName + "'"
 		}
 
 		if srcLoc.FilePath != "" || srcLoc.SrcFull != "" {
@@ -74,20 +79,59 @@ func (me *SrcFormattingBase) handle(req *msgReq, resp *msgResp) bool {
 		me.handle_SetDefMenu(req, resp)
 	case msgID_srcFmt_SetDefPick:
 		me.handle_SetDefPick(req, resp)
+	case msgID_srcFmt_RunOnFile, msgID_srcFmt_RunOnSel:
+		me.handle_RunFormatter(req, resp)
 	default:
 		return false
 	}
 	return true
 }
 
+func (me *SrcFormattingBase) handle_RunFormatter(req *msgReq, resp *msgResp) {
+	self := me.Self
+	formatter := self.KnownFormatters().ByName(Prog.Cfg.FormatterName)
+	if formatter == nil {
+		resp.NoteWarn = "Select a Default Formatter first, either via the Zentient 'Palette' menu or:"
+		resp.MsgID = msgID_srcFmt_SetDefMenu
+		resp.MsgAction = Strf("Pick your preferred Zentient default %s formatter…", Lang.Title)
+		return
+	}
+
+	srcfilepath := req.SrcLoc.FilePath
+	if !ufs.FileExists(srcfilepath) {
+		srcfilepath = ""
+	}
+
+	src := &req.SrcLoc.SrcSel
+	if *src == "" {
+		src = &req.SrcLoc.SrcFull
+	}
+	// if *src == "" && req.SrcLoc.FilePath != "" && ufs.FileExists(req.SrcLoc.FilePath) {
+	// 	req.SrcLoc.SrcFull = ufs.ReadTextFile(req.SrcLoc.FilePath, true, "")
+	// 	src = &req.SrcLoc.SrcFull
+	// }
+	if *src != "" {
+		srcfilepath = ""
+	} else if srcfilepath == "" {
+		resp.ErrMsg = "Nothing to format?!"
+		return
+	}
+
+	if srcformatted, err := self.RunFormatter(formatter, Prog.Cfg.FormatterProg, srcfilepath, *src); err != nil {
+		resp.ErrMsg = err.Error()
+	} else {
+		*src = srcformatted
+		resp.SrcMod = req.SrcLoc
+	}
+}
+
 func (me *SrcFormattingBase) handle_SetDefMenu(req *msgReq, resp *msgResp) {
-	cfmt := Lang.SrcFmt // need the interface impl, not the embedded base!
 	m := coreCmdsMenu{Desc: "First pick a known formatter, then optionally specify a custom tool name:"}
-	for _, kf := range cfmt.KnownFormatters() {
+	for _, kf := range me.Self.KnownFormatters() {
 		var cmd = coreCmd{Title: kf.Name, MsgID: msgID_srcFmt_SetDefPick}
 		cmd.MsgArgs = map[string]interface{}{"fn": kf.Name, "fp": msgArgPrompt{Placeholder: kf.Name,
-			Prompt: strf("Optionally enter the name of an alternative '%s'-compatible equivalent tool to use", kf.Name)}}
-		cmd.Desc = strf("➜ Pick to use '%s' (or compatible equivalent) as the default %s formatter", kf.Name, Lang.Title)
+			Prompt: Strf("Optionally enter the name of an alternative '%s'-compatible equivalent tool to use", kf.Name)}}
+		cmd.Desc = Strf("➜ Pick to use '%s' (or compatible equivalent) as the default %s formatter", kf.Name, Lang.Title)
 		if kf.Name != Prog.Cfg.FormatterName || !me.isFormatterCustom() {
 			if cmd.Hint = "· Installed "; !kf.Installed {
 				cmd.Hint = "· Not Installed "
@@ -113,11 +157,11 @@ func (me *SrcFormattingBase) handle_SetDefPick(req *msgReq, resp *msgResp) {
 	if err := Prog.Cfg.Save(); err != nil {
 		resp.ErrMsg = err.Error()
 	} else {
-		resp.Note = strf("Default %s formatter changed to '%s'", Lang.Title, Prog.Cfg.FormatterName)
+		resp.NoteInfo = Strf("Default %s formatter changed to '%s'", Lang.Title, Prog.Cfg.FormatterName)
 		if me.isFormatterCustom() {
-			resp.Note += strf("-compatible equivalent '%s'", Prog.Cfg.FormatterProg)
+			resp.NoteInfo += Strf("-compatible equivalent '%s'", Prog.Cfg.FormatterProg)
 		}
-		resp.Note += "."
+		resp.NoteInfo += "."
 	}
 }
 

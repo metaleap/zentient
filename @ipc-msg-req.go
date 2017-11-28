@@ -30,9 +30,9 @@ func reqDecodeAndRespond(jsonreq string) *msgResp {
 	var req msgReq
 	var resp msgResp
 	if !Lang.Enabled {
-		resp.ErrMsg = strf("%s does not appear to be installed on this machine.", Lang.Title)
+		resp.ErrMsg = Strf("%s does not appear to be installed on this machine.", Lang.Title)
 	} else if Prog.Cfg.err != nil {
-		resp.ErrMsg = strf("Your %s is currently broken: either fix it or delete it, then reload Zentient.", Prog.Cfg.filePath)
+		resp.ErrMsg = Strf("Your %s is currently broken: either fix it or delete it, then reload Zentient.", Prog.Cfg.filePath)
 	} else if err := json.NewDecoder(strings.NewReader(jsonreq)).Decode(&req); err == nil {
 		resp.ReqID = req.ReqID
 		resp.to(&req)

@@ -9,9 +9,13 @@ type msgResp struct {
 	ReqID  int64  `json:"ri"`
 	ErrMsg string `json:"e,omitempty"`
 
+	MsgID        msgIDs        `json:"mi,omitempty"`
 	CoreCmdsMenu *coreCmdsMenu `json:"menu,omitempty"`
 	WebsiteURL   string        `json:"url,omitempty"`
-	Note         string        `json:"note,omitempty"`
+	NoteInfo     string        `json:"info,omitempty"`
+	NoteWarn     string        `json:"warn,omitempty"`
+	MsgAction    string        `json:"action,omitempty"`
+	SrcMod       *SrcLoc       `json:"srcMod,omitempty"`
 }
 
 type msgArgPrompt struct {
@@ -22,10 +26,10 @@ type msgArgPrompt struct {
 
 func (me *msgResp) onResponseReady() {
 	if except := recover(); except != nil {
-		me.ErrMsg = strf("%v", except)
+		me.ErrMsg = Strf("%v", except)
 	}
 	if me.ErrMsg != "" {
-		me.ErrMsg = strf("[%s] %s", Prog.name, me.ErrMsg)
+		me.ErrMsg = Strf("[%s] %s", Prog.name, me.ErrMsg)
 	}
 }
 
@@ -36,5 +40,5 @@ func (me *msgResp) to(req *msgReq) {
 			return
 		}
 	}
-	me.ErrMsg = strf("Invalid MsgID %d", req.MsgID)
+	me.ErrMsg = Strf("Invalid MsgID %d", req.MsgID)
 }

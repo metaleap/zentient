@@ -19,7 +19,8 @@ const (
 )
 
 var (
-	strf = fmt.Sprintf
+	Errf = fmt.Errorf
+	Strf = fmt.Sprintf
 
 	cmdProviders []iCoreCmds
 	handlers     = []iHandler{
@@ -47,7 +48,7 @@ var (
 )
 
 func Bad(what, which string) {
-	panic(strf("%s: invalid %s %s '%s'", Prog.name, Lang.Title, what, which))
+	panic(Strf("%s: invalid %s %s '%s'", Prog.name, Lang.Title, what, which))
 }
 
 func Init() (err error) {

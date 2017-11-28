@@ -7,7 +7,7 @@ import (
 type srcFormatting struct {
 	z.SrcFormattingBase
 
-	knownFormatters []*z.Tool
+	knownFormatters z.Tools
 }
 
 var (
@@ -20,11 +20,15 @@ func init() {
 }
 
 func (me *srcFormatting) onPreInit() {
-	srcFmt.knownFormatters = []*z.Tool{
+	srcFmt.knownFormatters = z.Tools{
 		tools.hindent, tools.stylishhaskell, tools.brittany,
 	}
 }
 
-func (me *srcFormatting) KnownFormatters() []*z.Tool {
+func (me *srcFormatting) KnownFormatters() z.Tools {
 	return me.knownFormatters
+}
+
+func (me *srcFormatting) RunFormatter(formatter *z.Tool, customProgName string, srcFilePath string, srcFull string) (string, error) {
+	return "", z.Errf("Not yet implemented")
 }
