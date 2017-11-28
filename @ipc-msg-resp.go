@@ -20,14 +20,17 @@ type msgArgPrompt struct {
 	Value       string `json:"value,omitempty"`
 }
 
-func (me *msgResp) catch() {
+func (me *msgResp) onResponseReady() {
 	if except := recover(); except != nil {
 		me.ErrMsg = strf("%v", except)
+	}
+	if me.ErrMsg != "" {
+		me.ErrMsg = strf("[%s] %s", Prog.name, me.ErrMsg)
 	}
 }
 
 func (me *msgResp) to(req *msgReq) {
-	defer me.catch()
+	defer me.onResponseReady()
 	for _, h := range handlers {
 		if h.handle(req, me) {
 			return

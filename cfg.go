@@ -19,10 +19,6 @@ type Config struct {
 	timeLastLoaded int64
 }
 
-func (me *Config) isFormatterCustom() bool {
-	return me.FormatterProg != "" && me.FormatterProg != me.FormatterName
-}
-
 func (me *Config) reload() {
 	if stale, _ := ufs.IsNewerThanTime(me.filePath, me.timeLastLoaded); stale {
 		// 1. re-initialize me

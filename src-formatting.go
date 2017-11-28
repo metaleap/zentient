@@ -1,9 +1,5 @@
 package z
 
-import (
-	"strings"
-)
-
 type iSrcFormatting interface {
 	iCoreCmds
 
@@ -11,7 +7,6 @@ type iSrcFormatting interface {
 }
 
 type SrcFormattingBase struct {
-	cmdListAll   *coreCmd
 	cmdSetDef    *coreCmd
 	cmdRunOnFile *coreCmd
 	cmdRunOnSel  *coreCmd
@@ -20,11 +15,6 @@ type SrcFormattingBase struct {
 }
 
 func (me *SrcFormattingBase) Init() {
-	me.cmdListAll = &coreCmd{
-		MsgID: msgID_srcFmt_ListAll,
-		Title: "List All Known Formatters",
-		Desc:  "Lists all known " + Lang.Title + " formatters and their installation info / status",
-	}
 	me.cmdSetDef = &coreCmd{
 		MsgID: msgID_srcFmt_SetDefMenu,
 		Title: "Change Default Formatter",
@@ -41,21 +31,13 @@ func (me *SrcFormattingBase) Init() {
 }
 
 func (me *SrcFormattingBase) Cmds(srcLoc *SrcLoc) (cmds []*coreCmd) {
-	if me.cmdListAll.Hint == "" {
-		kfnames := []string{}
-		for _, kf := range me.Self.KnownFormatters() {
-			kfnames = append(kfnames, kf.Name)
-		}
-		me.cmdListAll.Hint = strings.Join(kfnames, " · ")
-	}
-
 	if srcLoc != nil {
 		desc := "(" + me.cmdSetDef.Desc + " first)"
-		if Prog.Cfg.FormatterName != "" {
-			if desc = "➜ using "; Prog.Cfg.isFormatterCustom() {
-				desc += "'" + Prog.Cfg.FormatterProg + "' in place of "
+		if me.hasFormatter() {
+			if desc = "➜ using "; me.isFormatterCustom() {
+				desc += "'" + Prog.Cfg.FormatterProg + "' as a "
 			}
-			desc += "'" + Prog.Cfg.FormatterName + "'"
+			desc += "'" + Prog.Cfg.FormatterName + "' equivalent"
 		}
 
 		if srcLoc.FilePath != "" || srcLoc.SrcFull != "" {
@@ -71,13 +53,14 @@ func (me *SrcFormattingBase) Cmds(srcLoc *SrcLoc) (cmds []*coreCmd) {
 			cmds = append(cmds, me.cmdRunOnSel)
 		}
 	}
-	if me.cmdSetDef.Hint = "(none)"; Prog.Cfg.FormatterName != "" {
-		if me.cmdSetDef.Hint = "'" + Prog.Cfg.FormatterName + "'"; Prog.Cfg.isFormatterCustom() {
+
+	if me.cmdSetDef.Hint = "(none)"; me.hasFormatter() {
+		if me.cmdSetDef.Hint = "'" + Prog.Cfg.FormatterName + "'"; me.isFormatterCustom() {
 			me.cmdSetDef.Hint += "-compatible '" + Prog.Cfg.FormatterProg + "'"
 		}
 	}
 	me.cmdSetDef.Hint = "Current: " + me.cmdSetDef.Hint
-	cmds = append(cmds, me.cmdSetDef, me.cmdListAll)
+	cmds = append(cmds, me.cmdSetDef)
 	return
 }
 
@@ -87,10 +70,6 @@ func (me *SrcFormattingBase) CmdsCategory() string {
 
 func (me *SrcFormattingBase) handle(req *msgReq, resp *msgResp) bool {
 	switch req.MsgID {
-	case msgID_srcFmt_ListAll:
-		me.handle_ListAll(req, resp)
-	case msgID_srcFmt_InfoLink:
-		me.handle_InfoLink(req, resp)
 	case msgID_srcFmt_SetDefMenu:
 		me.handle_SetDefMenu(req, resp)
 	case msgID_srcFmt_SetDefPick:
@@ -101,55 +80,28 @@ func (me *SrcFormattingBase) handle(req *msgReq, resp *msgResp) bool {
 	return true
 }
 
-func (me *SrcFormattingBase) handle_InfoLink(req *msgReq, resp *msgResp) {
-	fmtname := req.MsgArgs.(string)
-	for _, kf := range me.Self.KnownFormatters() {
-		if kf.Name == fmtname {
-			if !kf.Installed {
-				resp.Note = strf("After installing '%s', reload Zentient to recognize it.", kf.Name)
-			}
-			resp.WebsiteURL = kf.Website
-			return
-		}
-	}
-	Bad("formatter", fmtname)
-}
-
-func (me *SrcFormattingBase) handle_ListAll(req *msgReq, resp *msgResp) {
+func (me *SrcFormattingBase) handle_SetDefMenu(req *msgReq, resp *msgResp) {
 	cfmt := Lang.SrcFmt // need the interface impl, not the embedded base!
-	m := coreCmdsMenu{Desc: strf("❬%s❭ · %s:", cfmt.CmdsCategory(), me.cmdListAll.Title)}
+	m := coreCmdsMenu{Desc: "First pick a known formatter, then optionally specify a custom tool name:"}
 	for _, kf := range cfmt.KnownFormatters() {
-		var cmd = coreCmd{Title: kf.Name, MsgArgs: kf.Name, MsgID: msgID_srcFmt_InfoLink}
-		cmd.Desc = "➜ Open website at ⟨ " + kf.Website + " ⟩"
-		if !kf.Installed {
-			cmd.Desc += " for installation help"
-			cmd.Hint = "Not installed"
-		} else {
-			cmd.Hint = "Installed"
+		var cmd = coreCmd{Title: kf.Name, MsgID: msgID_srcFmt_SetDefPick}
+		cmd.MsgArgs = map[string]interface{}{"fn": kf.Name, "fp": msgArgPrompt{Placeholder: kf.Name,
+			Prompt: strf("Optionally enter the name of an alternative '%s'-compatible equivalent tool to use", kf.Name)}}
+		cmd.Desc = strf("➜ Pick to use '%s' (or compatible equivalent) as the default %s formatter", kf.Name, Lang.Title)
+		if kf.Name != Prog.Cfg.FormatterName || !me.isFormatterCustom() {
+			if cmd.Hint = "· Installed "; !kf.Installed {
+				cmd.Hint = "· Not Installed "
+			}
 		}
 		if kf.Name == Prog.Cfg.FormatterName {
-			if cmd.Hint += " · Set as Default"; Prog.Cfg.isFormatterCustom() {
-				cmd.Hint += " (via '" + Prog.Cfg.FormatterProg + "')"
+			if cmd.Hint += "· Current Default "; me.isFormatterCustom() {
+				cmd.Hint += "— Using '" + Prog.Cfg.FormatterProg + "' "
 			}
 		}
+		cmd.Hint += "· " + kf.Website
 		m.Choices = append(m.Choices, &cmd)
 	}
 	resp.CoreCmdsMenu = &m
-}
-
-func (me *SrcFormattingBase) handle_SetDefMenu(req *msgReq, resp *msgResp) {
-	me.handle_ListAll(req, resp)
-	resp.CoreCmdsMenu.Desc = "First pick a known formatter, then optionally specify a custom tool name:"
-	for _, cmd := range resp.CoreCmdsMenu.Choices {
-		toolname := cmd.MsgArgs.(string)
-		cmd.Hint = strf(" — or specify a custom alternative (but '%s'-compatible) equivalent tool next", toolname)
-		cmd.Desc = strf("➜ Pick to use '%s' (or compatible equivalent) as the default %s formatter", toolname, Lang.Title)
-		cmd.MsgID = msgID_srcFmt_SetDefPick
-		cmd.MsgArgs = map[string]interface{}{
-			"fn": toolname,
-			"fp": msgArgPrompt{Prompt: strf("Optionally enter the name of an alternative '%s'-compatible equivalent tool to use", toolname), Placeholder: toolname},
-		}
-	}
 }
 
 func (me *SrcFormattingBase) handle_SetDefPick(req *msgReq, resp *msgResp) {
@@ -162,8 +114,16 @@ func (me *SrcFormattingBase) handle_SetDefPick(req *msgReq, resp *msgResp) {
 		resp.ErrMsg = err.Error()
 	} else {
 		resp.Note = strf("Default %s formatter changed to '%s'", Lang.Title, Prog.Cfg.FormatterName)
-		if Prog.Cfg.FormatterProg != "" {
+		if me.isFormatterCustom() {
 			resp.Note += strf("-compatible equivalent '%s'", Prog.Cfg.FormatterProg)
 		}
+		resp.Note += "."
 	}
+}
+
+func (*SrcFormattingBase) hasFormatter() bool {
+	return Prog.Cfg.FormatterName != ""
+}
+func (*SrcFormattingBase) isFormatterCustom() bool {
+	return Prog.Cfg.FormatterProg != "" && Prog.Cfg.FormatterProg != Prog.Cfg.FormatterName
 }
