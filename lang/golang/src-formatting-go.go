@@ -1,7 +1,6 @@
 package zgo
 
 import (
-	"github.com/metaleap/go-util/run"
 	"github.com/metaleap/zentient"
 )
 
@@ -54,9 +53,5 @@ func (me *srcFormatting) RunFormatter(formatter *z.Tool, customProgName string, 
 		cmdargs = append(cmdargs, srcFilePath)
 	}
 
-	stdout, stderr, err := urun.CmdExecStdin(src, "", cmdname, cmdargs...)
-	if stderr != "" {
-		stderr = z.Strf("%s: %s", cmdname, stderr)
-	}
-	return stdout, stderr, err
+	return z.ExecTool(cmdname, cmdargs, src)
 }
