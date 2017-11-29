@@ -35,8 +35,8 @@ func (me *SrcFormattingBase) Init() {
 	}
 }
 
-func (me *SrcFormattingBase) Cmds(srcLoc *SrcLoc) (cmds []*coreCmd) {
-	if srcLoc != nil {
+func (me *SrcFormattingBase) Cmds(srcLens *SrcLens) (cmds []*coreCmd) {
+	if srcLens != nil {
 		desc := "(" + me.cmdSetDef.Desc + " first)"
 		if me.hasFormatter() {
 			if desc = "➜ using "; me.isFormatterCustom() {
@@ -45,16 +45,16 @@ func (me *SrcFormattingBase) Cmds(srcLoc *SrcLoc) (cmds []*coreCmd) {
 			desc += "'" + Prog.Cfg.FormatterName + "'"
 		}
 
-		if srcLoc.FilePath != "" || srcLoc.SrcFull != "" {
+		if srcLens.FilePath != "" || srcLens.SrcFull != "" {
 			me.cmdRunOnFile.Desc = desc
-			if me.cmdRunOnFile.Hint = srcLoc.FilePath; me.cmdRunOnFile.Hint == "" {
-				me.cmdRunOnFile.Hint = srcLoc.SrcFull
+			if me.cmdRunOnFile.Hint = srcLens.FilePath; me.cmdRunOnFile.Hint == "" {
+				me.cmdRunOnFile.Hint = srcLens.SrcFull
 			}
 			cmds = append(cmds, me.cmdRunOnFile)
 		}
-		if srcLoc.SrcSel != "" {
+		if srcLens.SrcSel != "" {
 			me.cmdRunOnSel.Desc = desc
-			me.cmdRunOnSel.Hint = srcLoc.SrcSel
+			me.cmdRunOnSel.Hint = srcLens.SrcSel
 			cmds = append(cmds, me.cmdRunOnSel)
 		}
 	}
@@ -97,18 +97,19 @@ func (me *SrcFormattingBase) handle_RunFormatter(req *msgReq, resp *msgResp) {
 		return
 	}
 
-	srcfilepath := req.SrcLoc.FilePath
+	srcfilepath := req.SrcLens.FilePath
 	if !ufs.FileExists(srcfilepath) {
 		srcfilepath = ""
 	}
 
-	src := &req.SrcLoc.SrcSel
+	src := &req.SrcLens.SrcSel
 	if *src == "" {
-		src = &req.SrcLoc.SrcFull
+		src = &req.SrcLens.SrcFull
 	}
-	// if *src == "" && req.SrcLoc.FilePath != "" && ufs.FileExists(req.SrcLoc.FilePath) {
-	// 	req.SrcLoc.SrcFull = ufs.ReadTextFile(req.SrcLoc.FilePath, true, "")
-	// 	src = &req.SrcLoc.SrcFull
+	// won't use this until we encounter a formatter that doesn't itself support file-path arguments:
+	// if *src == "" && req.SrcLens.FilePath != "" && ufs.FileExists(req.SrcLens.FilePath) {
+	// 	req.SrcLens.SrcFull = ufs.ReadTextFile(req.SrcLens.FilePath, true, "")
+	// 	src = &req.SrcLens.SrcFull
 	// }
 	if *src != "" {
 		srcfilepath = ""
@@ -121,7 +122,7 @@ func (me *SrcFormattingBase) handle_RunFormatter(req *msgReq, resp *msgResp) {
 		resp.ErrMsg = err.Error()
 	} else {
 		*src = srcformatted
-		resp.SrcMod = req.SrcLoc
+		resp.SrcMod = req.SrcLens
 	}
 }
 

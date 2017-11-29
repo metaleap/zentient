@@ -15,7 +15,7 @@ type msgResp struct {
 	NoteInfo     string        `json:"info,omitempty"`
 	NoteWarn     string        `json:"warn,omitempty"`
 	MsgAction    string        `json:"action,omitempty"`
-	SrcMod       *SrcLoc       `json:"srcMod,omitempty"`
+	SrcMod       *SrcLens      `json:"srcMod,omitempty"`
 }
 
 type msgArgPrompt struct {

@@ -10,7 +10,7 @@ type msgIDs uint8
 const (
 	_ msgIDs = iota
 
-	msgID_coreCmds_ListAll
+	msgID_coreCmds_Palette
 
 	msgID_srcFmt_SetDefMenu
 	msgID_srcFmt_SetDefPick
@@ -23,7 +23,7 @@ type msgReq struct {
 	MsgID   msgIDs      `json:"mi"`
 	MsgArgs interface{} `json:"ma"`
 
-	SrcLoc *SrcLoc `json:"sl"`
+	SrcLens *SrcLens `json:"sl"`
 }
 
 func reqDecodeAndRespond(jsonreq string) *msgResp {

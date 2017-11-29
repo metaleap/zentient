@@ -3,6 +3,7 @@ package z
 import (
 	"bufio"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -19,6 +20,7 @@ const (
 )
 
 var (
+	Err  = errors.New
 	Errf = fmt.Errorf
 	Strf = fmt.Sprintf
 

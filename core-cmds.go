@@ -10,7 +10,7 @@ import (
 type iCoreCmds interface {
 	iHandler
 
-	Cmds(srcLoc *SrcLoc) []*coreCmd
+	Cmds(*SrcLens) []*coreCmd
 	CmdsCategory() string
 }
 
@@ -34,7 +34,7 @@ type coreCmdsHandler struct {
 
 func (me *coreCmdsHandler) handle(req *msgReq, resp *msgResp) bool {
 	switch req.MsgID {
-	case msgID_coreCmds_ListAll:
+	case msgID_coreCmds_Palette:
 		me.handle_ListAll(req, resp)
 	default:
 		return false
@@ -46,7 +46,7 @@ func (me *coreCmdsHandler) handle_ListAll(req *msgReq, resp *msgResp) {
 	var cats sort.StringSlice
 	m := coreCmdsMenu{Desc: "Showing: ", TopLevel: true}
 	for _, cmds := range cmdProviders {
-		for _, cmd := range cmds.Cmds(req.SrcLoc) {
+		for _, cmd := range cmds.Cmds(req.SrcLens) {
 			if cmd.Category = cmds.CmdsCategory(); !uslice.StrHas(cats, cmd.Category) {
 				cats = append(cats, cmd.Category)
 			}
