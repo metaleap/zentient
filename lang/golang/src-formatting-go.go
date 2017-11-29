@@ -36,9 +36,9 @@ func (me *srcFormatting) KnownFormatters() z.Tools {
 	return me.knownFormatters
 }
 
-func (me *srcFormatting) RunFormatter(formatter *z.Tool, customProgName string, srcFilePath string, src string) (string, error) {
+func (me *srcFormatting) RunFormatter(formatter *z.Tool, customProgName string, srcFilePath string, src string) (string, string, error) {
 	if formatter != tools.gofmt && formatter != tools.goimports {
-		return "", z.Errf("Invalid tool: %s" + formatter.Name)
+		return "", "", z.Errf("Invalid tool: %s" + formatter.Name)
 	}
 
 	cmdname := formatter.Name
@@ -55,8 +55,8 @@ func (me *srcFormatting) RunFormatter(formatter *z.Tool, customProgName string, 
 	}
 
 	stdout, stderr, err := urun.CmdExecStdin(src, "", cmdname, cmdargs...)
-	if err == nil && stderr != "" {
-		err = z.Errf("%s: %s", cmdname, stderr)
+	if stderr != "" {
+		stderr = z.Strf("%s: %s", cmdname, stderr)
 	}
-	return stdout, err
+	return stdout, stderr, err
 }

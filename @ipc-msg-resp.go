@@ -6,8 +6,9 @@ type iHandler interface {
 }
 
 type msgResp struct {
-	ReqID  int64  `json:"ri"`
-	ErrMsg string `json:"e,omitempty"`
+	ReqID          int64  `json:"ri"`
+	ErrMsg         string `json:"e,omitempty"`
+	ErrMsgFromTool bool   `json:"et,omitempty"`
 
 	MsgID        msgIDs        `json:"mi,omitempty"`
 	CoreCmdsMenu *coreCmdsMenu `json:"menu,omitempty"`
@@ -24,17 +25,19 @@ type msgArgPrompt struct {
 	Value       string `json:"value,omitempty"`
 }
 
-func (me *msgResp) onResponseReady() {
+func (me *msgResp) onResponseReady(req *msgReq) {
 	if except := recover(); except != nil {
 		me.ErrMsg = Strf("%v", except)
 	}
 	if me.ErrMsg != "" {
 		me.ErrMsg = Strf("[%s] %s", Prog.name, me.ErrMsg)
+		//	zero out nearly-everything for a leaner response
+		*me = msgResp{ErrMsg: me.ErrMsg, ErrMsgFromTool: me.ErrMsgFromTool, ReqID: me.ReqID, MsgID: req.MsgID}
 	}
 }
 
 func (me *msgResp) to(req *msgReq) {
-	defer me.onResponseReady()
+	defer me.onResponseReady(req)
 	for _, h := range handlers {
 		if h.handle(req, me) {
 			return

@@ -29,6 +29,6 @@ func (me *srcFormatting) KnownFormatters() z.Tools {
 	return me.knownFormatters
 }
 
-func (me *srcFormatting) RunFormatter(formatter *z.Tool, customProgName string, srcFilePath string, srcFull string) (string, error) {
-	return "", z.Errf("Not yet implemented")
+func (me *srcFormatting) RunFormatter(formatter *z.Tool, customProgName string, srcFilePath string, srcFull string) (string, string, error) {
+	return "", "", z.Errf("Not yet implemented")
 }

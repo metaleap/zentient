@@ -8,7 +8,7 @@ type iSrcFormatting interface {
 	iCoreCmds
 
 	KnownFormatters() Tools
-	RunFormatter(*Tool, string, string, string) (string, error)
+	RunFormatter(*Tool, string, string, string) (string, string, error)
 }
 
 type SrcFormattingBase struct {
@@ -118,8 +118,11 @@ func (me *SrcFormattingBase) handle_RunFormatter(req *msgReq, resp *msgResp) {
 		return
 	}
 
-	if srcformatted, err := self.RunFormatter(formatter, Prog.Cfg.FormatterProg, srcfilepath, *src); err != nil {
+	if srcformatted, stderr, err := self.RunFormatter(formatter, Prog.Cfg.FormatterProg, srcfilepath, *src); err != nil {
 		resp.ErrMsg = err.Error()
+	} else if stderr != "" {
+		resp.ErrMsg = stderr
+		resp.ErrMsgFromTool = true
 	} else {
 		*src = srcformatted
 		resp.SrcMod = req.SrcLens
