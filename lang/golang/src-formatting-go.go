@@ -35,14 +35,9 @@ func (me *srcFormatting) KnownFormatters() z.Tools {
 	return me.knownFormatters
 }
 
-func (me *srcFormatting) RunFormatter(formatter *z.Tool, customProgName string, srcFilePath string, src string) (string, string, error) {
+func (me *srcFormatting) RunFormatter(formatter *z.Tool, cmdName string, srcFilePath string, src string) (string, string, error) {
 	if formatter != tools.gofmt && formatter != tools.goimports {
 		return "", "", z.Errf("Invalid tool: %s" + formatter.Name)
-	}
-
-	cmdname := formatter.Name
-	if customProgName != "" {
-		cmdname = customProgName
 	}
 
 	var cmdargs []string
@@ -53,5 +48,5 @@ func (me *srcFormatting) RunFormatter(formatter *z.Tool, customProgName string, 
 		cmdargs = append(cmdargs, srcFilePath)
 	}
 
-	return z.ExecTool(cmdname, cmdargs, src)
+	return z.ExecTool(cmdName, cmdargs, src)
 }

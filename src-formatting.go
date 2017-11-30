@@ -7,6 +7,7 @@ import (
 type iSrcFormatting interface {
 	iCoreCmds
 
+	DoesStdoutWithFilePathArg(*Tool) bool
 	KnownFormatters() Tools
 	RunFormatter(*Tool, string, string, string) (string, string, error)
 }
@@ -69,8 +70,12 @@ func (me *SrcFormattingBase) Cmds(srcLens *SrcLens) (cmds []*coreCmd) {
 	return
 }
 
-func (me *SrcFormattingBase) CmdsCategory() string {
+func (*SrcFormattingBase) CmdsCategory() string {
 	return "Formatting"
+}
+
+func (*SrcFormattingBase) DoesStdoutWithFilePathArg(*Tool) bool {
+	return true
 }
 
 func (me *SrcFormattingBase) handle(req *msgReq, resp *msgResp) bool {
@@ -98,19 +103,19 @@ func (me *SrcFormattingBase) handle_RunFormatter(req *msgReq, resp *msgResp) {
 	}
 
 	srcfilepath := req.SrcLens.FilePath
-	if !ufs.FileExists(srcfilepath) {
+	withfilepathcmdarg := self.DoesStdoutWithFilePathArg(formatter)
+	if !(ufs.FileExists(srcfilepath) && withfilepathcmdarg) {
 		srcfilepath = ""
 	}
-
 	src := &req.SrcLens.SrcSel
 	if *src == "" {
 		src = &req.SrcLens.SrcFull
 	}
-	// won't use this until we encounter a formatter that doesn't itself support file-path arguments:
-	// if *src == "" && req.SrcLens.FilePath != "" && ufs.FileExists(req.SrcLens.FilePath) {
-	// 	req.SrcLens.SrcFull = ufs.ReadTextFile(req.SrcLens.FilePath, true, "")
-	// 	src = &req.SrcLens.SrcFull
-	// }
+	if (*src == "") && req.SrcLens.FilePath != "" && ufs.FileExists(req.SrcLens.FilePath) && !withfilepathcmdarg {
+		req.SrcLens.SrcFull = ufs.ReadTextFile(req.SrcLens.FilePath, true, "")
+		src = &req.SrcLens.SrcFull
+	}
+
 	if *src != "" {
 		srcfilepath = ""
 	} else if srcfilepath == "" {
@@ -118,7 +123,12 @@ func (me *SrcFormattingBase) handle_RunFormatter(req *msgReq, resp *msgResp) {
 		return
 	}
 
-	if srcformatted, stderr, err := self.RunFormatter(formatter, Prog.Cfg.FormatterProg, srcfilepath, *src); err != nil {
+	cmdname := formatter.Name
+	if Prog.Cfg.FormatterProg != "" {
+		cmdname = Prog.Cfg.FormatterProg
+	}
+
+	if srcformatted, stderr, err := self.RunFormatter(formatter, cmdname, srcfilepath, *src); err != nil {
 		resp.ErrMsg = err.Error()
 	} else if stderr != "" {
 		resp.ErrMsg = stderr
