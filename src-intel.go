@@ -18,6 +18,7 @@ type SrcIntelBase struct {
 }
 
 func (me *SrcIntelBase) Init() {
+	handlers = append(handlers, me.Self)
 }
 
 func (me *SrcIntelBase) handle(req *msgReq, resp *msgResp) bool {
@@ -30,7 +31,7 @@ func (me *SrcIntelBase) handle(req *msgReq, resp *msgResp) bool {
 	return true
 }
 
-func (me *SrcIntelBase) handle_Hover(req *msgReq, resp *msgResp) {
+func (*SrcIntelBase) handle_Hover(req *msgReq, resp *msgResp) {
 	resp.SrcIntel = &srcIntelResp{}
 	resp.SrcIntel.Hovers = append(resp.SrcIntel.Hovers,
 		srcHover{Value: "test **one** is _live_"},

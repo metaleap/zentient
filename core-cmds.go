@@ -71,17 +71,9 @@ func (me *coreCmdsHandler) Init() {
 	if l.SrcFmt != nil {
 		cmdProviders = append(cmdProviders, l.SrcFmt)
 	}
-	if l.SrcIntel != nil {
-		handlers = append(handlers, l.SrcIntel)
-	}
 
 	for _, cmds := range cmdProviders {
 		cmds.Init()
-		for _, h := range handlers {
-			if h == cmds {
-				continue
-			}
-		}
 		handlers = append(handlers, cmds)
 	}
 }

@@ -64,8 +64,11 @@ func Init() (err error) {
 		return
 	}
 	if Prog.Cfg.reload(); Prog.Cfg.err == nil {
-		for _, preDefinedHandler := range handlers {
-			preDefinedHandler.Init()
+		if Lang.SrcIntel != nil {
+			Lang.SrcIntel.Init()
+		}
+		for _, handler := range handlers {
+			handler.Init()
 		}
 	}
 	return
