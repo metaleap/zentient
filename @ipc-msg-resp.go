@@ -10,13 +10,10 @@ type msgResp struct {
 	ErrMsg         string `json:"e,omitempty"`
 	ErrMsgFromTool bool   `json:"et,omitempty"`
 
-	MsgID        msgIDs        `json:"mi,omitempty"`
-	CoreCmdsMenu *coreCmdsMenu `json:"menu,omitempty"`
-	WebsiteURL   string        `json:"url,omitempty"`
-	NoteInfo     string        `json:"info,omitempty"`
-	NoteWarn     string        `json:"warn,omitempty"`
-	MsgAction    string        `json:"action,omitempty"`
-	SrcMod       *SrcLens      `json:"srcMod,omitempty"`
+	MsgID    msgIDs        `json:"mi,omitempty"`
+	CoreCmd  *coreCmdResp  `json:"coreCmd,omitempty"`
+	SrcIntel *srcIntelResp `json:"srcIntel,omitempty"`
+	SrcMod   *SrcLens      `json:"srcMod,omitempty"`
 }
 
 type msgArgPrompt struct {

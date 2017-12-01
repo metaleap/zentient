@@ -4,11 +4,6 @@ import (
 	"github.com/metaleap/go-util/fs"
 )
 
-type SrcFormattingOptions struct {
-	TabSize      int  `json:"tabSize"`
-	InsertSpaces bool `json:"insertSpaces"`
-}
-
 type iSrcFormatting interface {
 	iCoreCmds
 
@@ -98,13 +93,27 @@ func (me *SrcFormattingBase) handle(req *msgReq, resp *msgResp) bool {
 }
 
 func (me *SrcFormattingBase) handle_RunFormatter(req *msgReq, resp *msgResp) {
-	// opt, _ := req.MsgArgs.(*SrcFormattingOptions)
+	var hasopt = false
+	opt, _ := req.MsgArgs.(map[string]interface{})
+	if opt != nil {
+		_, tabSize := opt["tabSize"]
+		_, insertSpaces := opt["insertSpaces"]
+		hasopt = tabSize || insertSpaces
+	}
+	if !hasopt {
+		resp.CoreCmd = &coreCmdResp{}
+	}
+
 	self := me.Self
 	formatter := self.KnownFormatters().ByName(Prog.Cfg.FormatterName)
 	if formatter == nil {
-		resp.NoteWarn = "Select a Default Formatter first, either via the Zentient 'Palette' menu or:"
-		resp.MsgID = msgID_srcFmt_SetDefMenu
-		resp.MsgAction = Strf("Pick your preferred Zentient default %s formatter…", Lang.Title)
+		if resp.CoreCmd == nil {
+			resp.ErrMsg = "Select a Default Formatter first via the Zentient 'Palette' menu."
+		} else {
+			resp.CoreCmd.NoteWarn = "Select a Default Formatter first, either via the Zentient 'Palette' menu or:"
+			resp.MsgID = msgID_srcFmt_SetDefMenu
+			resp.CoreCmd.MsgAction = Strf("Pick your preferred Zentient default %s formatter…", Lang.Title)
+		}
 		return
 	}
 
@@ -165,7 +174,7 @@ func (me *SrcFormattingBase) handle_SetDefMenu(req *msgReq, resp *msgResp) {
 		cmd.Hint += "· " + kf.Website
 		m.Choices = append(m.Choices, &cmd)
 	}
-	resp.CoreCmdsMenu = &m
+	resp.CoreCmd = &coreCmdResp{CoreCmdsMenu: &m}
 }
 
 func (me *SrcFormattingBase) handle_SetDefPick(req *msgReq, resp *msgResp) {
@@ -177,11 +186,12 @@ func (me *SrcFormattingBase) handle_SetDefPick(req *msgReq, resp *msgResp) {
 	if err := Prog.Cfg.Save(); err != nil {
 		resp.ErrMsg = err.Error()
 	} else {
-		resp.NoteInfo = Strf("Default %s formatter changed to '%s'", Lang.Title, Prog.Cfg.FormatterName)
+		resp.CoreCmd = &coreCmdResp{}
+		resp.CoreCmd.NoteInfo = Strf("Default %s formatter changed to '%s'", Lang.Title, Prog.Cfg.FormatterName)
 		if me.isFormatterCustom() {
-			resp.NoteInfo += Strf("-compatible equivalent '%s'", Prog.Cfg.FormatterProg)
+			resp.CoreCmd.NoteInfo += Strf("-compatible equivalent '%s'", Prog.Cfg.FormatterProg)
 		}
-		resp.NoteInfo += "."
+		resp.CoreCmd.NoteInfo += "."
 	}
 }
 

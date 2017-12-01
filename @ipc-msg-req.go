@@ -16,6 +16,7 @@ const (
 	msgID_srcFmt_SetDefPick
 	msgID_srcFmt_RunOnFile
 	msgID_srcFmt_RunOnSel
+	msgID_srcIntel_Hover
 )
 
 type msgReq struct {

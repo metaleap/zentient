@@ -29,6 +29,14 @@ type coreCmd struct {
 	Hint     string      `json:"h,omitempty"`
 }
 
+type coreCmdResp struct {
+	CoreCmdsMenu *coreCmdsMenu `json:"menu,omitempty"`
+	WebsiteURL   string        `json:"url,omitempty"`
+	NoteInfo     string        `json:"info,omitempty"`
+	NoteWarn     string        `json:"warn,omitempty"`
+	MsgAction    string        `json:"action,omitempty"`
+}
+
 type coreCmdsHandler struct {
 }
 
@@ -55,7 +63,7 @@ func (me *coreCmdsHandler) handle_ListAll(req *msgReq, resp *msgResp) {
 	}
 	sort.Sort(cats)
 	m.Desc += strings.Join(cats, " · ")
-	resp.CoreCmdsMenu = &m
+	resp.CoreCmd = &coreCmdResp{CoreCmdsMenu: &m}
 }
 
 func (me *coreCmdsHandler) Init() {
@@ -63,9 +71,17 @@ func (me *coreCmdsHandler) Init() {
 	if l.SrcFmt != nil {
 		cmdProviders = append(cmdProviders, l.SrcFmt)
 	}
+	if l.SrcIntel != nil {
+		handlers = append(handlers, l.SrcIntel)
+	}
 
 	for _, cmds := range cmdProviders {
 		cmds.Init()
+		for _, h := range handlers {
+			if h == cmds {
+				continue
+			}
+		}
 		handlers = append(handlers, cmds)
 	}
 }

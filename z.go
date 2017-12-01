@@ -30,10 +30,11 @@ var (
 	}
 
 	Lang struct {
-		Enabled bool
-		ID      string
-		Title   string
-		SrcFmt  iSrcFormatting
+		Enabled  bool
+		ID       string
+		Title    string
+		SrcFmt   iSrcFormatting
+		SrcIntel iSrcIntel
 	}
 	Prog struct {
 		Cfg  Config

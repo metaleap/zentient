@@ -4,38 +4,36 @@ import (
 	"github.com/metaleap/zentient"
 )
 
-type srcFormatting struct {
+type goSrcFormatting struct {
 	z.SrcFormattingBase
 
 	knownFormatters z.Tools
 }
 
-var (
-	srcFmt srcFormatting
-)
+var srcFmt goSrcFormatting
 
 func init() {
 	srcFmt.Self = &srcFmt
 	z.Lang.SrcFmt = &srcFmt
 }
 
-func (me *srcFormatting) onPreInit() {
+func (me *goSrcFormatting) onPreInit() {
 	me.knownFormatters = z.Tools{
 		tools.gofmt, tools.goimports,
 	}
 }
 
-func (me *srcFormatting) onPostInit() {
+func (me *goSrcFormatting) onPostInit() {
 	if z.Prog.Cfg.FormatterName == "" && tools.gofmt.Installed {
 		z.Prog.Cfg.FormatterName = "gofmt"
 	}
 }
 
-func (me *srcFormatting) KnownFormatters() z.Tools {
+func (me *goSrcFormatting) KnownFormatters() z.Tools {
 	return me.knownFormatters
 }
 
-func (me *srcFormatting) RunFormatter(formatter *z.Tool, cmdName string, srcFilePath string, src string) (string, string, error) {
+func (me *goSrcFormatting) RunFormatter(formatter *z.Tool, cmdName string, srcFilePath string, src string) (string, string, error) {
 	if formatter != tools.gofmt && formatter != tools.goimports {
 		return "", "", z.Errf("Invalid tool: %s" + formatter.Name)
 	}
