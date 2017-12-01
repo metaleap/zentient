@@ -4,6 +4,11 @@ import (
 	"github.com/metaleap/go-util/fs"
 )
 
+type SrcFormattingOptions struct {
+	TabSize      int  `json:"tabSize"`
+	InsertSpaces bool `json:"insertSpaces"`
+}
+
 type iSrcFormatting interface {
 	iCoreCmds
 
@@ -93,6 +98,7 @@ func (me *SrcFormattingBase) handle(req *msgReq, resp *msgResp) bool {
 }
 
 func (me *SrcFormattingBase) handle_RunFormatter(req *msgReq, resp *msgResp) {
+	// opt, _ := req.MsgArgs.(*SrcFormattingOptions)
 	self := me.Self
 	formatter := self.KnownFormatters().ByName(Prog.Cfg.FormatterName)
 	if formatter == nil {
