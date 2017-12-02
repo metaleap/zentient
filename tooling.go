@@ -23,10 +23,14 @@ func (me Tools) ByName(name string) *Tool {
 	return nil
 }
 
-func ExecTool(cmdname string, cmdargs []string, stdin string) (string, string, error) {
+func (*Tool) Exec(cmdname string, cmdargs []string, stdin string) (string, string, error) {
 	stdout, stderr, err := urun.CmdExecStdin(stdin, "", cmdname, cmdargs...)
 	if stderr != "" {
 		stderr = Strf("%s: %s", cmdname, stderr)
 	}
 	return stdout, stderr, err
+}
+
+func (me *Tool) NotInstalledMessage() string {
+	return Strf("Not installed: `%s`, how-to at: %s", me.Name, me.Website)
 }

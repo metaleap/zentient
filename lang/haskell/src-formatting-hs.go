@@ -46,5 +46,5 @@ func (me *hsSrcFormatting) RunFormatter(formatter *z.Tool, cmdName string, srcFi
 		cmdargs = append(cmdargs, srcFilePath)
 	}
 
-	return z.ExecTool(cmdName, cmdargs, src)
+	return formatter.Exec(cmdName, cmdargs, src)
 }

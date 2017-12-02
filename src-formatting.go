@@ -127,7 +127,7 @@ func (me *SrcFormattingBase) handle_RunFormatter(req *msgReq, resp *msgResp) {
 		src = &req.SrcLens.SrcFull
 	}
 	if (*src == "") && req.SrcLens.FilePath != "" && ufs.FileExists(req.SrcLens.FilePath) && !withfilepathcmdarg {
-		req.SrcLens.SrcFull = ufs.ReadTextFile(req.SrcLens.FilePath, true, "")
+		req.SrcLens.ensureSrcFull()
 		src = &req.SrcLens.SrcFull
 	}
 

@@ -27,9 +27,9 @@ func (me *SrcIntelBase) Init() {
 
 func (_ *SrcIntelBase) Hovers(srcLens *SrcLens) (hovs []SrcIntelHover) {
 	hovs = append(hovs,
-		SrcIntelHover{Value: Strf("Hovers not yet implemented for %s by %s", Lang.Title, Prog.name)},
-		SrcIntelHover{Value: srcLens.FilePath, Language: "plaintext"},
-		SrcIntelHover{Value: Strf("%v", *srcLens.Pos)},
+		SrcIntelHover{Value: Strf("Hovers not yet implemented for **%s** by `%s`", Lang.Title, Prog.name)},
+		SrcIntelHover{Value: Strf("File: %s", srcLens.FilePath), Language: "plaintext"},
+		SrcIntelHover{Value: Strf("Line/Char/Offset: %v", *srcLens.Pos)},
 	)
 	return
 }
