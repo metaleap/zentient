@@ -35,7 +35,6 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.SrcIntelHover) {
 			   "DocUrl":"github.com/metaleap/go-util/slice#StrHas",
 			   "pos":"/home/__/c/go/src/github.com/metaleap/go-util/slice/str.gt.go:157:6",
 			   "pkg":"uslice",
-			   "ImpS":"github.com/metaleap/go-util/slice",
 			   "ImpN":"uslice#StrHas"}
 			*/
 			ispkglocal := ustr.Pref(ggd.Pos, filepath.Dir(srcLens.FilePath))
@@ -49,6 +48,15 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.SrcIntelHover) {
 				hovs = append(hovs, z.SrcIntelHover{Value: "### " + headline})
 			}
 			if ggd.Decl != "" {
+				if ggd.ImpP != "" {
+					ggd.Decl = ustr.Replace(ggd.Decl, map[string]string{
+						ggd.ImpP + ".": "",
+					})
+				}
+				if ustr.Pref(ggd.Decl, "field ") {
+					ggd.Decl = z.Strf("struct /*field*/ { %s }", ggd.Decl[6:])
+				}
+				// hovs = append(hovs, z.SrcIntelHover{Value: "DBG\tN|" + ggd.ImpN + "\t|P|" + ggd.ImpP + "\t|T|" + ggd.Type})
 				decl = &z.SrcIntelHover{Language: z.Lang.ID, Value: ggd.Decl}
 				hovs = append(hovs, *decl)
 			}
