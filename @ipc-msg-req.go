@@ -10,13 +10,16 @@ type msgIDs uint8
 const (
 	_ msgIDs = iota
 
-	msgID_coreCmds_Palette
+	MSGID_CORECMDS_PALETTE
+	MSGID_SRCFMT_SETDEFMENU
+	MSGID_SRCFMT_SETDEFPICK
+	MSGID_SRCFMT_RUNONFILE
+	MSGID_SRCFMT_RUNONSEL
+	MSGID_SRCINTEL_HOVER
+	MSGID_SRCINTEL_SYMS_FILE
+	MSGID_SRCINTEL_SYMS_PROJ
 
-	msgID_srcFmt_SetDefMenu
-	msgID_srcFmt_SetDefPick
-	msgID_srcFmt_RunOnFile
-	msgID_srcFmt_RunOnSel
-	msgID_srcIntel_Hover
+	MSGID_MIN_INVALID
 )
 
 type msgReq struct {
@@ -34,11 +37,11 @@ func reqDecodeAndRespond(jsonreq string) *msgResp {
 		resp.ErrMsg = Strf("%s does not appear to be installed on this machine.", Lang.Title)
 	} else if Prog.Cfg.err != nil {
 		resp.ErrMsg = Strf("Your %s is currently broken: either fix it or delete it, then reload Zentient.", Prog.Cfg.filePath)
-	} else if err := json.NewDecoder(strings.NewReader(jsonreq)).Decode(&req); err == nil {
-		resp.ReqID = req.ReqID
-		resp.to(&req)
-	} else {
+	}
+	if err := json.NewDecoder(strings.NewReader(jsonreq)).Decode(&req); err != nil {
 		resp.ErrMsg = err.Error()
+	} else if resp.ReqID = req.ReqID; resp.ErrMsg == "" {
+		resp.to(&req)
 	}
 	return &resp
 }

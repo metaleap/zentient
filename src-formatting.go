@@ -22,16 +22,16 @@ type SrcFormattingBase struct {
 
 func (me *SrcFormattingBase) Init() {
 	me.cmdSetDef = &coreCmd{
-		MsgID: msgID_srcFmt_SetDefMenu,
+		MsgID: MSGID_SRCFMT_SETDEFMENU,
 		Title: "Change Default Formatter",
 		Desc:  Strf("Specify your preferred default %s source formatter", Lang.Title),
 	}
 	me.cmdRunOnFile = &coreCmd{
-		MsgID: msgID_srcFmt_RunOnFile,
+		MsgID: MSGID_SRCFMT_RUNONFILE,
 		Title: "Format Document",
 	}
 	me.cmdRunOnSel = &coreCmd{
-		MsgID: msgID_srcFmt_RunOnSel,
+		MsgID: MSGID_SRCFMT_RUNONSEL,
 		Title: "Format Selection",
 	}
 }
@@ -80,11 +80,11 @@ func (*SrcFormattingBase) DoesStdoutWithFilePathArg(*Tool) bool {
 
 func (me *SrcFormattingBase) handle(req *msgReq, resp *msgResp) bool {
 	switch req.MsgID {
-	case msgID_srcFmt_SetDefMenu:
+	case MSGID_SRCFMT_SETDEFMENU:
 		me.handle_SetDefMenu(req, resp)
-	case msgID_srcFmt_SetDefPick:
+	case MSGID_SRCFMT_SETDEFPICK:
 		me.handle_SetDefPick(req, resp)
-	case msgID_srcFmt_RunOnFile, msgID_srcFmt_RunOnSel:
+	case MSGID_SRCFMT_RUNONFILE, MSGID_SRCFMT_RUNONSEL:
 		me.handle_RunFormatter(req, resp)
 	default:
 		return false
@@ -111,7 +111,7 @@ func (me *SrcFormattingBase) handle_RunFormatter(req *msgReq, resp *msgResp) {
 			resp.ErrMsg = "Select a Default Formatter first via the Zentient 'Palette' menu."
 		} else {
 			resp.CoreCmd.NoteWarn = "Select a Default Formatter first, either via the Zentient 'Palette' menu or:"
-			resp.MsgID = msgID_srcFmt_SetDefMenu
+			resp.MsgID = MSGID_SRCFMT_SETDEFMENU
 			resp.CoreCmd.MsgAction = Strf("Pick your preferred Zentient default %s formatter…", Lang.Title)
 		}
 		return
@@ -157,7 +157,7 @@ func (me *SrcFormattingBase) handle_RunFormatter(req *msgReq, resp *msgResp) {
 func (me *SrcFormattingBase) handle_SetDefMenu(req *msgReq, resp *msgResp) {
 	m := coreCmdsMenu{Desc: "First pick a known formatter, then optionally specify a custom tool name:"}
 	for _, kf := range me.Self.KnownFormatters() {
-		var cmd = coreCmd{Title: kf.Name, MsgID: msgID_srcFmt_SetDefPick}
+		var cmd = coreCmd{Title: kf.Name, MsgID: MSGID_SRCFMT_SETDEFPICK}
 		cmd.MsgArgs = map[string]interface{}{"fn": kf.Name, "fp": msgArgPrompt{Placeholder: kf.Name,
 			Prompt: Strf("Optionally enter the name of an alternative '%s'-compatible equivalent tool to use", kf.Name)}}
 		cmd.Desc = Strf("➜ Pick to use '%s' (or compatible equivalent) as the default %s formatter", kf.Name, Lang.Title)

@@ -33,6 +33,7 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.SrcIntelHover) {
 	var ggd *udevgo.Gogetdoc
 	var decl *z.SrcIntelHover
 	offset := z.Strf("%d", srcLens.ByteOffsetForPosWithRuneOffset(srcLens.Pos))
+
 	if !tools.gogetdoc.Installed {
 		hovs = append(hovs, z.SrcIntelHover{Value: tools.gogetdoc.NotInstalledMessage()})
 	} else {
@@ -56,7 +57,6 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.SrcIntelHover) {
 					ggd.Decl = z.Strf("struct/*field*/ { %s }", ggd.Decl[6:])
 				}
 				ggd.Decl = me.hoverShortenImpPaths(ggd.Decl)
-				// hovs = append(hovs, z.SrcIntelHover{Value: "DBG\tN|" + ggd.ImpN + "\t|P|" + ggd.ImpP + "\t|T|" + ggd.Type})
 				decl = &z.SrcIntelHover{Language: z.Lang.ID, Value: ggd.Decl}
 				hovs = append(hovs, *decl)
 			}
@@ -75,9 +75,11 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.SrcIntelHover) {
 			}
 		}
 	}
+
 	if tools.godef.Installed && decl == nil {
-		if cmdout := udevgo.QueryDefDecl_GoDef(srcLens.FilePath, srcLens.SrcFull, offset); cmdout != "" {
-			hovs = append([]z.SrcIntelHover{z.SrcIntelHover{Language: z.Lang.ID, Value: cmdout}}, hovs...)
+		if defdecl := udevgo.QueryDefDecl_GoDef(srcLens.FilePath, srcLens.SrcFull, offset); defdecl != "" {
+			decl = &z.SrcIntelHover{Language: z.Lang.ID, Value: defdecl}
+			hovs = append([]z.SrcIntelHover{*decl}, hovs...)
 		}
 	}
 	return

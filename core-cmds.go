@@ -42,7 +42,7 @@ type coreCmdsHandler struct {
 
 func (me *coreCmdsHandler) handle(req *msgReq, resp *msgResp) bool {
 	switch req.MsgID {
-	case msgID_coreCmds_Palette:
+	case MSGID_CORECMDS_PALETTE:
 		me.handle_ListAll(req, resp)
 	default:
 		return false
