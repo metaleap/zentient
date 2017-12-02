@@ -2,6 +2,7 @@ package zgo
 
 import (
 	"path/filepath"
+	"strings"
 
 	"github.com/metaleap/go-util/dev/go"
 	"github.com/metaleap/go-util/str"
@@ -19,6 +20,15 @@ func init() {
 	z.Lang.SrcIntel = &srcIntel
 }
 
+func (*goSrcIntel) hoverShortenImpPaths(s string) string {
+	if islash := ustr.Idx(s, "/"); islash > 0 {
+		if idot := ustr.Idx(s[islash+1:], "."); idot > 0 && udevgo.ShortenImpPaths != nil {
+			return udevgo.ShortenImpPaths.Replace(s)
+		}
+	}
+	return s
+}
+
 func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.SrcIntelHover) {
 	var ggd *udevgo.Gogetdoc
 	var decl *z.SrcIntelHover
@@ -27,16 +37,6 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.SrcIntelHover) {
 		hovs = append(hovs, z.SrcIntelHover{Value: tools.gogetdoc.NotInstalledMessage()})
 	} else {
 		if ggd = udevgo.Query_Gogetdoc(srcLens.FilePath, srcLens.SrcFull, offset); ggd != nil {
-			/*
-			   {"name":"StrHas",
-			   "import":"github.com/metaleap/go-util/slice",
-			   "decl":"func StrHas(slice []string, val string) bool",
-			   "doc":"Returns whether `val` is in `slice`.\n",
-			   "DocUrl":"github.com/metaleap/go-util/slice#StrHas",
-			   "pos":"/home/__/c/go/src/github.com/metaleap/go-util/slice/str.gt.go:157:6",
-			   "pkg":"uslice",
-			   "ImpN":"uslice#StrHas"}
-			*/
 			ispkglocal := ustr.Pref(ggd.Pos, filepath.Dir(srcLens.FilePath))
 			if ggd.Err != "" {
 				hovs = append(hovs, z.SrcIntelHover{Language: "plaintext", Value: ggd.Err})
@@ -45,17 +45,17 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.SrcIntelHover) {
 				hovs = append(hovs, z.SrcIntelHover{Language: "plaintext", Value: ggd.ErrMsgs})
 			}
 			if headline := ggd.ImpN; headline != "" && !ispkglocal {
+				headline = me.hoverShortenImpPaths(headline)
 				hovs = append(hovs, z.SrcIntelHover{Value: "### " + headline})
 			}
 			if ggd.Decl != "" {
 				if ggd.ImpP != "" {
-					ggd.Decl = ustr.Replace(ggd.Decl, map[string]string{
-						ggd.ImpP + ".": "",
-					})
+					ggd.Decl = strings.Replace(ggd.Decl, ggd.ImpP+".", "", -1)
 				}
-				if ustr.Pref(ggd.Decl, "field ") {
-					ggd.Decl = z.Strf("struct /*field*/ { %s }", ggd.Decl[6:])
+				if ustr.Pref(ggd.Decl, "field ") { // ensure syntax-highlighting:
+					ggd.Decl = z.Strf("struct/*field*/ { %s }", ggd.Decl[6:])
 				}
+				ggd.Decl = me.hoverShortenImpPaths(ggd.Decl)
 				// hovs = append(hovs, z.SrcIntelHover{Value: "DBG\tN|" + ggd.ImpN + "\t|P|" + ggd.ImpP + "\t|T|" + ggd.Type})
 				decl = &z.SrcIntelHover{Language: z.Lang.ID, Value: ggd.Decl}
 				hovs = append(hovs, *decl)
