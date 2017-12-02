@@ -1,13 +1,15 @@
 package z
 
 type SrcLens struct {
-	FilePath string  `json:"fp,omitempty"`
-	SrcFull  string  `json:"sf,omitempty"`
-	SrcSel   string  `json:"ss,omitempty"`
-	Pos0     *SrcPos `json:"p0,omitempty"`
-	Pos1     *SrcPos `json:"p1,omitempty"`
+	FilePath   string  `json:"fp,omitempty"`
+	SrcFull    string  `json:"sf,omitempty"`
+	SrcSel     string  `json:"ss,omitempty"`
+	Pos        *SrcPos `json:"p,omitempty"`
+	RangeStart *SrcPos `json:"r0,omitempty"`
+	RangeEnd   *SrcPos `json:"r1,omitempty"`
 }
 
+// All fields are 1-based, so 0 means 'missing'
 type SrcPos struct {
 	Off int `json:"o,omitempty"`
 	Ln  int `json:"l,omitempty"`

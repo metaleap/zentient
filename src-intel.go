@@ -2,14 +2,18 @@ package z
 
 type iSrcIntel interface {
 	iHandler
+
+	Hovers(*SrcLens) []SrcIntelHover
 }
 
 type srcIntelResp struct {
-	Hovers []srcHover `json:"h,omitempty"`
+	Hovers []SrcIntelHover `json:"h,omitempty"`
 }
 
-type srcHover struct {
-	Value    string `json:"value"`
+type SrcIntelHover struct {
+	Value string `json:"value"`
+
+	// If empty, clients default to 'markdown'
 	Language string `json:"language,omitempty"`
 }
 
@@ -19,6 +23,15 @@ type SrcIntelBase struct {
 
 func (me *SrcIntelBase) Init() {
 	handlers = append(handlers, me.Self)
+}
+
+func (_ *SrcIntelBase) Hovers(srcLens *SrcLens) (hovs []SrcIntelHover) {
+	hovs = append(hovs,
+		SrcIntelHover{Value: Strf("Hovers not yet implemented for %s by %s", Lang.Title, Prog.name)},
+		SrcIntelHover{Value: srcLens.FilePath, Language: "plaintext"},
+		SrcIntelHover{Value: Strf("%v", *srcLens.Pos)},
+	)
+	return
 }
 
 func (me *SrcIntelBase) handle(req *msgReq, resp *msgResp) bool {
@@ -31,11 +44,6 @@ func (me *SrcIntelBase) handle(req *msgReq, resp *msgResp) bool {
 	return true
 }
 
-func (*SrcIntelBase) handle_Hover(req *msgReq, resp *msgResp) {
-	resp.SrcIntel = &srcIntelResp{}
-	resp.SrcIntel.Hovers = append(resp.SrcIntel.Hovers,
-		srcHover{Value: "test **one** is _live_"},
-		srcHover{Value: "test **two** is a _go_", Language: "plaintext"},
-		srcHover{Value: "func main() { println(123) }", Language: "go"},
-	)
+func (me *SrcIntelBase) handle_Hover(req *msgReq, resp *msgResp) {
+	resp.SrcIntel = &srcIntelResp{Hovers: me.Self.Hovers(req.SrcLens)}
 }
