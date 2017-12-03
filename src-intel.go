@@ -7,6 +7,7 @@ import (
 type iSrcIntel interface {
 	iHandler
 
+	ComplDetails(*SrcLens, string, *SrcIntelCompl)
 	ComplItems(*SrcLens) []SrcIntelCompl
 	Hovers(*SrcLens) []SrcIntelHover
 	Symbols(*SrcLens, string, bool) udev.SrcMsgs
@@ -47,20 +48,17 @@ func (me *SrcIntelBase) Init() {
 	handlers = append(handlers, me.Self)
 }
 
+func (_ *SrcIntelBase) ComplDetails(srcLens *SrcLens, itemText string, into *SrcIntelCompl) {
+	into.Detail = "Details for " + itemText
+	into.Documentation = "Docs for " + itemText
+}
+
 func (_ *SrcIntelBase) ComplItems(srcLens *SrcLens) (cmpls []SrcIntelCompl) {
 	cmpls = make([]SrcIntelCompl, 25)
 	for i := 0; i < len(cmpls); i++ {
 		cmplkind := Completion(i)
 		cmpls[i].Label = cmplkind.String()
 		cmpls[i].Kind = cmplkind
-		cmpls[i].Detail = Strf("Detail for %s", cmplkind)
-		cmpls[i].Documentation = Strf("Doc for %s", cmplkind)
-		// srcRefs = append(srcRefs,
-		// 	&udev.SrcMsg{Flag: icon, Msg: Strf("%s", Symbol(icon)), Ref: srcLens.FilePath,
-		// 		Misc:   Strf("flag: %d", icon),
-		// 		Pos1Ch: 1, Pos1Ln: icon + 1, Pos2Ch: 1, Pos2Ln: icon + 1,
-		// 	},
-		// )
 	}
 	return
 }
@@ -109,6 +107,9 @@ func (me *SrcIntelBase) handle_CmplItems(req *msgReq, resp *msgResp) {
 }
 
 func (me *SrcIntelBase) handle_CmplDetails(req *msgReq, resp *msgResp) {
+	itemtext, _ := req.MsgArgs.(string)
+	resp.SrcIntel = &srcIntelResp{Cmpl: make([]SrcIntelCompl, 1, 1)}
+	me.Self.ComplDetails(req.SrcLens, itemtext, &(resp.SrcIntel.Cmpl[0]))
 }
 
 func (me *SrcIntelBase) handle_Hover(req *msgReq, resp *msgResp) {
