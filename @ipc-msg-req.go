@@ -43,5 +43,8 @@ func reqDecodeAndRespond(jsonreq string) *msgResp {
 	} else if resp.ReqID = req.ReqID; resp.ErrMsg == "" {
 		resp.to(&req)
 	}
+	if resp.ErrMsg != "" {
+		resp.MsgID = req.MsgID
+	}
 	return &resp
 }

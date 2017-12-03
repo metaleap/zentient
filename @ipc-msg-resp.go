@@ -86,27 +86,27 @@ type msgArgPrompt struct {
 	Value       string `json:"value,omitempty"`
 }
 
-func (me *msgResp) onResponseReady(req *msgReq) {
+func (me *msgResp) onResponseReady() {
 	if except := recover(); except != nil {
 		me.ErrMsg = Strf("%v", except)
 	}
 	if me.ErrMsg != "" {
 		me.ErrMsg = Strf("[%s] %s", Prog.name, me.ErrMsg)
 		//	zero out nearly-everything for a leaner response
-		*me = msgResp{ErrMsg: me.ErrMsg, ErrMsgFromTool: me.ErrMsgFromTool, ReqID: me.ReqID, MsgID: req.MsgID}
+		*me = msgResp{ErrMsg: me.ErrMsg, ErrMsgFromTool: me.ErrMsgFromTool, ReqID: me.ReqID}
 	}
 }
 
 func (me *msgResp) to(req *msgReq) {
-	defer me.onResponseReady(req)
+	defer me.onResponseReady()
 	for _, h := range handlers {
 		if h.handle(req, me) {
 			return
 		}
 	}
-	if req.MsgID >= MSGID_MIN_INVALID {
+	if req.MsgID < MSGID_CORECMDS_PALETTE || req.MsgID >= MSGID_MIN_INVALID {
 		me.ErrMsg = Strf("Invalid MsgID %d", req.MsgID)
 	} else {
-		me.ErrMsg = Strf("The requested feature (MsgID %d) isn't supported for **%s**.", req.MsgID, Lang.Title)
+		me.ErrMsg = Strf("The requested feature (MsgID %d) wasn't implemented for **%s**.", req.MsgID, Lang.Title)
 	}
 }
