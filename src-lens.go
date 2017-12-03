@@ -4,13 +4,28 @@ import (
 	"github.com/metaleap/go-util/fs"
 )
 
+// All public fields are 1-based (so 0 means 'missing') and rune-not-byte-based
+type SrcPos struct {
+	Ln  int `json:"l,omitempty"`
+	Col int `json:"c,omitempty"`
+	Off int `json:"o,omitempty"`
+
+	// if & when this is computed, it'll be 0-based
+	byteOff int
+	byteoff bool
+}
+
+type SrcRange struct {
+	Start SrcPos `json:"s"`
+	End   SrcPos `json:"e,omitempty"`
+}
+
 type SrcLens struct {
-	FilePath   string  `json:"fp,omitempty"`
-	SrcFull    string  `json:"sf,omitempty"`
-	SrcSel     string  `json:"ss,omitempty"`
-	Pos        *SrcPos `json:"p,omitempty"`
-	RangeStart *SrcPos `json:"r0,omitempty"`
-	RangeEnd   *SrcPos `json:"r1,omitempty"`
+	FilePath string    `json:"fp,omitempty"`
+	SrcFull  string    `json:"sf,omitempty"`
+	SrcSel   string    `json:"ss,omitempty"`
+	Pos      *SrcPos   `json:"p,omitempty"`
+	Range    *SrcRange `json:"r,omitempty"`
 }
 
 func (me *SrcLens) ensureSrcFull() {
@@ -36,15 +51,4 @@ func (me *SrcLens) ByteOffsetForPosWithRuneOffset(pos *SrcPos) int {
 		}
 	}
 	return pos.byteOff
-}
-
-// All public fields are 1-based (so 0 means 'missing') and rune-not-byte-based
-type SrcPos struct {
-	Ln  int `json:"l,omitempty"`
-	Col int `json:"c,omitempty"`
-	Off int `json:"o,omitempty"`
-
-	// if & when this is computed, it'll be 0-based
-	byteOff int
-	byteoff bool
 }

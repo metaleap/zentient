@@ -16,7 +16,7 @@ type goSrcIntel struct {
 var srcIntel goSrcIntel
 
 func init() {
-	srcIntel.Self = &srcIntel
+	srcIntel.Impl = &srcIntel
 	z.Lang.SrcIntel = &srcIntel
 }
 

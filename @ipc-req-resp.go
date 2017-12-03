@@ -1,8 +1,40 @@
 package z
 
-type iHandler interface {
-	handle(*msgReq, *msgResp) bool
+import (
+	"encoding/json"
+	"strings"
+)
+
+type iDispatcher interface {
+	dispatch(*msgReq, *msgResp) bool
 	Init()
+}
+
+type msgReq struct {
+	ReqID   int64       `json:"ri"`
+	MsgID   msgIDs      `json:"mi"`
+	MsgArgs interface{} `json:"ma"`
+
+	SrcLens *SrcLens `json:"sl"`
+}
+
+func reqDecodeAndRespond(jsonreq string) *msgResp {
+	var req msgReq
+	var resp msgResp
+	if !Lang.Enabled {
+		resp.ErrMsg = Strf("%s does not appear to be installed on this machine.", Lang.Title)
+	} else if Prog.Cfg.err != nil {
+		resp.ErrMsg = Strf("Your %s is currently broken: either fix it or delete it, then reload Zentient.", Prog.Cfg.filePath)
+	}
+	if err := json.NewDecoder(strings.NewReader(jsonreq)).Decode(&req); err != nil {
+		resp.ErrMsg = err.Error()
+	} else if resp.ReqID = req.ReqID; resp.ErrMsg == "" {
+		resp.to(&req)
+	}
+	if resp.ErrMsg != "" {
+		resp.MsgID = req.MsgID
+	}
+	return &resp
 }
 
 type msgResp struct {
@@ -14,12 +46,6 @@ type msgResp struct {
 	CoreCmd  *coreCmdResp  `json:"coreCmd,omitempty"`
 	SrcIntel *srcIntelResp `json:"srcIntel,omitempty"`
 	SrcMod   *SrcLens      `json:"srcMod,omitempty"`
-}
-
-type msgArgPrompt struct {
-	Prompt      string `json:"prompt,omitempty"`
-	Placeholder string `json:"placeHolder,omitempty"`
-	Value       string `json:"value,omitempty"`
 }
 
 func (me *msgResp) onResponseReady() {
@@ -35,8 +61,8 @@ func (me *msgResp) onResponseReady() {
 
 func (me *msgResp) to(req *msgReq) {
 	defer me.onResponseReady()
-	for _, h := range handlers {
-		if h.handle(req, me) {
+	for _, h := range dispatchers {
+		if h.dispatch(req, me) {
 			return
 		}
 	}

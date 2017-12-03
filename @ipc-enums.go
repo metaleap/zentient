@@ -1,6 +1,6 @@
 package z
 
-// REMINDER TO SELF, on the rare update also update corresponding String()ers at the end of the file
+// REMINDER TO SELF, on the rare update also update corresponding String()ers at the bottom end of the file
 
 type msgIDs uint8
 
@@ -19,6 +19,7 @@ const (
 	MSGID_SRCINTEL_SYMS_PROJ
 	MSGID_SRCINTEL_CMPL_ITEMS
 	MSGID_SRCINTEL_CMPL_DETAILS
+	MSGID_SRCINTEL_HIGHLIGHTS
 
 	MSGID_MIN_INVALID
 )
@@ -118,6 +119,8 @@ func (me msgIDs) String() string {
 		return "MSGID_SRCINTEL_CMPL_ITEMS"
 	case MSGID_SRCINTEL_CMPL_DETAILS:
 		return "MSGID_SRCINTEL_CMPL_DETAILS"
+	case MSGID_SRCINTEL_HIGHLIGHTS:
+		return "MSGID_SRCINTEL_HIGHLIGHTS"
 	}
 	return Strf("%d", me)
 }

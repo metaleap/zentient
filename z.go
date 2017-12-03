@@ -25,8 +25,8 @@ var (
 	Strf = fmt.Sprintf
 
 	cmdProviders []iCoreCmds
-	handlers     = []iHandler{
-		&coreCmdsHandler{},
+	dispatchers  = []iDispatcher{
+		&coreCmds{},
 	}
 
 	Lang struct {
@@ -67,8 +67,8 @@ func Init() (err error) {
 		if Lang.SrcIntel != nil {
 			Lang.SrcIntel.Init()
 		}
-		for _, handler := range handlers {
-			handler.Init()
+		for _, dispatcher := range dispatchers {
+			dispatcher.Init()
 		}
 	}
 	return

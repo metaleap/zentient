@@ -8,7 +8,7 @@ import (
 )
 
 type iCoreCmds interface {
-	iHandler
+	iDispatcher
 
 	Cmds(*SrcLens) []*coreCmd
 	CmdsCategory() string
@@ -29,6 +29,12 @@ type coreCmd struct {
 	Hint     string      `json:"h,omitempty"`
 }
 
+type coreCmdMsgArgPrompt struct {
+	Prompt      string `json:"prompt,omitempty"`
+	Placeholder string `json:"placeHolder,omitempty"`
+	Value       string `json:"value,omitempty"`
+}
+
 type coreCmdResp struct {
 	CoreCmdsMenu *coreCmdsMenu `json:"menu,omitempty"`
 	WebsiteURL   string        `json:"url,omitempty"`
@@ -37,20 +43,20 @@ type coreCmdResp struct {
 	MsgAction    string        `json:"action,omitempty"`
 }
 
-type coreCmdsHandler struct {
+type coreCmds struct {
 }
 
-func (me *coreCmdsHandler) handle(req *msgReq, resp *msgResp) bool {
+func (me *coreCmds) dispatch(req *msgReq, resp *msgResp) bool {
 	switch req.MsgID {
 	case MSGID_CORECMDS_PALETTE:
-		me.handle_ListAll(req, resp)
+		me.onListAll(req, resp)
 	default:
 		return false
 	}
 	return true
 }
 
-func (me *coreCmdsHandler) handle_ListAll(req *msgReq, resp *msgResp) {
+func (me *coreCmds) onListAll(req *msgReq, resp *msgResp) {
 	var cats sort.StringSlice
 	m := coreCmdsMenu{Desc: "Showing: ", TopLevel: true}
 	for _, cmds := range cmdProviders {
@@ -66,7 +72,7 @@ func (me *coreCmdsHandler) handle_ListAll(req *msgReq, resp *msgResp) {
 	resp.CoreCmd = &coreCmdResp{CoreCmdsMenu: &m}
 }
 
-func (me *coreCmdsHandler) Init() {
+func (me *coreCmds) Init() {
 	l := &Lang
 	if l.SrcFmt != nil {
 		cmdProviders = append(cmdProviders, l.SrcFmt)
@@ -74,6 +80,6 @@ func (me *coreCmdsHandler) Init() {
 
 	for _, cmds := range cmdProviders {
 		cmds.Init()
-		handlers = append(handlers, cmds)
+		dispatchers = append(dispatchers, cmds)
 	}
 }

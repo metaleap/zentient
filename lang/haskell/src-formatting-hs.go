@@ -13,7 +13,7 @@ type hsSrcFormatting struct {
 var srcFmt hsSrcFormatting
 
 func init() {
-	srcFmt.Self = &srcFmt
+	srcFmt.Impl = &srcFmt
 	z.Lang.SrcFmt = &srcFmt
 }
 

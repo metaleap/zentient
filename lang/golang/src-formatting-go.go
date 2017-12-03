@@ -13,7 +13,7 @@ type goSrcFormatting struct {
 var srcFmt goSrcFormatting
 
 func init() {
-	srcFmt.Self = &srcFmt
+	srcFmt.Impl = &srcFmt
 	z.Lang.SrcFmt = &srcFmt
 }
 

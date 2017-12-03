@@ -17,7 +17,7 @@ type SrcFormattingBase struct {
 	cmdRunOnFile *coreCmd
 	cmdRunOnSel  *coreCmd
 
-	Self iSrcFormatting
+	Impl iSrcFormatting
 }
 
 func (me *SrcFormattingBase) Init() {
@@ -78,21 +78,21 @@ func (*SrcFormattingBase) DoesStdoutWithFilePathArg(*Tool) bool {
 	return true
 }
 
-func (me *SrcFormattingBase) handle(req *msgReq, resp *msgResp) bool {
+func (me *SrcFormattingBase) dispatch(req *msgReq, resp *msgResp) bool {
 	switch req.MsgID {
 	case MSGID_SRCFMT_SETDEFMENU:
-		me.handle_SetDefMenu(req, resp)
+		me.onSetDefMenu(req, resp)
 	case MSGID_SRCFMT_SETDEFPICK:
-		me.handle_SetDefPick(req, resp)
+		me.onSetDefPick(req, resp)
 	case MSGID_SRCFMT_RUNONFILE, MSGID_SRCFMT_RUNONSEL:
-		me.handle_RunFormatter(req, resp)
+		me.onRunFormatter(req, resp)
 	default:
 		return false
 	}
 	return true
 }
 
-func (me *SrcFormattingBase) handle_RunFormatter(req *msgReq, resp *msgResp) {
+func (me *SrcFormattingBase) onRunFormatter(req *msgReq, resp *msgResp) {
 	var hasopt = false
 	opt, _ := req.MsgArgs.(map[string]interface{})
 	if opt != nil {
@@ -104,8 +104,7 @@ func (me *SrcFormattingBase) handle_RunFormatter(req *msgReq, resp *msgResp) {
 		resp.CoreCmd = &coreCmdResp{}
 	}
 
-	self := me.Self
-	formatter := self.KnownFormatters().ByName(Prog.Cfg.FormatterName)
+	formatter := me.Impl.KnownFormatters().ByName(Prog.Cfg.FormatterName)
 	if formatter == nil {
 		if resp.CoreCmd == nil {
 			resp.ErrMsg = "Select a Default Formatter first via the Zentient 'Palette' menu."
@@ -118,7 +117,7 @@ func (me *SrcFormattingBase) handle_RunFormatter(req *msgReq, resp *msgResp) {
 	}
 
 	srcfilepath := req.SrcLens.FilePath
-	withfilepathcmdarg := self.DoesStdoutWithFilePathArg(formatter)
+	withfilepathcmdarg := me.Impl.DoesStdoutWithFilePathArg(formatter)
 	if !(ufs.FileExists(srcfilepath) && withfilepathcmdarg) {
 		srcfilepath = ""
 	}
@@ -143,7 +142,7 @@ func (me *SrcFormattingBase) handle_RunFormatter(req *msgReq, resp *msgResp) {
 		cmdname = Prog.Cfg.FormatterProg
 	}
 
-	if srcformatted, stderr, err := self.RunFormatter(formatter, cmdname, srcfilepath, *src); err != nil {
+	if srcformatted, stderr, err := me.Impl.RunFormatter(formatter, cmdname, srcfilepath, *src); err != nil {
 		resp.ErrMsg = err.Error()
 	} else if stderr != "" {
 		resp.ErrMsg = stderr
@@ -154,11 +153,11 @@ func (me *SrcFormattingBase) handle_RunFormatter(req *msgReq, resp *msgResp) {
 	}
 }
 
-func (me *SrcFormattingBase) handle_SetDefMenu(req *msgReq, resp *msgResp) {
+func (me *SrcFormattingBase) onSetDefMenu(req *msgReq, resp *msgResp) {
 	m := coreCmdsMenu{Desc: "First pick a known formatter, then optionally specify a custom tool name:"}
-	for _, kf := range me.Self.KnownFormatters() {
+	for _, kf := range me.Impl.KnownFormatters() {
 		var cmd = coreCmd{Title: kf.Name, MsgID: MSGID_SRCFMT_SETDEFPICK}
-		cmd.MsgArgs = map[string]interface{}{"fn": kf.Name, "fp": msgArgPrompt{Placeholder: kf.Name,
+		cmd.MsgArgs = map[string]interface{}{"fn": kf.Name, "fp": coreCmdMsgArgPrompt{Placeholder: kf.Name,
 			Prompt: Strf("Optionally enter the name of an alternative '%s'-compatible equivalent tool to use", kf.Name)}}
 		cmd.Desc = Strf("➜ Pick to use '%s' (or compatible equivalent) as the default %s formatter", kf.Name, Lang.Title)
 		if kf.Name != Prog.Cfg.FormatterName || !me.isFormatterCustom() {
@@ -177,7 +176,7 @@ func (me *SrcFormattingBase) handle_SetDefMenu(req *msgReq, resp *msgResp) {
 	resp.CoreCmd = &coreCmdResp{CoreCmdsMenu: &m}
 }
 
-func (me *SrcFormattingBase) handle_SetDefPick(req *msgReq, resp *msgResp) {
+func (me *SrcFormattingBase) onSetDefPick(req *msgReq, resp *msgResp) {
 	m := req.MsgArgs.(map[string]interface{})
 	Prog.Cfg.FormatterName = m["fn"].(string)
 	if Prog.Cfg.FormatterProg = m["fp"].(string); Prog.Cfg.FormatterProg == Prog.Cfg.FormatterName {

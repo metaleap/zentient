@@ -5,18 +5,20 @@ import (
 )
 
 type iSrcIntel interface {
-	iHandler
+	iDispatcher
 
 	ComplDetails(*SrcLens, string, *SrcIntelCompl)
 	ComplItems(*SrcLens) []SrcIntelCompl
+	Highlights(*SrcLens, string) []SrcRange
 	Hovers(*SrcLens) []SrcIntelHover
 	Symbols(*SrcLens, string, bool) udev.SrcMsgs
 }
 
 type srcIntelResp struct {
-	Cmpl    []SrcIntelCompl `json:"cmpl,omitempty"`
-	Hovers  []SrcIntelHover `json:"hovs,omitempty"`
-	Symbols udev.SrcMsgs    `json:"syms,omitempty"`
+	Cmpl       []SrcIntelCompl `json:"cmpl,omitempty"`
+	Hovers     []SrcIntelHover `json:"hovs,omitempty"`
+	Symbols    udev.SrcMsgs    `json:"syms,omitempty"`
+	Highlights []SrcRange      `json:"high,omitempty"`
 }
 
 type SrcIntelCompl struct {
@@ -30,7 +32,7 @@ type SrcIntelCompl struct {
 	CommitChars   []string   `json:"commitCharacters,omitempty"`
 	// Range               Range      `json:"Range,omitempty"`
 	// AdditionalTextEdits []TextEdit `json:"additionalTextEdits,omitempty"`
-	// Command Command `json:"command,omitempty"`
+	// Command             Command    `json:"command,omitempty"`
 }
 
 type SrcIntelHover struct {
@@ -41,85 +43,54 @@ type SrcIntelHover struct {
 }
 
 type SrcIntelBase struct {
-	Self iSrcIntel
+	Impl iSrcIntel
 }
 
 func (me *SrcIntelBase) Init() {
-	handlers = append(handlers, me.Self)
+	dispatchers = append(dispatchers, me.Impl)
 }
 
-func (_ *SrcIntelBase) ComplDetails(srcLens *SrcLens, itemText string, into *SrcIntelCompl) {
-	into.Detail = "Details for " + itemText
-	into.Documentation = "Docs for " + itemText
-}
-
-func (_ *SrcIntelBase) ComplItems(srcLens *SrcLens) (cmpls []SrcIntelCompl) {
-	cmpls = make([]SrcIntelCompl, 25)
-	for i := 0; i < len(cmpls); i++ {
-		cmplkind := Completion(i)
-		cmpls[i].Label = cmplkind.String()
-		cmpls[i].Kind = cmplkind
-	}
-	return
-}
-
-func (_ *SrcIntelBase) Hovers(srcLens *SrcLens) (hovs []SrcIntelHover) {
-	hovs = append(hovs,
-		SrcIntelHover{Value: Strf("Hovers not yet implemented for **%s** by `%s`", Lang.Title, Prog.name)},
-		SrcIntelHover{Value: Strf("File: %s", srcLens.FilePath), Language: "plaintext"},
-		SrcIntelHover{Value: Strf("Line/Char/Offset: %v", *srcLens.Pos)},
-	)
-	return
-}
-
-func (*SrcIntelBase) Symbols(srcLens *SrcLens, query string, curFileOnly bool) (srcRefs udev.SrcMsgs) {
-	if curFileOnly {
-		for i := 0; i <= 25; i++ {
-			srcRefs = append(srcRefs,
-				&udev.SrcMsg{Flag: i, Msg: Strf("%s", Symbol(i)), Ref: srcLens.FilePath,
-					Misc:   Strf("flag: %d", i),
-					Pos1Ch: 1, Pos1Ln: i + 1, Pos2Ch: 1, Pos2Ln: i + 1,
-				},
-			)
-		}
-	}
-	return
-}
-
-func (me *SrcIntelBase) handle(req *msgReq, resp *msgResp) bool {
+func (me *SrcIntelBase) dispatch(req *msgReq, resp *msgResp) bool {
 	switch req.MsgID {
 	case MSGID_SRCINTEL_HOVER:
-		me.handle_Hover(req, resp)
+		me.onHover(req, resp)
 	case MSGID_SRCINTEL_SYMS_FILE, MSGID_SRCINTEL_SYMS_PROJ:
-		me.handle_Syms(req, resp)
+		me.onSyms(req, resp)
 	case MSGID_SRCINTEL_CMPL_ITEMS:
-		me.handle_CmplItems(req, resp)
+		me.onCmplItems(req, resp)
 	case MSGID_SRCINTEL_CMPL_DETAILS:
-		me.handle_CmplDetails(req, resp)
+		me.onCmplDetails(req, resp)
+	case MSGID_SRCINTEL_HIGHLIGHTS:
+		me.onHighlights(req, resp)
 	default:
 		return false
 	}
 	return true
 }
 
-func (me *SrcIntelBase) handle_CmplItems(req *msgReq, resp *msgResp) {
-	resp.SrcIntel = &srcIntelResp{Cmpl: me.Self.ComplItems(req.SrcLens)}
+func (me *SrcIntelBase) onCmplItems(req *msgReq, resp *msgResp) {
+	resp.SrcIntel = &srcIntelResp{Cmpl: me.Impl.ComplItems(req.SrcLens)}
 }
 
-func (me *SrcIntelBase) handle_CmplDetails(req *msgReq, resp *msgResp) {
+func (me *SrcIntelBase) onCmplDetails(req *msgReq, resp *msgResp) {
 	itemtext, _ := req.MsgArgs.(string)
 	resp.SrcIntel = &srcIntelResp{Cmpl: make([]SrcIntelCompl, 1, 1)}
-	me.Self.ComplDetails(req.SrcLens, itemtext, &(resp.SrcIntel.Cmpl[0]))
+	me.Impl.ComplDetails(req.SrcLens, itemtext, &(resp.SrcIntel.Cmpl[0]))
 }
 
-func (me *SrcIntelBase) handle_Hover(req *msgReq, resp *msgResp) {
-	resp.SrcIntel = &srcIntelResp{Hovers: me.Self.Hovers(req.SrcLens)}
+func (me *SrcIntelBase) onHighlights(req *msgReq, resp *msgResp) {
+	curword, _ := req.MsgArgs.(string)
+	resp.SrcIntel = &srcIntelResp{Highlights: me.Impl.Highlights(req.SrcLens, curword)}
 }
 
-func (me *SrcIntelBase) handle_Syms(req *msgReq, resp *msgResp) {
+func (me *SrcIntelBase) onHover(req *msgReq, resp *msgResp) {
+	resp.SrcIntel = &srcIntelResp{Hovers: me.Impl.Hovers(req.SrcLens)}
+}
+
+func (me *SrcIntelBase) onSyms(req *msgReq, resp *msgResp) {
 	var query string
 	if req.MsgID == MSGID_SRCINTEL_SYMS_PROJ {
 		query, _ = req.MsgArgs.(string)
 	}
-	resp.SrcIntel = &srcIntelResp{Symbols: me.Self.Symbols(req.SrcLens, query, req.MsgID == MSGID_SRCINTEL_SYMS_FILE)}
+	resp.SrcIntel = &srcIntelResp{Symbols: me.Impl.Symbols(req.SrcLens, query, req.MsgID == MSGID_SRCINTEL_SYMS_FILE)}
 }
