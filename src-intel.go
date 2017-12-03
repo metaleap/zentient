@@ -41,20 +41,15 @@ func (_ *SrcIntelBase) Hovers(srcLens *SrcLens) (hovs []SrcIntelHover) {
 }
 
 func (*SrcIntelBase) Symbols(srcLens *SrcLens, query string, curFileOnly bool) (srcRefs udev.SrcMsgs) {
-	if srcLens == nil {
-		srcRefs = append(srcRefs,
-			&udev.SrcMsg{Flag: SYM_FILE, Msg: "The Proj Symbol", Ref: "/home/__/c/go/src/github.com/metaleap/zentient/z.go",
-				Misc:   "query: " + query,
-				Pos1Ch: 2, Pos1Ln: 3, Pos2Ch: 5, Pos2Ln: 3,
-			},
-		)
-	} else {
-		srcRefs = append(srcRefs,
-			&udev.SrcMsg{Flag: SYM_FILE, Msg: "The File Symbol", Ref: srcLens.FilePath,
-				Misc:   "query: " + query,
-				Pos1Ch: 2, Pos1Ln: 3, Pos2Ch: 5, Pos2Ln: 3,
-			},
-		)
+	if curFileOnly {
+		for icon := 0; icon <= 25; icon++ {
+			srcRefs = append(srcRefs,
+				&udev.SrcMsg{Flag: icon, Msg: Strf("%s", Symbol(icon)), Ref: srcLens.FilePath,
+					Misc:   Strf("flag: %d", icon),
+					Pos1Ch: 1, Pos1Ln: icon + 1, Pos2Ch: 1, Pos2Ln: icon + 1,
+				},
+			)
+		}
 	}
 	return
 }

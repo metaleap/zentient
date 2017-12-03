@@ -5,23 +5,6 @@ import (
 	"strings"
 )
 
-type msgIDs uint8
-
-const (
-	_ msgIDs = iota
-
-	MSGID_CORECMDS_PALETTE
-	MSGID_SRCFMT_SETDEFMENU
-	MSGID_SRCFMT_SETDEFPICK
-	MSGID_SRCFMT_RUNONFILE
-	MSGID_SRCFMT_RUNONSEL
-	MSGID_SRCINTEL_HOVER
-	MSGID_SRCINTEL_SYMS_FILE
-	MSGID_SRCINTEL_SYMS_PROJ
-
-	MSGID_MIN_INVALID
-)
-
 type msgReq struct {
 	ReqID   int64       `json:"ri"`
 	MsgID   msgIDs      `json:"mi"`
