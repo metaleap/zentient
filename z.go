@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	ℤ           = "⟨ℤ⟩"
+	// ℤ           = "⟨ℤ⟩"
 	pretendSlow = false
 )
 
