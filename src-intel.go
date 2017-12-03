@@ -11,28 +11,35 @@ type iSrcIntel interface {
 	ComplItems(*SrcLens) []SrcIntelCompl
 	Highlights(*SrcLens, string) []SrcRange
 	Hovers(*SrcLens) []SrcIntelHover
+	Signature(*SrcLens) *SrcIntelSigHelp
 	Symbols(*SrcLens, string, bool) udev.SrcMsgs
 }
 
 type srcIntelResp struct {
-	Cmpl       []SrcIntelCompl `json:"cmpl,omitempty"`
-	Hovers     []SrcIntelHover `json:"hovs,omitempty"`
-	Symbols    udev.SrcMsgs    `json:"syms,omitempty"`
-	Highlights []SrcRange      `json:"high,omitempty"`
+	Cmpl       []SrcIntelCompl  `json:"cmpl,omitempty"`
+	Hovers     []SrcIntelHover  `json:"hovs,omitempty"`
+	Symbols    udev.SrcMsgs     `json:"syms,omitempty"`
+	Highlights []SrcRange       `json:"high,omitempty"`
+	Signature  *SrcIntelSigHelp `json:"sig,omitempty"`
 }
 
 type SrcIntelCompl struct {
-	Label         string     `json:"label"`
-	Kind          Completion `json:"kind,omitempty"`
-	Detail        string     `json:"detail,omitempty"`
-	Documentation string     `json:"documentation,omitempty"`
-	SortText      string     `json:"sortText,omitempty"`
-	FilterText    string     `json:"filterText,omitempty"`
-	InsertText    string     `json:"insertText,omitempty"`
-	CommitChars   []string   `json:"commitCharacters,omitempty"`
+	Label         string      `json:"label"`
+	Kind          Completion  `json:"kind,omitempty"`
+	Detail        string      `json:"detail,omitempty"`
+	Documentation SrcIntelDoc `json:"documentation,omitempty"`
+	SortText      string      `json:"sortText,omitempty"`
+	FilterText    string      `json:"filterText,omitempty"`
+	InsertText    string      `json:"insertText,omitempty"`
+	CommitChars   []string    `json:"commitCharacters,omitempty"`
 	// Range               Range      `json:"Range,omitempty"`
 	// AdditionalTextEdits []TextEdit `json:"additionalTextEdits,omitempty"`
 	// Command             Command    `json:"command,omitempty"`
+}
+
+type SrcIntelDoc struct {
+	Value     string `json:"value"`
+	IsTrusted bool   `json:"isTrusted"`
 }
 
 type SrcIntelHover struct {
@@ -40,6 +47,23 @@ type SrcIntelHover struct {
 
 	// If empty, clients default to 'markdown'
 	Language string `json:"language,omitempty"`
+}
+
+type SrcIntelSigHelp struct {
+	ActiveSignature int               `json:"activeSignature"`
+	ActiveParameter int               `json:"activeParameter"`
+	Signatures      []SrcIntelSigInfo `json:"signatures"`
+}
+
+type SrcIntelSigInfo struct {
+	Label         string             `json:"label"`
+	Documentation SrcIntelDoc        `json:"documentation,omitempty"`
+	Parameters    []SrcIntelSigParam `json:"parameters,omitempty"`
+}
+
+type SrcIntelSigParam struct {
+	Label         string      `json:"label"`
+	Documentation SrcIntelDoc `json:"documentation,omitempty"`
 }
 
 type SrcIntelBase struct {
@@ -62,6 +86,8 @@ func (me *SrcIntelBase) dispatch(req *msgReq, resp *msgResp) bool {
 		me.onCmplDetails(req, resp)
 	case MSGID_SRCINTEL_HIGHLIGHTS:
 		me.onHighlights(req, resp)
+	case MSGID_SRCINTEL_SIGNATURE:
+		me.onSignature(req, resp)
 	default:
 		return false
 	}
@@ -85,6 +111,10 @@ func (me *SrcIntelBase) onHighlights(req *msgReq, resp *msgResp) {
 
 func (me *SrcIntelBase) onHover(req *msgReq, resp *msgResp) {
 	resp.SrcIntel = &srcIntelResp{Hovers: me.Impl.Hovers(req.SrcLens)}
+}
+
+func (me *SrcIntelBase) onSignature(req *msgReq, resp *msgResp) {
+	resp.SrcIntel = &srcIntelResp{Signature: me.Impl.Signature(req.SrcLens)}
 }
 
 func (me *SrcIntelBase) onSyms(req *msgReq, resp *msgResp) {

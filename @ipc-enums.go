@@ -20,8 +20,9 @@ const (
 	MSGID_SRCINTEL_CMPL_ITEMS
 	MSGID_SRCINTEL_CMPL_DETAILS
 	MSGID_SRCINTEL_HIGHLIGHTS
+	MSGID_SRCINTEL_SIGNATURE
 
-	MSGID_MIN_INVALID
+	MSGID_MIN_INVALID // new entries go above this one
 )
 
 type DiagSeverity uint8
@@ -31,6 +32,8 @@ const (
 	DIAG_SEV_WARN
 	DIAG_SEV_INFO
 	DIAG_SEV_HINT
+
+	DIAG_MIN_INVALID // new entries go above this one
 )
 
 type Symbol uint8
@@ -62,6 +65,8 @@ const (
 	SYM_EVENT
 	SYM_OPERATOR
 	SYM_TYPEPARAMETER
+
+	SYM_MIN_INVALID // new entries go above this one
 )
 
 type Completion uint8
@@ -92,6 +97,8 @@ const (
 	CMPL_EVENT
 	CMPL_OPERATOR
 	CMPL_TYPEPARAMETER
+
+	CMPL_MIN_INVALID // new entries go above this one
 )
 
 // Stringers below.
@@ -121,6 +128,8 @@ func (me msgIDs) String() string {
 		return "MSGID_SRCINTEL_CMPL_DETAILS"
 	case MSGID_SRCINTEL_HIGHLIGHTS:
 		return "MSGID_SRCINTEL_HIGHLIGHTS"
+	case MSGID_SRCINTEL_SIGNATURE:
+		return "MSGID_SRCINTEL_SIGNATURE"
 	}
 	return Strf("%d", me)
 }

@@ -8,11 +8,11 @@ import (
 
 func (_ *SrcIntelBase) ComplDetails(srcLens *SrcLens, itemText string, into *SrcIntelCompl) {
 	into.Detail = "Details for " + itemText
-	into.Documentation = "Docs for " + itemText
+	into.Documentation.IsTrusted, into.Documentation.Value = true, "**Docs** for: `"+itemText+"`"
 }
 
 func (_ *SrcIntelBase) ComplItems(srcLens *SrcLens) (all []SrcIntelCompl) {
-	all = make([]SrcIntelCompl, 25)
+	all = make([]SrcIntelCompl, CMPL_MIN_INVALID)
 	for i := 0; i < len(all); i++ {
 		cmplkind := Completion(i)
 		all[i].Label = cmplkind.String()
@@ -55,11 +55,19 @@ func (_ *SrcIntelBase) Hovers(srcLens *SrcLens) (all []SrcIntelHover) {
 	return
 }
 
+func (*SrcIntelBase) Signature(srcLens *SrcLens) *SrcIntelSigHelp {
+	var sig SrcIntelSigHelp
+	sig.Signatures = []SrcIntelSigInfo{SrcIntelSigInfo{Label: "Signature", Documentation: SrcIntelDoc{IsTrusted: true, Value: "Helpful **doc** `comment`s.."}}}
+	sig.Signatures[0].Parameters = []SrcIntelSigParam{SrcIntelSigParam{Label: "Parameter 1", Documentation: SrcIntelDoc{IsTrusted: true, Value: "Every argument gets a *helpful* `doc` comment."}}}
+	return &sig
+}
+
 func (*SrcIntelBase) Symbols(srcLens *SrcLens, query string, curFileOnly bool) (all udev.SrcMsgs) {
 	if curFileOnly {
-		for i := 0; i <= 25; i++ {
+		const symMinInvalid = int(SYM_MIN_INVALID)
+		for i := 0; i < symMinInvalid; i++ {
 			all = append(all,
-				&udev.SrcMsg{Flag: i, Msg: Strf("%s", Symbol(i)), Ref: srcLens.FilePath,
+				&udev.SrcMsg{Flag: i, Msg: Symbol(i).String(), Ref: srcLens.FilePath,
 					Misc:   Strf("flag: %d", i),
 					Pos1Ch: 1, Pos1Ln: i + 1, Pos2Ch: 1, Pos2Ln: i + 1,
 				},
