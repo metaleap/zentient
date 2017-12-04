@@ -7,7 +7,7 @@ import (
 	"github.com/metaleap/go-util/slice"
 )
 
-type iCoreCmds interface {
+type iCmdsProvider interface {
 	iDispatcher
 
 	Cmds(*SrcLens) []*coreCmd
@@ -73,13 +73,4 @@ func (me *coreCmds) onListAll(req *msgReq, resp *msgResp) {
 }
 
 func (me *coreCmds) Init() {
-	l := &Lang
-	if l.SrcMod != nil {
-		cmdProviders = append(cmdProviders, l.SrcMod)
-	}
-
-	for _, cmds := range cmdProviders {
-		cmds.Init()
-		dispatchers = append(dispatchers, cmds)
-	}
 }

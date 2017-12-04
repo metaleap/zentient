@@ -5,10 +5,11 @@ import (
 )
 
 type iSrcMod interface {
-	iCoreCmds
+	iCmdsProvider
 
 	DoesStdoutWithFilePathArg(*Tool) bool
 	KnownFormatters() Tools
+	Rename(*SrcLens, string) []*SrcLens
 	RunFormatter(*Tool, string, string, string) (string, string, error)
 }
 
@@ -78,6 +79,10 @@ func (*SrcModBase) DoesStdoutWithFilePathArg(*Tool) bool {
 	return true
 }
 
+func (*SrcModBase) Rename(srcLens *SrcLens, newName string) (all []*SrcLens) {
+	panic(Strf("Rename not yet implemented for __%s__.", Lang.Title))
+}
+
 func (me *SrcModBase) dispatch(req *msgReq, resp *msgResp) bool {
 	switch req.MsgID {
 	case MSGID_SRCMOD_FMT_SETDEFMENU:
@@ -86,10 +91,21 @@ func (me *SrcModBase) dispatch(req *msgReq, resp *msgResp) bool {
 		me.onSetDefPick(req, resp)
 	case MSGID_SRCMOD_FMT_RUNONFILE, MSGID_SRCMOD_FMT_RUNONSEL:
 		me.onRunFormatter(req, resp)
+	case MSGID_SRCMOD_RENAME:
+		me.onRename(req, resp)
 	default:
 		return false
 	}
 	return true
+}
+
+func (me *SrcModBase) onRename(req *msgReq, resp *msgResp) {
+	newname, _ := req.MsgArgs.(string)
+	if newname == "" {
+		resp.ErrMsg = "Rename: missing new-name"
+	} else {
+		resp.SrcMods = me.Impl.Rename(req.SrcLens, newname)
+	}
 }
 
 func (me *SrcModBase) onRunFormatter(req *msgReq, resp *msgResp) {

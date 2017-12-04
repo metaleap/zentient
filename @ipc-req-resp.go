@@ -67,8 +67,8 @@ func (me *msgResp) to(req *msgReq) {
 		}
 	}
 	if req.MsgID < MSGID_CORECMDS_PALETTE || req.MsgID >= MSGID_MIN_INVALID {
-		me.ErrMsg = Strf("Invalid MsgID %s", req.MsgID)
+		me.ErrMsg = Strf("Invalid MsgID %d", req.MsgID)
 	} else {
-		me.ErrMsg = Strf("The requested feature %s wasn't implemented for **%s**.", req.MsgID, Lang.Title)
+		me.ErrMsg = Strf("The requested feature `%s` wasn't yet implemented for *%s*.", req.MsgID, Lang.Title)
 	}
 }

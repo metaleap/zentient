@@ -71,7 +71,6 @@ type SrcIntelBase struct {
 }
 
 func (me *SrcIntelBase) Init() {
-	dispatchers = append(dispatchers, me.Impl)
 }
 
 func (me *SrcIntelBase) dispatch(req *msgReq, resp *msgResp) bool {

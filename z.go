@@ -24,7 +24,7 @@ var (
 	Errf = fmt.Errorf
 	Strf = fmt.Sprintf
 
-	cmdProviders []iCoreCmds
+	cmdProviders []iCmdsProvider
 	dispatchers  = []iDispatcher{
 		&coreCmds{},
 	}
@@ -50,7 +50,7 @@ var (
 	}
 )
 
-func Bad(what, which string) {
+func Bad(what string, which string) {
 	panic(Strf("%s: invalid %s %s '%s'", Prog.name, Lang.Title, what, which))
 }
 
@@ -63,26 +63,42 @@ func Init() (err error) {
 	} else if err = ufs.EnsureDirExists(Prog.dir.cache); err != nil {
 		return
 	}
+
 	if Prog.Cfg.reload(); Prog.Cfg.err == nil {
-		if Lang.SrcIntel != nil {
-			Lang.SrcIntel.Init()
+		wellknowndispatchers := []iDispatcher{
+			Lang.SrcIntel, Lang.SrcMod,
 		}
-		for _, dispatcher := range dispatchers {
-			dispatcher.Init()
+		for _, disp := range wellknowndispatchers {
+			if disp != nil {
+				dispatchers = append(dispatchers, disp)
+				disp.Init()
+			}
+		}
+
+		wellknowncmdproviders := []iCmdsProvider{
+			Lang.SrcMod,
+		}
+		for _, cmds := range wellknowncmdproviders {
+			if cmds != nil {
+				cmdProviders = append(cmdProviders, cmds)
+			}
 		}
 	}
 	return
 }
 
-func InitAndServeOrPanic(onPreInit func(), onPostInit func()) {
-	// note to self: don't ADD any further logic in here, either in Init() or in Serve()
+func InitAndServe(onPreInit func(), onPostInit func()) (err error) {
+	// note to self: don't ADD any further logic in here, do it only in either Init() or Serve()
 	onPreInit()
-	err := Init()
-	if err == nil {
+	if err = Init(); err == nil {
 		onPostInit()
 		err = Serve()
 	}
-	if err != nil {
+	return
+}
+
+func InitAndServeOrPanic(onPreInit func(), onPostInit func()) {
+	if err := InitAndServe(onPreInit, onPostInit); err != nil {
 		panic(err)
 	}
 }
@@ -92,7 +108,7 @@ func catch(err *error) {
 		if e, ok := except.(error); ok {
 			*err = e
 		} else {
-			*err = fmt.Errorf("%v", except)
+			*err = Errf("%v", except)
 		}
 	}
 }
@@ -100,14 +116,17 @@ func catch(err *error) {
 func Serve() (err error) {
 	var stdin *bufio.Scanner
 	stdin, pipeIO.outWriter, pipeIO.outEncoder = urun.SetupJsonProtoPipes(1024*1024*4, false, true)
+
+	// we allow our sub-ordinate go-routines to panic and just before we return, we recover() the `err` to return (if any)
+	defer catch(&err)
+
 	// we don't directly wire up a json.Decoder to stdin but read individual lines in as strings first:
 	// - this enforces our line-delimited (rather than 'json-delimited') protocol
-	// - allows decoding in separate go-routine
-	// - bad lines are simply reported to client without having decoder in confused/error state; and without needing to exit
-	defer catch(&err)
+	// - allows json-decoding in separate go-routine
+	// - bad lines are simply reported to client without having a single 'global' decoder in confused/error state / without needing to exit
 	for stdin.Scan() {
 		if err = stdin.Err(); err != nil {
-			return
+			break
 		} else {
 			go serveIncomingReq(stdin.Text())
 		}
