@@ -4,7 +4,7 @@ import (
 	"github.com/metaleap/go-util/fs"
 )
 
-type iSrcFormatting interface {
+type iSrcMod interface {
 	iCoreCmds
 
 	DoesStdoutWithFilePathArg(*Tool) bool
@@ -12,33 +12,33 @@ type iSrcFormatting interface {
 	RunFormatter(*Tool, string, string, string) (string, string, error)
 }
 
-type SrcFormattingBase struct {
-	cmdSetDef    *coreCmd
-	cmdRunOnFile *coreCmd
-	cmdRunOnSel  *coreCmd
+type SrcModBase struct {
+	cmdFmtSetDef    *coreCmd
+	cmdFmtRunOnFile *coreCmd
+	cmdFmtRunOnSel  *coreCmd
 
-	Impl iSrcFormatting
+	Impl iSrcMod
 }
 
-func (me *SrcFormattingBase) Init() {
-	me.cmdSetDef = &coreCmd{
-		MsgID: MSGID_SRCFMT_SETDEFMENU,
+func (me *SrcModBase) Init() {
+	me.cmdFmtSetDef = &coreCmd{
+		MsgID: MSGID_SRCMOD_FMT_SETDEFMENU,
 		Title: "Change Default Formatter",
 		Desc:  Strf("Specify your preferred default %s source formatter", Lang.Title),
 	}
-	me.cmdRunOnFile = &coreCmd{
-		MsgID: MSGID_SRCFMT_RUNONFILE,
+	me.cmdFmtRunOnFile = &coreCmd{
+		MsgID: MSGID_SRCMOD_FMT_RUNONFILE,
 		Title: "Format Document",
 	}
-	me.cmdRunOnSel = &coreCmd{
-		MsgID: MSGID_SRCFMT_RUNONSEL,
+	me.cmdFmtRunOnSel = &coreCmd{
+		MsgID: MSGID_SRCMOD_FMT_RUNONSEL,
 		Title: "Format Selection",
 	}
 }
 
-func (me *SrcFormattingBase) Cmds(srcLens *SrcLens) (cmds []*coreCmd) {
+func (me *SrcModBase) Cmds(srcLens *SrcLens) (cmds []*coreCmd) {
 	if srcLens != nil {
-		desc := "(" + me.cmdSetDef.Desc + " first)"
+		desc := "(" + me.cmdFmtSetDef.Desc + " first)"
 		if me.hasFormatter() {
 			if desc = "➜ using "; me.isFormatterCustom() {
 				desc += "'" + Prog.Cfg.FormatterProg + "' like "
@@ -47,44 +47,44 @@ func (me *SrcFormattingBase) Cmds(srcLens *SrcLens) (cmds []*coreCmd) {
 		}
 
 		if srcLens.FilePath != "" || srcLens.SrcFull != "" {
-			me.cmdRunOnFile.Desc = desc
-			if me.cmdRunOnFile.Hint = srcLens.FilePath; me.cmdRunOnFile.Hint == "" {
-				me.cmdRunOnFile.Hint = srcLens.SrcFull
+			me.cmdFmtRunOnFile.Desc = desc
+			if me.cmdFmtRunOnFile.Hint = srcLens.FilePath; me.cmdFmtRunOnFile.Hint == "" {
+				me.cmdFmtRunOnFile.Hint = srcLens.SrcFull
 			}
-			cmds = append(cmds, me.cmdRunOnFile)
+			cmds = append(cmds, me.cmdFmtRunOnFile)
 		}
 		if srcLens.SrcSel != "" {
-			me.cmdRunOnSel.Desc = desc
-			me.cmdRunOnSel.Hint = srcLens.SrcSel
-			cmds = append(cmds, me.cmdRunOnSel)
+			me.cmdFmtRunOnSel.Desc = desc
+			me.cmdFmtRunOnSel.Hint = srcLens.SrcSel
+			cmds = append(cmds, me.cmdFmtRunOnSel)
 		}
 	}
 
-	if me.cmdSetDef.Hint = "(none)"; me.hasFormatter() {
-		if me.cmdSetDef.Hint = "'" + Prog.Cfg.FormatterName + "'"; me.isFormatterCustom() {
-			me.cmdSetDef.Hint += "-compatible '" + Prog.Cfg.FormatterProg + "'"
+	if me.cmdFmtSetDef.Hint = "(none)"; me.hasFormatter() {
+		if me.cmdFmtSetDef.Hint = "'" + Prog.Cfg.FormatterName + "'"; me.isFormatterCustom() {
+			me.cmdFmtSetDef.Hint += "-compatible '" + Prog.Cfg.FormatterProg + "'"
 		}
 	}
-	me.cmdSetDef.Hint = "Current: " + me.cmdSetDef.Hint
-	cmds = append(cmds, me.cmdSetDef)
+	me.cmdFmtSetDef.Hint = "Current: " + me.cmdFmtSetDef.Hint
+	cmds = append(cmds, me.cmdFmtSetDef)
 	return
 }
 
-func (*SrcFormattingBase) CmdsCategory() string {
+func (*SrcModBase) CmdsCategory() string {
 	return "Formatting"
 }
 
-func (*SrcFormattingBase) DoesStdoutWithFilePathArg(*Tool) bool {
+func (*SrcModBase) DoesStdoutWithFilePathArg(*Tool) bool {
 	return true
 }
 
-func (me *SrcFormattingBase) dispatch(req *msgReq, resp *msgResp) bool {
+func (me *SrcModBase) dispatch(req *msgReq, resp *msgResp) bool {
 	switch req.MsgID {
-	case MSGID_SRCFMT_SETDEFMENU:
+	case MSGID_SRCMOD_FMT_SETDEFMENU:
 		me.onSetDefMenu(req, resp)
-	case MSGID_SRCFMT_SETDEFPICK:
+	case MSGID_SRCMOD_FMT_SETDEFPICK:
 		me.onSetDefPick(req, resp)
-	case MSGID_SRCFMT_RUNONFILE, MSGID_SRCFMT_RUNONSEL:
+	case MSGID_SRCMOD_FMT_RUNONFILE, MSGID_SRCMOD_FMT_RUNONSEL:
 		me.onRunFormatter(req, resp)
 	default:
 		return false
@@ -92,7 +92,7 @@ func (me *SrcFormattingBase) dispatch(req *msgReq, resp *msgResp) bool {
 	return true
 }
 
-func (me *SrcFormattingBase) onRunFormatter(req *msgReq, resp *msgResp) {
+func (me *SrcModBase) onRunFormatter(req *msgReq, resp *msgResp) {
 	var hasopt = false
 	opt, _ := req.MsgArgs.(map[string]interface{})
 	if opt != nil {
@@ -110,7 +110,7 @@ func (me *SrcFormattingBase) onRunFormatter(req *msgReq, resp *msgResp) {
 			resp.ErrMsg = "Select a Default Formatter first via the Zentient 'Palette' menu."
 		} else {
 			resp.CoreCmd.NoteWarn = "Select a Default Formatter first, either via the Zentient 'Palette' menu or:"
-			resp.MsgID = MSGID_SRCFMT_SETDEFMENU
+			resp.MsgID = MSGID_SRCMOD_FMT_SETDEFMENU
 			resp.CoreCmd.MsgAction = Strf("Pick your preferred Zentient default %s formatter…", Lang.Title)
 		}
 		return
@@ -149,14 +149,14 @@ func (me *SrcFormattingBase) onRunFormatter(req *msgReq, resp *msgResp) {
 		resp.ErrMsgFromTool = true
 	} else {
 		*src = srcformatted
-		resp.SrcMod = req.SrcLens
+		resp.SrcMods = []*SrcLens{req.SrcLens}
 	}
 }
 
-func (me *SrcFormattingBase) onSetDefMenu(req *msgReq, resp *msgResp) {
+func (me *SrcModBase) onSetDefMenu(req *msgReq, resp *msgResp) {
 	m := coreCmdsMenu{Desc: "First pick a known formatter, then optionally specify a custom tool name:"}
 	for _, kf := range me.Impl.KnownFormatters() {
-		var cmd = coreCmd{Title: kf.Name, MsgID: MSGID_SRCFMT_SETDEFPICK}
+		var cmd = coreCmd{Title: kf.Name, MsgID: MSGID_SRCMOD_FMT_SETDEFPICK}
 		cmd.MsgArgs = map[string]interface{}{"fn": kf.Name, "fp": coreCmdMsgArgPrompt{Placeholder: kf.Name,
 			Prompt: Strf("Optionally enter the name of an alternative '%s'-compatible equivalent tool to use", kf.Name)}}
 		cmd.Desc = Strf("➜ Pick to use '%s' (or compatible equivalent) as the default %s formatter", kf.Name, Lang.Title)
@@ -176,7 +176,7 @@ func (me *SrcFormattingBase) onSetDefMenu(req *msgReq, resp *msgResp) {
 	resp.CoreCmd = &coreCmdResp{CoreCmdsMenu: &m}
 }
 
-func (me *SrcFormattingBase) onSetDefPick(req *msgReq, resp *msgResp) {
+func (me *SrcModBase) onSetDefPick(req *msgReq, resp *msgResp) {
 	m := req.MsgArgs.(map[string]interface{})
 	Prog.Cfg.FormatterName = m["fn"].(string)
 	if Prog.Cfg.FormatterProg = m["fp"].(string); Prog.Cfg.FormatterProg == Prog.Cfg.FormatterName {
@@ -194,9 +194,9 @@ func (me *SrcFormattingBase) onSetDefPick(req *msgReq, resp *msgResp) {
 	}
 }
 
-func (*SrcFormattingBase) hasFormatter() bool {
+func (*SrcModBase) hasFormatter() bool {
 	return Prog.Cfg.FormatterName != ""
 }
-func (*SrcFormattingBase) isFormatterCustom() bool {
+func (*SrcModBase) isFormatterCustom() bool {
 	return Prog.Cfg.FormatterProg != "" && Prog.Cfg.FormatterProg != Prog.Cfg.FormatterName
 }

@@ -33,7 +33,7 @@ var (
 		Enabled  bool
 		ID       string
 		Title    string
-		SrcFmt   iSrcFormatting
+		SrcMod   iSrcMod
 		SrcIntel iSrcIntel
 	}
 	Prog struct {

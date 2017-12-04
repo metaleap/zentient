@@ -12,10 +12,10 @@ func OnPreInit() {
 	if l.Enabled = udevgo.HasGoDevEnv(); l.Enabled {
 		go udevgo.RefreshPkgs()
 		toolsInit()
-		srcFmt.onPreInit()
+		srcMod.onPreInit()
 	}
 }
 
 func OnPostInit() {
-	srcFmt.onPostInit()
+	srcMod.onPostInit()
 }

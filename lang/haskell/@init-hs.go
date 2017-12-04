@@ -11,7 +11,7 @@ func OnPreInit() {
 	l.Title = "Haskell"
 	if l.Enabled = udevhs.HasHsDevEnv(); l.Enabled {
 		toolsInit()
-		srcFmt.onPreInit()
+		srcMod.onPreInit()
 	}
 }
 

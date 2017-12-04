@@ -4,34 +4,34 @@ import (
 	"github.com/metaleap/zentient"
 )
 
-type hsSrcFormatting struct {
-	z.SrcFormattingBase
+type hsSrcMod struct {
+	z.SrcModBase
 
 	knownFormatters z.Tools
 }
 
-var srcFmt hsSrcFormatting
+var srcMod hsSrcMod
 
 func init() {
-	srcFmt.Impl = &srcFmt
-	z.Lang.SrcFmt = &srcFmt
+	srcMod.Impl = &srcMod
+	z.Lang.SrcMod = &srcMod
 }
 
-func (me *hsSrcFormatting) onPreInit() {
-	srcFmt.knownFormatters = z.Tools{
+func (me *hsSrcMod) onPreInit() {
+	srcMod.knownFormatters = z.Tools{
 		tools.hindent, tools.stylishhaskell, tools.brittany,
 	}
 }
 
-func (*hsSrcFormatting) DoesStdoutWithFilePathArg(tool *z.Tool) bool {
+func (*hsSrcMod) DoesStdoutWithFilePathArg(tool *z.Tool) bool {
 	return tool != tools.hindent
 }
 
-func (me *hsSrcFormatting) KnownFormatters() z.Tools {
+func (me *hsSrcMod) KnownFormatters() z.Tools {
 	return me.knownFormatters
 }
 
-func (me *hsSrcFormatting) RunFormatter(formatter *z.Tool, cmdName string, srcFilePath string, src string) (string, string, error) {
+func (me *hsSrcMod) RunFormatter(formatter *z.Tool, cmdName string, srcFilePath string, src string) (string, string, error) {
 	if formatter != tools.brittany && formatter != tools.hindent && formatter != tools.stylishhaskell {
 		return "", "", z.Errf("Invalid tool: %s" + formatter.Name)
 	}

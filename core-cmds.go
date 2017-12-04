@@ -74,8 +74,8 @@ func (me *coreCmds) onListAll(req *msgReq, resp *msgResp) {
 
 func (me *coreCmds) Init() {
 	l := &Lang
-	if l.SrcFmt != nil {
-		cmdProviders = append(cmdProviders, l.SrcFmt)
+	if l.SrcMod != nil {
+		cmdProviders = append(cmdProviders, l.SrcMod)
 	}
 
 	for _, cmds := range cmdProviders {
