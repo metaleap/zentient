@@ -54,7 +54,7 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.SrcIntelHover) {
 					ggd.Decl = strings.Replace(ggd.Decl, ggd.ImpP+".", "", -1)
 				}
 				if ustr.Pref(ggd.Decl, "field ") { // ensure syntax-highlighting:
-					ggd.Decl = z.Strf("struct/*field*/ { %s }", ggd.Decl[6:])
+					ggd.Decl = z.Strf("//ℤ/ struct field:\n{ %s }\n//ℤ/ field context (tags etc.) not shown", ggd.Decl[6:])
 				}
 				ggd.Decl = me.hoverShortenImpPaths(ggd.Decl)
 				decl = &z.SrcIntelHover{Language: z.Lang.ID, Value: ggd.Decl}

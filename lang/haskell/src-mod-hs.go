@@ -31,9 +31,9 @@ func (me *hsSrcMod) KnownFormatters() z.Tools {
 	return me.knownFormatters
 }
 
-func (me *hsSrcMod) RunFormatter(formatter *z.Tool, cmdName string, srcFilePath string, src string) (string, string, error) {
+func (me *hsSrcMod) RunFormatter(formatter *z.Tool, cmdName string, srcFilePath string, src string) (string, string) {
 	if formatter != tools.brittany && formatter != tools.hindent && formatter != tools.stylishhaskell {
-		return "", "", z.Errf("Invalid tool: %s" + formatter.Name)
+		z.Bad("formatting tool", formatter.Name)
 	}
 
 	var cmdargs []string

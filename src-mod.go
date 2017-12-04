@@ -10,7 +10,7 @@ type iSrcMod interface {
 	DoesStdoutWithFilePathArg(*Tool) bool
 	KnownFormatters() Tools
 	Rename(*SrcLens, string) []*SrcLens
-	RunFormatter(*Tool, string, string, string) (string, string, error)
+	RunFormatter(*Tool, string, string, string) (string, string)
 }
 
 type SrcModBase struct {
@@ -158,11 +158,8 @@ func (me *SrcModBase) onRunFormatter(req *msgReq, resp *msgResp) {
 		cmdname = Prog.Cfg.FormatterProg
 	}
 
-	if srcformatted, stderr, err := me.Impl.RunFormatter(formatter, cmdname, srcfilepath, *src); err != nil {
-		resp.ErrMsg = err.Error()
-	} else if stderr != "" {
+	if srcformatted, stderr := me.Impl.RunFormatter(formatter, cmdname, srcfilepath, *src); stderr != "" {
 		resp.ErrMsg = stderr
-		resp.ErrMsgFromTool = true
 	} else {
 		*src = srcformatted
 		resp.SrcMods = []*SrcLens{req.SrcLens}

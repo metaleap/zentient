@@ -23,12 +23,15 @@ func (me Tools) ByName(name string) *Tool {
 	return nil
 }
 
-func (*Tool) Exec(cmdname string, cmdargs []string, stdin string) (string, string, error) {
+func (*Tool) Exec(cmdname string, cmdargs []string, stdin string) (string, string) {
 	stdout, stderr, err := urun.CmdExecStdin(stdin, "", cmdname, cmdargs...)
+	if err != nil {
+		panic(err)
+	}
 	if stderr != "" {
 		stderr = Strf("%s: %s", cmdname, stderr)
 	}
-	return stdout, stderr, err
+	return stdout, stderr
 }
 
 func (me *Tool) NotInstalledMessage() string {

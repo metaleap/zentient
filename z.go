@@ -1,4 +1,4 @@
-package z
+package z // ⟨ℤ⟩
 
 import (
 	"bufio"
@@ -15,7 +15,6 @@ import (
 )
 
 const (
-	// ℤ           = "⟨ℤ⟩"
 	pretendSlow = false
 )
 

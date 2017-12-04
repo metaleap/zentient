@@ -2,6 +2,14 @@ package z
 
 // REMINDER TO SELF, on the rare update also update corresponding String()ers at the bottom end of the file
 
+type errCategory uint8
+
+const (
+	ERR_CAT_LOGICAL errCategory = iota // Zentient backend rejecting invalid inputs/state
+	ERR_CAT_SYS                        // OS or IO errors
+	ERR_CAT_STDERR                     // tooling-provided error messages
+)
+
 type msgIDs uint8
 
 const (

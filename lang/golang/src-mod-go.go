@@ -33,9 +33,13 @@ func (me *goSrcMod) KnownFormatters() z.Tools {
 	return me.knownFormatters
 }
 
-func (me *goSrcMod) RunFormatter(formatter *z.Tool, cmdName string, srcFilePath string, src string) (string, string, error) {
+func (me *goSrcMod) Rename(srcLens *z.SrcLens, newName string) (mods []*z.SrcLens) {
+	return
+}
+
+func (me *goSrcMod) RunFormatter(formatter *z.Tool, cmdName string, srcFilePath string, src string) (string, string) {
 	if formatter != tools.gofmt && formatter != tools.goimports {
-		return "", "", z.Errf("Invalid tool: %s" + formatter.Name)
+		z.Bad("formatting tool", formatter.Name)
 	}
 
 	var cmdargs []string

@@ -38,9 +38,8 @@ func reqDecodeAndRespond(jsonreq string) *msgResp {
 }
 
 type msgResp struct {
-	ReqID          int64  `json:"ri"`
-	ErrMsg         string `json:"e,omitempty"`
-	ErrMsgFromTool bool   `json:"et,omitempty"`
+	ReqID  int64  `json:"ri"`
+	ErrMsg string `json:"e,omitempty"`
 
 	MsgID    msgIDs        `json:"mi,omitempty"`
 	CoreCmd  *coreCmdResp  `json:"coreCmd,omitempty"`
@@ -55,7 +54,7 @@ func (me *msgResp) onResponseReady() {
 	if me.ErrMsg != "" {
 		me.ErrMsg = Strf("[%s] %s", Prog.name, me.ErrMsg)
 		//	zero out nearly-everything for a leaner response
-		*me = msgResp{ErrMsg: me.ErrMsg, ErrMsgFromTool: me.ErrMsgFromTool, ReqID: me.ReqID}
+		*me = msgResp{ErrMsg: me.ErrMsg, ReqID: me.ReqID}
 	}
 }
 
@@ -69,6 +68,6 @@ func (me *msgResp) to(req *msgReq) {
 	if req.MsgID < MSGID_CORECMDS_PALETTE || req.MsgID >= MSGID_MIN_INVALID {
 		me.ErrMsg = Strf("Invalid MsgID %d", req.MsgID)
 	} else {
-		me.ErrMsg = Strf("The requested feature `%s` wasn't yet implemented for *%s*.", req.MsgID, Lang.Title)
+		me.ErrMsg = Strf("The requested feature `%s` wasn't yet implemented for __%s__.", req.MsgID, Lang.Title)
 	}
 }
