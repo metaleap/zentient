@@ -57,8 +57,8 @@ func (_ *SrcIntelBase) Hovers(srcLens *SrcLens) (all []SrcIntelHover) {
 
 func (*SrcIntelBase) Signature(srcLens *SrcLens) *SrcIntelSigHelp {
 	var sig SrcIntelSigHelp
-	sig.Signatures = []SrcIntelSigInfo{SrcIntelSigInfo{Label: "Signature", Documentation: SrcIntelDoc{IsTrusted: true, Value: "Helpful **doc** `comment`s.."}}}
-	sig.Signatures[0].Parameters = []SrcIntelSigParam{SrcIntelSigParam{Label: "Parameter 1", Documentation: SrcIntelDoc{IsTrusted: true, Value: "Every argument gets a *helpful* `doc` comment."}}}
+	sig.Signatures = []SrcIntelSigInfo{{Label: "Signature", Documentation: SrcIntelDoc{IsTrusted: true, Value: "Helpful **doc** `comment`s.."}}}
+	sig.Signatures[0].Parameters = []SrcIntelSigParam{{Label: "Parameter 1", Documentation: SrcIntelDoc{IsTrusted: true, Value: "Every argument gets a *helpful* `doc` comment."}}}
 	return &sig
 }
 

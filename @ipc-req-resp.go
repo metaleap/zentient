@@ -25,13 +25,12 @@ func reqDecodeAndRespond(jsonreq string) *msgResp {
 		resp.ErrMsg = Strf("%s does not appear to be installed on this machine.", Lang.Title)
 	} else if Prog.Cfg.err != nil {
 		resp.ErrMsg = Strf("Your %s is currently broken: either fix it or delete it, then reload Zentient.", Prog.Cfg.filePath)
-	}
-	if err := json.NewDecoder(strings.NewReader(jsonreq)).Decode(&req); err != nil {
+	} else if err := json.NewDecoder(strings.NewReader(jsonreq)).Decode(&req); err != nil {
 		resp.ErrMsg = err.Error()
-	} else if resp.ReqID = req.ReqID; resp.ErrMsg == "" {
+	} else {
 		resp.to(&req)
 	}
-	if resp.ErrMsg != "" {
+	if resp.ReqID = req.ReqID; resp.ErrMsg != "" {
 		resp.MsgID = req.MsgID
 	}
 	return &resp
@@ -53,8 +52,8 @@ func (me *msgResp) onResponseReady() {
 	}
 	if me.ErrMsg != "" {
 		me.ErrMsg = Strf("[%s] %s", Prog.name, me.ErrMsg)
-		//	zero out nearly-everything for a leaner response
-		*me = msgResp{ErrMsg: me.ErrMsg, ReqID: me.ReqID}
+		//	zero out almost-everything for a leaner response
+		*me = msgResp{ErrMsg: me.ErrMsg}
 	}
 }
 

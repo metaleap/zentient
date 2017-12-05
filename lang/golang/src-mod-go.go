@@ -1,8 +1,6 @@
 package zgo
 
 import (
-	"encoding/json"
-
 	"github.com/metaleap/go-util/dev/go"
 	"github.com/metaleap/zentient"
 )
@@ -31,7 +29,6 @@ func (me *goSrcMod) onPostInit() {
 		z.Prog.Cfg.FormatterName = "gofmt"
 	}
 }
-
 func (me *goSrcMod) KnownFormatters() z.Tools {
 	return me.knownFormatters
 }
@@ -50,8 +47,12 @@ func (me *goSrcMod) RunRenamer(srcLens *z.SrcLens, newName string) (mods []*z.Sr
 		panic(err)
 	}
 	for _, fedit := range fileedits {
-		data, _ := json.Marshal(&fedit)
-		println(string(data))
+		// fedit.Ref fedit.Msg fedit.Pos1Ln fedit.Pos2Ln
+		var mod z.SrcLens
+		mod.SrcSel, mod.Range, mod.FilePath = fedit.Msg, &z.SrcRange{}, fedit.Ref
+		mod.Range.Start.Col, mod.Range.Start.Ln = 1, fedit.Pos1Ln+1
+		mod.Range.End.Col, mod.Range.End.Ln = 1, fedit.Pos2Ln+1
+		mods = append(mods, &mod)
 	}
 	return
 }

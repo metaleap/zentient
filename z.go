@@ -1,4 +1,4 @@
-package z // ⟨ℤ⟩
+package z
 
 import (
 	"bufio"

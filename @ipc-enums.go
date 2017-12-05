@@ -154,7 +154,7 @@ func (me DiagSeverity) String() string {
 func (me Symbol) String() string {
 	switch me {
 	case SYM_FILE:
-		return "SYM_FILE Symbol"
+		return "SYM_FILE"
 	case SYM_MODULE:
 		return "SYM_MODULE"
 	case SYM_NAMESPACE:
