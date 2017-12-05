@@ -22,6 +22,7 @@ func (_ *SrcIntelBase) ComplItems(srcLens *SrcLens) (all []SrcIntelCompl) {
 }
 
 func (_ *SrcIntelBase) Highlights(srcLens *SrcLens, curWord string) (all []SrcRange) {
+	// bad implementation (will return buggy ranges with some exotic/unicode chars) but is meant to be overridden by a proper one anyway
 	srcLens.ensureSrcFull()
 	src := strings.ToUpper(srcLens.SrcFull)
 	if curWord == "" && srcLens.Range != nil {
@@ -43,7 +44,6 @@ func (_ *SrcIntelBase) Highlights(srcLens *SrcLens, curWord string) (all []SrcRa
 		}
 	}
 	return
-
 }
 
 func (_ *SrcIntelBase) Hovers(srcLens *SrcLens) (all []SrcIntelHover) {

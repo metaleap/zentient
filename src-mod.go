@@ -9,7 +9,7 @@ type iSrcMod interface {
 
 	DoesStdoutWithFilePathArg(*Tool) bool
 	KnownFormatters() Tools
-	Rename(*SrcLens, string) []*SrcLens
+	RunRenamer(*SrcLens, string) []*SrcLens
 	RunFormatter(*Tool, string, string, string) (string, string)
 }
 
@@ -79,7 +79,7 @@ func (*SrcModBase) DoesStdoutWithFilePathArg(*Tool) bool {
 	return true
 }
 
-func (*SrcModBase) Rename(srcLens *SrcLens, newName string) (all []*SrcLens) {
+func (*SrcModBase) RunRenamer(srcLens *SrcLens, newName string) (all []*SrcLens) {
 	panic(Strf("Rename not yet implemented for __%s__.", Lang.Title))
 }
 
@@ -104,7 +104,7 @@ func (me *SrcModBase) onRename(req *msgReq, resp *msgResp) {
 	if newname == "" {
 		resp.ErrMsg = "Rename: missing new-name"
 	} else {
-		resp.SrcMods = me.Impl.Rename(req.SrcLens, newname)
+		resp.SrcMods = me.Impl.RunRenamer(req.SrcLens, newname)
 	}
 }
 

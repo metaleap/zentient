@@ -1,6 +1,9 @@
 package zgo
 
 import (
+	"encoding/json"
+
+	"github.com/metaleap/go-util/dev/go"
 	"github.com/metaleap/zentient"
 )
 
@@ -33,7 +36,23 @@ func (me *goSrcMod) KnownFormatters() z.Tools {
 	return me.knownFormatters
 }
 
-func (me *goSrcMod) Rename(srcLens *z.SrcLens, newName string) (mods []*z.SrcLens) {
+func (me *goSrcMod) RunRenamer(srcLens *z.SrcLens, newName string) (mods []*z.SrcLens) {
+	if !tools.gorename.Installed {
+		panic(tools.gorename.NotInstalledMessage())
+	}
+	offset := srcLens.ByteOffsetForPosWithRuneOffset(srcLens.Pos)
+	eol := "\n"
+	if srcLens.CrLf {
+		eol = "\r\n"
+	}
+	fileedits, err := udevgo.Gorename(tools.gorename.Name, srcLens.FilePath, offset, newName, eol)
+	if err != nil {
+		panic(err)
+	}
+	for _, fedit := range fileedits {
+		data, _ := json.Marshal(&fedit)
+		println(string(data))
+	}
 	return
 }
 

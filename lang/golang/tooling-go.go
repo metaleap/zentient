@@ -11,6 +11,8 @@ var tools struct {
 
 	gogetdoc *z.Tool
 	godef    *z.Tool
+
+	gorename *z.Tool
 }
 
 func toolsInit() {
@@ -21,4 +23,6 @@ func toolsInit() {
 
 	t.gogetdoc = &z.Tool{Name: "gogetdoc", Website: "http://github.com/zmb3/gogetdoc#readme", Installed: udevgo.Has_gogetdoc}
 	t.godef = &z.Tool{Name: "godef", Website: "http://github.com/rogpeppe/godef#readme", Installed: udevgo.Has_godef}
+
+	t.gorename = &z.Tool{Name: "gorename", Website: "http://golang.org/x/tools/cmd/gorename", Installed: udevgo.Has_gorename}
 }
