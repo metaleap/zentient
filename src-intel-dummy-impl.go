@@ -19,6 +19,18 @@ func (_ *SrcIntelBase) ComplItems(srcLens *SrcLens) (all []SrcIntelCompl) {
 	return
 }
 
+func (me *SrcIntelBase) DefSym(srcLens *SrcLens) []SrcLens {
+	return me.References(srcLens, true)
+}
+
+func (me *SrcIntelBase) DefType(srcLens *SrcLens) []SrcLens {
+	return me.References(srcLens, true)
+}
+
+func (me *SrcIntelBase) DefImpl(srcLens *SrcLens) []SrcLens {
+	return me.References(srcLens, true)
+}
+
 func (_ *SrcIntelBase) Highlights(srcLens *SrcLens, curWord string) (all []SrcRange) {
 	// bad implementation (will return buggy ranges with some exotic/unicode chars) but is meant to be overridden by a proper one anyway
 	srcLens.ensureSrcFull()
@@ -53,11 +65,15 @@ func (_ *SrcIntelBase) Hovers(srcLens *SrcLens) (all []SrcIntelHover) {
 	return
 }
 
-func (*SrcIntelBase) References(srcLens *SrcLens) (all []SrcLens) {
-	all = append(all, SrcLens{FilePath: srcLens.FilePath, Pos: &SrcPos{Col: 1, Ln: 3}})
-	all = append(all, SrcLens{FilePath: srcLens.FilePath, Pos: &SrcPos{Col: 2, Ln: 5}})
-	all = append(all, SrcLens{FilePath: srcLens.FilePath, Pos: &SrcPos{Col: 4, Ln: 8}})
-	all = append(all, SrcLens{FilePath: srcLens.FilePath, Pos: &SrcPos{Col: 7, Ln: 12}})
+func (*SrcIntelBase) References(srcLens *SrcLens, includeDeclaration bool) (all []SrcLens) {
+	all = append(all,
+		SrcLens{FilePath: srcLens.FilePath, Pos: &SrcPos{Col: 1, Ln: 3}},
+		SrcLens{FilePath: srcLens.FilePath, Pos: &SrcPos{Col: 2, Ln: 5}},
+		SrcLens{FilePath: srcLens.FilePath, Pos: &SrcPos{Col: 4, Ln: 8}},
+		SrcLens{FilePath: srcLens.FilePath, Pos: &SrcPos{Col: 7, Ln: 12}})
+	if includeDeclaration {
+		all = append(all, *srcLens)
+	}
 	return
 }
 

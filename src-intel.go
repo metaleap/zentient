@@ -5,9 +5,12 @@ type iSrcIntel interface {
 
 	ComplDetails(*SrcLens, string, *SrcIntelCompl)
 	ComplItems(*SrcLens) []SrcIntelCompl
+	DefSym(*SrcLens) []SrcLens
+	DefType(*SrcLens) []SrcLens
+	DefImpl(*SrcLens) []SrcLens
 	Highlights(*SrcLens, string) []SrcRange
 	Hovers(*SrcLens) []SrcIntelHover
-	References(*SrcLens) []SrcLens
+	References(*SrcLens, bool) []SrcLens
 	Signature(*SrcLens) *SrcIntelSigHelp
 	Symbols(*SrcLens, string, bool) []SrcLens
 }
@@ -86,6 +89,12 @@ func (me *SrcIntelBase) dispatch(req *msgReq, resp *msgResp) bool {
 		me.onSignature(req, resp)
 	case MSGID_SRCINTEL_REFERENCES:
 		me.onReferences(req, resp)
+	case MSGID_SRCINTEL_DEFIMPL:
+		me.onDefinition(req, resp, me.Impl.DefImpl)
+	case MSGID_SRCINTEL_DEFSYM:
+		me.onDefinition(req, resp, me.Impl.DefSym)
+	case MSGID_SRCINTEL_DEFTYPE:
+		me.onDefinition(req, resp, me.Impl.DefType)
 	default:
 		return false
 	}
@@ -102,6 +111,10 @@ func (me *SrcIntelBase) onCmplDetails(req *msgReq, resp *msgResp) {
 	me.Impl.ComplDetails(req.SrcLens, itemtext, &(resp.SrcIntel.Cmpl[0]))
 }
 
+func (me *SrcIntelBase) onDefinition(req *msgReq, resp *msgResp, def func(*SrcLens) []SrcLens) {
+	resp.SrcIntel = &srcIntelResp{Refs: def(req.SrcLens)}
+}
+
 func (me *SrcIntelBase) onHighlights(req *msgReq, resp *msgResp) {
 	curword, _ := req.MsgArgs.(string)
 	resp.SrcIntel = &srcIntelResp{Highlights: me.Impl.Highlights(req.SrcLens, curword)}
@@ -112,7 +125,13 @@ func (me *SrcIntelBase) onHover(req *msgReq, resp *msgResp) {
 }
 
 func (me *SrcIntelBase) onReferences(req *msgReq, resp *msgResp) {
-	resp.SrcIntel = &srcIntelResp{Refs: me.References(req.SrcLens)}
+	includeDeclaration := false
+	if ctx, _ := req.MsgArgs.(map[string]interface{}); ctx != nil {
+		if incldecl, ok := ctx["includeDeclaration"]; ok {
+			includeDeclaration, _ = incldecl.(bool)
+		}
+	}
+	resp.SrcIntel = &srcIntelResp{Refs: me.Impl.References(req.SrcLens, includeDeclaration)}
 }
 
 func (me *SrcIntelBase) onSignature(req *msgReq, resp *msgResp) {

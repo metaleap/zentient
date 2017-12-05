@@ -33,7 +33,7 @@ func (me *goSrcMod) KnownFormatters() z.Tools {
 	return me.knownFormatters
 }
 
-func (me *goSrcMod) RunRenamer(srcLens *z.SrcLens, newName string) (srcmods []*z.SrcLens) {
+func (me *goSrcMod) RunRenamer(srcLens *z.SrcLens, newName string) (srcMods []*z.SrcLens) {
 	if !tools.gorename.Installed {
 		panic(tools.gorename.NotInstalledMessage())
 	}
@@ -49,7 +49,7 @@ func (me *goSrcMod) RunRenamer(srcLens *z.SrcLens, newName string) (srcmods []*z
 		srcmod := z.SrcLens{SrcSel: fedit.Msg, FilePath: fedit.Ref, Range: &z.SrcRange{}}
 		srcmod.Range.Start.Col, srcmod.Range.Start.Ln = 1, fedit.Pos1Ln+1
 		srcmod.Range.End.Col, srcmod.Range.End.Ln = 1, fedit.Pos2Ln+1
-		srcmods = append(srcmods, &srcmod)
+		srcMods = append(srcMods, &srcmod)
 	}
 	return
 }
