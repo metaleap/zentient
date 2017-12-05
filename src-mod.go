@@ -7,6 +7,7 @@ import (
 type iSrcMod interface {
 	iCmdsProvider
 
+	CodeActions(*SrcLens) []EditorAction
 	DoesStdoutWithFilePathArg(*Tool) bool
 	KnownFormatters() Tools
 	RunRenamer(*SrcLens, string) []*SrcLens
@@ -79,8 +80,21 @@ func (*SrcModBase) DoesStdoutWithFilePathArg(*Tool) bool {
 	return true
 }
 
+func (*SrcModBase) CodeActions(srcLens *SrcLens) (all []EditorAction) {
+	all = append(all, EditorAction{Title: "Open Zentient Menu", Cmd: "zen.core.cmds.listall", Hint: "Should open the main Palette menu"})
+	return
+}
+
 func (*SrcModBase) RunRenamer(srcLens *SrcLens, newName string) (all []*SrcLens) {
 	panic(Strf("Rename not yet implemented for __%s__.", Lang.Title))
+}
+
+func (*SrcModBase) hasFormatter() bool {
+	return Prog.Cfg.FormatterName != ""
+}
+
+func (*SrcModBase) isFormatterCustom() bool {
+	return Prog.Cfg.FormatterProg != "" && Prog.Cfg.FormatterProg != Prog.Cfg.FormatterName
 }
 
 func (me *SrcModBase) dispatch(req *msgReq, resp *msgResp) bool {
@@ -93,10 +107,16 @@ func (me *SrcModBase) dispatch(req *msgReq, resp *msgResp) bool {
 		me.onRunFormatter(req, resp)
 	case MSGID_SRCMOD_RENAME:
 		me.onRename(req, resp)
+	case MSGID_SRCMOD_ACTIONS:
+		me.onActions(req, resp)
 	default:
 		return false
 	}
 	return true
+}
+
+func (me *SrcModBase) onActions(req *msgReq, resp *msgResp) {
+	resp.SrcActions = me.Impl.CodeActions(req.SrcLens)
 }
 
 func (me *SrcModBase) onRename(req *msgReq, resp *msgResp) {
@@ -205,11 +225,4 @@ func (me *SrcModBase) onSetDefPick(req *msgReq, resp *msgResp) {
 		}
 		resp.CoreCmd.NoteInfo += "."
 	}
-}
-
-func (*SrcModBase) hasFormatter() bool {
-	return Prog.Cfg.FormatterName != ""
-}
-func (*SrcModBase) isFormatterCustom() bool {
-	return Prog.Cfg.FormatterProg != "" && Prog.Cfg.FormatterProg != Prog.Cfg.FormatterName
 }

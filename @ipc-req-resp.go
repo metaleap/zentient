@@ -40,10 +40,18 @@ type msgResp struct {
 	ReqID  int64  `json:"ri"`
 	ErrMsg string `json:"e,omitempty"`
 
-	MsgID    msgIDs        `json:"mi,omitempty"`
-	CoreCmd  *coreCmdResp  `json:"coreCmd,omitempty"`
-	SrcIntel *srcIntelResp `json:"srcIntel,omitempty"`
-	SrcMods  []*SrcLens    `json:"srcMods,omitempty"`
+	MsgID      msgIDs         `json:"mi,omitempty"`
+	CoreCmd    *coreCmdResp   `json:"coreCmd,omitempty"`
+	SrcIntel   *srcIntelResp  `json:"srcIntel,omitempty"`
+	SrcMods    []*SrcLens     `json:"srcMods,omitempty"`
+	SrcActions []EditorAction `json:"srcActions,omitempty"`
+}
+
+type EditorAction struct {
+	Title     string        `json:"title"`
+	Cmd       string        `json:"command"`
+	Hint      string        `json:"tooltip,omitempty"`
+	Arguments []interface{} `json:"arguments,omitempty"`
 }
 
 func (me *msgResp) onResponseReady() {
