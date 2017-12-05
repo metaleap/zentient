@@ -33,12 +33,11 @@ func (me *goSrcMod) KnownFormatters() z.Tools {
 	return me.knownFormatters
 }
 
-func (me *goSrcMod) RunRenamer(srcLens *z.SrcLens, newName string) (mods []*z.SrcLens) {
+func (me *goSrcMod) RunRenamer(srcLens *z.SrcLens, newName string) (srcmods []*z.SrcLens) {
 	if !tools.gorename.Installed {
 		panic(tools.gorename.NotInstalledMessage())
 	}
-	offset := srcLens.ByteOffsetForPosWithRuneOffset(srcLens.Pos)
-	eol := "\n"
+	eol, offset := "\n", srcLens.ByteOffsetForPosWithRuneOffset(srcLens.Pos)
 	if srcLens.CrLf {
 		eol = "\r\n"
 	}
@@ -47,12 +46,10 @@ func (me *goSrcMod) RunRenamer(srcLens *z.SrcLens, newName string) (mods []*z.Sr
 		panic(err)
 	}
 	for _, fedit := range fileedits {
-		// fedit.Ref fedit.Msg fedit.Pos1Ln fedit.Pos2Ln
-		var mod z.SrcLens
-		mod.SrcSel, mod.Range, mod.FilePath = fedit.Msg, &z.SrcRange{}, fedit.Ref
-		mod.Range.Start.Col, mod.Range.Start.Ln = 1, fedit.Pos1Ln+1
-		mod.Range.End.Col, mod.Range.End.Ln = 1, fedit.Pos2Ln+1
-		mods = append(mods, &mod)
+		srcmod := z.SrcLens{SrcSel: fedit.Msg, FilePath: fedit.Ref, Range: &z.SrcRange{}}
+		srcmod.Range.Start.Col, srcmod.Range.Start.Ln = 1, fedit.Pos1Ln+1
+		srcmod.Range.End.Col, srcmod.Range.End.Ln = 1, fedit.Pos2Ln+1
+		srcmods = append(srcmods, &srcmod)
 	}
 	return
 }

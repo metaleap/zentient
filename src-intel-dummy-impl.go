@@ -2,8 +2,6 @@ package z
 
 import (
 	"strings"
-
-	"github.com/metaleap/go-util/dev"
 )
 
 func (_ *SrcIntelBase) ComplDetails(srcLens *SrcLens, itemText string, into *SrcIntelCompl) {
@@ -55,6 +53,14 @@ func (_ *SrcIntelBase) Hovers(srcLens *SrcLens) (all []SrcIntelHover) {
 	return
 }
 
+func (*SrcIntelBase) References(srcLens *SrcLens) (all []SrcLens) {
+	all = append(all, SrcLens{FilePath: srcLens.FilePath, Pos: &SrcPos{Col: 1, Ln: 3}})
+	all = append(all, SrcLens{FilePath: srcLens.FilePath, Pos: &SrcPos{Col: 2, Ln: 5}})
+	all = append(all, SrcLens{FilePath: srcLens.FilePath, Pos: &SrcPos{Col: 4, Ln: 8}})
+	all = append(all, SrcLens{FilePath: srcLens.FilePath, Pos: &SrcPos{Col: 7, Ln: 12}})
+	return
+}
+
 func (*SrcIntelBase) Signature(srcLens *SrcLens) *SrcIntelSigHelp {
 	var sig SrcIntelSigHelp
 	sig.Signatures = []SrcIntelSigInfo{{Label: "Signature", Documentation: SrcIntelDoc{IsTrusted: true, Value: "Helpful **doc** `comment`s.."}}}
@@ -62,14 +68,13 @@ func (*SrcIntelBase) Signature(srcLens *SrcLens) *SrcIntelSigHelp {
 	return &sig
 }
 
-func (*SrcIntelBase) Symbols(srcLens *SrcLens, query string, curFileOnly bool) (all udev.SrcMsgs) {
+func (*SrcIntelBase) Symbols(srcLens *SrcLens, query string, curFileOnly bool) (all []SrcLens) {
 	if curFileOnly {
 		const symMinInvalid = int(SYM_MIN_INVALID)
 		for i := 0; i < symMinInvalid; i++ {
 			all = append(all,
-				&udev.SrcMsg{Flag: i, Msg: Symbol(i).String(), Ref: srcLens.FilePath,
-					Misc:   Strf("flag: %d", i),
-					Pos1Ch: 1, Pos1Ln: i + 1, Pos2Ch: 1, Pos2Ln: i + 1,
+				SrcLens{Flag: i, SrcSel: Symbol(i).String(), FilePath: srcLens.FilePath,
+					SrcFull: Strf("flag: %d", i), Pos: &SrcPos{Col: 1, Ln: i + 1},
 				},
 			)
 		}

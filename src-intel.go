@@ -1,9 +1,5 @@
 package z
 
-import (
-	"github.com/metaleap/go-util/dev"
-)
-
 type iSrcIntel interface {
 	iDispatcher
 
@@ -11,14 +7,15 @@ type iSrcIntel interface {
 	ComplItems(*SrcLens) []SrcIntelCompl
 	Highlights(*SrcLens, string) []SrcRange
 	Hovers(*SrcLens) []SrcIntelHover
+	References(*SrcLens) []SrcLens
 	Signature(*SrcLens) *SrcIntelSigHelp
-	Symbols(*SrcLens, string, bool) udev.SrcMsgs
+	Symbols(*SrcLens, string, bool) []SrcLens
 }
 
 type srcIntelResp struct {
 	Cmpl       []SrcIntelCompl  `json:"cmpl,omitempty"`
 	Hovers     []SrcIntelHover  `json:"hovs,omitempty"`
-	Symbols    udev.SrcMsgs     `json:"syms,omitempty"`
+	Refs       []SrcLens        `json:"refs,omitempty"`
 	Highlights []SrcRange       `json:"high,omitempty"`
 	Signature  *SrcIntelSigHelp `json:"sig,omitempty"`
 }
@@ -87,6 +84,8 @@ func (me *SrcIntelBase) dispatch(req *msgReq, resp *msgResp) bool {
 		me.onHighlights(req, resp)
 	case MSGID_SRCINTEL_SIGNATURE:
 		me.onSignature(req, resp)
+	case MSGID_SRCINTEL_REFERENCES:
+		me.onReferences(req, resp)
 	default:
 		return false
 	}
@@ -112,6 +111,10 @@ func (me *SrcIntelBase) onHover(req *msgReq, resp *msgResp) {
 	resp.SrcIntel = &srcIntelResp{Hovers: me.Impl.Hovers(req.SrcLens)}
 }
 
+func (me *SrcIntelBase) onReferences(req *msgReq, resp *msgResp) {
+	resp.SrcIntel = &srcIntelResp{Refs: me.References(req.SrcLens)}
+}
+
 func (me *SrcIntelBase) onSignature(req *msgReq, resp *msgResp) {
 	resp.SrcIntel = &srcIntelResp{Signature: me.Impl.Signature(req.SrcLens)}
 }
@@ -121,5 +124,5 @@ func (me *SrcIntelBase) onSyms(req *msgReq, resp *msgResp) {
 	if req.MsgID == MSGID_SRCINTEL_SYMS_PROJ {
 		query, _ = req.MsgArgs.(string)
 	}
-	resp.SrcIntel = &srcIntelResp{Symbols: me.Impl.Symbols(req.SrcLens, query, req.MsgID == MSGID_SRCINTEL_SYMS_FILE)}
+	resp.SrcIntel = &srcIntelResp{Refs: me.Impl.Symbols(req.SrcLens, query, req.MsgID == MSGID_SRCINTEL_SYMS_FILE)}
 }
