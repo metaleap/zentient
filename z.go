@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	pretendSlow = false
+	pretendSlow = true
 )
 
 var (
@@ -29,11 +29,13 @@ var (
 	}
 
 	Lang struct {
-		Enabled  bool
-		ID       string
-		Title    string
-		SrcMod   iSrcMod
-		SrcIntel iSrcIntel
+		Enabled    bool
+		ID         string
+		Title      string
+		SrcMod     iSrcMod
+		SrcIntel   iSrcIntel
+		ExtraIntel iExtras
+		ExtraQuery iExtras
 	}
 	Prog struct {
 		Cfg  Config
@@ -65,7 +67,7 @@ func Init() (err error) {
 
 	if Prog.Cfg.reload(); Prog.Cfg.err == nil {
 		wellknowndispatchers := []iDispatcher{
-			Lang.SrcIntel, Lang.SrcMod,
+			Lang.SrcIntel, Lang.SrcMod, Lang.ExtraIntel, Lang.ExtraQuery,
 		}
 		for _, disp := range wellknowndispatchers {
 			if disp != nil {

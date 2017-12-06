@@ -28,6 +28,9 @@ const (
 	MSGID_SRCINTEL_DEFTYPE
 	MSGID_SRCINTEL_DEFIMPL
 
+	MSGID_EXTRAS_INTEL_LIST
+	MSGID_EXTRAS_QUERY_LIST
+
 	MSGID_MIN_INVALID // new entries go above this one
 )
 
@@ -148,6 +151,10 @@ func (me msgIDs) String() string {
 		return "MSGID_SRCINTEL_DEFTYPE"
 	case MSGID_SRCINTEL_DEFIMPL:
 		return "MSGID_SRCINTEL_DEFIMPL"
+	case MSGID_EXTRAS_INTEL_LIST:
+		return "MSGID_EXTRAS_INTEL_LIST"
+	case MSGID_EXTRAS_QUERY_LIST:
+		return "MSGID_EXTRAS_QUERY_LIST"
 	}
 	return Strf("%d", me)
 }
