@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	pretendSlow = true
+	pretendSlow = false
 )
 
 var (
@@ -136,7 +136,7 @@ func Serve() (err error) {
 
 func serveIncomingReq(jsonreq string) {
 	if pretendSlow {
-		time.Sleep(time.Millisecond * 1234) // temporary artificial delay to briefly see client-side progress-bars etc
+		time.Sleep(time.Millisecond * 2345) // temporary artificial delay to briefly see client-side progress-bars etc
 	}
 	resp := reqDecodeAndRespond(jsonreq)
 

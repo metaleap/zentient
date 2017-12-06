@@ -30,6 +30,7 @@ const (
 
 	MSGID_EXTRAS_INTEL_LIST
 	MSGID_EXTRAS_QUERY_LIST
+	MSGID_EXTRAS_INVOKE
 
 	MSGID_MIN_INVALID // new entries go above this one
 )
@@ -155,6 +156,8 @@ func (me msgIDs) String() string {
 		return "MSGID_EXTRAS_INTEL_LIST"
 	case MSGID_EXTRAS_QUERY_LIST:
 		return "MSGID_EXTRAS_QUERY_LIST"
+	case MSGID_EXTRAS_INVOKE:
+		return "MSGID_EXTRAS_INVOKE"
 	}
 	return Strf("%d", me)
 }
