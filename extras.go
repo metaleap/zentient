@@ -1,15 +1,18 @@
 package z
 
-type ExtrasKind uint8
+type extrasKind uint8
 
 const (
-	_ ExtrasKind = iota
+	_ extrasKind = iota
 	EXTRAS_INTEL
 	EXTRAS_QUERY
 )
 
 type iExtras interface {
 	iDispatcher
+
+	ListIntelExtras() []ExtrasItem
+	ListQueryExtras() []ExtrasItem
 }
 
 type extrasResp struct {
@@ -17,6 +20,7 @@ type extrasResp struct {
 }
 
 type ExtrasItem struct {
+	ID          string `json:"id"`
 	Label       string `json:"label"`
 	Description string `json:"description"`
 	Detail      string `json:"detail,omitempty"`
@@ -43,6 +47,13 @@ func (me *ExtrasBase) dispatch(req *msgReq, resp *msgResp) bool {
 	return true
 }
 
-func (me *ExtrasBase) onList(req *msgReq, resp *msgResp, kind ExtrasKind) {
-	resp.Extras.Items = append(resp.Extras.Items, ExtrasItem{Label: "moo label", Description: "moo desc", Detail: "moo detail"})
+func (me *ExtrasBase) onList(req *msgReq, resp *msgResp, kind extrasKind) {
+	switch kind {
+	case EXTRAS_INTEL:
+		resp.Extras.Items = me.Impl.ListIntelExtras()
+	case EXTRAS_QUERY:
+		resp.Extras.Items = me.Impl.ListQueryExtras()
+	default:
+		Bad("extrasKind", Strf("%v", kind))
+	}
 }

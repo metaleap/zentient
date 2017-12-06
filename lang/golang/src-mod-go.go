@@ -20,7 +20,7 @@ func init() {
 
 func (me *goSrcMod) onPreInit() {
 	me.knownFormatters = z.Tools{
-		tools.gofmt, tools.goimports,
+		tools.gofmt, tools.goimports, tools.goreturns,
 	}
 }
 
@@ -55,7 +55,7 @@ func (me *goSrcMod) RunRenamer(srcLens *z.SrcLens, newName string) (srcMods []*z
 }
 
 func (me *goSrcMod) RunFormatter(formatter *z.Tool, cmdName string, srcFilePath string, src string) (string, string) {
-	if formatter != tools.gofmt && formatter != tools.goimports {
+	if formatter != tools.gofmt && formatter != tools.goimports && formatter != tools.goreturns {
 		z.Bad("formatting tool", formatter.Name)
 	}
 

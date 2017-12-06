@@ -29,13 +29,12 @@ var (
 	}
 
 	Lang struct {
-		Enabled    bool
-		ID         string
-		Title      string
-		SrcMod     iSrcMod
-		SrcIntel   iSrcIntel
-		ExtraIntel iExtras
-		ExtraQuery iExtras
+		Enabled  bool
+		ID       string
+		Title    string
+		SrcMod   iSrcMod
+		SrcIntel iSrcIntel
+		Extras   iExtras
 	}
 	Prog struct {
 		Cfg  Config
@@ -67,7 +66,7 @@ func Init() (err error) {
 
 	if Prog.Cfg.reload(); Prog.Cfg.err == nil {
 		wellknowndispatchers := []iDispatcher{
-			Lang.SrcIntel, Lang.SrcMod, Lang.ExtraIntel, Lang.ExtraQuery,
+			Lang.SrcIntel, Lang.SrcMod, Lang.Extras,
 		}
 		for _, disp := range wellknowndispatchers {
 			if disp != nil {
