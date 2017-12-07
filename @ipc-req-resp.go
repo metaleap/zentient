@@ -41,7 +41,7 @@ type msgResp struct {
 	ErrMsg string `json:"e,omitempty"`
 
 	MsgID      msgIDs         `json:"mi,omitempty"`
-	CoreCmd    *coreCmdResp   `json:"coreCmd,omitempty"`
+	Menu       *MenuResp      `json:"menu,omitempty"`
 	Extras     []ExtrasItem   `json:"extras,omitempty"`
 	SrcIntel   *srcIntelResp  `json:"srcIntel,omitempty"`
 	SrcMods    []*SrcLens     `json:"srcMods,omitempty"`
@@ -73,7 +73,7 @@ func (me *msgResp) to(req *msgReq) {
 			return
 		}
 	}
-	if req.MsgID < MSGID_CORECMDS_PALETTE || req.MsgID >= MSGID_MIN_INVALID {
+	if req.MsgID < MSGID_MENUS_MAIN || req.MsgID >= MSGID_MIN_INVALID {
 		me.ErrMsg = Strf("Invalid MsgID %d", req.MsgID)
 	} else {
 		me.ErrMsg = Strf("The requested feature `%s` wasn't yet implemented for __%s__.", req.MsgID, Lang.Title)

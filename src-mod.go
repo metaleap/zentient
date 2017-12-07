@@ -5,7 +5,7 @@ import (
 )
 
 type iSrcMod interface {
-	iCmdsProvider
+	iMenuProvider
 
 	CodeActions(*SrcLens) []EditorAction
 	DoesStdoutWithFilePathArg(*Tool) bool
@@ -15,30 +15,30 @@ type iSrcMod interface {
 }
 
 type SrcModBase struct {
-	cmdFmtSetDef    *coreCmd
-	cmdFmtRunOnFile *coreCmd
-	cmdFmtRunOnSel  *coreCmd
+	cmdFmtSetDef    *MenuItem
+	cmdFmtRunOnFile *MenuItem
+	cmdFmtRunOnSel  *MenuItem
 
 	Impl iSrcMod
 }
 
 func (me *SrcModBase) Init() {
-	me.cmdFmtSetDef = &coreCmd{
+	me.cmdFmtSetDef = &MenuItem{
 		MsgID: MSGID_SRCMOD_FMT_SETDEFMENU,
 		Title: "Change Default Formatter",
 		Desc:  Strf("Specify your preferred default %s source formatter", Lang.Title),
 	}
-	me.cmdFmtRunOnFile = &coreCmd{
+	me.cmdFmtRunOnFile = &MenuItem{
 		MsgID: MSGID_SRCMOD_FMT_RUNONFILE,
 		Title: "Format Document",
 	}
-	me.cmdFmtRunOnSel = &coreCmd{
+	me.cmdFmtRunOnSel = &MenuItem{
 		MsgID: MSGID_SRCMOD_FMT_RUNONSEL,
 		Title: "Format Selection",
 	}
 }
 
-func (me *SrcModBase) Cmds(srcLens *SrcLens) (cmds []*coreCmd) {
+func (me *SrcModBase) MenuItems(srcLens *SrcLens) (cmds []*MenuItem) {
 	if srcLens != nil {
 		desc := "(" + me.cmdFmtSetDef.Desc + " first)"
 		if me.hasFormatter() {
@@ -72,7 +72,7 @@ func (me *SrcModBase) Cmds(srcLens *SrcLens) (cmds []*coreCmd) {
 	return
 }
 
-func (*SrcModBase) CmdsCategory() string {
+func (*SrcModBase) MenuCategory() string {
 	return "Formatting"
 }
 
@@ -137,17 +137,17 @@ func (me *SrcModBase) onRunFormatter(req *msgReq, resp *msgResp) {
 		hasopt = tabSize || insertSpaces
 	}
 	if !hasopt {
-		resp.CoreCmd = &coreCmdResp{}
+		resp.Menu = &MenuResp{}
 	}
 
 	formatter := me.Impl.KnownFormatters().ByName(Prog.Cfg.FormatterName)
 	if formatter == nil {
-		if resp.CoreCmd == nil {
+		if resp.Menu == nil {
 			resp.ErrMsg = "Select a Default Formatter first via the Zentient 'Palette' menu."
 		} else {
-			resp.CoreCmd.NoteWarn = "Select a Default Formatter first, either via the Zentient 'Palette' menu or:"
+			resp.Menu.NoteWarn = "Select a Default Formatter first, either via the Zentient 'Palette' menu or:"
 			resp.MsgID = MSGID_SRCMOD_FMT_SETDEFMENU
-			resp.CoreCmd.MsgAction = Strf("Pick your preferred Zentient default %s formatter…", Lang.Title)
+			resp.Menu.MsgAction = Strf("Pick your preferred Zentient default %s formatter…", Lang.Title)
 		}
 		return
 	}
@@ -187,10 +187,10 @@ func (me *SrcModBase) onRunFormatter(req *msgReq, resp *msgResp) {
 }
 
 func (me *SrcModBase) onSetDefMenu(req *msgReq, resp *msgResp) {
-	m := coreCmdsMenu{Desc: "First pick a known formatter, then optionally specify a custom tool name:"}
+	m := Menu{Desc: "First pick a known formatter, then optionally specify a custom tool name:"}
 	for _, kf := range me.Impl.KnownFormatters() {
-		var cmd = coreCmd{Title: kf.Name, MsgID: MSGID_SRCMOD_FMT_SETDEFPICK}
-		cmd.MsgArgs = map[string]interface{}{"fn": kf.Name, "fp": coreCmdMsgArgPrompt{Placeholder: kf.Name,
+		var cmd = MenuItem{Title: kf.Name, MsgID: MSGID_SRCMOD_FMT_SETDEFPICK}
+		cmd.MsgArgs = map[string]interface{}{"fn": kf.Name, "fp": MenuItemMsgArgPrompt{Placeholder: kf.Name,
 			Prompt: Strf("Optionally enter the name of an alternative '%s'-compatible equivalent tool to use", kf.Name)}}
 		cmd.Desc = Strf("➜ Pick to use '%s' (or compatible equivalent) as the default %s formatter", kf.Name, Lang.Title)
 		if kf.Name != Prog.Cfg.FormatterName || !me.isFormatterCustom() {
@@ -204,9 +204,9 @@ func (me *SrcModBase) onSetDefMenu(req *msgReq, resp *msgResp) {
 			}
 		}
 		cmd.Hint += "· " + kf.Website
-		m.Choices = append(m.Choices, &cmd)
+		m.Items = append(m.Items, &cmd)
 	}
-	resp.CoreCmd = &coreCmdResp{CoreCmdsMenu: &m}
+	resp.Menu = &MenuResp{SubMenu: &m}
 }
 
 func (me *SrcModBase) onSetDefPick(req *msgReq, resp *msgResp) {
@@ -218,11 +218,11 @@ func (me *SrcModBase) onSetDefPick(req *msgReq, resp *msgResp) {
 	if err := Prog.Cfg.Save(); err != nil {
 		resp.ErrMsg = err.Error()
 	} else {
-		resp.CoreCmd = &coreCmdResp{}
-		resp.CoreCmd.NoteInfo = Strf("Default %s formatter changed to '%s'", Lang.Title, Prog.Cfg.FormatterName)
+		resp.Menu = &MenuResp{}
+		resp.Menu.NoteInfo = Strf("Default %s formatter changed to '%s'", Lang.Title, Prog.Cfg.FormatterName)
 		if me.isFormatterCustom() {
-			resp.CoreCmd.NoteInfo += Strf("-compatible equivalent '%s'", Prog.Cfg.FormatterProg)
+			resp.Menu.NoteInfo += Strf("-compatible equivalent '%s'", Prog.Cfg.FormatterProg)
 		}
-		resp.CoreCmd.NoteInfo += "."
+		resp.Menu.NoteInfo += "."
 	}
 }

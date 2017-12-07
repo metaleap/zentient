@@ -23,9 +23,9 @@ var (
 	Errf = fmt.Errorf
 	Strf = fmt.Sprintf
 
-	cmdProviders []iCmdsProvider
-	dispatchers  = []iDispatcher{
-		&coreCmds{},
+	menuProviders []iMenuProvider
+	dispatchers   = []iDispatcher{
+		&mainMenu{},
 	}
 
 	Lang struct {
@@ -75,12 +75,12 @@ func Init() (err error) {
 			}
 		}
 
-		wellknowncmdproviders := []iCmdsProvider{
+		wellknownmenuproviders := []iMenuProvider{
 			Lang.SrcMod,
 		}
-		for _, cmds := range wellknowncmdproviders {
-			if cmds != nil {
-				cmdProviders = append(cmdProviders, cmds)
+		for _, menu := range wellknownmenuproviders {
+			if menu != nil {
+				menuProviders = append(menuProviders, menu)
 			}
 		}
 	}
