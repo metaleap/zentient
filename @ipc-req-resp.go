@@ -42,7 +42,7 @@ type msgResp struct {
 
 	MsgID      msgIDs         `json:"mi,omitempty"`
 	Menu       *MenuResp      `json:"menu,omitempty"`
-	Extras     []ExtrasItem   `json:"extras,omitempty"`
+	Extras     *ExtrasResp    `json:"extras,omitempty"`
 	SrcIntel   *srcIntelResp  `json:"srcIntel,omitempty"`
 	SrcMods    []*SrcLens     `json:"srcMods,omitempty"`
 	SrcActions []EditorAction `json:"srcActions,omitempty"`

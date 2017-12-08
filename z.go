@@ -125,12 +125,9 @@ func Serve() (err error) {
 	// - allows json-decoding in separate go-routine
 	// - bad lines are simply reported to client without having a single 'global' decoder in confused/error state / without needing to exit
 	for stdin.Scan() {
-		if err = stdin.Err(); err != nil {
-			break
-		} else {
-			go serveIncomingReq(stdin.Text())
-		}
+		go serveIncomingReq(stdin.Text())
 	}
+	err = stdin.Err()
 	return
 }
 

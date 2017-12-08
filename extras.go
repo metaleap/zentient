@@ -13,18 +13,22 @@ type iExtras interface {
 
 	ListIntelExtras() []ExtrasItem
 	ListQueryExtras() []ExtrasItem
-	RunIntelExtra(*SrcLens, string, string) *MenuResp
-	RunQueryExtra(*SrcLens, string, string) *MenuResp
+	RunIntelExtra(*SrcLens, string, string, *ExtrasResp)
+	RunQueryExtra(*SrcLens, string, string, *ExtrasResp)
 }
 
 type ExtrasItem struct {
-	ID             string     `json:"id"`
-	Kind           ExtrasKind `json:"k"`
-	Label          string     `json:"label"`
-	Description    string     `json:"description"`
-	Detail         string     `json:"detail,omitempty"`
-	QueryArgLabel  string     `json:"argLabel,omitempty"`
-	QueryArgDetail string     `json:"argDetail,omitempty"`
+	ID          string     `json:"id"`
+	Kind        ExtrasKind `json:"kind"`
+	Label       string     `json:"label"`
+	Description string     `json:"description"`
+	Detail      string     `json:"detail,omitempty"`
+	QueryArg    string     `json:"arg,omitempty"`
+}
+
+type ExtrasResp struct {
+	SrcIntels
+	Items []ExtrasItem `json:"items,omitempty"`
 }
 
 type ExtrasBase struct {
@@ -35,6 +39,7 @@ func (*ExtrasBase) Init() {
 }
 
 func (me *ExtrasBase) dispatch(req *msgReq, resp *msgResp) bool {
+	resp.Extras = &ExtrasResp{}
 	switch req.MsgID {
 	case MSGID_EXTRAS_INTEL_LIST:
 		me.onList(req, resp, EXTRAS_INTEL)
@@ -45,6 +50,7 @@ func (me *ExtrasBase) dispatch(req *msgReq, resp *msgResp) bool {
 	case MSGID_EXTRAS_QUERY_RUN:
 		me.onRun(req, resp, EXTRAS_QUERY)
 	default:
+		resp.Extras = nil
 		return false
 	}
 	return true
@@ -55,7 +61,7 @@ func (me *ExtrasBase) onList(req *msgReq, resp *msgResp, kind ExtrasKind) {
 	if kind == EXTRAS_QUERY {
 		list = me.Impl.ListQueryExtras
 	}
-	resp.Extras = list()
+	resp.Extras.Items = list()
 }
 
 func (me *ExtrasBase) onRun(req *msgReq, resp *msgResp, kind ExtrasKind) {
@@ -66,5 +72,5 @@ func (me *ExtrasBase) onRun(req *msgReq, resp *msgResp, kind ExtrasKind) {
 	if kind == EXTRAS_QUERY {
 		run = me.Impl.RunQueryExtra
 	}
-	resp.Menu = run(req.SrcLens, id, arg)
+	run(req.SrcLens, id, arg, resp.Extras)
 }

@@ -15,12 +15,16 @@ type iSrcIntel interface {
 	Symbols(*SrcLens, string, bool) []SrcLens
 }
 
+type SrcIntels struct {
+	InfoTips []SrcIntelHover `json:"tips,omitempty"`
+	Refs     []SrcLens       `json:"refs,omitempty"`
+}
+
 type srcIntelResp struct {
-	Cmpl       []SrcIntelCompl  `json:"cmpl,omitempty"`
-	Hovers     []SrcIntelHover  `json:"hovs,omitempty"`
-	Refs       []SrcLens        `json:"refs,omitempty"`
-	Highlights []SrcRange       `json:"high,omitempty"`
+	SrcIntels
 	Signature  *SrcIntelSigHelp `json:"sig,omitempty"`
+	Cmpl       []SrcIntelCompl  `json:"cmpl,omitempty"`
+	Highlights []SrcRange       `json:"high,omitempty"`
 }
 
 type SrcIntelCompl struct {
@@ -123,7 +127,7 @@ func (me *SrcIntelBase) onHighlights(req *msgReq, resp *msgResp) {
 }
 
 func (me *SrcIntelBase) onHover(req *msgReq, resp *msgResp) {
-	resp.SrcIntel.Hovers = me.Impl.Hovers(req.SrcLens)
+	resp.SrcIntel.InfoTips = me.Impl.Hovers(req.SrcLens)
 }
 
 func (me *SrcIntelBase) onReferences(req *msgReq, resp *msgResp) {

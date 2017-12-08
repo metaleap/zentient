@@ -12,7 +12,8 @@ var (
 	extras goExtras
 
 	querierGoDoc = z.ExtrasItem{ID: "go_doc", Kind: z.EXTRAS_QUERY, Label: "go doc",
-		Description: "[package] [member name]", Detail: "➜ shows the specified item's summary description"}
+		Description: "[package] [member name]", Detail: "➜ shows the specified item's summary description",
+		QueryArg: "Query to `go doc`"}
 )
 
 func init() {
@@ -38,10 +39,10 @@ func (me *goExtras) ListQueryExtras() (all []z.ExtrasItem) {
 	return
 }
 
-func (me *goExtras) RunIntelExtra(srcLens *z.SrcLens, id string, arg string) *z.MenuResp {
-	return &z.MenuResp{NoteInfo: "intel " + id}
+func (me *goExtras) RunIntelExtra(srcLens *z.SrcLens, id string, arg string, resp *z.ExtrasResp) {
+	resp.InfoTips = []z.SrcIntelHover{{Value: "intel " + id + " for " + arg}}
 }
 
-func (me *goExtras) RunQueryExtra(srcLens *z.SrcLens, id string, arg string) *z.MenuResp {
-	return &z.MenuResp{NoteWarn: "query " + id}
+func (me *goExtras) RunQueryExtra(srcLens *z.SrcLens, id string, arg string, resp *z.ExtrasResp) {
+	resp.InfoTips = []z.SrcIntelHover{{Value: "query " + id + " for " + arg}}
 }
