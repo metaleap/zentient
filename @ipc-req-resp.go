@@ -40,12 +40,13 @@ type msgResp struct {
 	ReqID  int64  `json:"ri"`
 	ErrMsg string `json:"e,omitempty"`
 
-	MsgID      msgIDs         `json:"mi,omitempty"`
-	Menu       *MenuResp      `json:"menu,omitempty"`
-	Extras     *ExtrasResp    `json:"extras,omitempty"`
-	SrcIntel   *srcIntelResp  `json:"srcIntel,omitempty"`
-	SrcMods    []*SrcLens     `json:"srcMods,omitempty"`
-	SrcActions []EditorAction `json:"srcActions,omitempty"`
+	MsgID       msgIDs         `json:"mi,omitempty"`
+	Menu        *MenuResp      `json:"menu,omitempty"`
+	Extras      *ExtrasResp    `json:"extras,omitempty"`
+	SrcIntel    *srcIntelResp  `json:"srcIntel,omitempty"`
+	SrcMods     []*SrcLens     `json:"srcMods,omitempty"`
+	SrcActions  []EditorAction `json:"srcActions,omitempty"`
+	CaddyUpdate *Caddy         `json:"caddy,omitempty"`
 }
 
 type EditorAction struct {

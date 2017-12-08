@@ -35,6 +35,7 @@ var (
 		SrcMod   iSrcMod
 		SrcIntel iSrcIntel
 		Extras   iExtras
+		Caddies  []*Caddy
 	}
 	Prog struct {
 		Cfg  Config
@@ -84,6 +85,9 @@ func Init() (err error) {
 			}
 		}
 	}
+	for _, c := range Lang.Caddies {
+		c.onInit()
+	}
 	return
 }
 
@@ -113,12 +117,27 @@ func catch(err *error) {
 	}
 }
 
+func send(resp *msgResp) (err error) {
+	if err = pipeIO.outEncoder.Encode(resp); err == nil {
+		err = pipeIO.outWriter.Flush()
+	}
+	return
+}
+
 func Serve() (err error) {
 	var stdin *bufio.Scanner
 	stdin, pipeIO.outWriter, pipeIO.outEncoder = urun.SetupJsonProtoPipes(1024*1024*4, false, true)
 
 	// we allow our sub-ordinate go-routines to panic and just before we return, we recover() the `err` to return (if any)
 	defer catch(&err)
+
+	// the caddies are notified that their status changes may now be broadcast
+	for _, c := range Lang.Caddies {
+		send(&msgResp{CaddyUpdate: c})
+	}
+	for _, c := range Lang.Caddies {
+		go c.OnReady()
+	}
 
 	// we don't directly wire up a json.Decoder to stdin but read individual lines in as strings first:
 	// - this enforces our line-delimited (rather than 'json-delimited') protocol
@@ -140,10 +159,7 @@ func serveIncomingReq(jsonreq string) {
 	// err only covers: either resp couldn't be json-encoded, or stdout write/flush problem
 	// (both would indicate bigger problems --- still recover()ed in Serve() though)
 	// any other kind of error, reqDecodeAndRespond will record into resp.ErrMsg to report it back to the client
-	err := pipeIO.outEncoder.Encode(resp)
-	if err == nil {
-		err = pipeIO.outWriter.Flush()
-	}
+	err := send(resp)
 	if err != nil {
 		panic(err)
 	}
