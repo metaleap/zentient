@@ -131,10 +131,11 @@ func Serve() (err error) {
 	// we allow our sub-ordinate go-routines to panic and just before we return, we recover() the `err` to return (if any)
 	defer catch(&err)
 
-	// the caddies are notified that their status changes may now be broadcast
+	// announce each caddy's existence
 	for _, c := range Lang.Caddies {
 		send(&msgResp{CaddyUpdate: c})
 	}
+	// only now are the caddies notified that their status changes may now be broadcast
 	for _, c := range Lang.Caddies {
 		go c.OnReady()
 	}
@@ -157,10 +158,9 @@ func serveIncomingReq(jsonreq string) {
 	resp := reqDecodeAndRespond(jsonreq)
 
 	// err only covers: either resp couldn't be json-encoded, or stdout write/flush problem
-	// (both would indicate bigger problems --- still recover()ed in Serve() though)
-	// any other kind of error, reqDecodeAndRespond will record into resp.ErrMsg to report it back to the client
-	err := send(resp)
-	if err != nil {
+	// (both would indicate bigger problems --- still recover()ed in Serve(), but program-ending)
+	// any other kind of error, above reqDecodeAndRespond will record into resp.ErrMsg to report it back to the client and the program stays running
+	if err := send(resp); err != nil {
 		panic(err)
 	}
 }

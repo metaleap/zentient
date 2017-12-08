@@ -1,5 +1,7 @@
 package z
 
+// What's a Caddy: lurks around idly until ordered to run!
+
 type CaddyStatus uint8
 
 const (
@@ -17,6 +19,9 @@ type Caddy struct {
 		Flag CaddyStatus
 		Desc string `json:",omitempty"`
 	}
+	Details     string `json:",omitempty"`
+	ClientCmdID string `json:",omitempty"`
+
 	OnReady         func() `json:"-"`
 	OnStatusChanged func() `json:"-"`
 }
