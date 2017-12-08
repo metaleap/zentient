@@ -9,15 +9,15 @@ type iSrcIntel interface {
 	DefType(*SrcLens) []SrcLens
 	DefImpl(*SrcLens) []SrcLens
 	Highlights(*SrcLens, string) []SrcRange
-	Hovers(*SrcLens) []SrcIntelHover
+	Hovers(*SrcLens) []InfoTip
 	References(*SrcLens, bool) []SrcLens
 	Signature(*SrcLens) *SrcIntelSigHelp
 	Symbols(*SrcLens, string, bool) []SrcLens
 }
 
 type SrcIntels struct {
-	InfoTips []SrcIntelHover `json:"tips,omitempty"`
-	Refs     []SrcLens       `json:"refs,omitempty"`
+	InfoTips []InfoTip `json:"tips,omitempty"`
+	Refs     []SrcLens `json:"refs,omitempty"`
 }
 
 type srcIntelResp struct {
@@ -44,13 +44,6 @@ type SrcIntelCompl struct {
 type SrcIntelDoc struct {
 	Value     string `json:"value"`
 	IsTrusted bool   `json:"isTrusted"`
-}
-
-type SrcIntelHover struct {
-	Value string `json:"value"`
-
-	// If empty, clients default to 'markdown'
-	Language string `json:"language,omitempty"`
 }
 
 type SrcIntelSigHelp struct {

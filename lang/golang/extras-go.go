@@ -1,6 +1,8 @@
 package zgo
 
 import (
+	"strings"
+
 	"github.com/metaleap/zentient"
 )
 
@@ -21,15 +23,6 @@ func init() {
 	z.Lang.Extras = &extras
 }
 
-func (me *goExtras) KindOf(id string) z.ExtrasKind {
-	switch id {
-	case querierGoDoc.ID:
-		return z.EXTRAS_QUERY
-	default:
-		return z.EXTRAS_INTEL
-	}
-}
-
 func (me *goExtras) ListIntelExtras() (all []z.ExtrasItem) {
 	return
 }
@@ -40,9 +33,17 @@ func (me *goExtras) ListQueryExtras() (all []z.ExtrasItem) {
 }
 
 func (me *goExtras) RunIntelExtra(srcLens *z.SrcLens, id string, arg string, resp *z.ExtrasResp) {
-	resp.InfoTips = []z.SrcIntelHover{{Value: "intel " + id + " for " + arg}}
+	switch id {
+	default:
+		z.Bad("CodeIntel Extras ID", id)
+	}
 }
 
 func (me *goExtras) RunQueryExtra(srcLens *z.SrcLens, id string, arg string, resp *z.ExtrasResp) {
-	resp.InfoTips = []z.SrcIntelHover{{Value: "query " + id + " for " + arg}}
+	switch id {
+	case querierGoDoc.ID:
+		me.runQueryGoDoc(srcLens, strings.TrimSpace(arg), resp)
+	default:
+		z.Bad("CodeQuery Extras ID", id)
+	}
 }

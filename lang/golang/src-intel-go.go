@@ -29,25 +29,25 @@ func (*goSrcIntel) hoverShortenImpPaths(s string) string {
 	return s
 }
 
-func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.SrcIntelHover) {
+func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 	var ggd *udevgo.Gogetdoc
-	var decl *z.SrcIntelHover
+	var decl *z.InfoTip
 	offset := z.Strf("%d", srcLens.ByteOffsetForPosWithRuneOffset(srcLens.Pos))
 
 	if !tools.gogetdoc.Installed {
-		hovs = append(hovs, z.SrcIntelHover{Value: tools.gogetdoc.NotInstalledMessage()})
+		hovs = append(hovs, z.InfoTip{Value: tools.gogetdoc.NotInstalledMessage()})
 	} else {
 		if ggd = udevgo.Query_Gogetdoc(srcLens.FilePath, srcLens.SrcFull, offset); ggd != nil {
 			ispkglocal := ustr.Pref(ggd.Pos, filepath.Dir(srcLens.FilePath))
 			if ggd.Err != "" {
-				hovs = append(hovs, z.SrcIntelHover{Language: "plaintext", Value: ggd.Err})
+				hovs = append(hovs, z.InfoTip{Language: "plaintext", Value: ggd.Err})
 			}
 			if ggd.ErrMsgs != "" {
-				hovs = append(hovs, z.SrcIntelHover{Language: "plaintext", Value: ggd.ErrMsgs})
+				hovs = append(hovs, z.InfoTip{Language: "plaintext", Value: ggd.ErrMsgs})
 			}
 			if headline := ggd.ImpN; headline != "" && !ispkglocal {
 				headline = me.hoverShortenImpPaths(headline)
-				hovs = append(hovs, z.SrcIntelHover{Value: "### " + headline})
+				hovs = append(hovs, z.InfoTip{Value: "### " + headline})
 			}
 			if ggd.Decl != "" {
 				if ggd.ImpP != "" {
@@ -57,7 +57,7 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.SrcIntelHover) {
 					ggd.Decl = z.Strf("//ℤ/ struct field:\n{ %s }\n//ℤ/ field context (tags etc.) not shown", ggd.Decl[6:])
 				}
 				ggd.Decl = me.hoverShortenImpPaths(ggd.Decl)
-				decl = &z.SrcIntelHover{Language: z.Lang.ID, Value: ggd.Decl}
+				decl = &z.InfoTip{Language: z.Lang.ID, Value: ggd.Decl}
 				hovs = append(hovs, *decl)
 			}
 			if impdoc := ggd.ImpP; ggd.Doc != "" || impdoc != "" {
@@ -71,15 +71,15 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.SrcIntelHover) {
 					}
 					impdoc = "[" + impdoc + "](http://godoc.org/" + ggd.DocUrl + ")"
 				}
-				hovs = append(hovs, z.SrcIntelHover{Value: ustr.Both(impdoc, "\n\n", ggd.Doc)})
+				hovs = append(hovs, z.InfoTip{Value: ustr.Both(impdoc, "\n\n", ggd.Doc)})
 			}
 		}
 	}
 
 	if tools.godef.Installed && decl == nil {
 		if defdecl := udevgo.QueryDefDecl_GoDef(srcLens.FilePath, srcLens.SrcFull, offset); defdecl != "" {
-			decl = &z.SrcIntelHover{Language: z.Lang.ID, Value: defdecl}
-			hovs = append([]z.SrcIntelHover{*decl}, hovs...)
+			decl = &z.InfoTip{Language: z.Lang.ID, Value: defdecl}
+			hovs = append([]z.InfoTip{*decl}, hovs...)
 		}
 	}
 	return

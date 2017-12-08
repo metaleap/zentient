@@ -55,6 +55,13 @@ type EditorAction struct {
 	Arguments []interface{} `json:"arguments,omitempty"`
 }
 
+type InfoTip struct {
+	Value string `json:"value"`
+
+	// If empty, clients default to 'markdown'
+	Language string `json:"language,omitempty"`
+}
+
 func (me *msgResp) onResponseReady() {
 	if except := recover(); except != nil {
 		me.ErrMsg = Strf("%v", except)

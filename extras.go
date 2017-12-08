@@ -29,6 +29,7 @@ type ExtrasItem struct {
 type ExtrasResp struct {
 	SrcIntels
 	Items []ExtrasItem `json:"items,omitempty"`
+	Warns []string     `json:"warns,omitempty"`
 }
 
 type ExtrasBase struct {

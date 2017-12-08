@@ -56,11 +56,11 @@ func (_ *SrcIntelBase) Highlights(srcLens *SrcLens, curWord string) (all []SrcRa
 	return
 }
 
-func (_ *SrcIntelBase) Hovers(srcLens *SrcLens) (all []SrcIntelHover) {
+func (_ *SrcIntelBase) Hovers(srcLens *SrcLens) (all []InfoTip) {
 	all = append(all,
-		SrcIntelHover{Value: Strf("Hovers not yet implemented for **%s** by `%s`", Lang.Title, Prog.name)},
-		SrcIntelHover{Value: Strf("File: %s", srcLens.FilePath), Language: "plaintext"},
-		SrcIntelHover{Value: Strf("Line/Char/Offset: %v", *srcLens.Pos)},
+		InfoTip{Value: Strf("Hovers not yet implemented for **%s** by `%s`", Lang.Title, Prog.name)},
+		InfoTip{Value: Strf("File: %s", srcLens.FilePath), Language: "plaintext"},
+		InfoTip{Value: Strf("Line/Char/Offset: %v", *srcLens.Pos)},
 	)
 	return
 }

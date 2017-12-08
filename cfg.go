@@ -9,10 +9,9 @@ import (
 )
 
 type Config struct {
-	FormatterName string
-	FormatterProg string
-
-	Strs map[string]string
+	Misc          map[string]string `json:",omitempty"`
+	FormatterName string            `json:",omitempty"`
+	FormatterProg string            `json:",omitempty"`
 
 	err            error
 	filePath       string
@@ -24,7 +23,7 @@ func (me *Config) reload() {
 		// 1. re-initialize me
 		var empty Config
 		*me = empty
-		me.Strs = map[string]string{}
+		me.Misc = map[string]string{}
 		me.filePath = filepath.Join(Prog.dir.config, Prog.name+".config.json")
 
 		// 2. load
