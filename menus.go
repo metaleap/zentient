@@ -57,13 +57,19 @@ func (me *mainMenu) dispatch(req *ipcReq, resp *ipcResp) bool {
 
 func (me *mainMenu) onMainMenu(req *ipcReq, resp *ipcResp) {
 	var cats []string
+	catfilter, _ := req.IpcArgs.(string)
 	m := Menu{Desc: "Categories:  ", TopLevel: true}
+	if catfilter != "" {
+		m.Desc = "Showing:  "
+	}
 	for _, menu := range Prog.menus {
 		for _, item := range menu.MenuItems(req.SrcLens) {
-			if item.Category = menu.MenuCategory(); !uslice.StrHas(cats, item.Category) {
-				cats = append(cats, item.Category)
+			if catfilter == "" || item.Category == catfilter {
+				if item.Category = menu.MenuCategory(); !uslice.StrHas(cats, item.Category) {
+					cats = append(cats, item.Category)
+				}
+				m.Items = append(m.Items, item)
 			}
-			m.Items = append(m.Items, item)
 		}
 	}
 	m.Desc += strings.Join(cats, "  ·  ")

@@ -10,11 +10,6 @@ type PkgIntelBase struct {
 	Impl IPkgIntel
 }
 
-func init() {
-	var dummy PkgIntelBase
-	Lang.PkgIntel, dummy.Impl = &dummy, &dummy
-}
-
 func (me *PkgIntelBase) Init() {
 	me.ListMenuBase.init(me.Impl, "Packages", "%s packages %s")
 }

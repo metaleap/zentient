@@ -10,7 +10,6 @@ func OnPreInit() {
 	l.ID = "go"
 	l.Title = "Go"
 	if l.Enabled = udevgo.HasGoDevEnv(); l.Enabled {
-		caddiesInit()
 		toolsInit()
 		srcMod.onPreInit()
 	}

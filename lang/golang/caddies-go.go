@@ -11,13 +11,13 @@ var (
 	caddyRefreshPkgs = z.Caddy{ID: "goPkgs", Title: "GOPATH tracker", Icon: ""}
 )
 
-func caddiesInit() {
+func init() {
 	caddyRefreshPkgs.OnReady = caddyRunRefreshPkgs
 	z.Lang.Caddies = append(z.Lang.Caddies, &caddyRefreshPkgs)
 }
 
 func caddyRunRefreshPkgs() {
-	caddyRefreshPkgs.Status.Flag, caddyRefreshPkgs.Status.Desc, caddyRefreshPkgs.Details, caddyRefreshPkgs.ClientCmdID =
+	caddyRefreshPkgs.Status.Flag, caddyRefreshPkgs.Status.Desc, caddyRefreshPkgs.Details, caddyRefreshPkgs.UxActionID =
 		z.CADDY_BUSY, "refreshing", "", ""
 	caddyRefreshPkgs.OnStatusChanged()
 
@@ -28,7 +28,7 @@ func caddyRunRefreshPkgs() {
 		caddyRefreshPkgs.Status.Flag, caddyRefreshPkgs.Status.Desc =
 			z.CADDY_GOOD, fmt.Sprintf("%d Go packages (%d broken)", len(udevgo.PkgsByDir), len(udevgo.PkgsErrs))
 		if len(udevgo.PkgsErrs) > 0 {
-			caddyRefreshPkgs.ClientCmdID = "zen.extras.query"
+			caddyRefreshPkgs.UxActionID = "zen.menus.main." + z.Lang.PkgIntel.MenuCategory()
 			for _, pkg := range udevgo.PkgsErrs {
 				caddyRefreshPkgs.Details += pkg.ImportPath + "\n"
 			}
