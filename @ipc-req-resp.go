@@ -62,7 +62,7 @@ func (me *ipcResp) onResponseReady() {
 
 func (me *ipcResp) to(req *ipcReq) {
 	defer me.onResponseReady()
-	for _, h := range dispatchers {
+	for _, h := range Prog.dispatchers {
 		if h.dispatch(req, me) {
 			return
 		}

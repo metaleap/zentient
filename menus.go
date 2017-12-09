@@ -1,13 +1,12 @@
 package z
 
 import (
-	"sort"
 	"strings"
 
 	"github.com/metaleap/go-util/slice"
 )
 
-type IMenuProvider interface {
+type IMenuItems interface {
 	iDispatcher
 
 	MenuItems(*SrcLens) []*MenuItem
@@ -49,17 +48,17 @@ type mainMenu struct {
 func (me *mainMenu) dispatch(req *ipcReq, resp *ipcResp) bool {
 	switch req.IpcID {
 	case IPCID_MENUS_MAIN:
-		me.onListAll(req, resp)
+		me.onMainMenu(req, resp)
 	default:
 		return false
 	}
 	return true
 }
 
-func (me *mainMenu) onListAll(req *ipcReq, resp *ipcResp) {
-	var cats sort.StringSlice
-	m := Menu{Desc: "Showing ➜ ", TopLevel: true}
-	for _, menu := range menuProviders {
+func (me *mainMenu) onMainMenu(req *ipcReq, resp *ipcResp) {
+	var cats []string
+	m := Menu{Desc: "Categories:  ", TopLevel: true}
+	for _, menu := range Prog.menus {
 		for _, item := range menu.MenuItems(req.SrcLens) {
 			if item.Category = menu.MenuCategory(); !uslice.StrHas(cats, item.Category) {
 				cats = append(cats, item.Category)

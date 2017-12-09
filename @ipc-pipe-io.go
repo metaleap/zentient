@@ -2,6 +2,7 @@ package z
 
 import (
 	"bufio"
+	"fmt"
 
 	"github.com/metaleap/go-util/run"
 )
@@ -11,21 +12,21 @@ func catch(err *error) {
 		if e, ok := except.(error); ok {
 			*err = e
 		} else {
-			*err = Errf("%v", except)
+			*err = fmt.Errorf("%v", except)
 		}
 	}
 }
 
 func send(resp *ipcResp) (err error) {
-	if err = pipeIO.outEncoder.Encode(resp); err == nil {
-		err = pipeIO.outWriter.Flush()
+	if err = Prog.pipeIO.outEncoder.Encode(resp); err == nil {
+		err = Prog.pipeIO.outWriter.Flush()
 	}
 	return
 }
 
 func Serve() (err error) {
 	var stdin *bufio.Scanner
-	stdin, pipeIO.outWriter, pipeIO.outEncoder = urun.SetupJsonIpcPipes(1024*1024*4, false, true)
+	stdin, Prog.pipeIO.outWriter, Prog.pipeIO.outEncoder = urun.SetupJsonIpcPipes(1024*1024*4, false, true)
 
 	// we allow our sub-ordinate go-routines to panic and just before we return, we recover() the `err` to return (if any)
 	defer catch(&err)

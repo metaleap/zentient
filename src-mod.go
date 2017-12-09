@@ -5,7 +5,7 @@ import (
 )
 
 type ISrcMod interface {
-	IMenuProvider
+	IMenuItems
 
 	CodeActions(*SrcLens) []EditorAction
 	DoesStdoutWithFilePathArg(*Tool) bool

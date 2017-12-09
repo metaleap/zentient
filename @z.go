@@ -3,7 +3,6 @@ package z
 import (
 	"bufio"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -13,15 +12,7 @@ import (
 )
 
 var (
-	Err  = errors.New
-	Errf = fmt.Errorf
 	Strf = fmt.Sprintf
-
-	menuProviders []IMenuProvider
-	dispatchers   = []iDispatcher{
-		&mainMenu{},
-	}
-
 	Lang struct {
 		Enabled  bool
 		ID       string
@@ -33,16 +24,19 @@ var (
 		Caddies  []*Caddy
 	}
 	Prog struct {
-		Cfg  Config
+		Cfg Config
+
 		name string
 		dir  struct {
 			cache  string
 			config string
 		}
-	}
-	pipeIO struct {
-		outEncoder *json.Encoder
-		outWriter  *bufio.Writer
+		menus       []IMenuItems
+		dispatchers []iDispatcher
+		pipeIO      struct {
+			outEncoder *json.Encoder
+			outWriter  *bufio.Writer
+		}
 	}
 )
 
@@ -62,21 +56,21 @@ func Init() (err error) {
 
 	if Prog.Cfg.reload(); Prog.Cfg.err == nil {
 		wellknowndispatchers := []iDispatcher{
-			Lang.SrcIntel, Lang.SrcMod, Lang.Extras, Lang.PkgIntel,
+			&mainMenu{}, Lang.SrcIntel, Lang.SrcMod, Lang.Extras, Lang.PkgIntel,
 		}
 		for _, disp := range wellknowndispatchers {
 			if disp != nil {
-				dispatchers = append(dispatchers, disp)
+				Prog.dispatchers = append(Prog.dispatchers, disp)
 				disp.Init()
 			}
 		}
 
-		wellknownmenuproviders := []IMenuProvider{
+		wellknownmenus := []IMenuItems{
 			Lang.PkgIntel, Lang.SrcMod,
 		}
-		for _, menu := range wellknownmenuproviders {
+		for _, menu := range wellknownmenus {
 			if menu != nil {
-				menuProviders = append(menuProviders, menu)
+				Prog.menus = append(Prog.menus, menu)
 			}
 		}
 	}
