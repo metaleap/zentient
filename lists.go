@@ -1,10 +1,10 @@
 package z
 
 type IList interface {
-	DescUnfiltered() string
-	Count([]*ListFilter, map[string]bool) int
+	UnfilteredDesc() string
+	Count(ListFilters) int
 	Filters() []*ListFilter
-	// List([]*ListFilter, map[string]bool) int
+	List(ListFilters) []interface{}
 }
 
 type IListMenu interface {
@@ -12,10 +12,14 @@ type IListMenu interface {
 	IMenuItems
 }
 
+type ListFilters map[*ListFilter]bool
+
 type ListFilter struct {
 	ID    string
 	Title string `json:"-"`
 	Desc  string `json:"-"`
+
+	Pred func(interface{}) bool `json:"-"`
 }
 
 type ListBase struct {
@@ -27,7 +31,7 @@ type ListBase struct {
 func (me *ListBase) init(impl IList) {
 	me.impl = impl
 	me.listFilters = []*ListFilter{
-		&ListFilter{Title: "All", Desc: me.impl.DescUnfiltered()},
+		&ListFilter{Title: "All", Desc: me.impl.UnfilteredDesc()},
 	}
 	me.listFilters = append(me.listFilters, me.impl.Filters()...)
 }
@@ -55,7 +59,7 @@ func (me *ListMenuBase) init(impl IListMenu, cat string, fdesc string) {
 
 	for _, lf := range me.listFilters {
 		item := &MenuItem{Title: lf.Title, Desc: Strf(fdesc, Lang.Title, lf.Desc)}
-		item.IpcArgs = lf
+		item.IpcArgs = lf.ID
 		me.items = append(me.items, item)
 	}
 }
@@ -67,8 +71,12 @@ func (me *ListMenuBase) MenuCategory() string {
 func (me *ListMenuBase) MenuItems(*SrcLens) []*MenuItem {
 	const fhint = "(%v at last count)"
 	for _, item := range me.items {
-		fcount, lf := "amount unknown", item.IpcArgs.(*ListFilter)
-		count := me.impl.Count([]*ListFilter{lf}, nil)
+		fcount, filterid := "amount unknown", item.IpcArgs.(string)
+		filters := ListFilters{me.filterWithID(filterid): true}
+		if filterid == "" {
+			filters = nil
+		}
+		count := me.impl.Count(filters)
 		if count >= 0 {
 			fcount = Strf("%d", count)
 		}

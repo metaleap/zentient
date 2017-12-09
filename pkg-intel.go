@@ -11,7 +11,7 @@ type PkgIntelBase struct {
 }
 
 func (me *PkgIntelBase) Init() {
-	me.ListMenuBase.init(me.Impl, "Packages", "%s packages %s")
+	me.ListMenuBase.init(me.Impl, "Packages", "Lists %s packages %s")
 }
 
 func (me *PkgIntelBase) dispatch(req *ipcReq, resp *ipcResp) bool {

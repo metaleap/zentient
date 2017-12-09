@@ -60,12 +60,12 @@ func (me *mainMenu) onMainMenu(req *ipcReq, resp *ipcResp) {
 	catfilter, _ := req.IpcArgs.(string)
 	m := Menu{Desc: "Categories:  ", TopLevel: true}
 	if catfilter != "" {
-		m.Desc = "Showing:  "
+		m.Desc = "Category:  "
 	}
 	for _, menu := range Prog.menus {
 		for _, item := range menu.MenuItems(req.SrcLens) {
-			if catfilter == "" || item.Category == catfilter {
-				if item.Category = menu.MenuCategory(); !uslice.StrHas(cats, item.Category) {
+			if item.Category = menu.MenuCategory(); catfilter == "" || item.Category == catfilter {
+				if !uslice.StrHas(cats, item.Category) {
 					cats = append(cats, item.Category)
 				}
 				m.Items = append(m.Items, item)
