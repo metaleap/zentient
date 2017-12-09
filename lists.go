@@ -84,8 +84,9 @@ func (me *ListMenuBase) init(impl IListMenu, cat string, fdesc string) {
 }
 
 func (me *ListMenuBase) ListItemsSubMenu(title string, desc string, filters ListFilters) *Menu {
-	menu := &Menu{Desc: me.cat + " ➜ " + title + " (" + desc + ")"}
-	for _, listitem := range me.impl.List(filters) {
+	listitems := me.impl.List(filters)
+	menu := &Menu{Desc: Strf("%d %s ➜ %s (%s)", len(listitems), me.cat, title, desc)}
+	for _, listitem := range listitems {
 		if menuitem := me.impl.ListItemToMenuItem(listitem); menuitem != nil {
 			menu.Items = append(menu.Items, menuitem)
 		}

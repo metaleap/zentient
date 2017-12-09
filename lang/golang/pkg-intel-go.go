@@ -80,9 +80,7 @@ func (me *goPkgIntel) list(allFilters z.ListFilters, count *int) (results z.List
 				}
 			}
 		}
-		if len(results) > 0 {
-			sort.Sort(results)
-		}
+		sort.Sort(results)
 	}
 	return
 }
@@ -90,6 +88,8 @@ func (me *goPkgIntel) list(allFilters z.ListFilters, count *int) (results z.List
 func (me *goPkgIntel) List(allFilters z.ListFilters) (results z.ListItems) {
 	return me.list(allFilters, nil)
 }
+
+type __ struct{ __ func(z.ListItem) bool }
 
 func (me *goPkgIntel) ListItemToMenuItem(p z.ListItem) (item *z.MenuItem) {
 	pkg, _ := p.(*udevgo.Pkg)
@@ -122,20 +122,17 @@ func (me *goPkgIntel) ListItemToMenuItem(p z.ListItem) (item *z.MenuItem) {
 		if me.isPkgStale(pkg) {
 			hints = append(hints, "Stale: "+pkg.StaleReason)
 		}
-		if me.isPkgBinary(pkg) {
-			hints = append(hints, "Binary")
+		m := map[*__]string{
+			&__{me.isPkgBinary}:     "Binary",
+			&__{me.isPkgCommand}:    "Command",
+			&__{me.isPkgIncomplete}: "Incomplete",
+			&__{me.isPkgStandard}:   "Standard",
+			&__{me.isPkgGoRoot}:     "In GOROOT",
 		}
-		if me.isPkgCommand(pkg) {
-			hints = append(hints, "Command")
-		}
-		if me.isPkgIncomplete(pkg) {
-			hints = append(hints, "Incomplete")
-		}
-		if me.isPkgStandard(pkg) {
-			hints = append(hints, "Standard")
-		}
-		if me.isPkgGoRoot(pkg) {
-			hints = append(hints, "In GOROOT")
+		for __, str := range m {
+			if __.__(pkg) {
+				hints = append(hints, str)
+			}
 		}
 		if me.isPkgError(pkg) {
 			if len(pkg.Errs) == 0 {
