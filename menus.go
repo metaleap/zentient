@@ -58,7 +58,7 @@ func (me *mainMenu) dispatch(req *ipcReq, resp *ipcResp) bool {
 
 func (me *mainMenu) onListAll(req *ipcReq, resp *ipcResp) {
 	var cats sort.StringSlice
-	m := Menu{Desc: "Showing: ", TopLevel: true}
+	m := Menu{Desc: "Showing ➜ ", TopLevel: true}
 	for _, menu := range menuProviders {
 		for _, item := range menu.MenuItems(req.SrcLens) {
 			if item.Category = menu.MenuCategory(); !uslice.StrHas(cats, item.Category) {
@@ -67,8 +67,7 @@ func (me *mainMenu) onListAll(req *ipcReq, resp *ipcResp) {
 			m.Items = append(m.Items, item)
 		}
 	}
-	sort.Sort(cats)
-	m.Desc += strings.Join(cats, " · ")
+	m.Desc += strings.Join(cats, "  ·  ")
 	resp.Menu = &MenuResp{SubMenu: &m}
 }
 
