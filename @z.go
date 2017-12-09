@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/metaleap/go-util/fs"
 	"github.com/metaleap/go-util/sys"
@@ -34,6 +35,7 @@ var (
 		menus       []IMenuItems
 		dispatchers []iDispatcher
 		pipeIO      struct {
+			mutex      sync.Mutex
 			outEncoder *json.Encoder
 			outWriter  *bufio.Writer
 		}

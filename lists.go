@@ -1,15 +1,30 @@
 package z
 
+type ListItem interface {
+	LessThan(interface{}) bool
+}
+
+type ListItems []ListItem
+
+func (me ListItems) Len() int               { return len(me) }
+func (me ListItems) Less(i int, j int) bool { return me[i].LessThan(me[j]) }
+func (me ListItems) Swap(i, j int)          { me[i], me[j] = me[j], me[i] }
+
 type IList interface {
 	UnfilteredDesc() string
 	Count(ListFilters) int
+	FilterByID(string) *ListFilter
 	Filters() []*ListFilter
-	List(ListFilters) []interface{}
+	List(ListFilters) ListItems
 }
 
 type IListMenu interface {
 	IList
 	IMenuItems
+
+	IpcID(*ListFilter) ipcIDs
+	ListItemsSubMenu(string, string, ListFilters) *Menu
+	ListItemToMenuItem(ListItem) *MenuItem
 }
 
 type ListFilters map[*ListFilter]bool
@@ -19,7 +34,7 @@ type ListFilter struct {
 	Title string `json:"-"`
 	Desc  string `json:"-"`
 
-	Pred func(interface{}) bool `json:"-"`
+	Pred func(ListItem) bool `json:"-"`
 }
 
 type ListBase struct {
@@ -36,7 +51,11 @@ func (me *ListBase) init(impl IList) {
 	me.listFilters = append(me.listFilters, me.impl.Filters()...)
 }
 
-func (me *ListBase) filterWithID(id string) *ListFilter {
+func (me *ListBase) Count(all ListFilters) int {
+	return len(me.impl.List(all))
+}
+
+func (me *ListBase) FilterByID(id string) *ListFilter {
 	for _, lf := range me.listFilters {
 		if lf.ID == id {
 			return lf
@@ -59,9 +78,19 @@ func (me *ListMenuBase) init(impl IListMenu, cat string, fdesc string) {
 
 	for _, lf := range me.listFilters {
 		item := &MenuItem{Title: lf.Title, Desc: Strf(fdesc, Lang.Title, lf.Desc)}
-		item.IpcArgs = lf.ID
+		item.IpcID, item.IpcArgs = me.impl.IpcID(lf), lf.ID
 		me.items = append(me.items, item)
 	}
+}
+
+func (me *ListMenuBase) ListItemsSubMenu(title string, desc string, filters ListFilters) *Menu {
+	menu := &Menu{Desc: me.cat + " ➜ " + title + " (" + desc + ")"}
+	for _, listitem := range me.impl.List(filters) {
+		if menuitem := me.impl.ListItemToMenuItem(listitem); menuitem != nil {
+			menu.Items = append(menu.Items, menuitem)
+		}
+	}
+	return menu
 }
 
 func (me *ListMenuBase) MenuCategory() string {
@@ -72,9 +101,9 @@ func (me *ListMenuBase) MenuItems(*SrcLens) []*MenuItem {
 	const fhint = "(%v at last count)"
 	for _, item := range me.items {
 		fcount, filterid := "amount unknown", item.IpcArgs.(string)
-		filters := ListFilters{me.filterWithID(filterid): true}
-		if filterid == "" {
-			filters = nil
+		var filters ListFilters
+		if filterid != "" {
+			filters = ListFilters{me.impl.FilterByID(filterid): true}
 		}
 		count := me.impl.Count(filters)
 		if count >= 0 {

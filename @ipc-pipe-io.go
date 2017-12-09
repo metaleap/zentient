@@ -18,6 +18,8 @@ func catch(err *error) {
 }
 
 func send(resp *ipcResp) (err error) {
+	Prog.pipeIO.mutex.Lock()
+	defer Prog.pipeIO.mutex.Unlock()
 	if err = Prog.pipeIO.outEncoder.Encode(resp); err == nil {
 		err = Prog.pipeIO.outWriter.Flush()
 	}
