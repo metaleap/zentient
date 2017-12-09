@@ -4,8 +4,8 @@ import (
 	"github.com/metaleap/go-util/fs"
 )
 
-type iSrcMod interface {
-	iMenuProvider
+type ISrcMod interface {
+	IMenuProvider
 
 	CodeActions(*SrcLens) []EditorAction
 	DoesStdoutWithFilePathArg(*Tool) bool
@@ -19,21 +19,21 @@ type SrcModBase struct {
 	cmdFmtRunOnFile *MenuItem
 	cmdFmtRunOnSel  *MenuItem
 
-	Impl iSrcMod
+	Impl ISrcMod
 }
 
 func (me *SrcModBase) Init() {
 	me.cmdFmtSetDef = &MenuItem{
-		MsgID: MSGID_SRCMOD_FMT_SETDEFMENU,
+		IpcID: IPCID_SRCMOD_FMT_SETDEFMENU,
 		Title: "Change Default Formatter",
 		Desc:  Strf("Specify your preferred default %s source formatter", Lang.Title),
 	}
 	me.cmdFmtRunOnFile = &MenuItem{
-		MsgID: MSGID_SRCMOD_FMT_RUNONFILE,
+		IpcID: IPCID_SRCMOD_FMT_RUNONFILE,
 		Title: "Format Document",
 	}
 	me.cmdFmtRunOnSel = &MenuItem{
-		MsgID: MSGID_SRCMOD_FMT_RUNONSEL,
+		IpcID: IPCID_SRCMOD_FMT_RUNONSEL,
 		Title: "Format Selection",
 	}
 }
@@ -97,17 +97,17 @@ func (*SrcModBase) isFormatterCustom() bool {
 	return Prog.Cfg.FormatterProg != "" && Prog.Cfg.FormatterProg != Prog.Cfg.FormatterName
 }
 
-func (me *SrcModBase) dispatch(req *msgReq, resp *msgResp) bool {
-	switch req.MsgID {
-	case MSGID_SRCMOD_FMT_SETDEFMENU:
+func (me *SrcModBase) dispatch(req *ipcReq, resp *ipcResp) bool {
+	switch req.IpcID {
+	case IPCID_SRCMOD_FMT_SETDEFMENU:
 		me.onSetDefMenu(req, resp)
-	case MSGID_SRCMOD_FMT_SETDEFPICK:
+	case IPCID_SRCMOD_FMT_SETDEFPICK:
 		me.onSetDefPick(req, resp)
-	case MSGID_SRCMOD_FMT_RUNONFILE, MSGID_SRCMOD_FMT_RUNONSEL:
+	case IPCID_SRCMOD_FMT_RUNONFILE, IPCID_SRCMOD_FMT_RUNONSEL:
 		me.onRunFormatter(req, resp)
-	case MSGID_SRCMOD_RENAME:
+	case IPCID_SRCMOD_RENAME:
 		me.onRename(req, resp)
-	case MSGID_SRCMOD_ACTIONS:
+	case IPCID_SRCMOD_ACTIONS:
 		me.onActions(req, resp)
 	default:
 		return false
@@ -115,12 +115,12 @@ func (me *SrcModBase) dispatch(req *msgReq, resp *msgResp) bool {
 	return true
 }
 
-func (me *SrcModBase) onActions(req *msgReq, resp *msgResp) {
+func (me *SrcModBase) onActions(req *ipcReq, resp *ipcResp) {
 	resp.SrcActions = me.Impl.CodeActions(req.SrcLens)
 }
 
-func (me *SrcModBase) onRename(req *msgReq, resp *msgResp) {
-	newname, _ := req.MsgArgs.(string)
+func (me *SrcModBase) onRename(req *ipcReq, resp *ipcResp) {
+	newname, _ := req.IpcArgs.(string)
 	if newname == "" {
 		resp.ErrMsg = "Rename: missing new-name"
 	} else {
@@ -128,9 +128,9 @@ func (me *SrcModBase) onRename(req *msgReq, resp *msgResp) {
 	}
 }
 
-func (me *SrcModBase) onRunFormatter(req *msgReq, resp *msgResp) {
+func (me *SrcModBase) onRunFormatter(req *ipcReq, resp *ipcResp) {
 	var hasopt = false
-	opt, _ := req.MsgArgs.(map[string]interface{})
+	opt, _ := req.IpcArgs.(map[string]interface{})
 	if opt != nil {
 		_, tabSize := opt["tabSize"]
 		_, insertSpaces := opt["insertSpaces"]
@@ -146,8 +146,8 @@ func (me *SrcModBase) onRunFormatter(req *msgReq, resp *msgResp) {
 			resp.ErrMsg = "Select a Default Formatter first via the Zentient 'Palette' menu."
 		} else {
 			resp.Menu.NoteWarn = "Select a Default Formatter first, either via the Zentient 'Palette' menu or:"
-			resp.MsgID = MSGID_SRCMOD_FMT_SETDEFMENU
-			resp.Menu.MsgAction = Strf("Pick your preferred Zentient default %s formatter…", Lang.Title)
+			resp.IpcID = IPCID_SRCMOD_FMT_SETDEFMENU
+			resp.Menu.UxActionLabel = Strf("Pick your preferred Zentient default %s formatter…", Lang.Title)
 		}
 		return
 	}
@@ -186,11 +186,11 @@ func (me *SrcModBase) onRunFormatter(req *msgReq, resp *msgResp) {
 	}
 }
 
-func (me *SrcModBase) onSetDefMenu(req *msgReq, resp *msgResp) {
+func (me *SrcModBase) onSetDefMenu(req *ipcReq, resp *ipcResp) {
 	m := Menu{Desc: "First pick a known formatter, then optionally specify a custom tool name:"}
 	for _, kf := range me.Impl.KnownFormatters() {
-		var cmd = MenuItem{Title: kf.Name, MsgID: MSGID_SRCMOD_FMT_SETDEFPICK}
-		cmd.MsgArgs = map[string]interface{}{"fn": kf.Name, "fp": MenuItemMsgArgPrompt{Placeholder: kf.Name,
+		var cmd = MenuItem{Title: kf.Name, IpcID: IPCID_SRCMOD_FMT_SETDEFPICK}
+		cmd.IpcArgs = map[string]interface{}{"fn": kf.Name, "fp": MenuItemIpcArgPrompt{Placeholder: kf.Name,
 			Prompt: Strf("Optionally enter the name of an alternative '%s'-compatible equivalent tool to use", kf.Name)}}
 		cmd.Desc = Strf("➜ Pick to use '%s' (or compatible equivalent) as the default %s formatter", kf.Name, Lang.Title)
 		if kf.Name != Prog.Cfg.FormatterName || !me.isFormatterCustom() {
@@ -209,8 +209,8 @@ func (me *SrcModBase) onSetDefMenu(req *msgReq, resp *msgResp) {
 	resp.Menu = &MenuResp{SubMenu: &m}
 }
 
-func (me *SrcModBase) onSetDefPick(req *msgReq, resp *msgResp) {
-	m := req.MsgArgs.(map[string]interface{})
+func (me *SrcModBase) onSetDefPick(req *ipcReq, resp *ipcResp) {
+	m := req.IpcArgs.(map[string]interface{})
 	Prog.Cfg.FormatterName = m["fn"].(string)
 	if Prog.Cfg.FormatterProg = m["fp"].(string); Prog.Cfg.FormatterProg == Prog.Cfg.FormatterName {
 		Prog.Cfg.FormatterProg = ""

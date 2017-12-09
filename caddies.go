@@ -32,5 +32,5 @@ func (me *Caddy) onInit() {
 }
 
 func (me *Caddy) onStatusChanged() {
-	send(&msgResp{CaddyUpdate: me})
+	send(&ipcResp{CaddyUpdate: me})
 }

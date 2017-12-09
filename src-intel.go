@@ -1,6 +1,6 @@
 package z
 
-type iSrcIntel interface {
+type ISrcIntel interface {
 	iDispatcher
 
 	ComplDetails(*SrcLens, string, *SrcIntelCompl)
@@ -64,34 +64,34 @@ type SrcIntelSigParam struct {
 }
 
 type SrcIntelBase struct {
-	Impl iSrcIntel
+	Impl ISrcIntel
 }
 
 func (*SrcIntelBase) Init() {
 }
 
-func (me *SrcIntelBase) dispatch(req *msgReq, resp *msgResp) bool {
+func (me *SrcIntelBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	resp.SrcIntel = &srcIntelResp{}
-	switch req.MsgID {
-	case MSGID_SRCINTEL_HOVER:
+	switch req.IpcID {
+	case IPCID_SRCINTEL_HOVER:
 		me.onHover(req, resp)
-	case MSGID_SRCINTEL_SYMS_FILE, MSGID_SRCINTEL_SYMS_PROJ:
+	case IPCID_SRCINTEL_SYMS_FILE, IPCID_SRCINTEL_SYMS_PROJ:
 		me.onSyms(req, resp)
-	case MSGID_SRCINTEL_CMPL_ITEMS:
+	case IPCID_SRCINTEL_CMPL_ITEMS:
 		me.onCmplItems(req, resp)
-	case MSGID_SRCINTEL_CMPL_DETAILS:
+	case IPCID_SRCINTEL_CMPL_DETAILS:
 		me.onCmplDetails(req, resp)
-	case MSGID_SRCINTEL_HIGHLIGHTS:
+	case IPCID_SRCINTEL_HIGHLIGHTS:
 		me.onHighlights(req, resp)
-	case MSGID_SRCINTEL_SIGNATURE:
+	case IPCID_SRCINTEL_SIGNATURE:
 		me.onSignature(req, resp)
-	case MSGID_SRCINTEL_REFERENCES:
+	case IPCID_SRCINTEL_REFERENCES:
 		me.onReferences(req, resp)
-	case MSGID_SRCINTEL_DEFIMPL:
+	case IPCID_SRCINTEL_DEFIMPL:
 		me.onDefinition(req, resp, me.Impl.DefImpl)
-	case MSGID_SRCINTEL_DEFSYM:
+	case IPCID_SRCINTEL_DEFSYM:
 		me.onDefinition(req, resp, me.Impl.DefSym)
-	case MSGID_SRCINTEL_DEFTYPE:
+	case IPCID_SRCINTEL_DEFTYPE:
 		me.onDefinition(req, resp, me.Impl.DefType)
 	default:
 		resp.SrcIntel = nil
@@ -100,32 +100,32 @@ func (me *SrcIntelBase) dispatch(req *msgReq, resp *msgResp) bool {
 	return true
 }
 
-func (me *SrcIntelBase) onCmplItems(req *msgReq, resp *msgResp) {
+func (me *SrcIntelBase) onCmplItems(req *ipcReq, resp *ipcResp) {
 	resp.SrcIntel.Cmpl = me.Impl.ComplItems(req.SrcLens)
 }
 
-func (me *SrcIntelBase) onCmplDetails(req *msgReq, resp *msgResp) {
-	itemtext, _ := req.MsgArgs.(string)
+func (me *SrcIntelBase) onCmplDetails(req *ipcReq, resp *ipcResp) {
+	itemtext, _ := req.IpcArgs.(string)
 	resp.SrcIntel.Cmpl = make([]SrcIntelCompl, 1, 1)
 	me.Impl.ComplDetails(req.SrcLens, itemtext, &(resp.SrcIntel.Cmpl[0]))
 }
 
-func (me *SrcIntelBase) onDefinition(req *msgReq, resp *msgResp, def func(*SrcLens) []SrcLens) {
+func (me *SrcIntelBase) onDefinition(req *ipcReq, resp *ipcResp, def func(*SrcLens) []SrcLens) {
 	resp.SrcIntel.Refs = def(req.SrcLens)
 }
 
-func (me *SrcIntelBase) onHighlights(req *msgReq, resp *msgResp) {
-	curword, _ := req.MsgArgs.(string)
+func (me *SrcIntelBase) onHighlights(req *ipcReq, resp *ipcResp) {
+	curword, _ := req.IpcArgs.(string)
 	resp.SrcIntel.Highlights = me.Impl.Highlights(req.SrcLens, curword)
 }
 
-func (me *SrcIntelBase) onHover(req *msgReq, resp *msgResp) {
+func (me *SrcIntelBase) onHover(req *ipcReq, resp *ipcResp) {
 	resp.SrcIntel.InfoTips = me.Impl.Hovers(req.SrcLens)
 }
 
-func (me *SrcIntelBase) onReferences(req *msgReq, resp *msgResp) {
+func (me *SrcIntelBase) onReferences(req *ipcReq, resp *ipcResp) {
 	includeDeclaration := false
-	if ctx, _ := req.MsgArgs.(map[string]interface{}); ctx != nil {
+	if ctx, _ := req.IpcArgs.(map[string]interface{}); ctx != nil {
 		if incldecl, ok := ctx["includeDeclaration"]; ok {
 			includeDeclaration, _ = incldecl.(bool)
 		}
@@ -133,14 +133,14 @@ func (me *SrcIntelBase) onReferences(req *msgReq, resp *msgResp) {
 	resp.SrcIntel.Refs = me.Impl.References(req.SrcLens, includeDeclaration)
 }
 
-func (me *SrcIntelBase) onSignature(req *msgReq, resp *msgResp) {
+func (me *SrcIntelBase) onSignature(req *ipcReq, resp *ipcResp) {
 	resp.SrcIntel.Signature = me.Impl.Signature(req.SrcLens)
 }
 
-func (me *SrcIntelBase) onSyms(req *msgReq, resp *msgResp) {
+func (me *SrcIntelBase) onSyms(req *ipcReq, resp *ipcResp) {
 	var query string
-	if req.MsgID == MSGID_SRCINTEL_SYMS_PROJ {
-		query, _ = req.MsgArgs.(string)
+	if req.IpcID == IPCID_SRCINTEL_SYMS_PROJ {
+		query, _ = req.IpcArgs.(string)
 	}
-	resp.SrcIntel.Refs = me.Impl.Symbols(req.SrcLens, query, req.MsgID == MSGID_SRCINTEL_SYMS_FILE)
+	resp.SrcIntel.Refs = me.Impl.Symbols(req.SrcLens, query, req.IpcID == IPCID_SRCINTEL_SYMS_FILE)
 }

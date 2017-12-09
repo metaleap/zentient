@@ -7,7 +7,7 @@ import (
 	"github.com/metaleap/go-util/slice"
 )
 
-type iMenuProvider interface {
+type IMenuProvider interface {
 	iDispatcher
 
 	MenuItems(*SrcLens) []*MenuItem
@@ -21,34 +21,34 @@ type Menu struct {
 }
 
 type MenuItem struct {
-	MsgID    msgIDs      `json:"mi,omitempty"`
-	MsgArgs  interface{} `json:"ma,omitempty"`
+	IpcID    ipcIDs      `json:"ii,omitempty"`
+	IpcArgs  interface{} `json:"ia,omitempty"`
 	Category string      `json:"c,omitempty"`
 	Title    string      `json:"t"`
 	Desc     string      `json:"d,omitempty"`
 	Hint     string      `json:"h,omitempty"`
 }
 
-type MenuItemMsgArgPrompt struct {
+type MenuItemIpcArgPrompt struct {
 	Prompt      string `json:"prompt,omitempty"`
 	Placeholder string `json:"placeHolder,omitempty"`
 	Value       string `json:"value,omitempty"`
 }
 
 type MenuResp struct {
-	SubMenu    *Menu  `json:"menu,omitempty"`
-	WebsiteURL string `json:"url,omitempty"`
-	NoteInfo   string `json:"info,omitempty"`
-	NoteWarn   string `json:"warn,omitempty"`
-	MsgAction  string `json:"action,omitempty"`
+	SubMenu       *Menu  `json:"menu,omitempty"`
+	WebsiteURL    string `json:"url,omitempty"`
+	NoteInfo      string `json:"info,omitempty"`
+	NoteWarn      string `json:"warn,omitempty"`
+	UxActionLabel string `json:"uxActionLabel,omitempty"`
 }
 
 type mainMenu struct {
 }
 
-func (me *mainMenu) dispatch(req *msgReq, resp *msgResp) bool {
-	switch req.MsgID {
-	case MSGID_MENUS_MAIN:
+func (me *mainMenu) dispatch(req *ipcReq, resp *ipcResp) bool {
+	switch req.IpcID {
+	case IPCID_MENUS_MAIN:
 		me.onListAll(req, resp)
 	default:
 		return false
@@ -56,7 +56,7 @@ func (me *mainMenu) dispatch(req *msgReq, resp *msgResp) bool {
 	return true
 }
 
-func (me *mainMenu) onListAll(req *msgReq, resp *msgResp) {
+func (me *mainMenu) onListAll(req *ipcReq, resp *ipcResp) {
 	var cats sort.StringSlice
 	m := Menu{Desc: "Showing: ", TopLevel: true}
 	for _, menu := range menuProviders {
