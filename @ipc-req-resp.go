@@ -35,13 +35,14 @@ func ipcDecodeReqAndRespond(jsonreq string) *ipcResp {
 		resp.ErrMsg = Strf("Your %s is currently broken: either fix it or delete it, then reload Zentient.", Prog.Cfg.filePath)
 	} else if req.IpcID == IPCID_OBJ_SNAPSHOT {
 		objpath, _ := req.IpcArgs.(string)
+		found := false
 		for _, objsnp := range Prog.objSnappers {
 			if pref := objsnp.ObjSnapPrefix(); strings.HasPrefix(objpath, pref) {
-				resp.Menu = &MenuResp{ObjSnapshot: objsnp.ObjSnap(objpath[len(pref):])}
+				found, resp.ObjSnapshot = true, objsnp.ObjSnap(objpath[len(pref):])
 				break
 			}
 		}
-		if found := resp.Menu != nil; !found {
+		if !found {
 			resp.ErrMsg = BadMsg(req.IpcID.String()+" path", objpath)
 		}
 	} else {
@@ -64,6 +65,7 @@ type ipcResp struct {
 	SrcMods     []*SrcLens     `json:"srcMods,omitempty"`
 	SrcActions  []EditorAction `json:"srcActions,omitempty"`
 	CaddyUpdate *Caddy         `json:"caddy,omitempty"`
+	ObjSnapshot interface{}    `json:"obj,omitempty"`
 }
 
 func (me *ipcResp) postProcess() {

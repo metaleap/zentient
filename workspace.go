@@ -48,8 +48,6 @@ func (me *WorkspaceBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	switch req.IpcID {
 	case IPCID_PROJ_CHANGED:
 		me.onChanges(req.ProjUpd)
-	// case IPCID_PROJ_SNAPSHOT:
-	// 	resp.ObjSnapshot = me.onSnapshot()
 	default:
 		return false
 	}
@@ -68,7 +66,6 @@ func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 		for _, closedfile := range upd.ClosedFiles {
 			delete(me.OpenFiles, closedfile)
 		}
-
 		for _, newdir := range upd.AddedDirs {
 			if dir, _ := me.OpenDirs[newdir]; dir == nil {
 				dir = &WorkspaceDir{Path: newdir}
