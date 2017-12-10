@@ -164,7 +164,7 @@ func (me *goPkgIntel) Filters() []*z.ListFilter {
 	return pkgIntel.listFilters
 }
 
-func (me *goPkgIntel) ObjSnap(pkgDir string) z.ListItem {
+func (me *goPkgIntel) ObjSnap(pkgDir string) interface{} {
 	if udevgo.PkgsByDir != nil {
 		return udevgo.PkgsByDir[pkgDir]
 	}

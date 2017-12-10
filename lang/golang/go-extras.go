@@ -34,7 +34,7 @@ func (me *goExtras) ListQueryExtras() (all []z.ExtrasItem) {
 func (me *goExtras) RunIntelExtra(srcLens *z.SrcLens, id string, arg string, resp *z.ExtrasResp) {
 	switch id {
 	default:
-		z.Bad("CodeIntel Extras ID", id)
+		z.BadPanic("CodeIntel Extras ID", id)
 	}
 }
 
@@ -43,6 +43,6 @@ func (me *goExtras) RunQueryExtra(srcLens *z.SrcLens, id string, arg string, res
 	case querierGoDoc.ID:
 		me.runQueryGoDoc(srcLens, strings.TrimSpace(arg), resp)
 	default:
-		z.Bad("CodeQuery Extras ID", id)
+		z.BadPanic("CodeQuery Extras ID", id)
 	}
 }

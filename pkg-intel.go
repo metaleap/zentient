@@ -1,13 +1,8 @@
 package z
 
-import (
-	"strings"
-)
-
 type IPkgIntel interface {
 	IListMenu
-
-	ObjSnap(string) ListItem
+	IObjSnap
 }
 
 type PkgIntelBase struct {
@@ -40,13 +35,8 @@ func (me *PkgIntelBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 		resp.Menu = &MenuResp{
 			SubMenu: me.Impl.ListItemsSubMenu(filter.Title, filter.Desc, filters),
 		}
-		return true
-	case IPCID_OBJ_SNAPSHOT:
-		pref := me.ObjSnapPrefix()
-		if path, _ := req.IpcArgs.(string); strings.HasPrefix(path, pref) {
-			resp.Menu = &MenuResp{ObjSnapshot: me.Impl.ObjSnap(path[len(pref):])}
-			return true
-		}
+	default:
+		return false
 	}
-	return false
+	return true
 }

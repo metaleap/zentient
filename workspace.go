@@ -2,6 +2,7 @@ package z
 
 type IWorkspace interface {
 	iDispatcher
+	IObjSnap
 }
 
 type WorkspaceDir struct {
@@ -69,15 +70,13 @@ func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 		}
 
 		for _, newdir := range upd.AddedDirs {
-			dir, _ := me.OpenDirs[newdir]
-			if dir == nil {
+			if dir, _ := me.OpenDirs[newdir]; dir == nil {
 				dir = &WorkspaceDir{Path: newdir}
 				me.OpenDirs[newdir] = dir
 			}
 		}
 		for _, newfile := range upd.OpenedFiles {
-			file, _ := me.OpenFiles[newfile]
-			if file == nil {
+			if file, _ := me.OpenFiles[newfile]; file == nil {
 				file = &WorkspaceFile{Path: newfile}
 				me.OpenFiles[newfile] = file
 			}
@@ -89,6 +88,10 @@ func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 	}
 }
 
-func (me *WorkspaceBase) onSnapshot() IWorkspace {
+func (me *WorkspaceBase) ObjSnap(_ string) interface{} {
 	return me.Impl
+}
+
+func (me *WorkspaceBase) ObjSnapPrefix() string {
+	return Lang.ID + ".proj."
 }

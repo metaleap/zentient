@@ -10,6 +10,11 @@ type iDispatcher interface {
 	Init()
 }
 
+type IObjSnap interface {
+	ObjSnapPrefix() string
+	ObjSnap(string) interface{}
+}
+
 type ipcReq struct {
 	ReqID   int64       `json:"ri"`
 	IpcID   ipcIDs      `json:"ii"`
@@ -28,6 +33,17 @@ func ipcDecodeReqAndRespond(jsonreq string) *ipcResp {
 		resp.ErrMsg = Strf("%s does not appear to be installed on this machine.", Lang.Title)
 	} else if Prog.Cfg.err != nil {
 		resp.ErrMsg = Strf("Your %s is currently broken: either fix it or delete it, then reload Zentient.", Prog.Cfg.filePath)
+	} else if req.IpcID == IPCID_OBJ_SNAPSHOT {
+		objpath, _ := req.IpcArgs.(string)
+		for _, objsnp := range Prog.objSnappers {
+			if pref := objsnp.ObjSnapPrefix(); strings.HasPrefix(objpath, pref) {
+				resp.Menu = &MenuResp{ObjSnapshot: objsnp.ObjSnap(objpath[len(pref):])}
+				break
+			}
+		}
+		if found := resp.Menu != nil; !found {
+			resp.ErrMsg = BadMsg(req.IpcID.String()+" path", objpath)
+		}
 	} else {
 		resp.to(&req)
 	}
@@ -70,14 +86,14 @@ func (me *ipcResp) onResponseReady() {
 
 func (me *ipcResp) to(req *ipcReq) {
 	defer me.onResponseReady()
-	for _, h := range Prog.dispatchers {
-		if h.dispatch(req, me) {
+	for _, disp := range Prog.dispatchers {
+		if disp.dispatch(req, me) {
 			me.postProcess()
 			return
 		}
 	}
 	if req.IpcID < IPCID_MENUS_MAIN || req.IpcID >= IPCID_MIN_INVALID {
-		me.ErrMsg = Strf("Invalid IpcID %d", req.IpcID)
+		me.ErrMsg = BadMsg("IpcID", req.IpcID.String())
 	} else {
 		me.ErrMsg = Strf("The requested feature `%s` wasn't yet implemented for __%s__.", req.IpcID, Lang.Title)
 	}

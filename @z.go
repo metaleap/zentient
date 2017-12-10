@@ -35,6 +35,7 @@ var (
 		}
 		menus       []IMenuItems
 		dispatchers []iDispatcher
+		objSnappers []IObjSnap
 		pipeIO      struct {
 			mutex         sync.Mutex
 			stdoutEncoder *json.Encoder
@@ -44,8 +45,12 @@ var (
 	}
 )
 
-func Bad(what string, which string) {
-	panic(Strf("%s: invalid %s %s '%s'", Prog.name, Lang.Title, what, which))
+func BadMsg(what string, which string) string {
+	return Strf("%s: invalid %s %s '%s'", Prog.name, Lang.Title, what, which)
+}
+
+func BadPanic(what string, which string) {
+	panic(BadMsg(what, which))
 }
 
 func Init() (err error) {
@@ -66,6 +71,9 @@ func Init() (err error) {
 			if disp != nil {
 				Prog.dispatchers = append(Prog.dispatchers, disp)
 				disp.Init()
+				if objsnp, _ := disp.(IObjSnap); objsnp != nil {
+					Prog.objSnappers = append(Prog.objSnappers, objsnp)
+				}
 			}
 		}
 
