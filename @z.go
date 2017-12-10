@@ -35,10 +35,10 @@ var (
 		menus       []IMenuItems
 		dispatchers []iDispatcher
 		pipeIO      struct {
-			mutex      sync.Mutex
-			outEncoder *json.Encoder
-			outWriter  *bufio.Writer
-			readLn     *bufio.Scanner
+			mutex         sync.Mutex
+			stdoutEncoder *json.Encoder
+			stdoutWriter  *bufio.Writer
+			stdinReadLn   *bufio.Scanner
 		}
 	}
 )
@@ -79,6 +79,7 @@ func Init() (err error) {
 	}
 	for _, c := range Lang.Caddies {
 		c.onInit()
+		c.LangID = Lang.ID
 	}
 	return
 }

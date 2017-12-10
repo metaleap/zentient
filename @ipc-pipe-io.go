@@ -9,14 +9,14 @@ import (
 func send(resp *ipcResp) (err error) {
 	Prog.pipeIO.mutex.Lock()
 	defer Prog.pipeIO.mutex.Unlock()
-	if err = Prog.pipeIO.outEncoder.Encode(resp); err == nil {
-		err = Prog.pipeIO.outWriter.Flush()
+	if err = Prog.pipeIO.stdoutEncoder.Encode(resp); err == nil {
+		err = Prog.pipeIO.stdoutWriter.Flush()
 	}
 	return
 }
 
 func catch(set *error) {
-	Prog.pipeIO.readLn, Prog.pipeIO.outWriter, Prog.pipeIO.outEncoder = nil, nil, nil
+	Prog.pipeIO.stdinReadLn, Prog.pipeIO.stdoutWriter, Prog.pipeIO.stdoutEncoder = nil, nil, nil
 	if except := recover(); except != nil {
 		if err, _ := except.(error); err != nil {
 			*set = err
@@ -27,7 +27,7 @@ func catch(set *error) {
 }
 
 func Serve() (err error) {
-	Prog.pipeIO.readLn, Prog.pipeIO.outWriter, Prog.pipeIO.outEncoder =
+	Prog.pipeIO.stdinReadLn, Prog.pipeIO.stdoutWriter, Prog.pipeIO.stdoutEncoder =
 		urun.SetupJsonIpcPipes(1024*1024*16, false, true)
 
 	// we allow our sub-ordinate go-routines to panic and just before we return, we recover() the `err` to return (if any)
@@ -42,14 +42,14 @@ func Serve() (err error) {
 		go c.OnReady()
 	}
 
-	// we don't directly wire up a json.Decoder to Prog.pipeIO.readLn but read individual lines in as strings first:
+	// we don't directly wire up a json.Decoder to stdin but read individual lines in as strings first:
 	// - this enforces our line-delimited (rather than 'json-delimited') protocol
 	// - allows json-decoding in separate go-routine
 	// - bad lines are simply reported to client without having a single 'global' decoder in confused/error state / without needing to exit
-	for Prog.pipeIO.readLn.Scan() {
-		go serveIncomingReq(Prog.pipeIO.readLn.Text())
+	for Prog.pipeIO.stdinReadLn.Scan() {
+		go serveIncomingReq(Prog.pipeIO.stdinReadLn.Text())
 	}
-	err = Prog.pipeIO.readLn.Err()
+	err = Prog.pipeIO.stdinReadLn.Err()
 	return
 }
 

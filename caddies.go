@@ -11,6 +11,7 @@ const (
 
 type Caddy struct {
 	ID     string `json:",omitempty"`
+	LangID string `json:",omitempty"`
 	Icon   string
 	Title  string `json:",omitempty"`
 	Status struct {

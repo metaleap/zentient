@@ -89,49 +89,50 @@ func (me *goPkgIntel) List(allFilters z.ListFilters) (results z.ListItems) {
 	return me.list(allFilters, nil)
 }
 
-type __ struct{ __ func(z.ListItem) bool }
-
 func (me *goPkgIntel) ListItemToMenuItem(p z.ListItem) (item *z.MenuItem) {
-	pkg, _ := p.(*udevgo.Pkg)
-	if pkg != nil {
-		var hints []string
+	if pkg, _ := p.(*udevgo.Pkg); pkg != nil {
+		delim, hints := " · ", []string{}
 		item = &z.MenuItem{Category: pkg.Name, Desc: pkg.Doc, Title: pkg.ImportPath}
+		if item.Category == "" {
+			item.Category = "  "
+		}
 		if len(pkg.Errs) > 0 {
 			item.Desc = ""
 			for _, e := range pkg.Errs {
-				item.Desc += " · " + e.Msg
+				item.Desc += delim + e.Msg
 			}
 		} else if pkg.Error != nil {
 			item.Desc = pkg.Error.Err
 		} else if len(pkg.DepsErrors) > 0 {
 			item.Desc = ""
 			for _, e := range pkg.DepsErrors {
-				item.Desc += " · " + e.Err
+				item.Desc += delim + e.Err
 			}
 		}
 		if item.Desc == "" {
 			item.Desc = pkg.StaleReason
-		} else if strings.HasPrefix(item.Desc, " · ") {
-			item.Desc = item.Desc[3:]
+		} else if strings.HasPrefix(item.Desc, delim) {
+			item.Desc = item.Desc[len(delim):]
 		} else if pref := "Package " + pkg.Name + " "; strings.HasPrefix(item.Desc, pref) {
 			item.Desc = item.Desc[len(pref):]
 		}
-		if item.Category == "" {
-			item.Category = "  "
+
+		if suffix := ": " + pkg.StaleReason; me.isPkgStale(pkg) {
+			if item.Desc == pkg.StaleReason {
+				suffix = ""
+			}
+			hints = append(hints, "Stale"+suffix)
 		}
-		if me.isPkgStale(pkg) {
-			hints = append(hints, "Stale: "+pkg.StaleReason)
-		}
-		m := map[*__]string{
-			&__{me.isPkgBinary}:     "Binary",
-			&__{me.isPkgCommand}:    "Command",
-			&__{me.isPkgIncomplete}: "Incomplete",
-			&__{me.isPkgStandard}:   "Standard",
-			&__{me.isPkgGoRoot}:     "In GOROOT",
-		}
-		for __, str := range m {
-			if __.__(pkg) {
-				hints = append(hints, str)
+		__ := func(f z.ListItemPredicate) *z.ListItemPredicate { return &f }
+		for f, s := range map[*z.ListItemPredicate]string{
+			__(me.isPkgBinary):     "Binary",
+			__(me.isPkgCommand):    "Command",
+			__(me.isPkgIncomplete): "Incomplete",
+			__(me.isPkgStandard):   "Standard",
+			__(me.isPkgGoRoot):     "In GOROOT",
+		} {
+			if (*f)(pkg) {
+				hints = append(hints, s)
 			}
 		}
 		if me.isPkgError(pkg) {
@@ -150,7 +151,7 @@ func (me *goPkgIntel) ListItemToMenuItem(p z.ListItem) (item *z.MenuItem) {
 		if l := len(pkg.InvalidGoFiles); l > 0 {
 			hints = append(hints, z.Strf("%d invalid file(s)", l))
 		}
-		item.Hint = strings.Join(hints, " · ")
+		item.Hint = strings.Join(hints, delim)
 		item.Tag = pkg
 	}
 	return

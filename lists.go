@@ -4,6 +4,8 @@ type ListItem interface {
 	LessThan(interface{}) bool
 }
 
+type ListItemPredicate func(ListItem) bool
+
 type ListItems []ListItem
 
 func (me ListItems) Len() int               { return len(me) }
@@ -34,7 +36,7 @@ type ListFilter struct {
 	Title string `json:"-"`
 	Desc  string `json:"-"`
 
-	Pred func(ListItem) bool `json:"-"`
+	Pred ListItemPredicate `json:"-"`
 }
 
 type ListBase struct {
