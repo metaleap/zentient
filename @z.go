@@ -38,6 +38,7 @@ var (
 			mutex      sync.Mutex
 			outEncoder *json.Encoder
 			outWriter  *bufio.Writer
+			readLn     *bufio.Scanner
 		}
 	}
 )
