@@ -7,10 +7,9 @@ import (
 
 func OnPreInit() {
 	l := &z.Lang
-	l.ID = "go"
-	l.Title = "Go"
+	l.ID, l.Title = "go", "Go"
 	if l.Enabled = udevgo.HasGoDevEnv(); l.Enabled {
-		toolsInit()
+		onToolsPreInit()
 		srcMod.onPreInit()
 	}
 }

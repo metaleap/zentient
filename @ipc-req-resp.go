@@ -15,7 +15,8 @@ type ipcReq struct {
 	IpcID   ipcIDs      `json:"ii"`
 	IpcArgs interface{} `json:"ia"`
 
-	SrcLens *SrcLens `json:"sl"`
+	ProjUpd *WorkspaceChanges `json:"projUpd"`
+	SrcLens *SrcLens          `json:"srcLens"`
 }
 
 func ipcDecodeReqAndRespond(jsonreq string) *ipcResp {
@@ -49,6 +50,13 @@ type ipcResp struct {
 	CaddyUpdate *Caddy         `json:"caddy,omitempty"`
 }
 
+func (me *ipcResp) postProcess() {
+	if me.Menu != nil && me.Menu.SubMenu != nil && me.Menu.SubMenu.Items == nil {
+		// handles better on the client-side (and UX-wise) --- instead of a "silent nothing", show an empty menu ("nothing to choose from")
+		me.Menu.SubMenu.Items = []*MenuItem{}
+	}
+}
+
 func (me *ipcResp) onResponseReady() {
 	if except := recover(); except != nil {
 		me.ErrMsg = Strf("%v", except)
@@ -64,6 +72,7 @@ func (me *ipcResp) to(req *ipcReq) {
 	defer me.onResponseReady()
 	for _, h := range Prog.dispatchers {
 		if h.dispatch(req, me) {
+			me.postProcess()
 			return
 		}
 	}

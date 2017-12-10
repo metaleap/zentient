@@ -4,17 +4,16 @@ import (
 	"github.com/metaleap/zentient"
 )
 
+var srcMod hsSrcMod
+
+func init() {
+	srcMod.Impl, z.Lang.SrcMod = &srcMod, &srcMod
+}
+
 type hsSrcMod struct {
 	z.SrcModBase
 
 	knownFormatters z.Tools
-}
-
-var srcMod hsSrcMod
-
-func init() {
-	srcMod.Impl = &srcMod
-	z.Lang.SrcMod = &srcMod
 }
 
 func (me *hsSrcMod) onPreInit() {

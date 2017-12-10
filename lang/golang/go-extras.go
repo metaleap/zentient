@@ -6,10 +6,6 @@ import (
 	"github.com/metaleap/zentient"
 )
 
-type goExtras struct {
-	z.ExtrasBase
-}
-
 var (
 	extras goExtras
 
@@ -19,8 +15,11 @@ var (
 )
 
 func init() {
-	extras.Impl = &extras
-	z.Lang.Extras = &extras
+	extras.Impl, z.Lang.Extras = &extras, &extras
+}
+
+type goExtras struct {
+	z.ExtrasBase
 }
 
 func (me *goExtras) ListIntelExtras() (all []z.ExtrasItem) {

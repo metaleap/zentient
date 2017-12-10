@@ -16,7 +16,7 @@ var tools struct {
 	gorename *z.Tool
 }
 
-func toolsInit() {
+func onToolsPreInit() {
 	t := &tools
 
 	t.gofmt = &z.Tool{Name: "gofmt", Website: "http://golang.org/cmd/gofmt", Installed: udevgo.Has_gofmt}

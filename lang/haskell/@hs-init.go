@@ -7,10 +7,9 @@ import (
 
 func OnPreInit() {
 	l := &z.Lang
-	l.ID = "haskell"
-	l.Title = "Haskell"
+	l.ID, l.Title = "haskell", "Haskell"
 	if l.Enabled = udevhs.HasHsDevEnv(); l.Enabled {
-		toolsInit()
+		onToolsPreInit()
 		srcMod.onPreInit()
 	}
 }

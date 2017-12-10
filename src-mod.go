@@ -81,7 +81,7 @@ func (*SrcModBase) DoesStdoutWithFilePathArg(*Tool) bool {
 }
 
 func (*SrcModBase) CodeActions(srcLens *SrcLens) (all []EditorAction) {
-	all = append(all, EditorAction{Title: "Open Zentient Menu", Cmd: "zen.core.cmds.listall", Hint: "Should open the main Palette menu"})
+	all = append(all, EditorAction{Title: "Open Zentient Main Menu", Cmd: "zen.menus.main", Hint: "Should open the main Palette menu"})
 	return
 }
 

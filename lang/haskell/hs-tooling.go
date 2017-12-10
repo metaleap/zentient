@@ -11,7 +11,7 @@ var tools struct {
 	stylishhaskell *z.Tool
 }
 
-func toolsInit() {
+func onToolsPreInit() {
 	t := &tools
 
 	t.stylishhaskell = &z.Tool{Name: "stylish-haskell", Website: "http://github.com/jaspervdj/stylish-haskell#readme", Installed: udevhs.Has_stylish_haskell}

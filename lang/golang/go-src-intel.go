@@ -9,15 +9,14 @@ import (
 	"github.com/metaleap/zentient"
 )
 
-type goSrcIntel struct {
-	z.SrcIntelBase
-}
-
 var srcIntel goSrcIntel
 
 func init() {
-	srcIntel.Impl = &srcIntel
-	z.Lang.SrcIntel = &srcIntel
+	srcIntel.Impl, z.Lang.SrcIntel = &srcIntel, &srcIntel
+}
+
+type goSrcIntel struct {
+	z.SrcIntelBase
 }
 
 func (*goSrcIntel) hoverShortenImpPaths(s string) string {

@@ -6,8 +6,7 @@ import (
 
 func OnPreInit() {
 	l := &z.Lang
-	l.ID = "purescript"
-	l.Title = "PureScript"
+	l.ID, l.Title = "purescript", "PureScript"
 }
 
 func OnPostInit() {

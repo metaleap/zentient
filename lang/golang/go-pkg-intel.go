@@ -11,7 +11,10 @@ import (
 var pkgIntel goPkgIntel
 
 func init() {
+	pkgIntel.Impl, z.Lang.PkgIntel = &pkgIntel, &pkgIntel
 	pkgIntel.listFilters = []*z.ListFilter{
+		&z.ListFilter{ID: "importers", Pred: pkgIntel.isPkgOpened, Title: "Dependants", Desc: "that import the current github.com/foo/bar package"},
+		&z.ListFilter{ID: "deps", Pred: pkgIntel.isPkgOpened, Title: "Dependencies", Desc: "imported by the current github.com/foo/bar package"},
 		&z.ListFilter{ID: "opened", Pred: pkgIntel.isPkgOpened, Title: "In Workspace", Desc: "located somewhere in the current workspace"},
 		&z.ListFilter{ID: "error", Pred: pkgIntel.isPkgError, Title: "With Errors", Desc: "as reported by `go list`"},
 		&z.ListFilter{ID: "deperr", Pred: pkgIntel.isPkgDepErr, Title: "With Dependency Errors", Desc: "as reported by `go list`"},
@@ -24,7 +27,6 @@ func init() {
 		&z.ListFilter{ID: "standard", Pred: pkgIntel.isPkgStandard, Title: "Standard", Desc: "as reported by `go list`"},
 		&z.ListFilter{ID: "goroot", Pred: pkgIntel.isPkgGoRoot, Title: "In GOROOT", Desc: "as reported by `go list`"},
 	}
-	z.Lang.PkgIntel, pkgIntel.Impl = &pkgIntel, &pkgIntel
 }
 
 type goPkgIntel struct {
@@ -152,11 +154,19 @@ func (me *goPkgIntel) ListItemToMenuItem(p z.ListItem) (item *z.MenuItem) {
 			hints = append(hints, z.Strf("%d invalid file(s)", l))
 		}
 		item.Hint = strings.Join(hints, delim)
-		item.Tag = pkg
+		item.IpcID = z.IPCID_OBJ_SNAPSHOT
+		item.IpcArgs = me.ObjSnapPrefix() + pkg.Dir
 	}
 	return
 }
 
 func (me *goPkgIntel) Filters() []*z.ListFilter {
 	return pkgIntel.listFilters
+}
+
+func (me *goPkgIntel) ObjSnap(pkgDir string) z.ListItem {
+	if udevgo.PkgsByDir != nil {
+		return udevgo.PkgsByDir[pkgDir]
+	}
+	return nil
 }

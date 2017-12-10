@@ -15,14 +15,15 @@ import (
 var (
 	Strf = fmt.Sprintf
 	Lang struct {
-		Enabled  bool
-		ID       string
-		Title    string
-		SrcMod   ISrcMod
-		SrcIntel ISrcIntel
-		Extras   IExtras
-		PkgIntel IPkgIntel
-		Caddies  []*Caddy
+		Enabled   bool
+		ID        string
+		Title     string
+		SrcMod    ISrcMod
+		SrcIntel  ISrcIntel
+		Extras    IExtras
+		PkgIntel  IPkgIntel
+		Caddies   []*Caddy
+		Workspace IWorkspace
 	}
 	Prog struct {
 		Cfg Config
@@ -59,7 +60,7 @@ func Init() (err error) {
 
 	if Prog.Cfg.reload(); Prog.Cfg.err == nil {
 		wellknowndispatchers := []iDispatcher{
-			&mainMenu{}, Lang.SrcIntel, Lang.SrcMod, Lang.Extras, Lang.PkgIntel,
+			&mainMenu{}, Lang.Workspace, Lang.SrcIntel, Lang.SrcMod, Lang.Extras, Lang.PkgIntel,
 		}
 		for _, disp := range wellknowndispatchers {
 			if disp != nil {

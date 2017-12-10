@@ -16,7 +16,7 @@ type IMenuItems interface {
 type Menu struct {
 	Desc     string      `json:"d,omitempty"`
 	TopLevel bool        `json:"tl,omitempty"`
-	Items    []*MenuItem `json:"i,omitempty"`
+	Items    []*MenuItem `json:"i"`
 }
 
 type MenuItem struct {
@@ -26,7 +26,6 @@ type MenuItem struct {
 	Title    string      `json:"t"`
 	Desc     string      `json:"d,omitempty"`
 	Hint     string      `json:"h,omitempty"`
-	Tag      interface{} `json:"tag,omitempty"`
 }
 
 type MenuItemIpcArgPrompt struct {
@@ -36,11 +35,12 @@ type MenuItemIpcArgPrompt struct {
 }
 
 type MenuResp struct {
-	SubMenu       *Menu  `json:"menu,omitempty"`
-	WebsiteURL    string `json:"url,omitempty"`
-	NoteInfo      string `json:"info,omitempty"`
-	NoteWarn      string `json:"warn,omitempty"`
-	UxActionLabel string `json:"uxActionLabel,omitempty"`
+	SubMenu       *Menu       `json:"menu,omitempty"`
+	WebsiteURL    string      `json:"url,omitempty"`
+	NoteInfo      string      `json:"info,omitempty"`
+	NoteWarn      string      `json:"warn,omitempty"`
+	UxActionLabel string      `json:"uxActionLabel,omitempty"`
+	ObjSnapshot   interface{} `json:"obj,omitempty"`
 }
 
 type mainMenu struct {
