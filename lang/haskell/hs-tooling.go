@@ -23,16 +23,16 @@ type hsTooling struct {
 }
 
 func (me *hsTooling) onPreInit() {
-	me.stylishhaskell = &z.Tool{Name: "stylish-haskell", Website: "http://github.com/jaspervdj/stylish-haskell#readme", Installed: udevhs.Has_stylish_haskell, Cats: []z.ToolCats{z.TOOLS_CAT_MOD_FMT}}
 	me.hindent = &z.Tool{Name: "hindent", Website: "http://github.com/commercialhaskell/hindent#readme", Installed: udevhs.Has_hindent, Cats: []z.ToolCats{z.TOOLS_CAT_MOD_FMT}}
+	me.stylishhaskell = &z.Tool{Name: "stylish-haskell", Website: "http://github.com/jaspervdj/stylish-haskell#readme", Installed: udevhs.Has_stylish_haskell, Cats: []z.ToolCats{z.TOOLS_CAT_MOD_FMT}}
 	me.brittany = &z.Tool{Name: "brittany", Website: "http://github.com/lspitzner/brittany#readme", Installed: udevhs.Has_brittany, Cats: []z.ToolCats{z.TOOLS_CAT_MOD_FMT}}
 
 	me.all = z.Tools{
-		me.stylishhaskell,
 		me.hindent,
+		me.stylishhaskell,
 		me.brittany,
 	}
-	me.numInst = me.SortAndCountNumInst(me.all)
+	me.numInst = me.CountNumInst(me.all)
 }
 
 func (me *hsTooling) KnownTools() z.Tools {

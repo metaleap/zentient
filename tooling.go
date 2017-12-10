@@ -1,7 +1,6 @@
 package z
 
 import (
-	"sort"
 	"strings"
 
 	"github.com/metaleap/go-util/run"
@@ -94,8 +93,7 @@ func (me *ToolingBase) MenuItems(srcLens *SrcLens) (menu []*MenuItem) {
 	return
 }
 
-func (me *ToolingBase) SortAndCountNumInst(all Tools) (numInst int) {
-	sort.Sort(all)
+func (me *ToolingBase) CountNumInst(all Tools) (numInst int) {
 	for _, t := range all {
 		if t.Installed {
 			numInst++
@@ -106,21 +104,21 @@ func (me *ToolingBase) SortAndCountNumInst(all Tools) (numInst int) {
 
 type Tools []*Tool
 
-func (me Tools) Len() int          { return len(me) }
-func (me Tools) Swap(i int, j int) { me[i], me[j] = me[j], me[i] }
-func (me Tools) Less(i1 int, i2 int) bool {
-	one, two := me[i1], me[i2]
-	if l := len(one.Cats); l != len(two.Cats) {
-		return l < len(two.Cats)
-	} else {
-		for i := 0; i < l; i++ {
-			if one.Cats[i] != two.Cats[i] {
-				return one.Cats[i] < two.Cats[i]
-			}
-		}
-	}
-	return one.Name < two.Name
-}
+// func (me Tools) Len() int          { return len(me) }
+// func (me Tools) Swap(i int, j int) { me[i], me[j] = me[j], me[i] }
+// func (me Tools) Less(i1 int, i2 int) bool {
+// 	one, two := me[i1], me[i2]
+// 	if l := len(one.Cats); l != len(two.Cats) {
+// 		return l < len(two.Cats)
+// 	} else {
+// 		for i := 0; i < l; i++ {
+// 			if one.Cats[i] != two.Cats[i] {
+// 				return one.Cats[i] < two.Cats[i]
+// 			}
+// 		}
+// 	}
+// 	return one.Name < two.Name
+// }
 
 func (me Tools) ByName(name string) *Tool {
 	if name != "" {

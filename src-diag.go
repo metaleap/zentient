@@ -37,8 +37,9 @@ func (me *DiagBase) MenuCategory() string {
 }
 
 func (me *DiagBase) MenuItems(srcLens *SrcLens) (menu []*MenuItem) {
+	menu = append(menu, me.cmdListDiags)
 	if srcLens != nil && srcLens.FilePath != "" {
-		menu = append(menu, me.cmdListDiags, me.cmdRunDiagsOther)
+		menu = append(menu, me.cmdRunDiagsOther)
 	}
 	return
 }

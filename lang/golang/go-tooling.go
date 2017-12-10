@@ -75,14 +75,14 @@ func (me *goTooling) onPreInit() {
 	me.staticcheck = &z.Tool{Name: "staticcheck", Website: "http://github.com/dominikh/go-tools#readme", Installed: udevgo.Has_staticcheck, Cats: []z.ToolCats{z.TOOLS_CAT_INTEL_DIAG}}
 
 	me.all = z.Tools{
+		me.gorename,
 		me.gofmt,
 		me.goimports,
 		me.goreturns,
-		me.go_doc,
 		me.gogetdoc,
 		me.godef,
 		me.guru,
-		me.gorename,
+		me.go_doc,
 		me.govet,
 		me.golint,
 		me.checkvar,
@@ -99,7 +99,7 @@ func (me *goTooling) onPreInit() {
 		me.unused,
 		me.staticcheck,
 	}
-	me.numInst = me.SortAndCountNumInst(me.all)
+	me.numInst = me.CountNumInst(me.all)
 }
 
 func (me *goTooling) KnownTools() z.Tools {

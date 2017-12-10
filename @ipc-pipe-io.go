@@ -31,11 +31,10 @@ func catch(set *error) {
 }
 
 func Serve() (err error) {
+	defer catch(&err)
+
 	Prog.pipeIO.stdinReadLn, Prog.pipeIO.stdoutWriter, Prog.pipeIO.stdoutEncoder =
 		urun.SetupJsonIpcPipes(1024*1024*16, false, true)
-
-	// we allow our sub-ordinate go-routines to panic and just before we return, we recover() the `err` to return (if any)
-	defer catch(&err)
 
 	// announce each caddy's existence
 	for _, c := range Lang.Caddies {
@@ -45,7 +44,10 @@ func Serve() (err error) {
 	for _, c := range Lang.Caddies {
 		go c.OnReady()
 	}
-	go workspacePollFileEventsEvery(789)
+
+	if Lang.Workspace != nil {
+		go Lang.Workspace.PollFileEventsEvery(789)
+	}
 
 	// we don't directly wire up a json.Decoder to stdin but read individual lines in as strings first:
 	// - this enforces our line-delimited (rather than 'json-delimited') protocol

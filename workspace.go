@@ -8,6 +8,8 @@ import (
 type IWorkspace interface {
 	iDispatcher
 	IObjSnap
+
+	PollFileEventsEvery(int64)
 }
 
 type WorkspaceDir struct {
@@ -35,8 +37,8 @@ func (me *WorkspaceChanges) hasChanges() bool {
 }
 
 type WorkspaceBase struct {
-	sync.RWMutex
-	Impl IWorkspace `json:"-"`
+	mutex sync.Mutex
+	Impl  IWorkspace `json:"-"`
 
 	OnBeforeChanges func(*WorkspaceChanges) `json:"-"`
 	OnAfterChanges  func(*WorkspaceChanges) `json:"-"`
@@ -46,6 +48,8 @@ type WorkspaceBase struct {
 }
 
 func (me *WorkspaceBase) Init() {
+	noop := func(_ *WorkspaceChanges) {}
+	me.OnBeforeChanges, me.OnAfterChanges = noop, noop
 	me.OpenDirs = map[string]*WorkspaceDir{}
 	me.OpenFiles = map[string]*WorkspaceFile{}
 }
@@ -62,45 +66,47 @@ func (me *WorkspaceBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 
 func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 	if upd != nil && upd.hasChanges() {
-		me.lock()
-		defer me.unlock()
+		me.OnBeforeChanges(upd)
 
-		if on := me.OnBeforeChanges; on != nil {
-			on(upd)
-		}
-		for _, gonedir := range upd.RemovedDirs {
-			delete(me.OpenDirs, gonedir)
-		}
-		for _, closedfile := range upd.ClosedFiles {
-			delete(me.OpenFiles, closedfile)
-		}
-		for _, newdir := range upd.AddedDirs {
-			if dir, _ := me.OpenDirs[newdir]; dir == nil {
-				dir = &WorkspaceDir{Path: newdir}
-				me.OpenDirs[newdir] = dir
+		me.mutex.Lock()
+		defer me.mutex.Unlock()
+		opendirs, openfiles := me.OpenDirs, me.OpenFiles
+
+		if len(upd.AddedDirs) > 0 || len(upd.RemovedDirs) > 0 {
+			opendirs = make(map[string]*WorkspaceDir, len(me.OpenDirs))
+			for k, v := range me.OpenDirs {
+				opendirs[k] = v
 			}
-		}
-		for _, newfile := range upd.OpenedFiles {
-			if file, _ := me.OpenFiles[newfile]; file == nil {
-				file = &WorkspaceFile{Path: newfile}
-				me.OpenFiles[newfile] = file
+			for _, gonedir := range upd.RemovedDirs {
+				delete(opendirs, gonedir)
+			}
+			for _, newdir := range upd.AddedDirs {
+				if dir, _ := opendirs[newdir]; dir == nil {
+					dir = &WorkspaceDir{Path: newdir}
+					opendirs[newdir] = dir
+				}
 			}
 		}
 
-		if on := me.OnAfterChanges; on != nil {
-			on(upd)
+		if len(upd.OpenedFiles) > 0 || len(upd.ClosedFiles) > 0 {
+			openfiles = make(map[string]*WorkspaceFile, len(me.OpenFiles))
+			for k, v := range me.OpenFiles {
+				openfiles[k] = v
+			}
+			for _, gonefile := range upd.ClosedFiles {
+				delete(openfiles, gonefile)
+			}
+			for _, newfile := range upd.OpenedFiles {
+				if file, _ := openfiles[newfile]; file == nil {
+					file = &WorkspaceFile{Path: newfile}
+					openfiles[newfile] = file
+				}
+			}
 		}
+
+		me.OpenDirs, me.OpenFiles = opendirs, openfiles
+		me.OnAfterChanges(upd)
 	}
-}
-
-func (me *WorkspaceBase) lock() {
-	me.RLock()
-	me.Lock()
-}
-
-func (me *WorkspaceBase) unlock() {
-	me.Unlock()
-	me.RUnlock()
 }
 
 func (me *WorkspaceBase) ObjSnap(_ string) interface{} {
@@ -111,11 +117,15 @@ func (me *WorkspaceBase) ObjSnapPrefix() string {
 	return Lang.ID + ".proj."
 }
 
-func workspacePollFileEventsEvery(milliseconds int64) {
+func (*WorkspaceBase) PollFileEventsEvery(milliseconds int64) {
 	interval := time.Millisecond * time.Duration(milliseconds)
 	msg := &ipcResp{IpcID: IPCID_PROJ_POLLEVTS}
-	for canSend() {
-		send(msg)
+	for {
 		time.Sleep(interval)
+		if !canSend() {
+			return
+		} else if err := send(msg); err != nil {
+			return
+		}
 	}
 }
