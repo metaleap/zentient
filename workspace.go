@@ -1,8 +1,14 @@
 package z
 
+import (
+	"time"
+)
+
 type IWorkspace interface {
 	iDispatcher
 	IObjSnap
+
+	PollFileEvents()
 }
 
 type WorkspaceDir struct {
@@ -91,4 +97,15 @@ func (me *WorkspaceBase) ObjSnap(_ string) interface{} {
 
 func (me *WorkspaceBase) ObjSnapPrefix() string {
 	return Lang.ID + ".proj."
+}
+
+func (me *WorkspaceBase) PollFileEvents() {
+
+}
+
+func workspacePollFileEvents() {
+	for canSend() {
+		send(&ipcResp{IpcID: IPCID_PROJ_POLLEVTS})
+		time.Sleep(time.Millisecond * 789)
+	}
 }
