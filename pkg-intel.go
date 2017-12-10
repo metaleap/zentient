@@ -12,7 +12,7 @@ type PkgIntelBase struct {
 }
 
 func (me *PkgIntelBase) Init() {
-	me.ListMenuBase.init(me.Impl, Lang.Title+" "+"Packages", "Lists %s packages %s")
+	me.ListMenuBase.init(me.Impl, "Packages", "Lists %s packages %s")
 }
 
 func (me *PkgIntelBase) IpcID(_ *ListFilter) ipcIDs {

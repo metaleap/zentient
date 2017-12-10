@@ -9,7 +9,8 @@ func OnPreInit() {
 	l := &z.Lang
 	l.ID, l.Title = "go", "Go"
 	if l.Enabled = udevgo.HasGoDevEnv(); l.Enabled {
-		onToolsPreInit()
+		tools.onPreInit()
+		diag.onPreInit()
 		srcMod.onPreInit()
 	}
 }

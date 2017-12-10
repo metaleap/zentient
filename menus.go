@@ -14,9 +14,9 @@ type IMenuItems interface {
 }
 
 type Menu struct {
-	Desc     string      `json:"d,omitempty"`
-	TopLevel bool        `json:"tl,omitempty"`
-	Items    []*MenuItem `json:"i"`
+	Desc     string      `json:"desc,omitempty"`
+	TopLevel bool        `json:"topLevel,omitempty"`
+	Items    []*MenuItem `json:"items"`
 }
 
 type MenuItem struct {

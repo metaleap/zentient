@@ -9,6 +9,7 @@ const (
 
 	IPCID_MENUS_MAIN
 	IPCID_MENUS_PKGS
+	IPCID_MENUS_TOOLS
 
 	IPCID_OBJ_SNAPSHOT
 
@@ -127,6 +128,8 @@ func (me ipcIDs) String() string {
 		return "IPCID_MENUS_MAIN"
 	case IPCID_MENUS_PKGS:
 		return "IPCID_MENUS_PKGS"
+	case IPCID_MENUS_TOOLS:
+		return "IPCID_MENUS_TOOLS"
 	case IPCID_OBJ_SNAPSHOT:
 		return "IPCID_OBJ_SNAPSHOT"
 	case IPCID_PROJ_CHANGED:

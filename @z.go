@@ -20,10 +20,12 @@ var (
 		Title     string
 		SrcMod    ISrcMod
 		SrcIntel  ISrcIntel
+		Diag      IDiag
 		Extras    IExtras
 		PkgIntel  IPkgIntel
 		Caddies   []*Caddy
 		Workspace IWorkspace
+		Tooling   ITooling
 	}
 	Prog struct {
 		Cfg Config
@@ -65,7 +67,7 @@ func Init() (err error) {
 
 	if Prog.Cfg.reload(); Prog.Cfg.err == nil {
 		wellknowndispatchers := []iDispatcher{
-			&mainMenu{}, Lang.Workspace, Lang.SrcIntel, Lang.SrcMod, Lang.Extras, Lang.PkgIntel,
+			&mainMenu{}, Lang.Workspace, Lang.SrcIntel, Lang.Diag, Lang.SrcMod, Lang.Extras, Lang.PkgIntel, Lang.Tooling,
 		}
 		for _, disp := range wellknowndispatchers {
 			if disp != nil {
@@ -78,7 +80,7 @@ func Init() (err error) {
 		}
 
 		wellknownmenus := []IMenuItems{
-			Lang.SrcMod, Lang.PkgIntel,
+			Lang.SrcMod, Lang.Diag, Lang.PkgIntel, Lang.Tooling,
 		}
 		for _, menu := range wellknownmenus {
 			if menu != nil {

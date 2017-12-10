@@ -45,7 +45,7 @@ func Serve() (err error) {
 	for _, c := range Lang.Caddies {
 		go c.OnReady()
 	}
-	go workspacePollFileEvents()
+	go workspacePollFileEventsEvery(789)
 
 	// we don't directly wire up a json.Decoder to stdin but read individual lines in as strings first:
 	// - this enforces our line-delimited (rather than 'json-delimited') protocol

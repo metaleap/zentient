@@ -1,14 +1,13 @@
 package z
 
 import (
+	"sync"
 	"time"
 )
 
 type IWorkspace interface {
 	iDispatcher
 	IObjSnap
-
-	PollFileEvents()
 }
 
 type WorkspaceDir struct {
@@ -36,10 +35,11 @@ func (me *WorkspaceChanges) hasChanges() bool {
 }
 
 type WorkspaceBase struct {
+	sync.RWMutex
 	Impl IWorkspace `json:"-"`
 
-	OnBeforeChanges []func(*WorkspaceChanges) `json:"-"`
-	OnAfterChanges  []func(*WorkspaceChanges) `json:"-"`
+	OnBeforeChanges func(*WorkspaceChanges) `json:"-"`
+	OnAfterChanges  func(*WorkspaceChanges) `json:"-"`
 
 	OpenDirs  map[string]*WorkspaceDir
 	OpenFiles map[string]*WorkspaceFile
@@ -62,10 +62,12 @@ func (me *WorkspaceBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 
 func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 	if upd != nil && upd.hasChanges() {
-		for _, on := range me.OnBeforeChanges {
+		me.lock()
+		defer me.unlock()
+
+		if on := me.OnBeforeChanges; on != nil {
 			on(upd)
 		}
-
 		for _, gonedir := range upd.RemovedDirs {
 			delete(me.OpenDirs, gonedir)
 		}
@@ -85,10 +87,20 @@ func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 			}
 		}
 
-		for _, on := range me.OnAfterChanges {
+		if on := me.OnAfterChanges; on != nil {
 			on(upd)
 		}
 	}
+}
+
+func (me *WorkspaceBase) lock() {
+	me.RLock()
+	me.Lock()
+}
+
+func (me *WorkspaceBase) unlock() {
+	me.Unlock()
+	me.RUnlock()
 }
 
 func (me *WorkspaceBase) ObjSnap(_ string) interface{} {
@@ -99,13 +111,11 @@ func (me *WorkspaceBase) ObjSnapPrefix() string {
 	return Lang.ID + ".proj."
 }
 
-func (me *WorkspaceBase) PollFileEvents() {
-
-}
-
-func workspacePollFileEvents() {
+func workspacePollFileEventsEvery(milliseconds int64) {
+	interval := time.Millisecond * time.Duration(milliseconds)
+	msg := &ipcResp{IpcID: IPCID_PROJ_POLLEVTS}
 	for canSend() {
-		send(&ipcResp{IpcID: IPCID_PROJ_POLLEVTS})
-		time.Sleep(time.Millisecond * 789)
+		send(msg)
+		time.Sleep(interval)
 	}
 }
