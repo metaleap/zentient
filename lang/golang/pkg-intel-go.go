@@ -111,8 +111,8 @@ func (me *goPkgIntel) ListItemToMenuItem(p z.ListItem) (item *z.MenuItem) {
 		}
 		if item.Desc == "" {
 			item.Desc = pkg.StaleReason
-		} else if strings.HasPrefix(item.Desc, "· ") {
-			item.Desc = item.Desc[2:]
+		} else if strings.HasPrefix(item.Desc, " · ") {
+			item.Desc = item.Desc[3:]
 		} else if pref := "Package " + pkg.Name + " "; strings.HasPrefix(item.Desc, pref) {
 			item.Desc = item.Desc[len(pref):]
 		}
@@ -151,6 +151,7 @@ func (me *goPkgIntel) ListItemToMenuItem(p z.ListItem) (item *z.MenuItem) {
 			hints = append(hints, z.Strf("%d invalid file(s)", l))
 		}
 		item.Hint = strings.Join(hints, " · ")
+		item.Tag = pkg
 	}
 	return
 }

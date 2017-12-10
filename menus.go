@@ -26,6 +26,7 @@ type MenuItem struct {
 	Title    string      `json:"t"`
 	Desc     string      `json:"d,omitempty"`
 	Hint     string      `json:"h,omitempty"`
+	Tag      interface{} `json:"tag,omitempty"`
 }
 
 type MenuItemIpcArgPrompt struct {
