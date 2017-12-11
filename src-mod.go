@@ -49,9 +49,7 @@ func (me *SrcModBase) MenuItems(srcLens *SrcLens) (cmds []*MenuItem) {
 		}
 
 		if isfp := srcfilepath != ""; isfp || srcLens.SrcFull != "" {
-			if isfp && Lang.Workspace != nil {
-				srcfilepath = Lang.Workspace.PrettyPath(srcfilepath)
-			}
+			srcfilepath = Lang.Workspace.PrettyPath(srcfilepath)
 			if me.cmdFmtRunOnFile.Desc, me.cmdFmtRunOnFile.Hint = desc, srcfilepath; !isfp {
 				me.cmdFmtRunOnFile.Hint = srcLens.SrcFull
 			}

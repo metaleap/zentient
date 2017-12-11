@@ -46,9 +46,7 @@ func Serve() (err error) {
 		go c.OnReady()
 	}
 
-	if Lang.Workspace != nil {
-		go Lang.Workspace.PollFileEventsEvery(789)
-	}
+	go Lang.Workspace.PollFileEventsEvery(789)
 
 	// we don't directly wire up a json.Decoder to stdin but read individual lines in as strings first:
 	// - this enforces our line-delimited (rather than 'json-delimited') protocol

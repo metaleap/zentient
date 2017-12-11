@@ -52,22 +52,20 @@ func (me *DiagBase) MenuItems(srcLens *SrcLens) (menu []*MenuItem) {
 			if len(toolnames) == 0 {
 				item.Hint = "(none)"
 			} else {
-				item.Hint = Strf("(%d/%d)  · ", len(diags), len(me.Impl.KnownDiags())) + strings.Join(toolnames, " · ")
+				item.Hint = Strf("(%d/%d)  · %s", len(diags), len(me.Impl.KnownDiags()), strings.Join(toolnames, " · "))
 			}
 		}
 	}
 
+	updatehint(me.knownDiags(true), me.cmdListDiags)
+	menu = append(menu, me.cmdListDiags)
 	if srcLens != nil && srcLens.FilePath != "" {
 		nonautodiags, srcfilepath := me.knownDiags(false), srcLens.FilePath
-		if Lang.Workspace != nil {
-			srcfilepath = Lang.Workspace.PrettyPath(srcfilepath)
-		}
+		srcfilepath = Lang.Workspace.PrettyPath(srcfilepath)
 		me.cmdRunDiagsOther.Desc = Strf("➜ run %d diagnostics tools on: %s", len(nonautodiags), srcfilepath)
 		updatehint(nonautodiags, me.cmdRunDiagsOther)
 		menu = append(menu, me.cmdRunDiagsOther)
 	}
-	updatehint(me.knownDiags(true), me.cmdListDiags)
-	menu = append(menu, me.cmdListDiags)
 	return
 }
 

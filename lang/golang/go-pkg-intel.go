@@ -1,10 +1,12 @@
 package zgo
 
 import (
+	"path/filepath"
 	"sort"
 	"strings"
 
 	"github.com/metaleap/go-util/dev/go"
+	"github.com/metaleap/go-util/slice"
 	"github.com/metaleap/zentient"
 )
 
@@ -12,10 +14,13 @@ var pkgIntel goPkgIntel
 
 func init() {
 	pkgIntel.Impl, z.Lang.PkgIntel = &pkgIntel, &pkgIntel
+	pkgIntel.listFilterImps = &z.ListFilter{ID: "imps", Pred: pkgIntel.isPkgNope, Title: "Dependants", OnSrcLens: pkgIntel.onSrcLens}
+	pkgIntel.listFilterDeps = &z.ListFilter{ID: "deps", Pred: pkgIntel.isPkgNope, Title: "Dependencies", OnSrcLens: pkgIntel.onSrcLens}
+	pkgIntel.listFilterOpen = &z.ListFilter{ID: "open", Pred: pkgIntel.isPkgOpened, Title: "In Workspace", Desc: "located somewhere in the current workspace"}
 	pkgIntel.listFilters = []*z.ListFilter{
-		&z.ListFilter{ID: "importers", Pred: pkgIntel.isPkgOpened, Title: "Dependants", Desc: "that import the current github.com/foo/bar package"},
-		&z.ListFilter{ID: "deps", Pred: pkgIntel.isPkgOpened, Title: "Dependencies", Desc: "imported by the current github.com/foo/bar package"},
-		&z.ListFilter{ID: "opened", Pred: pkgIntel.isPkgOpened, Title: "In Workspace", Desc: "located somewhere in the current workspace"},
+		pkgIntel.listFilterImps,
+		pkgIntel.listFilterDeps,
+		pkgIntel.listFilterOpen,
 		&z.ListFilter{ID: "error", Pred: pkgIntel.isPkgError, Title: "With Errors", Desc: "as reported by `go list`"},
 		&z.ListFilter{ID: "deperr", Pred: pkgIntel.isPkgDepErr, Title: "With Dependency Errors", Desc: "as reported by `go list`"},
 		&z.ListFilter{ID: "command", Pred: pkgIntel.isPkgCommand, Title: "Commands", Desc: "as reported by `go list`"},
@@ -32,9 +37,13 @@ func init() {
 type goPkgIntel struct {
 	z.PkgIntelBase
 
-	listFilters []*z.ListFilter
+	listFilterImps *z.ListFilter
+	listFilterDeps *z.ListFilter
+	listFilterOpen *z.ListFilter
+	listFilters    []*z.ListFilter
 }
 
+func (goPkgIntel) isPkgNope(pkg z.ListItem) bool       { return false }
 func (goPkgIntel) isPkgGoRoot(pkg z.ListItem) bool     { return pkg.(*udevgo.Pkg).Goroot }
 func (goPkgIntel) isPkgBinary(pkg z.ListItem) bool     { return pkg.(*udevgo.Pkg).BinaryOnly }
 func (goPkgIntel) isPkgCommand(pkg z.ListItem) bool    { return pkg.(*udevgo.Pkg).IsCommand() }
@@ -45,19 +54,55 @@ func (goPkgIntel) isPkgError(pkg z.ListItem) bool      { return pkg.(*udevgo.Pkg
 func (goPkgIntel) isPkgDepErr(pkg z.ListItem) bool     { return len(pkg.(*udevgo.Pkg).DepsErrors) > 0 }
 func (goPkgIntel) isPkgIgnored(pkg z.ListItem) bool    { return len(pkg.(*udevgo.Pkg).IgnoredGoFiles) > 0 }
 func (goPkgIntel) isPkgInvalid(pkg z.ListItem) bool    { return len(pkg.(*udevgo.Pkg).InvalidGoFiles) > 0 }
-func (*goPkgIntel) isPkgOpened(pkg z.ListItem) bool    { return false }
+func (*goPkgIntel) isPkgOpened(pkg z.ListItem) bool {
+	p := pkg.(*udevgo.Pkg)
+	for dirpath, _ := range workspace.OpenDirs {
+		if p.Dir == dirpath || strings.HasPrefix(p.Dir, strings.TrimRight(dirpath, "/\\")+string(filepath.Separator)) {
+			return true
+		}
+	}
+	return false
+}
 
 func (me *goPkgIntel) UnfilteredDesc() string {
 	return "in your GOPATH"
 }
 
-func (me *goPkgIntel) Count(allFilters z.ListFilters) (count int) {
+func (me *goPkgIntel) onSrcLens(lf *z.ListFilter, srcLens *z.SrcLens) {
+	curpkgdesc, isdeps, isimps := "?", lf == me.listFilterDeps, lf == me.listFilterImps
+	lf.Pred, lf.Desc = me.isPkgNope, "?"
+
+	if srcLens != nil && srcLens.FilePath != "" {
+		if pkg := udevgo.PkgsByDir[filepath.Dir(srcLens.FilePath)]; pkg != nil {
+			curpkgdesc = pkg.ImportPath
+			if isdeps {
+				lf.Pred = func(p z.ListItem) bool {
+					return uslice.StrHas(pkg.Deps, p.(*udevgo.Pkg).ImportPath)
+				}
+			} else if isimps {
+				lf.Pred = func(p z.ListItem) bool {
+					importers := pkg.Dependants()
+					return uslice.StrHas(importers, p.(*udevgo.Pkg).ImportPath)
+				}
+			}
+		}
+	}
+
+	if isdeps {
+		lf.Desc = "imported by `"
+	} else if isimps {
+		lf.Desc = "that import `"
+	}
+	lf.Desc += curpkgdesc + "`"
+}
+
+func (me *goPkgIntel) Count(filters z.ListFilters) (count int) {
 	count = -1
-	me.list(allFilters, &count)
+	me.list(filters, &count)
 	return
 }
 
-func (me *goPkgIntel) list(allFilters z.ListFilters, count *int) (results z.ListItems) {
+func (me *goPkgIntel) list(filters z.ListFilters, count *int) (results z.ListItems) {
 	if udevgo.PkgsByDir != nil {
 		if count != nil {
 			*count = 0
@@ -65,8 +110,8 @@ func (me *goPkgIntel) list(allFilters z.ListFilters, count *int) (results z.List
 		for _, pkg := range udevgo.PkgsByDir {
 			if pkg != nil {
 				allpredicatesmatch := true
-				if allFilters != nil {
-					for filter, desired := range allFilters {
+				if filters != nil {
+					for filter, desired := range filters {
 						if satisfiesfilter := filter.Pred(pkg); satisfiesfilter != desired {
 							allpredicatesmatch = false
 							break
@@ -87,8 +132,8 @@ func (me *goPkgIntel) list(allFilters z.ListFilters, count *int) (results z.List
 	return
 }
 
-func (me *goPkgIntel) List(allFilters z.ListFilters) (results z.ListItems) {
-	return me.list(allFilters, nil)
+func (me *goPkgIntel) List(filters z.ListFilters) (results z.ListItems) {
+	return me.list(filters, nil)
 }
 
 func (me *goPkgIntel) ListItemToMenuItem(p z.ListItem) (item *z.MenuItem) {
@@ -117,6 +162,13 @@ func (me *goPkgIntel) ListItemToMenuItem(p z.ListItem) (item *z.MenuItem) {
 			item.Desc = item.Desc[len(delim):]
 		} else if pref := "Package " + pkg.Name + " "; strings.HasPrefix(item.Desc, pref) {
 			item.Desc = item.Desc[len(pref):]
+		}
+		if pkgtarget := z.Lang.Workspace.PrettyPath(pkg.Target); me.isPkgCommand(pkg) && pkgtarget != "" {
+			if hint := "Target: " + pkgtarget; item.Desc == "" {
+				item.Desc = hint
+			} else {
+				hints = append(hints, hint)
+			}
 		}
 
 		if suffix := ": " + pkg.StaleReason; me.isPkgStale(pkg) {

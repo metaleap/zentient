@@ -5,6 +5,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/metaleap/go-util/sys"
 )
 
 type IWorkspace interface {
@@ -134,19 +136,24 @@ func (*WorkspaceBase) PollFileEventsEvery(milliseconds int64) {
 }
 
 func (me *WorkspaceBase) PrettyPath(fspath string) string {
-	candidates := []string{}
-	for _, d := range me.OpenDirs {
-		if rp, err := filepath.Rel(d.Path, fspath); err == nil && !strings.HasPrefix(rp, ".") {
-			candidates = append(candidates, filepath.Join("…", rp))
-		}
-	}
-	if shortest := ""; len(candidates) > 0 {
-		for _, c := range candidates {
-			if shortest == "" || len(c) < len(shortest) {
-				shortest = c
+	if fspath != "" {
+		candidates := []string{}
+		for _, d := range me.OpenDirs {
+			if rp, err := filepath.Rel(d.Path, fspath); err == nil && !strings.HasPrefix(rp, ".") {
+				candidates = append(candidates, filepath.Join("…", rp))
 			}
 		}
-		return shortest
+		if shortest := ""; len(candidates) > 0 {
+			for _, c := range candidates {
+				if shortest == "" || len(c) < len(shortest) {
+					shortest = c
+				}
+			}
+			return shortest
+		}
+		if rp, err := filepath.Rel(usys.UserHomeDirPath(), fspath); err == nil && !strings.HasPrefix(rp, ".") {
+			fspath = filepath.Join("~", rp)
+		}
 	}
 	return fspath
 }

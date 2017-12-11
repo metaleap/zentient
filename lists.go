@@ -1,5 +1,9 @@
 package z
 
+import (
+	"strings"
+)
+
 type ListItem interface {
 	LessThan(interface{}) bool
 }
@@ -32,11 +36,12 @@ type IListMenu interface {
 type ListFilters map[*ListFilter]bool
 
 type ListFilter struct {
-	ID    string
-	Title string `json:"-"`
-	Desc  string `json:"-"`
-
-	Pred ListItemPredicate `json:"-"`
+	ID        string
+	Disabled  bool
+	Title     string
+	Desc      string
+	OnSrcLens func(*ListFilter, *SrcLens)
+	Pred      ListItemPredicate
 }
 
 type ListBase struct {
@@ -71,23 +76,36 @@ type ListMenuBase struct {
 	impl IListMenu
 
 	cat   string
+	fdesc string
 	items []*MenuItem
 }
 
 func (me *ListMenuBase) init(impl IListMenu, cat string, fdesc string) {
+	me.fdesc = fdesc
 	me.ListBase.init(impl)
 	me.cat, me.impl = cat, impl
 
 	for _, lf := range me.listFilters {
-		item := &MenuItem{Title: lf.Title, Desc: Strf(fdesc, Lang.Title, lf.Desc)}
+		item := &MenuItem{Title: lf.Title, Desc: me.itemDesc(nil, lf)}
 		item.IpcID, item.IpcArgs = me.impl.IpcID(lf), lf.ID
 		me.items = append(me.items, item)
 	}
 }
 
+func (me *ListMenuBase) itemDesc(srcLens *SrcLens, lf *ListFilter) string {
+	if lf.OnSrcLens != nil {
+		lf.OnSrcLens(lf, srcLens)
+	}
+	return Strf(me.fdesc, Lang.Title, lf.Desc)
+}
+
 func (me *ListMenuBase) ListItemsSubMenu(title string, desc string, filters ListFilters) *Menu {
 	listitems := me.impl.List(filters)
-	menu := &Menu{Desc: Strf("%d %s ➜ %s (%s)", len(listitems), me.cat, title, desc)}
+	cat := me.cat
+	if len(listitems) == 1 && strings.HasSuffix(cat, "s") {
+		cat = cat[:len(cat)-1]
+	}
+	menu := &Menu{Desc: Strf("%d %s: %s (%s)", len(listitems), cat, title, desc)}
 	for _, listitem := range listitems {
 		if menuitem := me.impl.ListItemToMenuItem(listitem); menuitem != nil {
 			menu.Items = append(menu.Items, menuitem)
@@ -100,13 +118,17 @@ func (me *ListMenuBase) MenuCategory() string {
 	return me.cat
 }
 
-func (me *ListMenuBase) MenuItems(*SrcLens) []*MenuItem {
+func (me *ListMenuBase) MenuItems(srcLens *SrcLens) []*MenuItem {
 	const fhint = "(%v at last count)"
 	for _, item := range me.items {
 		fcount, filterid := "amount unknown", item.IpcArgs.(string)
 		var filters ListFilters
 		if filterid != "" {
-			filters = ListFilters{me.impl.FilterByID(filterid): true}
+			lf := me.impl.FilterByID(filterid)
+			if lf.OnSrcLens != nil {
+				item.Desc = me.itemDesc(srcLens, lf)
+			}
+			filters = ListFilters{lf: true}
 		}
 		count := me.impl.Count(filters)
 		if count >= 0 {
