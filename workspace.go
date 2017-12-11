@@ -1,6 +1,8 @@
 package z
 
 import (
+	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 )
@@ -10,6 +12,7 @@ type IWorkspace interface {
 	IObjSnap
 
 	PollFileEventsEvery(int64)
+	PrettyPath(string) string
 }
 
 type WorkspaceDir struct {
@@ -128,4 +131,22 @@ func (*WorkspaceBase) PollFileEventsEvery(milliseconds int64) {
 			return
 		}
 	}
+}
+
+func (me *WorkspaceBase) PrettyPath(fspath string) string {
+	candidates := []string{}
+	for _, d := range me.OpenDirs {
+		if rp, err := filepath.Rel(d.Path, fspath); err == nil && !strings.HasPrefix(rp, ".") {
+			candidates = append(candidates, filepath.Join("…", rp))
+		}
+	}
+	if shortest := ""; len(candidates) > 0 {
+		for _, c := range candidates {
+			if shortest == "" || len(c) < len(shortest) {
+				shortest = c
+			}
+		}
+		return shortest
+	}
+	return fspath
 }

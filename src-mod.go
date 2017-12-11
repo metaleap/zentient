@@ -25,7 +25,7 @@ type SrcModBase struct {
 func (me *SrcModBase) Init() {
 	me.cmdFmtSetDef = &MenuItem{
 		IpcID: IPCID_SRCMOD_FMT_SETDEFMENU,
-		Title: "Change Default Formatter",
+		Title: "Choose Default Formatter",
 		Desc:  Strf("Specify your preferred default %s source formatter", Lang.Title),
 	}
 	me.cmdFmtRunOnFile = &MenuItem{
@@ -40,7 +40,7 @@ func (me *SrcModBase) Init() {
 
 func (me *SrcModBase) MenuItems(srcLens *SrcLens) (cmds []*MenuItem) {
 	if srcLens != nil {
-		desc := "(" + me.cmdFmtSetDef.Desc + " first)"
+		srcfilepath, desc := srcLens.FilePath, "("+me.cmdFmtSetDef.Desc+" first)"
 		if me.hasFormatter() {
 			if desc = "➜ using "; me.isFormatterCustom() {
 				desc += "'" + Prog.Cfg.FormatterProg + "' like "
@@ -48,9 +48,11 @@ func (me *SrcModBase) MenuItems(srcLens *SrcLens) (cmds []*MenuItem) {
 			desc += "'" + Prog.Cfg.FormatterName + "'"
 		}
 
-		if srcLens.FilePath != "" || srcLens.SrcFull != "" {
-			me.cmdFmtRunOnFile.Desc = desc
-			if me.cmdFmtRunOnFile.Hint = srcLens.FilePath; me.cmdFmtRunOnFile.Hint == "" {
+		if isfp := srcfilepath != ""; isfp || srcLens.SrcFull != "" {
+			if isfp && Lang.Workspace != nil {
+				srcfilepath = Lang.Workspace.PrettyPath(srcfilepath)
+			}
+			if me.cmdFmtRunOnFile.Desc, me.cmdFmtRunOnFile.Hint = desc, srcfilepath; !isfp {
 				me.cmdFmtRunOnFile.Hint = srcLens.SrcFull
 			}
 			cmds = append(cmds, me.cmdFmtRunOnFile)

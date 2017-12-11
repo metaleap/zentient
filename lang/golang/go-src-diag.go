@@ -17,7 +17,7 @@ type goDiag struct {
 }
 
 func (me *goDiag) onPreInit() {
-	me.knownDiags = z.Tools{}
+	me.knownDiags = tools.KnownToolsFor(z.TOOLS_CAT_DIAGS)
 }
 
 func (me *goDiag) KnownDiags() z.Tools {

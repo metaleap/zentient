@@ -31,6 +31,7 @@ func catch(set *error) {
 }
 
 func Serve() (err error) {
+	// ensure that the returned `err` will capture a sub-ordinate go-routine's panic, if any:
 	defer catch(&err)
 
 	Prog.pipeIO.stdinReadLn, Prog.pipeIO.stdoutWriter, Prog.pipeIO.stdoutEncoder =

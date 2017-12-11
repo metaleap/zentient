@@ -9,7 +9,7 @@ import (
 var (
 	extras goExtras
 
-	querierGoDoc = z.ExtrasItem{ID: "go_doc", Kind: z.EXTRAS_QUERY, Label: "go doc",
+	querierGoDoc = z.ExtrasItem{ID: "go_doc", Label: "go doc",
 		Description: "[package] [member name]", Detail: "➜ shows the specified item's summary description",
 		QueryArg: "Query to `go doc`"}
 )

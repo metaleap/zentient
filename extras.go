@@ -1,13 +1,5 @@
 package z
 
-type ExtrasKind uint8
-
-const (
-	_ ExtrasKind = iota
-	EXTRAS_INTEL
-	EXTRAS_QUERY
-)
-
 type IExtras interface {
 	iDispatcher
 
@@ -18,12 +10,11 @@ type IExtras interface {
 }
 
 type ExtrasItem struct {
-	ID          string     `json:"id"`
-	Kind        ExtrasKind `json:"kind"`
-	Label       string     `json:"label"`
-	Description string     `json:"description"`
-	Detail      string     `json:"detail,omitempty"`
-	QueryArg    string     `json:"arg,omitempty"`
+	ID          string `json:"id"`
+	Label       string `json:"label"`
+	Description string `json:"description"`
+	Detail      string `json:"detail,omitempty"`
+	QueryArg    string `json:"arg,omitempty"`
 }
 
 type ExtrasResp struct {
@@ -43,13 +34,13 @@ func (me *ExtrasBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	resp.Extras = &ExtrasResp{}
 	switch req.IpcID {
 	case IPCID_EXTRAS_INTEL_LIST:
-		me.onList(req, resp, EXTRAS_INTEL)
+		me.onList(req, resp, false)
 	case IPCID_EXTRAS_QUERY_LIST:
-		me.onList(req, resp, EXTRAS_QUERY)
+		me.onList(req, resp, true)
 	case IPCID_EXTRAS_INTEL_RUN:
-		me.onRun(req, resp, EXTRAS_INTEL)
+		me.onRun(req, resp, false)
 	case IPCID_EXTRAS_QUERY_RUN:
-		me.onRun(req, resp, EXTRAS_QUERY)
+		me.onRun(req, resp, true)
 	default:
 		resp.Extras = nil
 		return false
@@ -57,20 +48,20 @@ func (me *ExtrasBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	return true
 }
 
-func (me *ExtrasBase) onList(req *ipcReq, resp *ipcResp, kind ExtrasKind) {
+func (me *ExtrasBase) onList(req *ipcReq, resp *ipcResp, isQuery bool) {
 	list := me.Impl.ListIntelExtras
-	if kind == EXTRAS_QUERY {
+	if isQuery {
 		list = me.Impl.ListQueryExtras
 	}
 	resp.Extras.Items = list()
 }
 
-func (me *ExtrasBase) onRun(req *ipcReq, resp *ipcResp, kind ExtrasKind) {
+func (me *ExtrasBase) onRun(req *ipcReq, resp *ipcResp, isQuery bool) {
 	ipcargs := req.IpcArgs.([]interface{})
 	id, _ := ipcargs[0].(string)
 	arg, _ := ipcargs[1].(string)
 	run := me.Impl.RunIntelExtra
-	if kind == EXTRAS_QUERY {
+	if isQuery {
 		run = me.Impl.RunQueryExtra
 	}
 	run(req.SrcLens, id, arg, resp.Extras)

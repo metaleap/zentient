@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/metaleap/go-util/run"
+	"github.com/metaleap/go-util/slice"
 )
 
 type ToolCats uint8
@@ -14,7 +15,7 @@ const (
 	TOOLS_CAT_MOD_FMT
 	TOOLS_CAT_INTEL_TIPS
 	TOOLS_CAT_EXTRAS_QUERY
-	TOOLS_CAT_INTEL_DIAG
+	TOOLS_CAT_DIAGS
 )
 
 func (me ToolCats) String() string {
@@ -25,7 +26,7 @@ func (me ToolCats) String() string {
 		return "Symbol Renaming"
 	case TOOLS_CAT_INTEL_TIPS:
 		return "Info Tips"
-	case TOOLS_CAT_INTEL_DIAG:
+	case TOOLS_CAT_DIAGS:
 		return "Diagnostics"
 	case TOOLS_CAT_EXTRAS_QUERY:
 		return "CodeQuery"
@@ -102,6 +103,28 @@ func (me *ToolingBase) CountNumInst(all Tools) (numInst int) {
 	return
 }
 
+func (me *ToolingBase) KnownToolsFor(cats ...ToolCats) (tools Tools) {
+	alltools := me.Impl.KnownTools()
+	if tools = alltools; len(cats) > 0 {
+		tools = Tools{}
+		added := false
+		for _, t := range alltools {
+			for _, tc := range t.Cats {
+				for _, c := range cats {
+					if added = (tc == c); added {
+						tools = append(tools, t)
+						break
+					}
+				}
+				if added {
+					break
+				}
+			}
+		}
+	}
+	return
+}
+
 type Tools []*Tool
 
 // func (me Tools) Len() int          { return len(me) }
@@ -149,6 +172,19 @@ func (*Tool) Exec(cmdname string, cmdargs []string, stdin string) (string, strin
 	return stdout, stderr
 }
 
+func (me *Tool) IsInAutoDiags() bool {
+	return uslice.StrHas(Prog.Cfg.AutoDiags, me.Name)
+}
+
 func (me *Tool) NotInstalledMessage() string {
 	return Strf("Not installed: `%s`, how-to at: %s", me.Name, me.Website)
+}
+
+func (me *Tool) ToggleInAutoDiags() error {
+	if me.IsInAutoDiags() {
+		Prog.Cfg.AutoDiags = uslice.StrWithout(Prog.Cfg.AutoDiags, false, me.Name)
+	} else {
+		Prog.Cfg.AutoDiags = append(Prog.Cfg.AutoDiags, me.Name)
+	}
+	return Prog.Cfg.Save()
 }

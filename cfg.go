@@ -12,6 +12,7 @@ type Config struct {
 	Misc          map[string]string `json:",omitempty"`
 	FormatterName string            `json:",omitempty"`
 	FormatterProg string            `json:",omitempty"`
+	AutoDiags     []string          `json:",omitempty"`
 
 	err            error
 	filePath       string
