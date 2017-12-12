@@ -8,6 +8,13 @@ type IDiag interface {
 	IMenuItems
 
 	KnownDiags() Tools
+	UpdateLintDiagsIfAndAsNeeded(WorkspaceFiles, bool)
+}
+
+type DiagItem struct {
+	ToolName string
+	FileRef  SrcLens
+	Message  string
 }
 
 type DiagBase struct {
@@ -67,6 +74,10 @@ func (me *DiagBase) MenuItems(srcLens *SrcLens) (menu []*MenuItem) {
 		menu = append(menu, me.cmdRunDiagsOther)
 	}
 	return
+}
+
+func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(files WorkspaceFiles, autos bool) {
+
 }
 
 func (me *DiagBase) dispatch(req *ipcReq, resp *ipcResp) bool {

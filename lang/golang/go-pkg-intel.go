@@ -70,7 +70,7 @@ func (goPkgIntel) isPkgIgnored(pkg z.ListItem) bool    { return len(pkg.(*udevgo
 func (goPkgIntel) isPkgInvalid(pkg z.ListItem) bool    { return len(pkg.(*udevgo.Pkg).InvalidGoFiles) > 0 }
 func (*goPkgIntel) isPkgOpened(pkg z.ListItem) bool {
 	p := pkg.(*udevgo.Pkg)
-	for dirpath, _ := range workspace.OpenDirs {
+	for dirpath, _ := range workspace.Dirs {
 		if p.Dir == dirpath || strings.HasPrefix(p.Dir, strings.TrimRight(dirpath, "/\\")+string(filepath.Separator)) {
 			return true
 		}

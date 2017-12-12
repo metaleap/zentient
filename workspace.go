@@ -23,8 +23,16 @@ type WorkspaceDir struct {
 	Path string
 }
 
+type WorkspaceFiles map[string]*WorkspaceFile
+
 type WorkspaceFile struct {
-	Path string
+	Path   string
+	IsOpen bool `json:",omitempty"`
+	Diags  struct {
+		UpToDate bool        `json:",omitempty"`
+		Build    []*DiagItem `json:",omitempty"`
+		Lint     []*DiagItem `json:",omitempty"`
+	}
 }
 
 type WorkspaceChanges struct {
@@ -50,15 +58,15 @@ type WorkspaceBase struct {
 	OnBeforeChanges func(*WorkspaceChanges) `json:"-"`
 	OnAfterChanges  func(*WorkspaceChanges) `json:"-"`
 
-	OpenDirs  map[string]*WorkspaceDir
-	OpenFiles map[string]*WorkspaceFile
+	Dirs  map[string]*WorkspaceDir
+	Files WorkspaceFiles
 }
 
 func (me *WorkspaceBase) Init() {
 	noop := func(_ *WorkspaceChanges) {}
 	me.OnBeforeChanges, me.OnAfterChanges = noop, noop
-	me.OpenDirs = map[string]*WorkspaceDir{}
-	me.OpenFiles = map[string]*WorkspaceFile{}
+	me.Dirs = map[string]*WorkspaceDir{}
+	me.Files = WorkspaceFiles{}
 }
 
 func (me *WorkspaceBase) dispatch(req *ipcReq, resp *ipcResp) bool {
@@ -77,43 +85,70 @@ func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 
 		me.mutex.Lock()
 		defer me.mutex.Unlock()
-		opendirs, openfiles := me.OpenDirs, me.OpenFiles
+		dirs, files := me.Dirs, me.Files
 
 		if len(upd.AddedDirs) > 0 || len(upd.RemovedDirs) > 0 {
-			opendirs = make(map[string]*WorkspaceDir, len(me.OpenDirs))
-			for k, v := range me.OpenDirs {
-				opendirs[k] = v
+			dirs = make(map[string]*WorkspaceDir, len(me.Dirs))
+			for k, v := range me.Dirs {
+				dirs[k] = v
 			}
+
 			for _, gonedir := range upd.RemovedDirs {
-				delete(opendirs, gonedir)
+				delete(dirs, gonedir)
 			}
 			for _, newdir := range upd.AddedDirs {
-				if dir, _ := opendirs[newdir]; dir == nil {
+				if dir, _ := dirs[newdir]; dir == nil {
 					dir = &WorkspaceDir{Path: newdir}
-					opendirs[newdir] = dir
+					dirs[newdir] = dir
 				}
 			}
 		}
 
-		if len(upd.OpenedFiles) > 0 || len(upd.ClosedFiles) > 0 {
-			openfiles = make(map[string]*WorkspaceFile, len(me.OpenFiles))
-			for k, v := range me.OpenFiles {
-				openfiles[k] = v
+		if hasnewfile, needsrelints := false, len(upd.WrittenFiles) > 0; needsrelints || len(upd.OpenedFiles) > 0 || len(upd.ClosedFiles) > 0 {
+			for _, sl := range [][]string{upd.OpenedFiles, upd.ClosedFiles, upd.WrittenFiles} {
+				for _, fp := range sl {
+					if f, _ := files[fp]; f == nil {
+						hasnewfile = true
+						break
+					}
+				}
+				if hasnewfile {
+					break
+				}
 			}
+			if needsrelints = hasnewfile || needsrelints; hasnewfile {
+				files = make(WorkspaceFiles, len(me.Files))
+				for k, v := range me.Files {
+					files[k] = v
+				}
+			}
+
 			for _, gonefile := range upd.ClosedFiles {
-				delete(openfiles, gonefile)
+				files.ensure(gonefile).IsOpen = false
 			}
 			for _, newfile := range upd.OpenedFiles {
-				if file, _ := openfiles[newfile]; file == nil {
-					file = &WorkspaceFile{Path: newfile}
-					openfiles[newfile] = file
-				}
+				files.ensure(newfile).IsOpen = true
+			}
+			for _, modfile := range upd.WrittenFiles {
+				file := files.ensure(modfile)
+				file.Diags.UpToDate, file.Diags.Build, file.Diags.Lint = false, nil, nil
+			}
+			if Lang.Diag != nil && needsrelints {
+				go Lang.Diag.UpdateLintDiagsIfAndAsNeeded(files, true)
 			}
 		}
 
-		me.OpenDirs, me.OpenFiles = opendirs, openfiles
+		me.Dirs, me.Files = dirs, files
 		me.OnAfterChanges(upd)
 	}
+}
+
+func (me WorkspaceFiles) ensure(fpath string) (file *WorkspaceFile) {
+	if file, _ = me[fpath]; file == nil {
+		file = &WorkspaceFile{Path: fpath}
+		me[fpath] = file
+	}
+	return
 }
 
 func (me *WorkspaceBase) ObjSnap(_ string) interface{} {
@@ -147,7 +182,7 @@ func (me *WorkspaceBase) PrettyPath(fsPath string, otherEnvs ...string) string {
 		}
 
 		candidates := []string{}
-		for _, d := range me.OpenDirs {
+		for _, d := range me.Dirs {
 			if rp := rel(d.Path); rp != "" {
 				candidates = append(candidates, filepath.Join("…", filepath.Base(d.Path), rp))
 			}
