@@ -25,14 +25,31 @@ type WorkspaceDir struct {
 
 type WorkspaceFiles map[string]*WorkspaceFile
 
+func (me WorkspaceFiles) ensure(fpath string) (file *WorkspaceFile) {
+	if file, _ = me[fpath]; file == nil {
+		file = &WorkspaceFile{Path: fpath}
+		me[fpath] = file
+	}
+	return
+}
+
+func (me WorkspaceFiles) exists(fpath string) bool {
+	f, _ := me[fpath]
+	return f != nil
+}
+
 type WorkspaceFile struct {
 	Path   string
 	IsOpen bool `json:",omitempty"`
 	Diags  struct {
-		UpToDate bool        `json:",omitempty"`
-		Build    []*DiagItem `json:",omitempty"`
-		Lint     []*DiagItem `json:",omitempty"`
+		Build Diags
+		Lint  Diags
 	}
+}
+
+func (me *WorkspaceFile) ForgetDiags() {
+	me.Diags.Build.Forget()
+	me.Diags.Lint.Forget()
 }
 
 type WorkspaceChanges struct {
@@ -42,6 +59,9 @@ type WorkspaceChanges struct {
 	ClosedFiles  []string
 	WrittenFiles []string
 }
+
+type WorkspaceChangesBefore func(upd *WorkspaceChanges, dirsChanged bool, newFiles bool, willAutoLint bool)
+type WorkspaceChangesAfter func(upd *WorkspaceChanges)
 
 func (me *WorkspaceChanges) hasChanges() bool {
 	return len(me.AddedDirs) > 0 ||
@@ -55,18 +75,28 @@ type WorkspaceBase struct {
 	mutex sync.Mutex
 	Impl  IWorkspace `json:"-"`
 
-	OnBeforeChanges func(*WorkspaceChanges) `json:"-"`
-	OnAfterChanges  func(*WorkspaceChanges) `json:"-"`
+	OnBeforeChanges WorkspaceChangesBefore `json:"-"`
+	OnAfterChanges  WorkspaceChangesAfter  `json:"-"`
 
 	Dirs  map[string]*WorkspaceDir
 	Files WorkspaceFiles
+
+	pollingPaused bool
 }
 
 func (me *WorkspaceBase) Init() {
-	noop := func(_ *WorkspaceChanges) {}
-	me.OnBeforeChanges, me.OnAfterChanges = noop, noop
 	me.Dirs = map[string]*WorkspaceDir{}
 	me.Files = WorkspaceFiles{}
+}
+
+func (me *WorkspaceBase) lockAndPause() {
+	me.mutex.Lock()
+	me.pollingPaused = true
+}
+
+func (me *WorkspaceBase) unlockAndUnpause() {
+	me.pollingPaused = false
+	me.mutex.Unlock()
 }
 
 func (me *WorkspaceBase) dispatch(req *ipcReq, resp *ipcResp) bool {
@@ -81,74 +111,71 @@ func (me *WorkspaceBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 
 func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 	if upd != nil && upd.hasChanges() {
-		me.OnBeforeChanges(upd)
+		hasnewfile, dirs, files, dirschanged :=
+			false, me.Dirs, me.Files, len(upd.AddedDirs) > 0 || len(upd.RemovedDirs) > 0
 
-		me.mutex.Lock()
-		defer me.mutex.Unlock()
-		dirs, files := me.Dirs, me.Files
+		for _, eventfiles := range [][]string{upd.OpenedFiles, upd.ClosedFiles, upd.WrittenFiles} {
+			for _, fpath := range eventfiles {
+				if hasnewfile = !files.exists(fpath); hasnewfile {
+					break
+				}
+			}
+			if hasnewfile {
+				break
+			}
+		}
+		needsfreshautolints := hasnewfile || len(upd.WrittenFiles) > 0
 
-		if len(upd.AddedDirs) > 0 || len(upd.RemovedDirs) > 0 {
+		if needsfreshautolints || hasnewfile || dirschanged {
+			me.lockAndPause()
+			defer me.unlockAndUnpause()
+		}
+		if me.OnBeforeChanges != nil {
+			me.OnBeforeChanges(upd, dirschanged, hasnewfile, needsfreshautolints)
+		}
+
+		if dirschanged {
 			dirs = make(map[string]*WorkspaceDir, len(me.Dirs))
 			for k, v := range me.Dirs {
 				dirs[k] = v
 			}
 
-			for _, gonedir := range upd.RemovedDirs {
-				delete(dirs, gonedir)
+			for _, gonedirpath := range upd.RemovedDirs {
+				delete(dirs, gonedirpath)
 			}
-			for _, newdir := range upd.AddedDirs {
-				if dir, _ := dirs[newdir]; dir == nil {
-					dir = &WorkspaceDir{Path: newdir}
-					dirs[newdir] = dir
+			for _, newdirpath := range upd.AddedDirs {
+				if dir, _ := dirs[newdirpath]; dir == nil {
+					dir = &WorkspaceDir{Path: newdirpath}
+					dirs[newdirpath] = dir
 				}
 			}
 		}
 
-		if hasnewfile, needsrelints := false, len(upd.WrittenFiles) > 0; needsrelints || len(upd.OpenedFiles) > 0 || len(upd.ClosedFiles) > 0 {
-			for _, sl := range [][]string{upd.OpenedFiles, upd.ClosedFiles, upd.WrittenFiles} {
-				for _, fp := range sl {
-					if f, _ := files[fp]; f == nil {
-						hasnewfile = true
-						break
-					}
-				}
-				if hasnewfile {
-					break
-				}
+		if hasnewfile {
+			files = make(WorkspaceFiles, len(me.Files))
+			for k, v := range me.Files {
+				files[k] = v
 			}
-			if needsrelints = hasnewfile || needsrelints; hasnewfile {
-				files = make(WorkspaceFiles, len(me.Files))
-				for k, v := range me.Files {
-					files[k] = v
-				}
-			}
+		}
 
-			for _, gonefile := range upd.ClosedFiles {
-				files.ensure(gonefile).IsOpen = false
-			}
-			for _, newfile := range upd.OpenedFiles {
-				files.ensure(newfile).IsOpen = true
-			}
-			for _, modfile := range upd.WrittenFiles {
-				file := files.ensure(modfile)
-				file.Diags.UpToDate, file.Diags.Build, file.Diags.Lint = false, nil, nil
-			}
-			if Lang.Diag != nil && needsrelints {
-				go Lang.Diag.UpdateLintDiagsIfAndAsNeeded(files, true)
-			}
+		for _, gonefilepath := range upd.ClosedFiles {
+			files.ensure(gonefilepath).IsOpen = false
+		}
+		for _, newfilepath := range upd.OpenedFiles {
+			files.ensure(newfilepath).IsOpen = true
+		}
+		for _, modfilepath := range upd.WrittenFiles {
+			files.ensure(modfilepath).ForgetDiags()
+		}
+		if needsfreshautolints && Lang.Diag != nil {
+			Lang.Diag.UpdateLintDiagsIfAndAsNeeded(files, true)
 		}
 
 		me.Dirs, me.Files = dirs, files
-		me.OnAfterChanges(upd)
+		if me.OnAfterChanges != nil {
+			me.OnAfterChanges(upd)
+		}
 	}
-}
-
-func (me WorkspaceFiles) ensure(fpath string) (file *WorkspaceFile) {
-	if file, _ = me[fpath]; file == nil {
-		file = &WorkspaceFile{Path: fpath}
-		me[fpath] = file
-	}
-	return
 }
 
 func (me *WorkspaceBase) ObjSnap(_ string) interface{} {
@@ -159,15 +186,16 @@ func (me *WorkspaceBase) ObjSnapPrefix() string {
 	return Lang.ID + ".proj."
 }
 
-func (*WorkspaceBase) PollFileEventsEvery(milliseconds int64) {
+func (me *WorkspaceBase) PollFileEventsEvery(milliseconds int64) {
 	interval := time.Millisecond * time.Duration(milliseconds)
 	msg := &ipcResp{IpcID: IPCID_PROJ_POLLEVTS}
 	for {
-		time.Sleep(interval)
-		if !canSend() {
-			return
-		} else if err := send(msg); err != nil {
-			return
+		if time.Sleep(interval); !me.pollingPaused {
+			if !canSend() {
+				return
+			} else if err := send(msg); err != nil {
+				return
+			}
 		}
 	}
 }

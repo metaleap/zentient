@@ -2,6 +2,8 @@ package z
 
 import (
 	"strings"
+	"sync"
+	"time"
 )
 
 type IDiag interface {
@@ -9,6 +11,18 @@ type IDiag interface {
 
 	KnownDiags() Tools
 	UpdateLintDiagsIfAndAsNeeded(WorkspaceFiles, bool)
+}
+
+type Diags struct {
+	UpToDate bool       `json:",omitempty"`
+	Items    []DiagItem `json:",omitempty"`
+
+	timeUpdated time.Time
+	mutex       sync.Mutex
+}
+
+func (me *Diags) Forget() {
+	me.UpToDate, me.Items = false, nil
 }
 
 type DiagItem struct {
@@ -77,6 +91,12 @@ func (me *DiagBase) MenuItems(srcLens *SrcLens) (menu []*MenuItem) {
 }
 
 func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(files WorkspaceFiles, autos bool) {
+	var filepaths []string
+	for _, f := range files {
+		if f != nil && !f.Diags.Lint.UpToDate {
+			filepaths = append(filepaths, f.Path)
+		}
+	}
 
 }
 

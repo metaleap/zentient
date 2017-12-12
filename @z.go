@@ -12,6 +12,10 @@ import (
 	"github.com/metaleap/go-util/sys"
 )
 
+const (
+	INTERVALMS_POLL_EDITORFILEEVENTS = 789
+)
+
 var (
 	Strf = fmt.Sprintf
 	Lang struct {
