@@ -40,24 +40,24 @@ func (me *SrcModBase) Init() {
 
 func (me *SrcModBase) MenuItems(srcLens *SrcLens) (cmds []*MenuItem) {
 	if srcLens != nil {
-		srcfilepath, desc := srcLens.FilePath, "("+me.cmdFmtSetDef.Desc+" first)"
+		srcfilepath, hint := srcLens.FilePath, "("+me.cmdFmtSetDef.Desc+" first)"
 		if me.hasFormatter() {
-			if desc = "➜ using "; me.isFormatterCustom() {
-				desc += "'" + Prog.Cfg.FormatterProg + "' like "
+			if hint = "➜ using "; me.isFormatterCustom() {
+				hint += "'" + Prog.Cfg.FormatterProg + "' like "
 			}
-			desc += "'" + Prog.Cfg.FormatterName + "'"
+			hint += "'" + Prog.Cfg.FormatterName + "'"
 		}
 
 		if isfp := srcfilepath != ""; isfp || srcLens.SrcFull != "" {
 			srcfilepath = Lang.Workspace.PrettyPath(srcfilepath)
-			if me.cmdFmtRunOnFile.Desc, me.cmdFmtRunOnFile.Hint = desc, srcfilepath; !isfp {
-				me.cmdFmtRunOnFile.Hint = srcLens.SrcFull
+			if me.cmdFmtRunOnFile.Desc, me.cmdFmtRunOnFile.Hint = srcfilepath, hint; !isfp {
+				me.cmdFmtRunOnFile.Desc = srcLens.SrcFull
 			}
 			cmds = append(cmds, me.cmdFmtRunOnFile)
 		}
 		if srcLens.SrcSel != "" {
-			me.cmdFmtRunOnSel.Desc = desc
-			me.cmdFmtRunOnSel.Hint = srcLens.SrcSel
+			me.cmdFmtRunOnSel.Desc = srcLens.SrcSel
+			me.cmdFmtRunOnSel.Hint = hint
 			cmds = append(cmds, me.cmdFmtRunOnSel)
 		}
 	}

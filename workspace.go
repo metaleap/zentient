@@ -1,11 +1,13 @@
 package z
 
 import (
+	"os"
 	"path/filepath"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/metaleap/go-util/dev/go"
 	"github.com/metaleap/go-util/sys"
 )
 
@@ -14,7 +16,7 @@ type IWorkspace interface {
 	IObjSnap
 
 	PollFileEventsEvery(int64)
-	PrettyPath(string) string
+	PrettyPath(string, ...string) string
 }
 
 type WorkspaceDir struct {
@@ -135,12 +137,19 @@ func (*WorkspaceBase) PollFileEventsEvery(milliseconds int64) {
 	}
 }
 
-func (me *WorkspaceBase) PrettyPath(fspath string) string {
-	if fspath != "" {
+func (me *WorkspaceBase) PrettyPath(fsPath string, otherEnvs ...string) string {
+	if fsPath != "" {
+		rel := func(path string) string {
+			if rp, err := filepath.Rel(path, fsPath); path != "" && err == nil && rp != "" && !strings.HasPrefix(rp, ".") {
+				return rp
+			}
+			return ""
+		}
+
 		candidates := []string{}
 		for _, d := range me.OpenDirs {
-			if rp, err := filepath.Rel(d.Path, fspath); err == nil && !strings.HasPrefix(rp, ".") {
-				candidates = append(candidates, filepath.Join("…", rp))
+			if rp := rel(d.Path); rp != "" {
+				candidates = append(candidates, filepath.Join("…", filepath.Base(d.Path), rp))
 			}
 		}
 		if shortest := ""; len(candidates) > 0 {
@@ -151,9 +160,28 @@ func (me *WorkspaceBase) PrettyPath(fspath string) string {
 			}
 			return shortest
 		}
-		if rp, err := filepath.Rel(usys.UserHomeDirPath(), fspath); err == nil && !strings.HasPrefix(rp, ".") {
-			fspath = filepath.Join("~", rp)
+
+		for _, gopath := range udevgo.GoPaths {
+			if rp := rel(gopath); rp != "" {
+				return filepath.Join("$GOPATH", rp)
+			}
+		}
+
+		for _, envname := range otherEnvs {
+			if envval := os.Getenv(envname); envval != "" {
+				if envpaths := filepath.SplitList(envval); len(envpaths) > 0 {
+					for _, envpath := range envpaths {
+						if rp := rel(envpath); rp != "" {
+							return filepath.Join("$"+envname, rp)
+						}
+					}
+				}
+			}
+		}
+
+		if rp := rel(usys.UserHomeDirPath()); rp != "" {
+			return filepath.Join("~", rp)
 		}
 	}
-	return fspath
+	return fsPath
 }
