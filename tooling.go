@@ -127,6 +127,15 @@ func (me *ToolingBase) KnownToolsFor(cats ...ToolCats) (tools Tools) {
 
 type Tools []*Tool
 
+func (me Tools) Len(inst bool) (num int) {
+	for _, t := range me {
+		if t.Installed == inst {
+			num++
+		}
+	}
+	return
+}
+
 // func (me Tools) Len() int          { return len(me) }
 // func (me Tools) Swap(i int, j int) { me[i], me[j] = me[j], me[i] }
 // func (me Tools) Less(i1 int, i2 int) bool {

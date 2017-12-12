@@ -21,7 +21,7 @@ func (me *DiagBase) Init() {
 	me.cmdListDiags = &MenuItem{
 		IpcID: IPCID_SRCDIAG_LIST,
 		Title: "Choose Auto-Diagnostics",
-		Desc:  Strf("Select out of %d which %s diagnostics tools should run automatically (on open and on save)", len(me.Impl.KnownDiags()), Lang.Title),
+		Desc:  Strf("Select which (out of %d) %s diagnostics tools should run automatically (on open and on save)", me.Impl.KnownDiags().Len(true), Lang.Title),
 	}
 	me.cmdRunDiagsOther = &MenuItem{
 		IpcID: IPCID_SRCDIAG_RUN,
@@ -62,7 +62,7 @@ func (me *DiagBase) MenuItems(srcLens *SrcLens) (menu []*MenuItem) {
 	if srcLens != nil && srcLens.FilePath != "" {
 		nonautodiags, srcfilepath := me.knownDiags(false), srcLens.FilePath
 		srcfilepath = Lang.Workspace.PrettyPath(srcfilepath)
-		me.cmdRunDiagsOther.Desc = Strf("➜ run %d diagnostics tools on: %s", len(nonautodiags), srcfilepath)
+		me.cmdRunDiagsOther.Desc = Strf("➜ run %d tools on: %s", nonautodiags.Len(true), srcfilepath)
 		updatehint(nonautodiags, me.cmdRunDiagsOther)
 		menu = append(menu, me.cmdRunDiagsOther)
 	}
@@ -86,16 +86,19 @@ func (me *DiagBase) onListAll(resp *ipcResp) {
 	isinautodiags := true
 	for _, kd := range []Tools{me.knownDiags(true), me.knownDiags(false)} {
 		for _, dt := range kd {
-			item := &MenuItem{Title: dt.Name, Hint: dt.Website, IpcID: IPCID_SRCDIAG_TOGGLE, IpcArgs: dt.Name}
+			item := &MenuItem{Title: dt.Name}
 			if dt.Installed {
-				item.Hint = "Installed  ·  " + item.Hint
+				item.Hint = "Installed  ·  " + dt.Website
+				item.IpcID, item.IpcArgs = IPCID_SRCDIAG_TOGGLE, dt.Name
+				if isinautodiags {
+					item.Desc = "Currently running automatically. ➜ Pick to turn this off."
+				} else {
+					item.Desc = "Not currently running automatically. ➜ Pick to turn this on."
+				}
 			} else {
-				item.Hint = "Not Installed  ·  " + item.Hint
-			}
-			if isinautodiags {
-				item.Desc = "Currently running automatically. ➜ Pick to turn this off."
-			} else {
-				item.Desc = "Not currently running automatically. ➜ Pick to turn this on."
+				item.Hint = "Not Installed"
+				item.Desc = "➜ " + dt.Website
+				item.IpcArgs = dt.Website
 			}
 			resp.Menu.SubMenu.Items = append(resp.Menu.SubMenu.Items, item)
 		}
