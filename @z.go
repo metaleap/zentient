@@ -28,8 +28,10 @@ var (
 		Extras    IExtras
 		PkgIntel  IPkgIntel
 		Caddies   []*Caddy
-		Workspace IWorkspace
 		Tooling   ITooling
+		Workspace IWorkspace
+
+		workspaceBase *WorkspaceBase
 	}
 	Prog struct {
 		Cfg Config

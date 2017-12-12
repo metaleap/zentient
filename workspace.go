@@ -87,16 +87,20 @@ type WorkspaceBase struct {
 func (me *WorkspaceBase) Init() {
 	me.Dirs = map[string]*WorkspaceDir{}
 	me.Files = WorkspaceFiles{}
+
+	if Lang.Workspace == me.Impl {
+		Lang.workspaceBase = me
+	}
 }
 
-func (me *WorkspaceBase) lockAndPause() {
-	me.mutex.Lock()
+func (me *WorkspaceBase) lockAndPausePolling() {
 	me.pollingPaused = true
+	me.mutex.Lock()
 }
 
-func (me *WorkspaceBase) unlockAndUnpause() {
-	me.pollingPaused = false
+func (me *WorkspaceBase) unlockAndResumePolling() {
 	me.mutex.Unlock()
+	me.pollingPaused = false
 }
 
 func (me *WorkspaceBase) dispatch(req *ipcReq, resp *ipcResp) bool {
@@ -127,8 +131,8 @@ func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 		needsfreshautolints := hasnewfile || len(upd.WrittenFiles) > 0
 
 		if needsfreshautolints || hasnewfile || dirschanged {
-			me.lockAndPause()
-			defer me.unlockAndUnpause()
+			me.lockAndPausePolling()
+			defer me.unlockAndResumePolling()
 		}
 		if me.OnBeforeChanges != nil {
 			me.OnBeforeChanges(upd, dirschanged, hasnewfile, needsfreshautolints)

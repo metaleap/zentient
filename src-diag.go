@@ -2,8 +2,6 @@ package z
 
 import (
 	"strings"
-	"sync"
-	"time"
 )
 
 type IDiag interface {
@@ -16,9 +14,6 @@ type IDiag interface {
 type Diags struct {
 	UpToDate bool       `json:",omitempty"`
 	Items    []DiagItem `json:",omitempty"`
-
-	timeUpdated time.Time
-	mutex       sync.Mutex
 }
 
 func (me *Diags) Forget() {
@@ -93,7 +88,7 @@ func (me *DiagBase) MenuItems(srcLens *SrcLens) (menu []*MenuItem) {
 func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(files WorkspaceFiles, autos bool) {
 	var filepaths []string
 	for _, f := range files {
-		if f != nil && !f.Diags.Lint.UpToDate {
+		if f != nil && f.IsOpen && !f.Diags.Lint.UpToDate {
 			filepaths = append(filepaths, f.Path)
 		}
 	}
@@ -144,9 +139,16 @@ func (me *DiagBase) onToggle(toolName string, resp *ipcResp) {
 		resp.ErrMsg = BadMsg(Lang.Title+" diagnostics tool name", toolName)
 	} else if err := tool.ToggleInAutoDiags(); err != nil {
 		resp.ErrMsg = err.Error()
-	} else if tool.IsInAutoDiags() {
-		resp.Menu = &MenuResp{NoteInfo: Strf("The %s diagnostics tool `%s` will be run automatically on open/save.", Lang.Title, toolName)}
 	} else {
-		resp.Menu = &MenuResp{NoteInfo: Strf("The %s diagnostics tool `%s` won't be run automatically on open/save, but may be invoked manually via the Zentient Main Menu.", Lang.Title, toolName)}
+		if tool.IsInAutoDiags() {
+			resp.Menu = &MenuResp{NoteInfo: Strf("The %s diagnostics tool `%s` will be run automatically on open/save.", Lang.Title, toolName)}
+		} else {
+			resp.Menu = &MenuResp{NoteInfo: Strf("The %s diagnostics tool `%s` won't be run automatically on open/save, but may be invoked manually via the Zentient Main Menu.", Lang.Title, toolName)}
+		}
+		files := Lang.workspaceBase.Files
+		for _, f := range files {
+			f.Diags.Lint.Forget()
+		}
+		me.Impl.UpdateLintDiagsIfAndAsNeeded(files, true)
 	}
 }
