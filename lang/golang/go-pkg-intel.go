@@ -14,14 +14,21 @@ var pkgIntel goPkgIntel
 
 func init() {
 	pkgIntel.Impl, z.Lang.PkgIntel = &pkgIntel, &pkgIntel
-	pkgIntel.listFilterSelf = &z.ListFilter{ID: "self", Pred: pkgIntel.isPkgNope, Title: "Current & Ancillary", OnSrcLens: pkgIntel.onSrcLens}
-	pkgIntel.listFilterImps = &z.ListFilter{ID: "imps", Pred: pkgIntel.isPkgNope, Title: "Dependants", OnSrcLens: pkgIntel.onSrcLens}
-	pkgIntel.listFilterDepD = &z.ListFilter{ID: "depd", Pred: pkgIntel.isPkgNope, Title: "Direct Dependencies", OnSrcLens: pkgIntel.onSrcLens}
-	pkgIntel.listFilterDepI = &z.ListFilter{ID: "depi", Pred: pkgIntel.isPkgNope, Title: "Direct & Indirect Dependencies", OnSrcLens: pkgIntel.onSrcLens}
-	pkgIntel.listFilterOpen = &z.ListFilter{ID: "open", Pred: pkgIntel.isPkgOpened, Title: "In Workspace", Desc: "located somewhere in the current workspace"}
+
+	dynfilter := func(id string, title string) *z.ListFilter {
+		return &z.ListFilter{ID: id, Pred: pkgIntel.isPkgNope, Title: title, OnSrcLens: pkgIntel.onSrcLens}
+	}
+	pkgIntel.listFilterSelf = dynfilter("self", "Current & Ancillary")
+	pkgIntel.listFilterImpD = dynfilter("impd", "Direct Dependants")
+	pkgIntel.listFilterImpI = dynfilter("impi", "Direct & Indirect Dependants")
+	pkgIntel.listFilterDepD = dynfilter("depd", "Direct Dependencies")
+	pkgIntel.listFilterDepI = dynfilter("depi", "Direct & Indirect Dependencies")
+	pkgIntel.listFilterOpen = &z.ListFilter{ID: "open", Pred: pkgIntel.isPkgOpened, Title: "In Workspace", Desc: "located somewhere in one of the currently opened workspace-folders"}
+
 	pkgIntel.listFilters = []*z.ListFilter{
 		pkgIntel.listFilterSelf,
-		pkgIntel.listFilterImps,
+		pkgIntel.listFilterImpD,
+		pkgIntel.listFilterImpI,
 		pkgIntel.listFilterDepD,
 		pkgIntel.listFilterDepI,
 		pkgIntel.listFilterOpen,
@@ -42,7 +49,8 @@ type goPkgIntel struct {
 	z.PkgIntelBase
 
 	listFilterSelf *z.ListFilter
-	listFilterImps *z.ListFilter
+	listFilterImpD *z.ListFilter
+	listFilterImpI *z.ListFilter
 	listFilterDepD *z.ListFilter
 	listFilterDepI *z.ListFilter
 	listFilterOpen *z.ListFilter
@@ -54,8 +62,8 @@ func (goPkgIntel) isPkgGoRoot(pkg z.ListItem) bool     { return pkg.(*udevgo.Pkg
 func (goPkgIntel) isPkgBinary(pkg z.ListItem) bool     { return pkg.(*udevgo.Pkg).BinaryOnly }
 func (goPkgIntel) isPkgCommand(pkg z.ListItem) bool    { return pkg.(*udevgo.Pkg).IsCommand() }
 func (goPkgIntel) isPkgStandard(pkg z.ListItem) bool   { return pkg.(*udevgo.Pkg).Standard }
-func (goPkgIntel) isPkgStale(pkg z.ListItem) bool      { return pkg.(*udevgo.Pkg).Stale }
 func (goPkgIntel) isPkgIncomplete(pkg z.ListItem) bool { return pkg.(*udevgo.Pkg).Incomplete }
+func (goPkgIntel) isPkgStale(pkg z.ListItem) bool      { return pkg.(*udevgo.Pkg).Stale }
 func (goPkgIntel) isPkgError(pkg z.ListItem) bool      { return pkg.(*udevgo.Pkg).Error != nil }
 func (goPkgIntel) isPkgDepErr(pkg z.ListItem) bool     { return len(pkg.(*udevgo.Pkg).DepsErrors) > 0 }
 func (goPkgIntel) isPkgIgnored(pkg z.ListItem) bool    { return len(pkg.(*udevgo.Pkg).IgnoredGoFiles) > 0 }
@@ -75,7 +83,7 @@ func (me *goPkgIntel) UnfilteredDesc() string {
 }
 
 func (me *goPkgIntel) onSrcLens(lf *z.ListFilter, srcLens *z.SrcLens) {
-	curpkgdesc, isdepd, isdepi, isimps, isself := "?", lf == me.listFilterDepD, lf == me.listFilterDepI, lf == me.listFilterImps, lf == me.listFilterSelf
+	curpkgdesc, isdepd, isdepi, isimpd, isimpi, isself := "?", lf == me.listFilterDepD, lf == me.listFilterDepI, lf == me.listFilterImpD, lf == me.listFilterImpI, lf == me.listFilterSelf
 	lf.Pred, lf.Desc = me.isPkgNope, "?"
 
 	if srcLens != nil && srcLens.FilePath != "" {
@@ -89,10 +97,13 @@ func (me *goPkgIntel) onSrcLens(lf *z.ListFilter, srcLens *z.SrcLens) {
 				lf.Pred = func(p z.ListItem) bool {
 					return uslice.StrHas(curpkg.Deps, p.(*udevgo.Pkg).ImportPath)
 				}
-			} else if isimps {
+			} else if isimpd { // d meaning 'direct' (vs. 'indirect') --- not 'dependant' (vs 'importer')
 				lf.Pred = func(p z.ListItem) bool {
-					importers := curpkg.Dependants()
-					return uslice.StrHas(importers, p.(*udevgo.Pkg).ImportPath)
+					return uslice.StrHas(curpkg.Importers(), p.(*udevgo.Pkg).ImportPath)
+				}
+			} else if isimpi { // i meaning 'indirect' (vs. 'direct') --- not 'importer' (vs 'dependant')
+				lf.Pred = func(p z.ListItem) bool {
+					return uslice.StrHas(curpkg.Dependants(), p.(*udevgo.Pkg).ImportPath)
 				}
 			} else if isself {
 				lf.Pred = func(p z.ListItem) bool {
@@ -107,10 +118,12 @@ func (me *goPkgIntel) onSrcLens(lf *z.ListFilter, srcLens *z.SrcLens) {
 		lf.Desc = "explicitly imported by `"
 	} else if isdepi {
 		lf.Desc = "explicitly or implicitly imported by `"
-	} else if isimps {
-		lf.Desc = "that import `"
+	} else if isimpd {
+		lf.Desc = "that directly import `"
+	} else if isimpi {
+		lf.Desc = "that directly or indirectly depend on `"
 	} else if isself {
-		lf.Desc = "that are part of `"
+		lf.Desc = "that appear to belong to `"
 	}
 	lf.Desc += curpkgdesc + "`"
 }
@@ -203,6 +216,7 @@ func (me *goPkgIntel) ListItemToMenuItem(p z.ListItem) (item *z.MenuItem) {
 			__(me.isPkgIncomplete): "Incomplete",
 			__(me.isPkgStandard):   "Standard",
 			__(me.isPkgGoRoot):     "In GOROOT",
+			__(me.isPkgOpened):     "In Workspace",
 		} {
 			if (*f)(pkg) {
 				hints = append(hints, s)
