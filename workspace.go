@@ -64,7 +64,7 @@ type WorkspaceChanges struct {
 	WrittenFiles []string
 }
 
-type WorkspaceChangesBefore func(upd *WorkspaceChanges, dirsChanged bool, newFiles []string, willAutoLint bool)
+type WorkspaceChangesBefore func(upd *WorkspaceChanges, dirsChanged bool, freshFiles []string, willAutoLint bool)
 type WorkspaceChangesAfter func(upd *WorkspaceChanges)
 
 func (me *WorkspaceChanges) hasChanges() bool {
@@ -108,30 +108,30 @@ func (me *WorkspaceBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	return true
 }
 
-func (_ *WorkspaceBase) analyzeChanges(files WorkspaceFiles, upd *WorkspaceChanges) (newFiles []string, hasNewFiles bool, dirsChanged bool, needsFreshAutoLints bool) {
+func (_ *WorkspaceBase) analyzeChanges(files WorkspaceFiles, upd *WorkspaceChanges) (freshFiles []string, hasFreshFiles bool, dirsChanged bool, needsFreshAutoLints bool) {
 	for _, eventfiles := range [][]string{upd.OpenedFiles, upd.ClosedFiles, upd.WrittenFiles} {
 		for _, fpath := range eventfiles {
 			if !files.exists(fpath) {
-				newFiles = append(newFiles, fpath)
+				freshFiles = append(freshFiles, fpath)
 			}
 		}
 	}
-	hasNewFiles, dirsChanged = len(newFiles) > 0, len(upd.AddedDirs) > 0 || len(upd.RemovedDirs) > 0
-	needsFreshAutoLints = hasNewFiles || len(upd.WrittenFiles) > 0
+	hasFreshFiles, dirsChanged = len(freshFiles) > 0, len(upd.AddedDirs) > 0 || len(upd.RemovedDirs) > 0
+	needsFreshAutoLints = hasFreshFiles || len(upd.WrittenFiles) > 0
 	return
 }
 
 func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 	if upd != nil && upd.hasChanges() {
 		dirs, files := me.dirs, me.files
-		newfiles, hasnewfiles, dirschanged, needsfreshautolints := me.analyzeChanges(files, upd)
+		freshfiles, hasfreshfiles, dirschanged, needsfreshautolints := me.analyzeChanges(files, upd)
 
-		if needsfreshautolints || hasnewfiles || dirschanged {
+		if needsfreshautolints || hasfreshfiles || dirschanged {
 			me.lockAndPausePolling()
 			defer me.unlockAndResumePolling()
 		}
 		if me.OnBeforeChanges != nil {
-			me.OnBeforeChanges(upd, dirschanged, newfiles, needsfreshautolints)
+			me.OnBeforeChanges(upd, dirschanged, freshfiles, needsfreshautolints)
 		}
 
 		if dirschanged {
@@ -151,7 +151,7 @@ func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 			}
 		}
 
-		if hasnewfiles {
+		if hasfreshfiles {
 			files = make(WorkspaceFiles, len(me.files))
 			for k, v := range me.files {
 				files[k] = v
@@ -161,8 +161,8 @@ func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 		for _, gonefilepath := range upd.ClosedFiles {
 			files.ensure(gonefilepath).IsOpen = false
 		}
-		for _, newfilepath := range upd.OpenedFiles {
-			files.ensure(newfilepath).IsOpen = true
+		for _, freshfilepath := range upd.OpenedFiles {
+			files.ensure(freshfilepath).IsOpen = true
 		}
 		for _, modfilepath := range upd.WrittenFiles {
 			files.ensure(modfilepath).ForgetDiags()

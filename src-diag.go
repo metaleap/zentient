@@ -170,13 +170,12 @@ func (me *DiagBase) onToggle(toolName string, resp *ipcResp) {
 }
 
 func (me *DiagBase) send() (err error) {
-	msg := ipcResp{IpcID: IPCID_SRCDIAG_PUB, SrcDiags: &DiagResp{All: map[string][]DiagItem{}, LangID: Lang.ID}}
-	files := Lang.Workspace.Files()
+	files, msg := Lang.Workspace.Files(), ipcResp{IpcID: IPCID_SRCDIAG_PUB, SrcDiags: &DiagResp{All: map[string][]DiagItem{}, LangID: Lang.ID}}
 	for _, f := range files {
-		filediags := make([]DiagItem, 0, len(f.Diags.Build.Items)+len(f.Diags.Lint.Items))
-		filediags = append(filediags, f.Diags.Build.Items...)
-		filediags = append(filediags, f.Diags.Lint.Items...)
-		if len(filediags) > 0 {
+		if num := len(f.Diags.Build.Items) + len(f.Diags.Lint.Items); num > 0 {
+			filediags := make([]DiagItem, 0, num)
+			filediags = append(filediags, f.Diags.Build.Items...)
+			filediags = append(filediags, f.Diags.Lint.Items...)
 			msg.SrcDiags.All[f.Path] = filediags
 		}
 	}
