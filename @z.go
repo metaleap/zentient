@@ -30,8 +30,6 @@ var (
 		Caddies   []*Caddy
 		Tooling   ITooling
 		Workspace IWorkspace
-
-		workspaceBase *WorkspaceBase
 	}
 	Prog struct {
 		Cfg Config

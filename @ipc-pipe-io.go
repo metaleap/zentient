@@ -43,6 +43,7 @@ func Serve() (err error) {
 	}
 	// only now are the caddies notified that their status changes may now be broadcast
 	for _, c := range Lang.Caddies {
+		c.ready = true
 		go c.OnReady()
 	}
 

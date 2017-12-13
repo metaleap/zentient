@@ -23,3 +23,9 @@ func (me *goDiag) onPreInit() {
 func (me *goDiag) KnownDiags() z.Tools {
 	return me.knownDiags
 }
+
+func (me *goDiag) UpdateLintDiags(workspaceFiles z.WorkspaceFiles, diagTools z.Tools, filePaths []string) {
+	for _, dt := range diagTools {
+		println(dt.Name)
+	}
+}

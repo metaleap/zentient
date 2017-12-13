@@ -8,6 +8,7 @@ type IDiag interface {
 	IMenuItems
 
 	KnownDiags() Tools
+	UpdateLintDiags(WorkspaceFiles, Tools, []string)
 	UpdateLintDiagsIfAndAsNeeded(WorkspaceFiles, bool)
 }
 
@@ -86,13 +87,19 @@ func (me *DiagBase) MenuItems(srcLens *SrcLens) (menu []*MenuItem) {
 }
 
 func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(files WorkspaceFiles, autos bool) {
-	var filepaths []string
-	for _, f := range files {
-		if f != nil && f.IsOpen && !f.Diags.Lint.UpToDate {
-			filepaths = append(filepaths, f.Path)
+	var diagtools = me.knownDiags(autos)
+
+	if len(diagtools) > 0 {
+		var filepaths []string
+		for _, f := range files {
+			if f != nil && f.IsOpen && len(f.Diags.Build.Items) == 0 && !f.Diags.Lint.UpToDate {
+				filepaths = append(filepaths, f.Path)
+			}
+		}
+		if len(filepaths) > 0 {
+			me.Impl.UpdateLintDiags(files, diagtools, filepaths)
 		}
 	}
-
 }
 
 func (me *DiagBase) dispatch(req *ipcReq, resp *ipcResp) bool {
@@ -145,7 +152,7 @@ func (me *DiagBase) onToggle(toolName string, resp *ipcResp) {
 		} else {
 			resp.Menu = &MenuResp{NoteInfo: Strf("The %s diagnostics tool `%s` won't be run automatically on open/save, but may be invoked manually via the Zentient Main Menu.", Lang.Title, toolName)}
 		}
-		files := Lang.workspaceBase.Files
+		files := Lang.Workspace.Files()
 		for _, f := range files {
 			f.Diags.Lint.Forget()
 		}

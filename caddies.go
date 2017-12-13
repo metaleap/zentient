@@ -22,6 +22,8 @@ type Caddy struct {
 	UxActionID string `json:",omitempty"`
 	ShowTitle  bool   `json:",omitempty"`
 
+	ready bool
+
 	OnReady         func() `json:"-"`
 	OnStatusChanged func() `json:"-"`
 }
@@ -33,4 +35,12 @@ func (me *Caddy) onInit() {
 
 func (me *Caddy) onStatusChanged() {
 	send(&ipcResp{CaddyUpdate: me})
+}
+
+func (me *Caddy) PendingOrBusy() bool {
+	return me.Status.Flag == CADDY_BUSY || me.Status.Flag == CADDY_PENDING
+}
+
+func (me *Caddy) Ready() bool {
+	return me.ready
 }
