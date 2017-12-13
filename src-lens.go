@@ -42,7 +42,7 @@ func (me *SrcLens) ByteOffsetForPosWithRuneOffset(pos *SrcPos) int {
 		if pos.Off > 1 {
 			me.ensureSrcFull()
 			r := 1
-			for i, _ := range me.SrcFull {
+			for i := range me.SrcFull {
 				if r == pos.Off {
 					pos.byteOff = i
 					return pos.byteOff

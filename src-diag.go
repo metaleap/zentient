@@ -34,6 +34,11 @@ type DiagBase struct {
 	cmdRunDiagsOther *MenuItem
 }
 
+type DiagResp struct {
+	All    map[string][]DiagItem
+	LangID string
+}
+
 func (me *DiagBase) Init() {
 	me.cmdListDiags = &MenuItem{
 		IpcID: IPCID_SRCDIAG_LIST,
@@ -98,6 +103,7 @@ func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(files WorkspaceFiles, autos boo
 		}
 		if len(filepaths) > 0 {
 			me.Impl.UpdateLintDiags(files, diagtools, filepaths)
+			me.send()
 		}
 	}
 }
@@ -152,10 +158,27 @@ func (me *DiagBase) onToggle(toolName string, resp *ipcResp) {
 		} else {
 			resp.Menu = &MenuResp{NoteInfo: Strf("The %s diagnostics tool `%s` won't be run automatically on open/save, but may be invoked manually via the Zentient Main Menu.", Lang.Title, toolName)}
 		}
-		files := Lang.Workspace.Files()
-		for _, f := range files {
-			f.Diags.Lint.Forget()
+		resp.onSent = func() {
+			files := Lang.Workspace.Files()
+			for _, f := range files {
+				f.Diags.Lint.Forget()
+			}
+			me.send()
+			me.Impl.UpdateLintDiagsIfAndAsNeeded(files, true)
 		}
-		me.Impl.UpdateLintDiagsIfAndAsNeeded(files, true)
 	}
+}
+
+func (me *DiagBase) send() (err error) {
+	msg := ipcResp{IpcID: IPCID_SRCDIAG_PUB, SrcDiags: &DiagResp{All: map[string][]DiagItem{}, LangID: Lang.ID}}
+	files := Lang.Workspace.Files()
+	for _, f := range files {
+		filediags := make([]DiagItem, 0, len(f.Diags.Build.Items)+len(f.Diags.Lint.Items))
+		filediags = append(filediags, f.Diags.Build.Items...)
+		filediags = append(filediags, f.Diags.Lint.Items...)
+		if len(filediags) > 0 {
+			msg.SrcDiags.All[f.Path] = filediags
+		}
+	}
+	return send(&msg)
 }

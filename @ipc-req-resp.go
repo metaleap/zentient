@@ -64,8 +64,11 @@ type ipcResp struct {
 	SrcIntel    *srcIntelResp  `json:"srcIntel,omitempty"`
 	SrcMods     []*SrcLens     `json:"srcMods,omitempty"`
 	SrcActions  []EditorAction `json:"srcActions,omitempty"`
+	SrcDiags    *DiagResp      `json:"srcDiags,omitempty"`
 	CaddyUpdate *Caddy         `json:"caddy,omitempty"`
 	ObjSnapshot interface{}    `json:"obj,omitempty"`
+
+	onSent func()
 }
 
 func (me *ipcResp) postProcess() {

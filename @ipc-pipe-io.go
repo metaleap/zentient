@@ -14,7 +14,9 @@ func send(resp *ipcResp) (err error) {
 	Prog.pipeIO.mutex.Lock()
 	defer Prog.pipeIO.mutex.Unlock()
 	if err = Prog.pipeIO.stdoutEncoder.Encode(resp); err == nil {
-		err = Prog.pipeIO.stdoutWriter.Flush()
+		if err = Prog.pipeIO.stdoutWriter.Flush(); err == nil && resp.onSent != nil {
+			resp.onSent()
+		}
 	}
 	return
 }
