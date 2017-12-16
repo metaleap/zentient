@@ -184,7 +184,8 @@ func (me *DiagBase) onToggle(toolName string, resp *ipcResp) {
 }
 
 func (me *DiagBase) send() {
-	files, msg := Lang.Workspace.Files(), ipcResp{IpcID: IPCID_SRCDIAG_PUB, SrcDiags: &DiagResp{All: diagItems{}, LangID: Lang.ID}}
+	files := Lang.Workspace.Files()
+	msg := ipcResp{IpcID: IPCID_SRCDIAG_PUB, SrcDiags: &DiagResp{LangID: Lang.ID, All: make(diagItems, len(files))}}
 	for _, f := range files {
 		if num := len(f.Diags.Build.Items) + len(f.Diags.Lint.Items); num > 0 {
 			filediags := make([]*DiagItem, 0, num)

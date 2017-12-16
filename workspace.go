@@ -1,6 +1,7 @@
 package z
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
@@ -97,6 +98,15 @@ func (me *WorkspaceBase) Lock() {
 func (me *WorkspaceBase) Unlock() {
 	me.mutex.Unlock()
 	me.pollingPaused = false
+}
+
+func (me *WorkspaceBase) MarshalJSON() ([]byte, error) {
+	var obj struct {
+		Dirs  WorkspaceDirs
+		Files WorkspaceFiles
+	}
+	obj.Dirs, obj.Files = me.dirs, me.files
+	return json.Marshal(&obj)
 }
 
 func (me *WorkspaceBase) dispatch(req *ipcReq, resp *ipcResp) bool {

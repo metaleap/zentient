@@ -29,36 +29,36 @@ func (me *goDiag) KnownDiags() z.Tools {
 	return me.knownDiags
 }
 
-func (me *goDiag) runDiag(tool *z.Tool, pkg *udevgo.Pkg, diagchan chan *z.DiagItem, onjobdone func()) {
+func (me *goDiag) runDiag(tool *z.Tool, pkg *udevgo.Pkg, yield chan *z.DiagItem, onjobdone func()) {
 	defer onjobdone()
 
 	diag := func(i int, fpath string, found string) *z.DiagItem {
-		return &z.DiagItem{Message: "Found " + found, ToolName: tool.Name, FileRef: z.SrcLens{FilePath: fpath, Flag: int(z.DIAG_SEV_HINT), Pos: &z.SrcPos{Off: i + 1}}}
+		return &z.DiagItem{Message: "Found " + found, ToolName: tool.Name, FileRef: z.SrcLens{FilePath: fpath, Flag: int(z.DIAG_SEV_WARN), Pos: &z.SrcPos{Off: i + 1}}}
 	}
 
 	for _, filename := range pkg.GoFiles {
 		fpath := filepath.Join(pkg.Dir, filename)
-		filesrc := strings.ToLower(ufs.ReadTextFile(fpath, true, ""))
-		if idx := strings.Index(filesrc, "sym"); tool.Name == "gosimple" && idx >= 0 {
-			diagchan <- diag(idx, fpath, "SYM")
+		filesrc := ufs.ReadTextFile(fpath, true, "")
+		if idx := strings.Index(filesrc, "/sys"); tool.Name == "gosimple" && idx >= 0 {
+			yield <- diag(idx, fpath, "/sys")
 		}
-		if idx := strings.Index(filesrc, "con"); tool.Name == "goconst" && idx >= 0 {
-			diagchan <- diag(idx, fpath, "CON")
+		if idx := strings.Index(filesrc, "/run"); tool.Name == "goconst" && idx >= 0 {
+			yield <- diag(idx, fpath, "/run")
 		}
-		if idx := strings.Index(filesrc, "lin"); tool.Name == "golint" && idx >= 0 {
-			diagchan <- diag(idx, fpath, "LIN")
+		if idx := strings.Index(filesrc, "/slice"); tool.Name == "golint" && idx >= 0 {
+			yield <- diag(idx, fpath, "/slice")
 		}
 	}
 }
 
 func (me *goDiag) UpdateLintDiags(workspaceFiles z.WorkspaceFiles, diagTools z.Tools, filePaths []string) {
 	if pkgs := udevgo.PkgsForFiles(filePaths...); len(pkgs) > 0 {
-		numjobs, diagchan := 0, make(chan *z.DiagItem)
-		numdone, onjobdone := 0, func() { diagchan <- nil }
+		numjobs, await := 0, make(chan *z.DiagItem)
+		numdone, onjobdone := 0, func() { await <- nil }
 		for _, pkg := range pkgs {
 			for _, diagtool := range diagTools {
 				numjobs++
-				go me.runDiag(diagtool, pkg, diagchan, onjobdone)
+				go me.runDiag(diagtool, pkg, await, onjobdone)
 			}
 			for _, filename := range pkg.GoFiles {
 				if f, _ := workspaceFiles[filepath.Join(pkg.Dir, filename)]; f != nil {
@@ -71,7 +71,7 @@ func (me *goDiag) UpdateLintDiags(workspaceFiles z.WorkspaceFiles, diagTools z.T
 		var diagitems []*z.DiagItem
 		for numdone < numjobs {
 			select {
-			case diagitem := <-diagchan:
+			case diagitem := <-await:
 				if diagitem == nil {
 					numdone++
 				} else {
