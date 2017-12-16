@@ -20,6 +20,7 @@ func caddyRunRefreshPkgs() {
 	caddyRefreshPkgs.Status.Flag, caddyRefreshPkgs.Status.Desc, caddyRefreshPkgs.Details, caddyRefreshPkgs.UxActionID =
 		z.CADDY_BUSY, "refreshing", "", ""
 	caddyRefreshPkgs.OnStatusChanged()
+	firstrun := (udevgo.PkgsByDir == nil)
 
 	if err := udevgo.RefreshPkgs(); err != nil {
 		caddyRefreshPkgs.Status.Flag, caddyRefreshPkgs.Status.Desc =
@@ -35,4 +36,9 @@ func caddyRunRefreshPkgs() {
 		}
 	}
 	caddyRefreshPkgs.OnStatusChanged()
+	if firstrun && (udevgo.PkgsByDir != nil) && (z.Lang.Diag != nil) {
+		z.Lang.Workspace.Lock()
+		defer z.Lang.Workspace.Unlock()
+		z.Lang.Diag.UpdateLintDiagsIfAndAsNeeded(nil, true)
+	}
 }

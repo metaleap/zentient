@@ -14,6 +14,7 @@ import (
 type IWorkspace interface {
 	iDispatcher
 	IObjSnap
+	sync.Locker
 
 	Dirs() WorkspaceDirs
 	Files() WorkspaceFiles
@@ -29,7 +30,7 @@ type WorkspaceDirs map[string]*WorkspaceDir
 
 type WorkspaceFiles map[string]*WorkspaceFile
 
-func (me WorkspaceFiles) ensure(fpath string) (file *WorkspaceFile) {
+func (me WorkspaceFiles) Ensure(fpath string) (file *WorkspaceFile) {
 	if file, _ = me[fpath]; file == nil {
 		file = &WorkspaceFile{Path: fpath}
 		me[fpath] = file
@@ -88,12 +89,12 @@ func (me *WorkspaceBase) Init()                         { me.dirs, me.files = Wo
 func (me *WorkspaceBase) Dirs() (dirs WorkspaceDirs)    { dirs = me.dirs; return }
 func (me *WorkspaceBase) Files() (files WorkspaceFiles) { files = me.files; return }
 
-func (me *WorkspaceBase) lockAndPausePolling() {
+func (me *WorkspaceBase) Lock() {
 	me.pollingPaused = true
 	me.mutex.Lock()
 }
 
-func (me *WorkspaceBase) unlockAndResumePolling() {
+func (me *WorkspaceBase) Unlock() {
 	me.mutex.Unlock()
 	me.pollingPaused = false
 }
@@ -117,7 +118,7 @@ func (_ *WorkspaceBase) analyzeChanges(files WorkspaceFiles, upd *WorkspaceChang
 		}
 	}
 	hasFreshFiles, dirsChanged = len(freshFiles) > 0, len(upd.AddedDirs) > 0 || len(upd.RemovedDirs) > 0
-	needsFreshAutoLints = hasFreshFiles || len(upd.WrittenFiles) > 0
+	needsFreshAutoLints = hasFreshFiles || len(upd.WrittenFiles) > 0 || len(upd.OpenedFiles) > 0
 	return
 }
 
@@ -127,8 +128,8 @@ func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 		freshfiles, hasfreshfiles, dirschanged, needsfreshautolints := me.analyzeChanges(files, upd)
 
 		if needsfreshautolints || hasfreshfiles || dirschanged {
-			me.lockAndPausePolling()
-			defer me.unlockAndResumePolling()
+			me.Lock()
+			defer me.Unlock()
 		}
 		if me.OnBeforeChanges != nil {
 			me.OnBeforeChanges(upd, dirschanged, freshfiles, needsfreshautolints)
@@ -159,13 +160,13 @@ func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 		}
 
 		for _, gonefilepath := range upd.ClosedFiles {
-			files.ensure(gonefilepath).IsOpen = false
+			files.Ensure(gonefilepath).IsOpen = false
 		}
 		for _, freshfilepath := range upd.OpenedFiles {
-			files.ensure(freshfilepath).IsOpen = true
+			files.Ensure(freshfilepath).IsOpen = true
 		}
 		for _, modfilepath := range upd.WrittenFiles {
-			files.ensure(modfilepath).ForgetDiags()
+			files.Ensure(modfilepath).ForgetDiags()
 		}
 		if needsfreshautolints && Lang.Diag != nil {
 			Lang.Diag.UpdateLintDiagsIfAndAsNeeded(files, true)
