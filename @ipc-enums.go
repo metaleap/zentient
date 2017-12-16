@@ -48,7 +48,7 @@ const (
 	IPCID_MIN_INVALID // new entries go above this one
 )
 
-type DiagSeverity uint8
+type DiagSeverity int
 
 const (
 	DIAG_SEV_ERR DiagSeverity = iota

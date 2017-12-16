@@ -17,8 +17,18 @@ type Diags struct {
 	Items    []*DiagItem `json:",omitempty"`
 }
 
-func (me *Diags) Forget() {
-	me.UpToDate, me.Items = false, nil
+func (me *Diags) Forget(onlyFor Tools) {
+	if len(onlyFor) == 0 {
+		me.UpToDate, me.Items = false, nil
+	} else {
+		for i := 0; i < len(me.Items); i++ {
+			if onlyFor.Has(me.Items[i].ToolName) {
+				pre, post := me.Items[:i], me.Items[i+1:]
+				me.Items = append(pre, post...)
+				i--
+			}
+		}
+	}
 }
 
 type diagItems map[string][]*DiagItem
@@ -97,9 +107,6 @@ func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(files WorkspaceFiles, autos boo
 	var diagtools = me.knownDiags(autos)
 
 	if len(diagtools) > 0 {
-		if files == nil {
-			files = Lang.Workspace.Files()
-		}
 		var filepaths []string
 		for _, f := range files {
 			if f != nil && f.IsOpen && len(f.Diags.Build.Items) == 0 && !f.Diags.Lint.UpToDate {
@@ -168,7 +175,7 @@ func (me *DiagBase) onToggle(toolName string, resp *ipcResp) {
 			defer Lang.Workspace.Unlock()
 			files := Lang.Workspace.Files()
 			for _, f := range files {
-				f.Diags.Lint.Forget()
+				f.Diags.Lint.Forget(nil)
 			}
 			me.send()
 			me.Impl.UpdateLintDiagsIfAndAsNeeded(files, true)

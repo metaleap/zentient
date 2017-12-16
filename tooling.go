@@ -127,6 +127,15 @@ func (me *ToolingBase) KnownToolsFor(cats ...ToolCats) (tools Tools) {
 
 type Tools []*Tool
 
+func (me Tools) Has(name string) bool {
+	for _, t := range me {
+		if t.Name == name {
+			return true
+		}
+	}
+	return false
+}
+
 func (me Tools) Len(inst bool) (num int) {
 	for _, t := range me {
 		if t.Installed == inst {

@@ -53,8 +53,8 @@ type WorkspaceFile struct {
 }
 
 func (me *WorkspaceFile) ForgetDiags() {
-	me.Diags.Build.Forget()
-	me.Diags.Lint.Forget()
+	me.Diags.Build.Forget(nil)
+	me.Diags.Lint.Forget(nil)
 }
 
 type WorkspaceChanges struct {

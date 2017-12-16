@@ -39,6 +39,6 @@ func caddyRunRefreshPkgs() {
 	if firstrun && (udevgo.PkgsByDir != nil) && (z.Lang.Diag != nil) {
 		z.Lang.Workspace.Lock()
 		defer z.Lang.Workspace.Unlock()
-		z.Lang.Diag.UpdateLintDiagsIfAndAsNeeded(nil, true)
+		z.Lang.Diag.UpdateLintDiagsIfAndAsNeeded(z.Lang.Workspace.Files(), true)
 	}
 }
