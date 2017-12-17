@@ -14,7 +14,6 @@ type IDiag interface {
 	OnUpdateLintDiags(WorkspaceFiles, Tools, []string) DiagLintJobs
 	RunBuildJobs(DiagBuildJobs) DiagItems
 	RunLintJob(*DiagJobLint)
-	send()
 	UpdateBuildDiagsAsNeeded(WorkspaceFiles, []string)
 	UpdateLintDiagsIfAndAsNeeded(WorkspaceFiles, bool)
 }
@@ -120,19 +119,15 @@ func (me DiagBuildJobs) Len() int               { return len(me) }
 func (me DiagBuildJobs) Swap(i int, j int)      { me[i], me[j] = me[j], me[i] }
 func (me DiagBuildJobs) Less(i int, j int) bool { return me[i].IsSortedPriorTo(me[j]) }
 
-func (me DiagBuildJobs) Find(check func(*DiagJobBuild) bool) *DiagJobBuild {
-	for _, dj := range me {
-		if check(dj) {
-			return dj
+func (me DiagBuildJobs) WithoutDuplicates() (nu DiagBuildJobs) {
+	nu = make(DiagBuildJobs, 0, len(me))
+	done := make(map[string]bool, len(me))
+	for _, job := range me {
+		if s := job.String(); !done[s] {
+			done[s], nu = true, append(nu, job)
 		}
 	}
-	return nil
-}
-
-func (me *DiagBuildJobs) RemoveAt(i int) {
-	m := *me
-	pref, suff := m[:i], m[i+1:]
-	*me = append(pref, suff...)
+	return
 }
 
 type DiagBase struct {
@@ -205,10 +200,11 @@ func (me *DiagBase) UpdateBuildDiagsAsNeeded(workspaceFiles WorkspaceFiles, writ
 		for _, job := range jobs {
 			job.forgetAndMarkUpToDate(nil, workspaceFiles)
 		}
+		go me.send(true)
 		diagitems := me.Impl.RunBuildJobs(jobs)
 		diagitems.propagate(false, workspaceFiles)
 	}
-	go me.send()
+	go me.send(false)
 }
 
 func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(workspaceFiles WorkspaceFiles, autos bool) {
@@ -223,7 +219,7 @@ func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(workspaceFiles WorkspaceFiles, 
 			me.updateLintDiags(workspaceFiles, diagtools, filepaths)
 		}
 	}
-	go me.send()
+	go me.send(false)
 }
 
 func (me *DiagBase) updateLintDiags(workspaceFiles WorkspaceFiles, diagTools Tools, filePaths []string) {
@@ -315,17 +311,19 @@ func (me *DiagBase) onToggled() {
 	me.Impl.UpdateLintDiagsIfAndAsNeeded(files, true)
 }
 
-func (me *DiagBase) send() {
-	hasbuilddiags, files := false, Lang.Workspace.Files()
+func (me *DiagBase) send(onlyBuildDiags bool) {
+	files := Lang.Workspace.Files()
 	resp := &DiagResp{LangID: Lang.ID, All: make(DiagItemsBy, len(files))}
-	for _, f := range files {
-		if hasbuilddiags = len(f.Diags.Build.Items) > 0; hasbuilddiags {
-			break
+	if !onlyBuildDiags {
+		for _, f := range files {
+			if onlyBuildDiags = len(f.Diags.Build.Items) > 0; onlyBuildDiags {
+				break
+			}
 		}
 	}
 	for _, f := range files {
 		fdiagitems := f.Diags.Lint.Items
-		if hasbuilddiags {
+		if onlyBuildDiags {
 			fdiagitems = f.Diags.Build.Items
 		}
 		resp.All[f.Path] = fdiagitems
