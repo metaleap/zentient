@@ -27,7 +27,7 @@ type SrcLens struct {
 	Pos      *SrcPos   `json:"p,omitempty"`
 	Range    *SrcRange `json:"r,omitempty"`
 	CrLf     bool      `json:"lf,omitempty"`
-	Flag     int       `json:"fl,omitempty"`
+	Flag     int       `json:"fl"` // don't omitempty
 }
 
 func (me *SrcLens) ensureSrcFull() {
