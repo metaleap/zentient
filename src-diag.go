@@ -119,8 +119,8 @@ func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(files WorkspaceFiles, autos boo
 		if len(filepaths) > 0 {
 			me.Impl.UpdateLintDiags(files, diagtools, filepaths)
 		}
-		me.send()
 	}
+	me.send()
 }
 
 func (me *DiagBase) dispatch(req *ipcReq, resp *ipcResp) bool {
@@ -173,17 +173,18 @@ func (me *DiagBase) onToggle(toolName string, resp *ipcResp) {
 		} else {
 			resp.Menu = &MenuResp{NoteInfo: Strf("The %s diagnostics tool `%s` won't be run automatically on open/save, but may be invoked manually via the Zentient Main Menu.", Lang.Title, toolName)}
 		}
-		resp.onSent = func() {
-			Lang.Workspace.Lock()
-			defer Lang.Workspace.Unlock()
-			files := Lang.Workspace.Files()
-			for _, f := range files {
-				f.Diags.Lint.Forget(nil)
-			}
-			me.Impl.UpdateLintDiagsIfAndAsNeeded(files, true)
-			me.send()
-		}
+		go me.onToggled()
 	}
+}
+
+func (me *DiagBase) onToggled() {
+	Lang.Workspace.Lock()
+	defer Lang.Workspace.Unlock()
+	files := Lang.Workspace.Files()
+	for _, f := range files {
+		f.Diags.Lint.Forget(nil)
+	}
+	me.Impl.UpdateLintDiagsIfAndAsNeeded(files, true)
 }
 
 func (me *DiagBase) send() {
