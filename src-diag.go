@@ -8,13 +8,14 @@ type IDiag interface {
 	IMenuItems
 
 	KnownDiags() Tools
+	OnSend() *DiagResp
 	UpdateLintDiags(WorkspaceFiles, Tools, []string)
 	UpdateLintDiagsIfAndAsNeeded(WorkspaceFiles, bool)
 }
 
 type Diags struct {
-	UpToDate bool        `json:",omitempty"`
-	Items    []*DiagItem `json:",omitempty"`
+	UpToDate bool      `json:",omitempty"`
+	Items    DiagItems `json:",omitempty"`
 }
 
 func (me *Diags) Forget(onlyFor Tools) {
@@ -31,13 +32,15 @@ func (me *Diags) Forget(onlyFor Tools) {
 	}
 }
 
-type diagItems map[string][]*DiagItem
+type diagItems map[string]DiagItems
 
 type DiagItem struct {
 	ToolName string
 	FileRef  SrcLens
 	Message  string
 }
+
+type DiagItems []*DiagItem
 
 type DiagBase struct {
 	Impl IDiag
@@ -109,14 +112,14 @@ func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(files WorkspaceFiles, autos boo
 	if len(diagtools) > 0 {
 		var filepaths []string
 		for _, f := range files {
-			if f != nil && f.IsOpen && len(f.Diags.Build.Items) == 0 && !f.Diags.Lint.UpToDate {
+			if f != nil && f.IsOpen && !f.Diags.Lint.UpToDate {
 				filepaths = append(filepaths, f.Path)
 			}
 		}
 		if len(filepaths) > 0 {
 			me.Impl.UpdateLintDiags(files, diagtools, filepaths)
-			me.send()
 		}
+		me.send()
 	}
 }
 
@@ -177,22 +180,27 @@ func (me *DiagBase) onToggle(toolName string, resp *ipcResp) {
 			for _, f := range files {
 				f.Diags.Lint.Forget(nil)
 			}
-			me.send()
 			me.Impl.UpdateLintDiagsIfAndAsNeeded(files, true)
+			me.send()
 		}
 	}
 }
 
 func (me *DiagBase) send() {
+	msg := &ipcResp{IpcID: IPCID_SRCDIAG_PUB, SrcDiags: me.Impl.OnSend()}
+	send(msg)
+}
+
+func (me *DiagBase) OnSend() (diags *DiagResp) {
 	files := Lang.Workspace.Files()
-	msg := ipcResp{IpcID: IPCID_SRCDIAG_PUB, SrcDiags: &DiagResp{LangID: Lang.ID, All: make(diagItems, len(files))}}
+	diags = &DiagResp{LangID: Lang.ID, All: make(diagItems, len(files))}
 	for _, f := range files {
 		if num := len(f.Diags.Build.Items) + len(f.Diags.Lint.Items); num > 0 {
-			filediags := make([]*DiagItem, 0, num)
+			filediags := make(DiagItems, 0, num)
 			filediags = append(filediags, f.Diags.Build.Items...)
 			filediags = append(filediags, f.Diags.Lint.Items...)
-			msg.SrcDiags.All[f.Path] = filediags
+			diags.All[f.Path] = filediags
 		}
 	}
-	send(&msg)
+	return
 }
