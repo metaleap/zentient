@@ -75,18 +75,32 @@ func (me *goDiag) OnUpdateLintDiags(workspaceFiles z.WorkspaceFiles, diagTools z
 	return
 }
 
-func (me *goDiag) RunBuildJob(job *z.DiagJobBuild, isFirst bool, isLast bool) bool {
-	failed, pkg, mockdiag := false, job.Target.(*udevgo.Pkg), func(i int, fpath string, found string) *z.DiagItem {
+func (me *goDiag) RunBuildJobs(jobs z.DiagBuildJobs) (diags z.DiagItems) {
+	justfailed := make(map[string]bool, len(jobs))
+	mockdiag := func(i int, fpath string, found string) *z.DiagItem {
 		return &z.DiagItem{Message: "Found " + found, ToolName: "go install", FileRef: z.SrcLens{FilePath: fpath, Flag: int(z.DIAG_SEV_ERR), Pos: &z.SrcPos{Off: i + 1}}}
 	}
-	for _, fpath := range pkg.GoFilePaths() {
-		filesrc := strings.ToLower(ufs.ReadTextFile(fpath, true, ""))
-		if idx := strings.Index(filesrc, "intel"); idx >= 0 {
-			job.Yield(mockdiag(idx, fpath, "intel"))
-			isLast, failed = true, true
+
+	for _, pkgjob := range jobs {
+		skip, pkg := false, pkgjob.Target.(*udevgo.Pkg)
+		if len(justfailed) > 0 {
+			for _, pdep := range pkg.Deps {
+				if skip, _ = justfailed[pdep]; skip {
+					break
+				}
+			}
+		}
+		if !skip {
+			for _, fpath := range pkg.GoFilePaths() {
+				filesrc := strings.ToLower(ufs.ReadTextFile(fpath, true, ""))
+				if idx := strings.Index(filesrc, "fo"+"ol"); idx >= 0 {
+					justfailed[pkg.ImportPath] = true
+					diags = append(diags, mockdiag(idx, fpath, "fo"+"ol"))
+				}
+			}
 		}
 	}
-	return !failed
+	return
 }
 
 func (me *goDiag) RunLintJob(job *z.DiagJobLint) {

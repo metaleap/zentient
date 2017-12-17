@@ -12,7 +12,7 @@ type IDiag interface {
 	KnownDiags() Tools
 	OnUpdateBuildDiags(WorkspaceFiles, []string) DiagBuildJobs
 	OnUpdateLintDiags(WorkspaceFiles, Tools, []string) DiagLintJobs
-	RunBuildJob(*DiagJobBuild, bool, bool) bool
+	RunBuildJobs(DiagBuildJobs) DiagItems
 	RunLintJob(*DiagJobLint)
 	send()
 	UpdateBuildDiagsAsNeeded(WorkspaceFiles, []string)
@@ -89,6 +89,7 @@ func (me *DiagJob) String() string { return me.Target.String() }
 type DiagJobBuild struct {
 	DiagJob
 	TargetCmp func(IDiagJobTarget, IDiagJobTarget) bool
+	Succeeded bool
 	diags     DiagItems
 }
 
@@ -199,16 +200,12 @@ func (me *DiagBase) menuItemsUpdateHint(diags Tools, item *MenuItem) {
 }
 
 func (me *DiagBase) UpdateBuildDiagsAsNeeded(workspaceFiles WorkspaceFiles, writtenFiles []string) {
-	if ok, jobs := true, me.Impl.OnUpdateBuildDiags(workspaceFiles, writtenFiles); len(jobs) > 0 {
+	if jobs := me.Impl.OnUpdateBuildDiags(workspaceFiles, writtenFiles); len(jobs) > 0 {
 		sort.Sort(jobs)
 		for _, job := range jobs {
 			job.forgetAndMarkUpToDate(nil, workspaceFiles)
 		}
-		var diagitems DiagItems
-		for i, ilast := 0, len(jobs)-1; ok && i <= ilast; i++ {
-			ok = me.Impl.RunBuildJob(jobs[i], i == 0, i == ilast)
-			diagitems = append(diagitems, jobs[i].diags...)
-		}
+		diagitems := me.Impl.RunBuildJobs(jobs)
 		diagitems.propagate(false, workspaceFiles)
 	}
 	go me.send()

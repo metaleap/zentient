@@ -13,7 +13,6 @@ func init() {
 
 type goTooling struct {
 	z.ToolingBase
-
 	all     z.Tools
 	numInst int
 
