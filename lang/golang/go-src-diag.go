@@ -69,15 +69,11 @@ func (me *goDiag) UpdateLintDiags(workspaceFiles z.WorkspaceFiles, diagTools z.T
 		}
 
 		var diagitems []*z.DiagItem
-		again := true
-		for again {
+		for numdone < numjobs {
 			select {
 			case diagitem := <-await:
 				if diagitem == nil {
 					numdone++
-					if numdone >= numjobs {
-						again = false
-					}
 				} else {
 					diagitems = append(diagitems, diagitem)
 				}
