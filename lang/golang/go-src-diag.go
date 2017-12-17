@@ -99,7 +99,7 @@ func (me *goDiag) runBuildPkg(pkg *udevgo.Pkg) (diags z.DiagItems) {
 		diags = make(z.DiagItems, 0, len(msgs))
 		fallbackfilepath := me.fallbackFilePath(pkg)
 		for _, srcref := range msgs {
-			if srcref.Msg != "too many errors" {
+			if srcref.Msg != "too many errors" && !(srcref.Pos1Ch == 1 && srcref.Pos1Ln == 1 && srcref.Msg == "package "+pkg.ImportPath+":") {
 				diags = append(diags, me.NewDiagItemFrom(srcref, "", true, fallbackfilepath))
 			}
 		}
