@@ -177,6 +177,7 @@ type Tool struct {
 	Name      string
 	Installed bool
 	Website   string
+	DiagSev   DiagSeverity
 }
 
 func (*Tool) Exec(cmdname string, cmdargs []string, stdin string) (string, string) {

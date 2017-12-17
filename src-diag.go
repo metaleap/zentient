@@ -9,8 +9,8 @@ type IDiag interface {
 
 	KnownDiags() Tools
 	OnSend() *DiagResp
-	OnUpdateLintDiags(WorkspaceFiles, []string) DiagTargets
-	RunDiag(*Tool, *DiagTarget, DiagItemsChan)
+	OnUpdateLintDiags(WorkspaceFiles, Tools, []string) DiagJobs
+	RunDiag(*DiagJob, DiagItemsChan)
 	UpdateLintDiagsIfAndAsNeeded(WorkspaceFiles, bool)
 }
 
@@ -47,12 +47,13 @@ type DiagItemsChan chan *DiagItem
 
 func (me DiagItemsChan) Done() { me <- nil }
 
-type DiagTarget struct {
+type DiagJob struct {
 	AffectedFilePaths []string
 	Target            interface{}
+	Tool              *Tool
 }
 
-type DiagTargets []*DiagTarget
+type DiagJobs []*DiagJob
 
 type DiagBase struct {
 	Impl IDiag
@@ -134,14 +135,12 @@ func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(workspaceFiles WorkspaceFiles, 
 }
 
 func (me *DiagBase) updateLintDiags(workspaceFiles WorkspaceFiles, diagTools Tools, filePaths []string) {
-	if targets := me.Impl.OnUpdateLintDiags(workspaceFiles, filePaths); len(targets) > 0 {
+	if jobs := me.Impl.OnUpdateLintDiags(workspaceFiles, diagTools, filePaths); len(jobs) > 0 {
 		numjobs, numdone, await := 0, 0, make(DiagItemsChan)
-		for _, target := range targets {
-			for _, diagtool := range diagTools {
-				numjobs++
-				go me.Impl.RunDiag(diagtool, target, await)
-			}
-			for _, filepath := range target.AffectedFilePaths {
+		for _, job := range jobs {
+			numjobs++
+			go me.Impl.RunDiag(job, await)
+			for _, filepath := range job.AffectedFilePaths {
 				if f, _ := workspaceFiles[filepath]; f != nil {
 					f.Diags.Lint.Forget(diagTools)
 					f.Diags.Lint.UpToDate = true

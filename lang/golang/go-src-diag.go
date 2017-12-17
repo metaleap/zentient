@@ -29,35 +29,37 @@ func (me *goDiag) KnownDiags() z.Tools {
 	return me.knownDiags
 }
 
-func (me *goDiag) OnUpdateLintDiags(workspaceFiles z.WorkspaceFiles, filePaths []string) (targets z.DiagTargets) {
+func (me *goDiag) OnUpdateLintDiags(workspaceFiles z.WorkspaceFiles, diagTools z.Tools, filePaths []string) (jobs z.DiagJobs) {
 	if pkgs := udevgo.PkgsForFiles(filePaths...); len(pkgs) > 0 {
 		for _, pkg := range pkgs {
-			target := &z.DiagTarget{Target: pkg}
+			pkgfilepaths := make([]string, 0, len(pkg.GoFiles))
 			for _, filename := range pkg.GoFiles {
-				target.AffectedFilePaths = append(target.AffectedFilePaths, filepath.Join(pkg.Dir, filename))
+				pkgfilepaths = append(pkgfilepaths, filepath.Join(pkg.Dir, filename))
 			}
-			targets = append(targets, target)
+			for _, diagtool := range diagTools {
+				jobs = append(jobs, &z.DiagJob{Tool: diagtool, AffectedFilePaths: pkgfilepaths, Target: pkg})
+			}
 		}
 	}
 	return
 }
 
-func (me *goDiag) RunDiag(tool *z.Tool, target *z.DiagTarget, yield z.DiagItemsChan) {
+func (me *goDiag) RunDiag(job *z.DiagJob, yield z.DiagItemsChan) {
 	defer yield.Done()
-	pkg, diag := target.Target.(*udevgo.Pkg), func(i int, fpath string, found string) *z.DiagItem {
-		return &z.DiagItem{Message: "Found " + found, ToolName: tool.Name, FileRef: z.SrcLens{FilePath: fpath, Flag: int(z.DIAG_SEV_WARN), Pos: &z.SrcPos{Off: i + 1}}}
+	pkg, mockdiag := job.Target.(*udevgo.Pkg), func(i int, fpath string, found string) *z.DiagItem {
+		return &z.DiagItem{Message: "Found " + found, ToolName: job.Tool.Name, FileRef: z.SrcLens{FilePath: fpath, Flag: int(job.Tool.DiagSev), Pos: &z.SrcPos{Off: i + 1}}}
 	}
 	for _, filename := range pkg.GoFiles {
 		fpath := filepath.Join(pkg.Dir, filename)
 		filesrc := ufs.ReadTextFile(fpath, true, "")
-		if idx := strings.Index(filesrc, "/sys"); tool.Name == "gosimple" && idx >= 0 {
-			yield <- diag(idx, fpath, "/sys")
+		if idx := strings.Index(filesrc, "/sys"); job.Tool.Name == "gosimple" && idx >= 0 {
+			yield <- mockdiag(idx, fpath, "/sys")
 		}
-		if idx := strings.Index(filesrc, "/run"); tool.Name == "goconst" && idx >= 0 {
-			yield <- diag(idx, fpath, "/run")
+		if idx := strings.Index(filesrc, "/run"); job.Tool.Name == "goconst" && idx >= 0 {
+			yield <- mockdiag(idx, fpath, "/run")
 		}
-		if idx := strings.Index(filesrc, "/slice"); tool.Name == "golint" && idx >= 0 {
-			yield <- diag(idx, fpath, "/slice")
+		if idx := strings.Index(filesrc, "/slice"); job.Tool.Name == "golint" && idx >= 0 {
+			yield <- mockdiag(idx, fpath, "/slice")
 		}
 	}
 }
