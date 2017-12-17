@@ -2,8 +2,12 @@ package z
 
 import (
 	"fmt"
+	"path/filepath"
 	"sort"
 	"strings"
+
+	"github.com/metaleap/go-util/dev"
+	"github.com/metaleap/go-util/fs"
 )
 
 type IDiag interface {
@@ -192,6 +196,30 @@ func (me *DiagBase) menuItemsUpdateHint(diags Tools, item *MenuItem) {
 			item.Hint = Strf("(%d/%d)  · %s", len(diags), len(me.Impl.KnownDiags()), strings.Join(toolnames, " · "))
 		}
 	}
+}
+
+func (me *DiagBase) NewDiagItemFrom(srcRef *udev.SrcMsg, toolName string, relToAbs bool, fallbackFilePath string) (diagItem *DiagItem) {
+	diagItem = &DiagItem{Message: srcRef.Msg, ToolName: toolName}
+	diagItem.FileRef.Flag = srcRef.Flag
+	if srcRef.Pos2Ch > 0 && srcRef.Pos2Ln > 0 {
+		diagItem.FileRef.Range = &SrcRange{Start: SrcPos{Ln: srcRef.Pos1Ln, Col: srcRef.Pos1Ch},
+			End: SrcPos{Ln: srcRef.Pos2Ln, Col: srcRef.Pos2Ch}}
+	} else {
+		diagItem.FileRef.Pos = &SrcPos{Ln: srcRef.Pos1Ln, Col: srcRef.Pos1Ch}
+	}
+	if diagItem.FileRef.FilePath = srcRef.Ref; !filepath.IsAbs(diagItem.FileRef.FilePath) {
+		if absfilepath, err := filepath.Abs(diagItem.FileRef.FilePath); err != nil {
+			println(err.Error())
+			diagItem.FileRef.FilePath = fallbackFilePath
+		} else {
+			diagItem.FileRef.FilePath = absfilepath
+		}
+	}
+	if !ufs.FileExists(diagItem.FileRef.FilePath) {
+		println("MISSING: " + diagItem.FileRef.FilePath)
+		diagItem.FileRef.FilePath = fallbackFilePath
+	}
+	return
 }
 
 func (me *DiagBase) UpdateBuildDiagsAsNeeded(workspaceFiles WorkspaceFiles, writtenFiles []string) {

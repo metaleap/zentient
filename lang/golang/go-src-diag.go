@@ -2,8 +2,8 @@ package zgo
 
 import (
 	"strings"
-	"time"
 
+	"github.com/metaleap/go-util/dev"
 	"github.com/metaleap/go-util/dev/go"
 	"github.com/metaleap/go-util/fs"
 	"github.com/metaleap/zentient"
@@ -34,7 +34,10 @@ func ensureBuildOrder(dis z.IDiagJobTarget, dat z.IDiagJobTarget) bool {
 }
 
 func (me *goDiag) onUpdateDiagsPkgJobs(workspaceFiles z.WorkspaceFiles, filePaths []string) (jobs []z.DiagJob) {
-	if pkgs := udevgo.PkgsForFiles(filePaths...); len(pkgs) > 0 {
+	if pkgs, shouldrefresh := udevgo.PkgsForFiles(filePaths...); len(pkgs) > 0 {
+		if shouldrefresh {
+			go caddyRunRefreshPkgs()
+		}
 		for _, pkg := range pkgs {
 			jobs = append(jobs, z.DiagJob{AffectedFilePaths: pkg.GoFilePaths(), Target: pkg})
 		}
@@ -76,41 +79,62 @@ func (me *goDiag) OnUpdateLintDiags(workspaceFiles z.WorkspaceFiles, diagTools z
 	return
 }
 
+func (_ *goDiag) fallbackFilePath(pkg *udevgo.Pkg) (filePath string) {
+	workspacefiles := z.Lang.Workspace.Files()
+	for _, fp := range pkg.GoFilePaths() {
+		if filePath == "" {
+			filePath = fp
+		}
+		if workspacefile, _ := workspacefiles[fp]; workspacefile != nil {
+			if filePath = fp; workspacefile.IsOpen {
+				break
+			}
+		}
+	}
+	return
+}
+
+func (me *goDiag) runBuildPkg(pkg *udevgo.Pkg) (diags z.DiagItems) {
+	if msgs := udev.CmdExecOnSrc(true, nil, "go", "install", pkg.ImportPath); len(msgs) > 0 {
+		diags = make(z.DiagItems, 0, len(msgs))
+		fallbackfilepath := me.fallbackFilePath(pkg)
+		for _, srcref := range msgs {
+			if srcref.Msg != "too many errors" {
+				diags = append(diags, me.NewDiagItemFrom(srcref, "", true, fallbackfilepath))
+			}
+		}
+	}
+	return
+}
+
 func (me *goDiag) RunBuildJobs(jobs z.DiagBuildJobs) (diags z.DiagItems) {
 	numjobs := len(jobs)
-	justfailed, skipped := make(map[string]bool, numjobs), make(map[string]bool, numjobs)
+	failed, skipped := make(map[string]bool, numjobs), make(map[string]bool, numjobs)
 	pkgnames := make([]string, 0, numjobs)
 	for i := 0; i < numjobs; i++ {
 		pkgnames = append(pkgnames, jobs[i].Target.(*udevgo.Pkg).ImportPath)
 	}
-	mockdiag := func(i int, fpath string, found string) *z.DiagItem {
-		return &z.DiagItem{Message: "Found " + found, ToolName: "go install", FileRef: z.SrcLens{FilePath: fpath, Flag: int(z.DIAG_SEV_ERR), Pos: &z.SrcPos{Off: i + 1}}}
-	}
 
 	for i, pkgjob := range jobs {
 		caddyBuildOnRunning(numjobs, i, pkgnames)
-		time.Sleep(time.Millisecond * 123)
-		failed, skip, pkg := false, false, pkgjob.Target.(*udevgo.Pkg)
-		if len(justfailed) > 0 {
+		skip, pkg := false, pkgjob.Target.(*udevgo.Pkg)
+		if len(failed) > 0 {
 			for _, pdep := range pkg.Deps {
-				if skip, _ = justfailed[pdep]; skip {
+				if skip, _ = failed[pdep]; skip {
 					skipped[pkg.ImportPath] = true
 					break
 				}
 			}
 		}
 		if !skip {
-			for _, fpath := range pkg.GoFilePaths() {
-				filesrc := strings.ToLower(ufs.ReadTextFile(fpath, true, ""))
-				if idx := strings.Index(filesrc, "fo"+"ol"); idx >= 0 {
-					justfailed[pkg.ImportPath], failed = true, true
-					diags = append(diags, mockdiag(idx, fpath, "fo"+"ol"))
-				}
+			pkgdiags := me.runBuildPkg(pkg)
+			if diags, pkgjob.Succeeded = append(diags, pkgdiags...), len(pkgdiags) == 0; !pkgjob.Succeeded {
+				failed[pkg.ImportPath] = true
 			}
-			pkgjob.Succeeded = !failed
 		}
 	}
-	caddyBuildOnDone(justfailed, skipped, pkgnames)
+	caddyBuildOnDone(failed, skipped, pkgnames)
+	go caddyRunRefreshPkgs()
 	return
 }
 
