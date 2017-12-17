@@ -178,10 +178,14 @@ func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 		for _, modfilepath := range upd.WrittenFiles {
 			files.Ensure(modfilepath).ForgetDiags()
 		}
-		if needsfreshautolints && Lang.Diag != nil {
-			Lang.Diag.UpdateLintDiagsIfAndAsNeeded(files, true)
+		if Lang.Diag != nil {
+			if len(upd.WrittenFiles) > 0 {
+				Lang.Diag.UpdateBuildDiagsAsNeeded(files, upd.WrittenFiles)
+			}
+			if needsfreshautolints {
+				Lang.Diag.UpdateLintDiagsIfAndAsNeeded(files, true)
+			}
 		}
-
 		me.dirs, me.files = dirs, files
 		if me.OnAfterChanges != nil {
 			me.OnAfterChanges(upd)

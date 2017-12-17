@@ -29,23 +29,48 @@ func (me *goDiag) KnownDiags() z.Tools {
 	return me.knownDiags
 }
 
-func (me *goDiag) OnUpdateLintDiags(workspaceFiles z.WorkspaceFiles, diagTools z.Tools, filePaths []string) (jobs z.DiagJobs) {
+func ensureBuildOrder(dis z.IDiagJobTarget, dat z.IDiagJobTarget) bool {
+	return dis.(*udevgo.Pkg).IsSortedPriorToByDeps(dat.(*udevgo.Pkg))
+}
+
+func (me *goDiag) onUpdateDiagsPkgJobs(workspaceFiles z.WorkspaceFiles, filePaths []string) (jobs z.DiagJobs) {
 	if pkgs := udevgo.PkgsForFiles(filePaths...); len(pkgs) > 0 {
 		for _, pkg := range pkgs {
-			pkgfilepaths := make([]string, 0, len(pkg.GoFiles))
-			for _, filename := range pkg.GoFiles {
-				pkgfilepaths = append(pkgfilepaths, filepath.Join(pkg.Dir, filename))
-			}
-			for _, diagtool := range diagTools {
-				jobs = append(jobs, &z.DiagJob{Tool: diagtool, AffectedFilePaths: pkgfilepaths, Target: pkg})
+			jobs = append(jobs, &z.DiagJob{AffectedFilePaths: pkg.GoFilePaths(), Target: pkg})
+		}
+	}
+	return
+}
+
+func (me *goDiag) OnUpdateBuildDiags(workspaceFiles z.WorkspaceFiles, writtenFilePaths []string) (jobs z.DiagJobs) {
+	if dependant, pkgjobs := "", me.onUpdateDiagsPkgJobs(workspaceFiles, writtenFilePaths); len(pkgjobs) > 0 {
+		jobs = pkgjobs
+		byimppath := func(job *z.DiagJob) bool { return job.Target.(*udevgo.Pkg).ImportPath == dependant }
+		for _, pj := range pkgjobs {
+			pj.TargetCmp = ensureBuildOrder
+			for _, dependant = range pj.Target.(*udevgo.Pkg).Dependants() {
+				if pkgdep := udevgo.PkgsByImP[dependant]; pkgdep != nil && jobs.Find(byimppath) == nil {
+					jobs = append(jobs, &z.DiagJob{Target: pkgdep, AffectedFilePaths: pkgdep.GoFilePaths(), TargetCmp: ensureBuildOrder})
+				}
 			}
 		}
 	}
 	return
 }
 
-func (me *goDiag) RunDiag(job *z.DiagJob, yield z.DiagItemsChan) {
-	defer yield.Done()
+func (me *goDiag) OnUpdateLintDiags(workspaceFiles z.WorkspaceFiles, diagTools z.Tools, filePaths []string) (jobs z.DiagJobs) {
+	if pkgjobs := me.onUpdateDiagsPkgJobs(workspaceFiles, filePaths); len(pkgjobs) > 0 {
+		for _, pj := range pkgjobs {
+			for _, dt := range diagTools {
+				jobs = append(jobs, &z.DiagJob{Tool: dt, Target: pj.Target, AffectedFilePaths: pj.AffectedFilePaths})
+			}
+		}
+	}
+	return
+}
+
+func (me *goDiag) RunDiag(job *z.DiagJob) {
+	defer job.Done()
 	pkg, mockdiag := job.Target.(*udevgo.Pkg), func(i int, fpath string, found string) *z.DiagItem {
 		return &z.DiagItem{Message: "Found " + found, ToolName: job.Tool.Name, FileRef: z.SrcLens{FilePath: fpath, Flag: int(job.Tool.DiagSev), Pos: &z.SrcPos{Off: i + 1}}}
 	}
@@ -53,13 +78,13 @@ func (me *goDiag) RunDiag(job *z.DiagJob, yield z.DiagItemsChan) {
 		fpath := filepath.Join(pkg.Dir, filename)
 		filesrc := ufs.ReadTextFile(fpath, true, "")
 		if idx := strings.Index(filesrc, "/sys"); job.Tool.Name == "gosimple" && idx >= 0 {
-			yield <- mockdiag(idx, fpath, "/sys")
+			job.Yield(mockdiag(idx, fpath, "/sys"))
 		}
 		if idx := strings.Index(filesrc, "/run"); job.Tool.Name == "goconst" && idx >= 0 {
-			yield <- mockdiag(idx, fpath, "/run")
+			job.Yield(mockdiag(idx, fpath, "/run"))
 		}
 		if idx := strings.Index(filesrc, "/slice"); job.Tool.Name == "golint" && idx >= 0 {
-			yield <- mockdiag(idx, fpath, "/slice")
+			job.Yield(mockdiag(idx, fpath, "/slice"))
 		}
 	}
 }

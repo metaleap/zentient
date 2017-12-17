@@ -57,18 +57,18 @@ type goPkgIntel struct {
 	listFilters    []*z.ListFilter
 }
 
-func (goPkgIntel) isPkgNope(pkg z.ListItem) bool       { return false }
-func (goPkgIntel) isPkgGoRoot(pkg z.ListItem) bool     { return pkg.(*udevgo.Pkg).Goroot }
-func (goPkgIntel) isPkgBinary(pkg z.ListItem) bool     { return pkg.(*udevgo.Pkg).BinaryOnly }
-func (goPkgIntel) isPkgCommand(pkg z.ListItem) bool    { return pkg.(*udevgo.Pkg).IsCommand() }
-func (goPkgIntel) isPkgStandard(pkg z.ListItem) bool   { return pkg.(*udevgo.Pkg).Standard }
-func (goPkgIntel) isPkgIncomplete(pkg z.ListItem) bool { return pkg.(*udevgo.Pkg).Incomplete }
-func (goPkgIntel) isPkgStale(pkg z.ListItem) bool      { return pkg.(*udevgo.Pkg).Stale }
-func (goPkgIntel) isPkgError(pkg z.ListItem) bool      { return pkg.(*udevgo.Pkg).Error != nil }
-func (goPkgIntel) isPkgDepErr(pkg z.ListItem) bool     { return len(pkg.(*udevgo.Pkg).DepsErrors) > 0 }
-func (goPkgIntel) isPkgIgnored(pkg z.ListItem) bool    { return len(pkg.(*udevgo.Pkg).IgnoredGoFiles) > 0 }
-func (goPkgIntel) isPkgInvalid(pkg z.ListItem) bool    { return len(pkg.(*udevgo.Pkg).InvalidGoFiles) > 0 }
-func (*goPkgIntel) isPkgOpened(pkg z.ListItem) bool {
+func (goPkgIntel) isPkgNope(pkg z.IListItem) bool       { return false }
+func (goPkgIntel) isPkgGoRoot(pkg z.IListItem) bool     { return pkg.(*udevgo.Pkg).Goroot }
+func (goPkgIntel) isPkgBinary(pkg z.IListItem) bool     { return pkg.(*udevgo.Pkg).BinaryOnly }
+func (goPkgIntel) isPkgCommand(pkg z.IListItem) bool    { return pkg.(*udevgo.Pkg).IsCommand() }
+func (goPkgIntel) isPkgStandard(pkg z.IListItem) bool   { return pkg.(*udevgo.Pkg).Standard }
+func (goPkgIntel) isPkgIncomplete(pkg z.IListItem) bool { return pkg.(*udevgo.Pkg).Incomplete }
+func (goPkgIntel) isPkgStale(pkg z.IListItem) bool      { return pkg.(*udevgo.Pkg).Stale }
+func (goPkgIntel) isPkgError(pkg z.IListItem) bool      { return pkg.(*udevgo.Pkg).Error != nil }
+func (goPkgIntel) isPkgDepErr(pkg z.IListItem) bool     { return len(pkg.(*udevgo.Pkg).DepsErrors) > 0 }
+func (goPkgIntel) isPkgIgnored(pkg z.IListItem) bool    { return len(pkg.(*udevgo.Pkg).IgnoredGoFiles) > 0 }
+func (goPkgIntel) isPkgInvalid(pkg z.IListItem) bool    { return len(pkg.(*udevgo.Pkg).InvalidGoFiles) > 0 }
+func (*goPkgIntel) isPkgOpened(pkg z.IListItem) bool {
 	p := pkg.(*udevgo.Pkg)
 	for dirpath := range workspace.Dirs() {
 		if p.Dir == dirpath || strings.HasPrefix(p.Dir, strings.TrimRight(dirpath, "/\\")+string(filepath.Separator)) {
@@ -90,23 +90,23 @@ func (me *goPkgIntel) onSrcLens(lf *z.ListFilter, srcLens *z.SrcLens) {
 		if curpkg := udevgo.PkgsByDir[filepath.Dir(srcLens.FilePath)]; curpkg != nil {
 			curpkgdesc = curpkg.ImportPath
 			if isdepd {
-				lf.Pred = func(p z.ListItem) bool {
+				lf.Pred = func(p z.IListItem) bool {
 					return uslice.StrHas(curpkg.Imports, p.(*udevgo.Pkg).ImportPath)
 				}
 			} else if isdepi {
-				lf.Pred = func(p z.ListItem) bool {
+				lf.Pred = func(p z.IListItem) bool {
 					return uslice.StrHas(curpkg.Deps, p.(*udevgo.Pkg).ImportPath)
 				}
 			} else if isimpd { // d meaning 'direct' (vs. 'indirect') --- not 'dependant' (vs 'importer')
-				lf.Pred = func(p z.ListItem) bool {
+				lf.Pred = func(p z.IListItem) bool {
 					return uslice.StrHas(curpkg.Importers(), p.(*udevgo.Pkg).ImportPath)
 				}
 			} else if isimpi { // i meaning 'indirect' (vs. 'direct') --- not 'importer' (vs 'dependant')
-				lf.Pred = func(p z.ListItem) bool {
+				lf.Pred = func(p z.IListItem) bool {
 					return uslice.StrHas(curpkg.Dependants(), p.(*udevgo.Pkg).ImportPath)
 				}
 			} else if isself {
-				lf.Pred = func(p z.ListItem) bool {
+				lf.Pred = func(p z.IListItem) bool {
 					imppath := p.(*udevgo.Pkg).ImportPath
 					return imppath == curpkg.ImportPath || strings.HasPrefix(imppath, curpkg.ImportPath+"/")
 				}
@@ -168,7 +168,7 @@ func (me *goPkgIntel) List(filters z.ListFilters) (results z.ListItems) {
 	return me.list(filters, nil)
 }
 
-func (me *goPkgIntel) ListItemToMenuItem(p z.ListItem) (item *z.MenuItem) {
+func (me *goPkgIntel) ListItemToMenuItem(p z.IListItem) (item *z.MenuItem) {
 	if pkg, _ := p.(*udevgo.Pkg); pkg != nil {
 		delim, hints := " · ", []string{}
 		item = &z.MenuItem{Category: pkg.Name, Desc: pkg.Doc, Title: pkg.ImportPath}

@@ -4,16 +4,20 @@ import (
 	"strings"
 )
 
-type ListItem interface {
-	LessThan(interface{}) bool
+type ISortable interface {
+	IsSortedPriorTo(interface{}) bool
 }
 
-type ListItemPredicate func(ListItem) bool
+type IListItem interface {
+	ISortable
+}
 
-type ListItems []ListItem
+type ListItemPredicate func(IListItem) bool
+
+type ListItems []IListItem
 
 func (me ListItems) Len() int               { return len(me) }
-func (me ListItems) Less(i int, j int) bool { return me[i].LessThan(me[j]) }
+func (me ListItems) Less(i int, j int) bool { return me[i].IsSortedPriorTo(me[j]) }
 func (me ListItems) Swap(i, j int)          { me[i], me[j] = me[j], me[i] }
 
 type IList interface {
@@ -30,7 +34,7 @@ type IListMenu interface {
 
 	IpcID(*ListFilter) ipcIDs
 	ListItemsSubMenu(string, string, ListFilters) *Menu
-	ListItemToMenuItem(ListItem) *MenuItem
+	ListItemToMenuItem(IListItem) *MenuItem
 }
 
 type ListFilters map[*ListFilter]bool

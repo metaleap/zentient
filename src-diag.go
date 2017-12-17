@@ -1,6 +1,8 @@
 package z
 
 import (
+	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -9,8 +11,10 @@ type IDiag interface {
 
 	KnownDiags() Tools
 	OnSend() *DiagResp
+	OnUpdateBuildDiags(WorkspaceFiles, []string) DiagJobs
 	OnUpdateLintDiags(WorkspaceFiles, Tools, []string) DiagJobs
-	RunDiag(*DiagJob, DiagItemsChan)
+	RunDiag(*DiagJob)
+	UpdateBuildDiagsAsNeeded(WorkspaceFiles, []string)
 	UpdateLintDiagsIfAndAsNeeded(WorkspaceFiles, bool)
 }
 
@@ -43,17 +47,58 @@ type DiagItem struct {
 
 type DiagItems []*DiagItem
 
-type DiagItemsChan chan *DiagItem
-
-func (me DiagItemsChan) Done() { me <- nil }
+type IDiagJobTarget interface {
+	ISortable
+	fmt.Stringer
+}
 
 type DiagJob struct {
 	AffectedFilePaths []string
-	Target            interface{}
+	Target            IDiagJobTarget
 	Tool              *Tool
+	TargetCmp         func(IDiagJobTarget, IDiagJobTarget) bool
+
+	ch chan *DiagItem
+}
+
+func (me *DiagJob) Done()                { me.ch <- nil }
+func (me *DiagJob) Yield(diag *DiagItem) { me.ch <- diag }
+func (me *DiagJob) String() string       { return me.Target.String() }
+func (me *DiagJob) IsSortedPriorTo(cmp interface{}) bool {
+	c, _ := cmp.(*DiagJob)
+	if me != nil && c != nil {
+		if me.Target != nil && c.Target != nil {
+			if me.TargetCmp != nil {
+				return me.TargetCmp(me.Target, c.Target)
+			} else {
+				return me.Target.IsSortedPriorTo(c.Target)
+			}
+		}
+		return me.Target == nil && c.Target == nil
+	}
+	return me == nil && c == nil
 }
 
 type DiagJobs []*DiagJob
+
+func (me DiagJobs) Len() int               { return len(me) }
+func (me DiagJobs) Swap(i int, j int)      { me[i], me[j] = me[j], me[i] }
+func (me DiagJobs) Less(i int, j int) bool { return me[i].IsSortedPriorTo(me[j]) }
+
+func (me DiagJobs) Find(check func(*DiagJob) bool) *DiagJob {
+	for _, dj := range me {
+		if check(dj) {
+			return dj
+		}
+	}
+	return nil
+}
+
+func (me *DiagJobs) RemoveAt(i int) {
+	m := *me
+	pref, suff := m[:i], m[i+1:]
+	*me = append(pref, suff...)
+}
 
 type DiagBase struct {
 	Impl IDiag
@@ -93,30 +138,36 @@ func (me *DiagBase) MenuCategory() string {
 }
 
 func (me *DiagBase) MenuItems(srcLens *SrcLens) (menu []*MenuItem) {
-	updatehint := func(diags Tools, item *MenuItem) {
-		if item.Hint == "" {
-			toolnames := []string{}
-			for _, dt := range diags {
-				toolnames = append(toolnames, dt.Name)
-			}
-			if len(toolnames) == 0 {
-				item.Hint = "(none)"
-			} else {
-				item.Hint = Strf("(%d/%d)  · %s", len(diags), len(me.Impl.KnownDiags()), strings.Join(toolnames, " · "))
-			}
-		}
-	}
-
-	updatehint(me.knownDiags(true), me.cmdListDiags)
+	me.menuItemsUpdateHint(me.knownDiags(true), me.cmdListDiags)
 	menu = append(menu, me.cmdListDiags)
 	if srcLens != nil && srcLens.FilePath != "" {
 		nonautodiags, srcfilepath := me.knownDiags(false), srcLens.FilePath
 		srcfilepath = Lang.Workspace.PrettyPath(srcfilepath)
 		me.cmdRunDiagsOther.Desc = Strf("➜ run %d tools on: %s", nonautodiags.Len(true), srcfilepath)
-		updatehint(nonautodiags, me.cmdRunDiagsOther)
+		me.menuItemsUpdateHint(nonautodiags, me.cmdRunDiagsOther)
 		menu = append(menu, me.cmdRunDiagsOther)
 	}
 	return
+}
+
+func (me *DiagBase) menuItemsUpdateHint(diags Tools, item *MenuItem) {
+	if item.Hint == "" {
+		toolnames := []string{}
+		for _, dt := range diags {
+			toolnames = append(toolnames, dt.Name)
+		}
+		if len(toolnames) == 0 {
+			item.Hint = "(none)"
+		} else {
+			item.Hint = Strf("(%d/%d)  · %s", len(diags), len(me.Impl.KnownDiags()), strings.Join(toolnames, " · "))
+		}
+	}
+}
+
+func (me *DiagBase) UpdateBuildDiagsAsNeeded(workspaceFiles WorkspaceFiles, writtenFiles []string) {
+	jobs := me.Impl.OnUpdateBuildDiags(workspaceFiles, writtenFiles)
+	sort.Sort(jobs)
+	println(Strf("%v", jobs))
 }
 
 func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(workspaceFiles WorkspaceFiles, autos bool) {
@@ -136,10 +187,11 @@ func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(workspaceFiles WorkspaceFiles, 
 
 func (me *DiagBase) updateLintDiags(workspaceFiles WorkspaceFiles, diagTools Tools, filePaths []string) {
 	if jobs := me.Impl.OnUpdateLintDiags(workspaceFiles, diagTools, filePaths); len(jobs) > 0 {
-		numjobs, numdone, await := 0, 0, make(DiagItemsChan)
+		numjobs, numdone, await := 0, 0, make(chan *DiagItem)
 		for _, job := range jobs {
 			numjobs++
-			go me.Impl.RunDiag(job, await)
+			job.ch = await
+			go me.Impl.RunDiag(job)
 			for _, filepath := range job.AffectedFilePaths {
 				if f, _ := workspaceFiles[filepath]; f != nil {
 					f.Diags.Lint.Forget(diagTools)
