@@ -9,7 +9,8 @@ type IDiag interface {
 
 	KnownDiags() Tools
 	OnSend() *DiagResp
-	UpdateLintDiags(WorkspaceFiles, Tools, []string)
+	OnUpdateLintDiags(WorkspaceFiles, []string) DiagTargets
+	RunDiag(*Tool, *DiagTarget, DiagItemsChan)
 	UpdateLintDiagsIfAndAsNeeded(WorkspaceFiles, bool)
 }
 
@@ -32,7 +33,7 @@ func (me *Diags) Forget(onlyFor Tools) {
 	}
 }
 
-type diagItems map[string]DiagItems
+type DiagItemsBy map[string]DiagItems
 
 type DiagItem struct {
 	ToolName string
@@ -42,6 +43,17 @@ type DiagItem struct {
 
 type DiagItems []*DiagItem
 
+type DiagItemsChan chan *DiagItem
+
+func (me DiagItemsChan) Done() { me <- nil }
+
+type DiagTarget struct {
+	AffectedFilePaths []string
+	Target            interface{}
+}
+
+type DiagTargets []*DiagTarget
+
 type DiagBase struct {
 	Impl IDiag
 
@@ -50,7 +62,7 @@ type DiagBase struct {
 }
 
 type DiagResp struct {
-	All    diagItems
+	All    DiagItemsBy
 	LangID string
 }
 
@@ -106,21 +118,54 @@ func (me *DiagBase) MenuItems(srcLens *SrcLens) (menu []*MenuItem) {
 	return
 }
 
-func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(files WorkspaceFiles, autos bool) {
-	var diagtools = me.knownDiags(autos)
-
-	if len(diagtools) > 0 {
+func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(workspaceFiles WorkspaceFiles, autos bool) {
+	if diagtools := me.knownDiags(autos); len(diagtools) > 0 {
 		var filepaths []string
-		for _, f := range files {
+		for _, f := range workspaceFiles {
 			if f != nil && f.IsOpen && !f.Diags.Lint.UpToDate {
 				filepaths = append(filepaths, f.Path)
 			}
 		}
 		if len(filepaths) > 0 {
-			me.Impl.UpdateLintDiags(files, diagtools, filepaths)
+			me.updateLintDiags(workspaceFiles, diagtools, filepaths)
 		}
 	}
 	go me.send()
+}
+
+func (me *DiagBase) updateLintDiags(workspaceFiles WorkspaceFiles, diagTools Tools, filePaths []string) {
+	if targets := me.Impl.OnUpdateLintDiags(workspaceFiles, filePaths); len(targets) > 0 {
+		numjobs, numdone, await := 0, 0, make(DiagItemsChan)
+		for _, target := range targets {
+			for _, diagtool := range diagTools {
+				numjobs++
+				go me.Impl.RunDiag(diagtool, target, await)
+			}
+			for _, filepath := range target.AffectedFilePaths {
+				if f, _ := workspaceFiles[filepath]; f != nil {
+					f.Diags.Lint.Forget(diagTools)
+					f.Diags.Lint.UpToDate = true
+				}
+			}
+		}
+
+		var diagitems []*DiagItem
+		for numdone < numjobs {
+			select {
+			case diagitem := <-await:
+				if diagitem == nil {
+					numdone++
+				} else {
+					diagitems = append(diagitems, diagitem)
+				}
+			}
+		}
+		for _, diag := range diagitems {
+			f := workspaceFiles.Ensure(diag.FileRef.FilePath)
+			f.Diags.Lint.UpToDate = true
+			f.Diags.Lint.Items = append(f.Diags.Lint.Items, diag)
+		}
+	}
 }
 
 func (me *DiagBase) dispatch(req *ipcReq, resp *ipcResp) bool {
@@ -192,9 +237,9 @@ func (me *DiagBase) send() {
 	send(msg)
 }
 
-func (me *DiagBase) OnSend() (diags *DiagResp) {
+func (me *DiagBase) OnSend() *DiagResp {
 	files := Lang.Workspace.Files()
-	diags = &DiagResp{LangID: Lang.ID, All: make(diagItems, len(files))}
+	diags := &DiagResp{LangID: Lang.ID, All: make(DiagItemsBy, len(files))}
 	for _, f := range files {
 		if num := len(f.Diags.Build.Items) + len(f.Diags.Lint.Items); num > 0 {
 			filediags := make(DiagItems, 0, num)
@@ -203,5 +248,5 @@ func (me *DiagBase) OnSend() (diags *DiagResp) {
 			diags.All[f.Path] = filediags
 		}
 	}
-	return
+	return diags
 }
