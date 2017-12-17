@@ -39,6 +39,13 @@ func (me WorkspaceFiles) Ensure(fpath string) (file *WorkspaceFile) {
 	return
 }
 
+func (me WorkspaceFiles) HasBuildDiags(filePath string) (has bool) {
+	if f, _ := me[filePath]; f != nil {
+		has = f.Diags.Build.upToDate && len(f.Diags.Build.Items) > 0
+	}
+	return
+}
+
 func (me WorkspaceFiles) exists(fpath string) bool {
 	f, _ := me[fpath]
 	return f != nil

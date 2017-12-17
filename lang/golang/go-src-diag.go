@@ -1,7 +1,6 @@
 package zgo
 
 import (
-	"path/filepath"
 	"strings"
 
 	"github.com/metaleap/go-util/dev/go"
@@ -33,24 +32,23 @@ func ensureBuildOrder(dis z.IDiagJobTarget, dat z.IDiagJobTarget) bool {
 	return dis.(*udevgo.Pkg).IsSortedPriorToByDeps(dat.(*udevgo.Pkg))
 }
 
-func (me *goDiag) onUpdateDiagsPkgJobs(workspaceFiles z.WorkspaceFiles, filePaths []string) (jobs z.DiagJobs) {
+func (me *goDiag) onUpdateDiagsPkgJobs(workspaceFiles z.WorkspaceFiles, filePaths []string) (jobs []z.DiagJob) {
 	if pkgs := udevgo.PkgsForFiles(filePaths...); len(pkgs) > 0 {
 		for _, pkg := range pkgs {
-			jobs = append(jobs, &z.DiagJob{AffectedFilePaths: pkg.GoFilePaths(), Target: pkg})
+			jobs = append(jobs, z.DiagJob{AffectedFilePaths: pkg.GoFilePaths(), Target: pkg})
 		}
 	}
 	return
 }
 
-func (me *goDiag) OnUpdateBuildDiags(workspaceFiles z.WorkspaceFiles, writtenFilePaths []string) (jobs z.DiagJobs) {
+func (me *goDiag) OnUpdateBuildDiags(workspaceFiles z.WorkspaceFiles, writtenFilePaths []string) (jobs z.DiagBuildJobs) {
 	if dependant, pkgjobs := "", me.onUpdateDiagsPkgJobs(workspaceFiles, writtenFilePaths); len(pkgjobs) > 0 {
-		jobs = pkgjobs
-		byimppath := func(job *z.DiagJob) bool { return job.Target.(*udevgo.Pkg).ImportPath == dependant }
+		byimppath := func(job *z.DiagJobBuild) bool { return job.Target.(*udevgo.Pkg).ImportPath == dependant }
 		for _, pj := range pkgjobs {
-			pj.TargetCmp = ensureBuildOrder
+			jobs = append(jobs, &z.DiagJobBuild{DiagJob: pj, TargetCmp: ensureBuildOrder})
 			for _, dependant = range pj.Target.(*udevgo.Pkg).Dependants() {
 				if pkgdep := udevgo.PkgsByImP[dependant]; pkgdep != nil && jobs.Find(byimppath) == nil {
-					jobs = append(jobs, &z.DiagJob{Target: pkgdep, AffectedFilePaths: pkgdep.GoFilePaths(), TargetCmp: ensureBuildOrder})
+					jobs = append(jobs, &z.DiagJobBuild{DiagJob: z.DiagJob{Target: pkgdep, AffectedFilePaths: pkgdep.GoFilePaths()}, TargetCmp: ensureBuildOrder})
 				}
 			}
 		}
@@ -58,24 +56,45 @@ func (me *goDiag) OnUpdateBuildDiags(workspaceFiles z.WorkspaceFiles, writtenFil
 	return
 }
 
-func (me *goDiag) OnUpdateLintDiags(workspaceFiles z.WorkspaceFiles, diagTools z.Tools, filePaths []string) (jobs z.DiagJobs) {
+func (me *goDiag) OnUpdateLintDiags(workspaceFiles z.WorkspaceFiles, diagTools z.Tools, filePaths []string) (jobs z.DiagLintJobs) {
 	if pkgjobs := me.onUpdateDiagsPkgJobs(workspaceFiles, filePaths); len(pkgjobs) > 0 {
 		for _, pj := range pkgjobs {
-			for _, dt := range diagTools {
-				jobs = append(jobs, &z.DiagJob{Tool: dt, Target: pj.Target, AffectedFilePaths: pj.AffectedFilePaths})
+			skippkg := false
+			for _, fpath := range pj.Target.(*udevgo.Pkg).GoFilePaths() {
+				if skippkg = workspaceFiles.HasBuildDiags(fpath); skippkg {
+					break
+				}
+			}
+			if !skippkg {
+				for _, dt := range diagTools {
+					jobs = append(jobs, &z.DiagJobLint{DiagJob: pj, Tool: dt})
+				}
 			}
 		}
 	}
 	return
 }
 
-func (me *goDiag) RunDiag(job *z.DiagJob) {
+func (me *goDiag) RunBuildJob(job *z.DiagJobBuild, isFirst bool, isLast bool) bool {
+	failed, pkg, mockdiag := false, job.Target.(*udevgo.Pkg), func(i int, fpath string, found string) *z.DiagItem {
+		return &z.DiagItem{Message: "Found " + found, ToolName: "go install", FileRef: z.SrcLens{FilePath: fpath, Flag: int(z.DIAG_SEV_ERR), Pos: &z.SrcPos{Off: i + 1}}}
+	}
+	for _, fpath := range pkg.GoFilePaths() {
+		filesrc := strings.ToLower(ufs.ReadTextFile(fpath, true, ""))
+		if idx := strings.Index(filesrc, "intel"); idx >= 0 {
+			job.Yield(mockdiag(idx, fpath, "intel"))
+			isLast, failed = true, true
+		}
+	}
+	return !failed
+}
+
+func (me *goDiag) RunLintJob(job *z.DiagJobLint) {
 	defer job.Done()
 	pkg, mockdiag := job.Target.(*udevgo.Pkg), func(i int, fpath string, found string) *z.DiagItem {
 		return &z.DiagItem{Message: "Found " + found, ToolName: job.Tool.Name, FileRef: z.SrcLens{FilePath: fpath, Flag: int(job.Tool.DiagSev), Pos: &z.SrcPos{Off: i + 1}}}
 	}
-	for _, filename := range pkg.GoFiles {
-		fpath := filepath.Join(pkg.Dir, filename)
+	for _, fpath := range pkg.GoFilePaths() {
 		filesrc := ufs.ReadTextFile(fpath, true, "")
 		if idx := strings.Index(filesrc, "/sys"); job.Tool.Name == "gosimple" && idx >= 0 {
 			job.Yield(mockdiag(idx, fpath, "/sys"))

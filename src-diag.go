@@ -10,22 +10,23 @@ type IDiag interface {
 	IMenuItems
 
 	KnownDiags() Tools
-	OnSend() *DiagResp
-	OnUpdateBuildDiags(WorkspaceFiles, []string) DiagJobs
-	OnUpdateLintDiags(WorkspaceFiles, Tools, []string) DiagJobs
-	RunDiag(*DiagJob)
+	OnUpdateBuildDiags(WorkspaceFiles, []string) DiagBuildJobs
+	OnUpdateLintDiags(WorkspaceFiles, Tools, []string) DiagLintJobs
+	RunBuildJob(*DiagJobBuild, bool, bool) bool
+	RunLintJob(*DiagJobLint)
+	send()
 	UpdateBuildDiagsAsNeeded(WorkspaceFiles, []string)
 	UpdateLintDiagsIfAndAsNeeded(WorkspaceFiles, bool)
 }
 
 type Diags struct {
-	UpToDate bool      `json:",omitempty"`
+	upToDate bool      `json:",omitempty"`
 	Items    DiagItems `json:",omitempty"`
 }
 
 func (me *Diags) Forget(onlyFor Tools) {
 	if len(onlyFor) == 0 {
-		me.UpToDate, me.Items = false, nil
+		me.upToDate, me.Items = false, nil
 	} else {
 		for i := 0; i < len(me.Items); i++ {
 			if onlyFor.Has(me.Items[i].ToolName) {
@@ -47,6 +48,18 @@ type DiagItem struct {
 
 type DiagItems []*DiagItem
 
+func (me DiagItems) propagate(lintDiags bool, workspaceFiles WorkspaceFiles) {
+	for _, diag := range me {
+		f := workspaceFiles.Ensure(diag.FileRef.FilePath)
+		fd := &f.Diags.Lint
+		if !lintDiags {
+			fd = &f.Diags.Build
+		}
+		fd.upToDate = true
+		fd.Items = append(fd.Items, diag)
+	}
+}
+
 type IDiagJobTarget interface {
 	ISortable
 	fmt.Stringer
@@ -55,37 +68,58 @@ type IDiagJobTarget interface {
 type DiagJob struct {
 	AffectedFilePaths []string
 	Target            IDiagJobTarget
-	Tool              *Tool
-	TargetCmp         func(IDiagJobTarget, IDiagJobTarget) bool
-
-	ch chan *DiagItem
 }
 
-func (me *DiagJob) Done()                { me.ch <- nil }
-func (me *DiagJob) Yield(diag *DiagItem) { me.ch <- diag }
-func (me *DiagJob) String() string       { return me.Target.String() }
-func (me *DiagJob) IsSortedPriorTo(cmp interface{}) bool {
-	c, _ := cmp.(*DiagJob)
-	if me != nil && c != nil {
-		if me.Target != nil && c.Target != nil {
-			if me.TargetCmp != nil {
-				return me.TargetCmp(me.Target, c.Target)
-			} else {
-				return me.Target.IsSortedPriorTo(c.Target)
+func (me *DiagJob) forgetAndMarkUpToDate(diagToolsIfLint Tools, workspaceFiles WorkspaceFiles) {
+	for _, filepath := range me.AffectedFilePaths {
+		if f, _ := workspaceFiles[filepath]; f != nil {
+			fd := &f.Diags.Build
+			if diagToolsIfLint != nil {
+				fd = &f.Diags.Lint
 			}
+			fd.Forget(diagToolsIfLint)
+			fd.upToDate = true
 		}
-		return me.Target == nil && c.Target == nil
 	}
-	return me == nil && c == nil
+
 }
 
-type DiagJobs []*DiagJob
+func (me *DiagJob) String() string { return me.Target.String() }
 
-func (me DiagJobs) Len() int               { return len(me) }
-func (me DiagJobs) Swap(i int, j int)      { me[i], me[j] = me[j], me[i] }
-func (me DiagJobs) Less(i int, j int) bool { return me[i].IsSortedPriorTo(me[j]) }
+type DiagJobBuild struct {
+	DiagJob
+	TargetCmp func(IDiagJobTarget, IDiagJobTarget) bool
+	diags     DiagItems
+}
 
-func (me DiagJobs) Find(check func(*DiagJob) bool) *DiagJob {
+func (me *DiagJobBuild) Yield(diag *DiagItem) { me.diags = append(me.diags, diag) }
+
+func (me *DiagJobBuild) IsSortedPriorTo(cmp interface{}) bool {
+	c := cmp.(*DiagJobBuild)
+	if me.TargetCmp != nil {
+		return me.TargetCmp(me.Target, c.Target)
+	}
+	return me.Target.IsSortedPriorTo(c.Target)
+}
+
+type DiagJobLint struct {
+	DiagJob
+	Tool     *Tool
+	lintChan chan *DiagItem
+}
+
+func (me *DiagJobLint) Done()                { me.lintChan <- nil }
+func (me *DiagJobLint) Yield(diag *DiagItem) { me.lintChan <- diag }
+
+type DiagLintJobs []*DiagJobLint
+
+type DiagBuildJobs []*DiagJobBuild
+
+func (me DiagBuildJobs) Len() int               { return len(me) }
+func (me DiagBuildJobs) Swap(i int, j int)      { me[i], me[j] = me[j], me[i] }
+func (me DiagBuildJobs) Less(i int, j int) bool { return me[i].IsSortedPriorTo(me[j]) }
+
+func (me DiagBuildJobs) Find(check func(*DiagJobBuild) bool) *DiagJobBuild {
 	for _, dj := range me {
 		if check(dj) {
 			return dj
@@ -94,7 +128,7 @@ func (me DiagJobs) Find(check func(*DiagJob) bool) *DiagJob {
 	return nil
 }
 
-func (me *DiagJobs) RemoveAt(i int) {
+func (me *DiagBuildJobs) RemoveAt(i int) {
 	m := *me
 	pref, suff := m[:i], m[i+1:]
 	*me = append(pref, suff...)
@@ -165,16 +199,26 @@ func (me *DiagBase) menuItemsUpdateHint(diags Tools, item *MenuItem) {
 }
 
 func (me *DiagBase) UpdateBuildDiagsAsNeeded(workspaceFiles WorkspaceFiles, writtenFiles []string) {
-	jobs := me.Impl.OnUpdateBuildDiags(workspaceFiles, writtenFiles)
-	sort.Sort(jobs)
-	println(Strf("%v", jobs))
+	if ok, jobs := true, me.Impl.OnUpdateBuildDiags(workspaceFiles, writtenFiles); len(jobs) > 0 {
+		sort.Sort(jobs)
+		for _, job := range jobs {
+			job.forgetAndMarkUpToDate(nil, workspaceFiles)
+		}
+		var diagitems DiagItems
+		for i, ilast := 0, len(jobs)-1; ok && i <= ilast; i++ {
+			ok = me.Impl.RunBuildJob(jobs[i], i == 0, i == ilast)
+			diagitems = append(diagitems, jobs[i].diags...)
+		}
+		diagitems.propagate(false, workspaceFiles)
+	}
+	go me.send()
 }
 
 func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(workspaceFiles WorkspaceFiles, autos bool) {
 	if diagtools := me.knownDiags(autos); len(diagtools) > 0 {
 		var filepaths []string
 		for _, f := range workspaceFiles {
-			if f != nil && f.IsOpen && !f.Diags.Lint.UpToDate {
+			if f != nil && f.IsOpen && !f.Diags.Lint.upToDate {
 				filepaths = append(filepaths, f.Path)
 			}
 		}
@@ -190,17 +234,12 @@ func (me *DiagBase) updateLintDiags(workspaceFiles WorkspaceFiles, diagTools Too
 		numjobs, numdone, await := 0, 0, make(chan *DiagItem)
 		for _, job := range jobs {
 			numjobs++
-			job.ch = await
-			go me.Impl.RunDiag(job)
-			for _, filepath := range job.AffectedFilePaths {
-				if f, _ := workspaceFiles[filepath]; f != nil {
-					f.Diags.Lint.Forget(diagTools)
-					f.Diags.Lint.UpToDate = true
-				}
-			}
+			job.lintChan = await
+			go me.Impl.RunLintJob(job)
+			job.forgetAndMarkUpToDate(diagTools, workspaceFiles)
 		}
 
-		var diagitems []*DiagItem
+		var diagitems DiagItems
 		for numdone < numjobs {
 			select {
 			case diagitem := <-await:
@@ -211,11 +250,7 @@ func (me *DiagBase) updateLintDiags(workspaceFiles WorkspaceFiles, diagTools Too
 				}
 			}
 		}
-		for _, diag := range diagitems {
-			f := workspaceFiles.Ensure(diag.FileRef.FilePath)
-			f.Diags.Lint.UpToDate = true
-			f.Diags.Lint.Items = append(f.Diags.Lint.Items, diag)
-		}
+		diagitems.propagate(true, workspaceFiles)
 	}
 }
 
@@ -284,20 +319,19 @@ func (me *DiagBase) onToggled() {
 }
 
 func (me *DiagBase) send() {
-	msg := &ipcResp{IpcID: IPCID_SRCDIAG_PUB, SrcDiags: me.Impl.OnSend()}
-	send(msg)
-}
-
-func (me *DiagBase) OnSend() *DiagResp {
-	files := Lang.Workspace.Files()
-	diags := &DiagResp{LangID: Lang.ID, All: make(DiagItemsBy, len(files))}
+	hasbuilddiags, files := false, Lang.Workspace.Files()
+	resp := &DiagResp{LangID: Lang.ID, All: make(DiagItemsBy, len(files))}
 	for _, f := range files {
-		if num := len(f.Diags.Build.Items) + len(f.Diags.Lint.Items); num > 0 {
-			filediags := make(DiagItems, 0, num)
-			filediags = append(filediags, f.Diags.Build.Items...)
-			filediags = append(filediags, f.Diags.Lint.Items...)
-			diags.All[f.Path] = filediags
+		if hasbuilddiags = len(f.Diags.Build.Items) > 0; hasbuilddiags {
+			break
 		}
 	}
-	return diags
+	for _, f := range files {
+		fdiagitems := f.Diags.Lint.Items
+		if hasbuilddiags {
+			fdiagitems = f.Diags.Build.Items
+		}
+		resp.All[f.Path] = fdiagitems
+	}
+	send(&ipcResp{IpcID: IPCID_SRCDIAG_PUB, SrcDiags: resp})
 }
