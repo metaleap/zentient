@@ -126,7 +126,7 @@ func (me *WorkspaceBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	return true
 }
 
-func (_ *WorkspaceBase) analyzeChanges(files WorkspaceFiles, upd *WorkspaceChanges) (freshFiles []string, hasFreshFiles bool, dirsChanged bool, needsFreshAutoLints bool) {
+func (*WorkspaceBase) analyzeChanges(files WorkspaceFiles, upd *WorkspaceChanges) (freshFiles []string, hasFreshFiles bool, dirsChanged bool, needsFreshAutoLints bool) {
 	for _, eventfiles := range [][]string{upd.OpenedFiles, upd.ClosedFiles, upd.WrittenFiles} {
 		for _, fpath := range eventfiles {
 			if !files.exists(fpath) {

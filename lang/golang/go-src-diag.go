@@ -1,11 +1,8 @@
 package zgo
 
 import (
-	"strings"
-
 	"github.com/metaleap/go-util/dev"
 	"github.com/metaleap/go-util/dev/go"
-	"github.com/metaleap/go-util/fs"
 	"github.com/metaleap/zentient"
 )
 
@@ -79,7 +76,7 @@ func (me *goDiag) OnUpdateLintDiags(workspaceFiles z.WorkspaceFiles, diagTools z
 	return
 }
 
-func (_ *goDiag) fallbackFilePath(pkg *udevgo.Pkg) (filePath string) {
+func (*goDiag) fallbackFilePath(pkg *udevgo.Pkg) (filePath string) {
 	workspacefiles := z.Lang.Workspace.Files()
 	for _, fp := range pkg.GoFilePaths() {
 		if filePath == "" {
@@ -100,7 +97,7 @@ func (me *goDiag) runBuildPkg(pkg *udevgo.Pkg) (diags z.DiagItems) {
 		fallbackfilepath, skipmsg := me.fallbackFilePath(pkg), "package "+pkg.ImportPath+":"
 		for _, srcref := range msgs {
 			if srcref.Msg != "too many errors" && !(srcref.Pos1Ch == 1 && srcref.Pos1Ln == 1 && srcref.Msg == skipmsg) {
-				diags = append(diags, me.NewDiagItemFrom(srcref, "", true, fallbackfilepath))
+				diags = append(diags, me.NewDiagItemFrom(srcref, "", fallbackfilepath))
 			}
 		}
 	}
@@ -140,19 +137,19 @@ func (me *goDiag) RunBuildJobs(jobs z.DiagBuildJobs) (diags z.DiagItems) {
 
 func (me *goDiag) RunLintJob(job *z.DiagJobLint) {
 	defer job.Done()
-	pkg, mockdiag := job.Target.(*udevgo.Pkg), func(i int, fpath string, found string) *z.DiagItem {
-		return &z.DiagItem{Message: "Found " + found, ToolName: job.Tool.Name, FileRef: z.SrcLens{FilePath: fpath, Flag: int(job.Tool.DiagSev), Pos: &z.SrcPos{Off: i + 1}}}
+	pkg := job.Target.(*udevgo.Pkg)
+	fallbackfilepath := me.fallbackFilePath(pkg)
+	var msgs udev.SrcMsgs
+	switch job.Tool.Name {
+	case "golint":
+		msgs = udevgo.LintGolint(pkg.ImportPath)
+	case "goconst":
+		msgs = udevgo.LintGoConst(pkg.Dir)
+	default:
+		msgs = append(msgs, &udev.SrcMsg{Msg: z.BadMsg("lint tool", job.Tool.Name)})
 	}
-	for _, fpath := range pkg.GoFilePaths() {
-		filesrc := ufs.ReadTextFile(fpath, true, "")
-		if idx := strings.Index(filesrc, "/sys"); job.Tool.Name == "gosimple" && idx >= 0 {
-			job.Yield(mockdiag(idx, fpath, "/sys"))
-		}
-		if idx := strings.Index(filesrc, "/run"); job.Tool.Name == "goconst" && idx >= 0 {
-			job.Yield(mockdiag(idx, fpath, "/run"))
-		}
-		if idx := strings.Index(filesrc, "/slice"); job.Tool.Name == "golint" && idx >= 0 {
-			job.Yield(mockdiag(idx, fpath, "/slice"))
-		}
+	for _, srcref := range msgs {
+		srcref.Flag = int(job.Tool.DiagSev)
+		job.Yield(me.NewDiagItemFrom(srcref, job.Tool.Name, fallbackfilepath))
 	}
 }

@@ -52,9 +52,6 @@ func (*goSrcIntel) hoverShortenImpPaths(s string) string {
 func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 	var ggd *udevgo.Gogetdoc
 	var decl *z.InfoTip
-	if 1 > 0 {
-		return
-	}
 	offset := z.Strf("%d", srcLens.ByteOffsetForPosWithRuneOffset(srcLens.Pos))
 
 	if !tools.gogetdoc.Installed {
