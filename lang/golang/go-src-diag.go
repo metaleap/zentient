@@ -97,9 +97,9 @@ func (_ *goDiag) fallbackFilePath(pkg *udevgo.Pkg) (filePath string) {
 func (me *goDiag) runBuildPkg(pkg *udevgo.Pkg) (diags z.DiagItems) {
 	if msgs := udev.CmdExecOnSrc(true, nil, "go", "install", pkg.ImportPath); len(msgs) > 0 {
 		diags = make(z.DiagItems, 0, len(msgs))
-		fallbackfilepath := me.fallbackFilePath(pkg)
+		fallbackfilepath, skipmsg := me.fallbackFilePath(pkg), "package "+pkg.ImportPath+":"
 		for _, srcref := range msgs {
-			if srcref.Msg != "too many errors" && !(srcref.Pos1Ch == 1 && srcref.Pos1Ln == 1 && srcref.Msg == "package "+pkg.ImportPath+":") {
+			if srcref.Msg != "too many errors" && !(srcref.Pos1Ch == 1 && srcref.Pos1Ln == 1 && srcref.Msg == skipmsg) {
 				diags = append(diags, me.NewDiagItemFrom(srcref, "", true, fallbackfilepath))
 			}
 		}

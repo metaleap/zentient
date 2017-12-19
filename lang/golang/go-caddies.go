@@ -64,7 +64,7 @@ func caddyRunRefreshPkgs() {
 			z.CADDY_ERROR, "error: "+err.Error()
 	} else {
 		caddyRefreshPkgs.Status.Flag, caddyRefreshPkgs.Status.Desc =
-			z.CADDY_GOOD, z.Strf("%d Go packages (%d broken)", len(udevgo.PkgsByDir), len(udevgo.PkgsErrs))
+			z.CADDY_GOOD, z.Strf("%d packages (at least %d broken)", len(udevgo.PkgsByDir), len(udevgo.PkgsErrs))
 		caddyRefreshPkgs.UxActionID = "zen.menus.main." + z.Lang.PkgIntel.MenuCategory()
 		// if len(udevgo.PkgsErrs) > 0 {
 		// 	for _, pkg := range udevgo.PkgsErrs {
