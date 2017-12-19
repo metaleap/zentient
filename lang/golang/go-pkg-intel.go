@@ -209,14 +209,14 @@ func (me *goPkgIntel) ListItemToMenuItem(p z.IListItem) (item *z.MenuItem) {
 			}
 			hints = append(hints, "Stale"+suffix)
 		}
-		__ := func(f z.ListItemPredicate) *z.ListItemPredicate { return &f }
+		ª := func(f z.ListItemPredicate) *z.ListItemPredicate { return &f }
 		for f, s := range map[*z.ListItemPredicate]string{
-			__(me.isPkgBinary):     "Binary",
-			__(me.isPkgCommand):    "Command",
-			__(me.isPkgIncomplete): "Incomplete",
-			__(me.isPkgStandard):   "Standard",
-			__(me.isPkgGoRoot):     "In GOROOT",
-			__(me.isPkgOpened):     "In Workspace",
+			ª(me.isPkgBinary):     "Binary",
+			ª(me.isPkgCommand):    "Command",
+			ª(me.isPkgIncomplete): "Incomplete",
+			ª(me.isPkgStandard):   "Standard",
+			ª(me.isPkgGoRoot):     "In GOROOT",
+			ª(me.isPkgOpened):     "In Workspace",
 		} {
 			if (*f)(pkg) {
 				hints = append(hints, s)

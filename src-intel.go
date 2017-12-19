@@ -106,7 +106,7 @@ func (me *SrcIntelBase) onCmplItems(req *ipcReq, resp *ipcResp) {
 
 func (me *SrcIntelBase) onCmplDetails(req *ipcReq, resp *ipcResp) {
 	itemtext, _ := req.IpcArgs.(string)
-	resp.SrcIntel.Cmpl = make([]SrcIntelCompl, 1, 1)
+	resp.SrcIntel.Cmpl = make([]SrcIntelCompl, 1)
 	me.Impl.ComplDetails(req.SrcLens, itemtext, &(resp.SrcIntel.Cmpl[0]))
 }
 

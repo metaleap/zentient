@@ -141,6 +141,8 @@ func (me *goDiag) RunLintJob(job *z.DiagJobLint) {
 	fallbackfilepath := me.fallbackFilePath(pkg)
 	var msgs udev.SrcMsgs
 	switch job.Tool.Name {
+	case "gosimple":
+		msgs = udevgo.LintGoSimple(pkg.ImportPath)
 	case "golint":
 		msgs = udevgo.LintGolint(pkg.ImportPath)
 	case "goconst":

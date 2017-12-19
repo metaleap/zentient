@@ -15,7 +15,7 @@ func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(workspaceFiles WorkspaceFiles, 
 	if diagtools := me.knownDiags(autos); len(diagtools) > 0 {
 		var filepaths []string
 		for _, f := range workspaceFiles {
-			if f != nil && f.IsOpen && !f.Diags.Lint.upToDate {
+			if f != nil && f.IsOpen && !f.Diags.Lint.UpToDate {
 				filepaths = append(filepaths, f.Path)
 			}
 		}
@@ -37,14 +37,11 @@ func (me *DiagBase) updateLintDiags(workspaceFiles WorkspaceFiles, diagTools Too
 		}
 
 		var diagitems DiagItems
-		for numdone < numjobs {
-			select {
-			case diagitem := <-await:
-				if diagitem == nil {
-					numdone++
-				} else {
-					diagitems = append(diagitems, diagitem)
-				}
+		for diagitem := range await {
+			if diagitem != nil {
+				diagitems = append(diagitems, diagitem)
+			} else if numdone++; numdone == numjobs {
+				break
 			}
 		}
 		diagitems.propagate(true, workspaceFiles)

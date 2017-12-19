@@ -22,13 +22,13 @@ type IDiag interface {
 }
 
 type Diags struct {
-	upToDate bool      `json:",omitempty"`
+	UpToDate bool      `json:",omitempty"`
 	Items    DiagItems `json:",omitempty"`
 }
 
 func (me *Diags) Forget(onlyFor Tools) {
 	if len(onlyFor) == 0 {
-		me.upToDate, me.Items = false, nil
+		me.UpToDate, me.Items = false, nil
 	} else {
 		for i := 0; i < len(me.Items); i++ {
 			if onlyFor.Has(me.Items[i].ToolName) {
@@ -57,7 +57,7 @@ func (me DiagItems) propagate(lintDiags bool, workspaceFiles WorkspaceFiles) {
 		if !lintDiags {
 			fd = &f.Diags.Build
 		}
-		fd.upToDate = true
+		fd.UpToDate = true
 		fd.Items = append(fd.Items, diag)
 	}
 }
@@ -74,13 +74,15 @@ type DiagJob struct {
 
 func (me *DiagJob) forgetAndMarkUpToDate(diagToolsIfLint Tools, workspaceFiles WorkspaceFiles) {
 	for _, filepath := range me.AffectedFilePaths {
-		if f, _ := workspaceFiles[filepath]; f != nil {
+		// f := workspaceFiles[filepath]
+		f := workspaceFiles.Ensure(filepath)
+		if f != nil {
 			fd := &f.Diags.Build
 			if diagToolsIfLint != nil {
 				fd = &f.Diags.Lint
 			}
 			fd.Forget(diagToolsIfLint)
-			fd.upToDate = true
+			fd.UpToDate = true
 		}
 	}
 
