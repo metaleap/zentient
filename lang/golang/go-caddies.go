@@ -55,7 +55,7 @@ func caddyBuildOnDone(failed map[string]bool, skipped map[string]bool, all []str
 
 func caddyRunRefreshPkgs() {
 	caddyRefreshPkgs.Status.Flag, caddyRefreshPkgs.Status.Desc, caddyRefreshPkgs.Details, caddyRefreshPkgs.UxActionID =
-		z.CADDY_BUSY, "refreshing", "", ""
+		z.CADDY_BUSY, "refreshing", "", "zen.menus.main."+z.Lang.PkgIntel.MenuCategory()
 	caddyRefreshPkgs.OnStatusChanged()
 	firstrun := (udevgo.PkgsByDir == nil)
 
@@ -65,12 +65,6 @@ func caddyRunRefreshPkgs() {
 	} else {
 		caddyRefreshPkgs.Status.Flag, caddyRefreshPkgs.Status.Desc =
 			z.CADDY_GOOD, z.Strf("%d packages (at least %d broken)", len(udevgo.PkgsByDir), len(udevgo.PkgsErrs))
-		caddyRefreshPkgs.UxActionID = "zen.menus.main." + z.Lang.PkgIntel.MenuCategory()
-		// if len(udevgo.PkgsErrs) > 0 {
-		// 	for _, pkg := range udevgo.PkgsErrs {
-		// 		caddyRefreshPkgs.Details += pkg.ImportPath + "\n"
-		// 	}
-		// }
 	}
 	caddyRefreshPkgs.OnStatusChanged()
 	if firstrun && (udevgo.PkgsByDir != nil) && (z.Lang.Diag != nil) {

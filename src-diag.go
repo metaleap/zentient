@@ -3,7 +3,6 @@ package z
 import (
 	"fmt"
 	"path/filepath"
-	"sort"
 	"strings"
 
 	"github.com/metaleap/go-util/dev"
@@ -89,51 +88,6 @@ func (me *DiagJob) forgetAndMarkUpToDate(diagToolsIfLint Tools, workspaceFiles W
 
 func (me *DiagJob) String() string { return me.Target.String() }
 
-type DiagJobBuild struct {
-	DiagJob
-	TargetCmp func(IDiagJobTarget, IDiagJobTarget) bool
-	Succeeded bool
-	diags     DiagItems
-}
-
-func (me *DiagJobBuild) Yield(diag *DiagItem) { me.diags = append(me.diags, diag) }
-
-func (me *DiagJobBuild) IsSortedPriorTo(cmp interface{}) bool {
-	c := cmp.(*DiagJobBuild)
-	if me.TargetCmp != nil {
-		return me.TargetCmp(me.Target, c.Target)
-	}
-	return me.Target.IsSortedPriorTo(c.Target)
-}
-
-type DiagJobLint struct {
-	DiagJob
-	Tool     *Tool
-	lintChan chan *DiagItem
-}
-
-func (me *DiagJobLint) Done()                { me.lintChan <- nil }
-func (me *DiagJobLint) Yield(diag *DiagItem) { me.lintChan <- diag }
-
-type DiagLintJobs []*DiagJobLint
-
-type DiagBuildJobs []*DiagJobBuild
-
-func (me DiagBuildJobs) Len() int               { return len(me) }
-func (me DiagBuildJobs) Swap(i int, j int)      { me[i], me[j] = me[j], me[i] }
-func (me DiagBuildJobs) Less(i int, j int) bool { return me[i].IsSortedPriorTo(me[j]) }
-
-func (me DiagBuildJobs) WithoutDuplicates() (nu DiagBuildJobs) {
-	nu = make(DiagBuildJobs, 0, len(me))
-	done := make(map[string]bool, len(me))
-	for _, job := range me {
-		if s := job.String(); !done[s] {
-			done[s], nu = true, append(nu, job)
-		}
-	}
-	return
-}
-
 type DiagBase struct {
 	Impl IDiag
 
@@ -209,70 +163,15 @@ func (me *DiagBase) NewDiagItemFrom(srcRef *udev.SrcMsg, toolName string, relToA
 	}
 	if diagItem.FileRef.FilePath = srcRef.Ref; !filepath.IsAbs(diagItem.FileRef.FilePath) {
 		if absfilepath, err := filepath.Abs(diagItem.FileRef.FilePath); err != nil {
-			println(err.Error())
 			diagItem.FileRef.FilePath = fallbackFilePath
 		} else {
 			diagItem.FileRef.FilePath = absfilepath
 		}
 	}
 	if !ufs.FileExists(diagItem.FileRef.FilePath) {
-		println("MISSING: " + diagItem.FileRef.FilePath)
 		diagItem.FileRef.FilePath = fallbackFilePath
 	}
 	return
-}
-
-func (me *DiagBase) UpdateBuildDiagsAsNeeded(workspaceFiles WorkspaceFiles, writtenFiles []string) {
-	if jobs := me.Impl.OnUpdateBuildDiags(workspaceFiles, writtenFiles); len(jobs) > 0 {
-		sort.Sort(jobs)
-		for _, job := range jobs {
-			job.forgetAndMarkUpToDate(nil, workspaceFiles)
-		}
-		go me.send(true)
-		diagitems := me.Impl.RunBuildJobs(jobs)
-		diagitems.propagate(false, workspaceFiles)
-	}
-	go me.send(false)
-}
-
-func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(workspaceFiles WorkspaceFiles, autos bool) {
-	if diagtools := me.knownDiags(autos); len(diagtools) > 0 {
-		var filepaths []string
-		for _, f := range workspaceFiles {
-			if f != nil && f.IsOpen && !f.Diags.Lint.upToDate {
-				filepaths = append(filepaths, f.Path)
-			}
-		}
-		if len(filepaths) > 0 {
-			me.updateLintDiags(workspaceFiles, diagtools, filepaths)
-		}
-	}
-	go me.send(false)
-}
-
-func (me *DiagBase) updateLintDiags(workspaceFiles WorkspaceFiles, diagTools Tools, filePaths []string) {
-	if jobs := me.Impl.OnUpdateLintDiags(workspaceFiles, diagTools, filePaths); len(jobs) > 0 {
-		numjobs, numdone, await := 0, 0, make(chan *DiagItem)
-		for _, job := range jobs {
-			numjobs++
-			job.lintChan = await
-			go me.Impl.RunLintJob(job)
-			job.forgetAndMarkUpToDate(diagTools, workspaceFiles)
-		}
-
-		var diagitems DiagItems
-		for numdone < numjobs {
-			select {
-			case diagitem := <-await:
-				if diagitem == nil {
-					numdone++
-				} else {
-					diagitems = append(diagitems, diagitem)
-				}
-			}
-		}
-		diagitems.propagate(true, workspaceFiles)
-	}
 }
 
 func (me *DiagBase) dispatch(req *ipcReq, resp *ipcResp) bool {
