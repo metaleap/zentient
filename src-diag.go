@@ -7,6 +7,7 @@ import (
 
 	"github.com/metaleap/go-util/dev"
 	"github.com/metaleap/go-util/fs"
+	"github.com/metaleap/go-util/str"
 )
 
 type IDiag interface {
@@ -43,9 +44,39 @@ func (me *Diags) Forget(onlyFor Tools) {
 type DiagItemsBy map[string]DiagItems
 
 type DiagItem struct {
-	ToolName string
-	FileRef  SrcLens
-	Message  string
+	ToolName   string
+	FileRef    SrcLens
+	Message    string
+	SrcActions []EditorAction
+}
+
+func (me *DiagItem) resetAndInferSrcActions() {
+	me.SrcActions = nil
+	if ilastcolon := strings.LastIndex(me.Message, ":"); ilastcolon > 0 {
+		if ilastnum := ustr.ToInt(me.Message[ilastcolon+1:]); ilastnum > 0 {
+			if ifirstsep := strings.IndexRune(me.Message, filepath.Separator); ifirstsep >= 0 {
+				refpath := me.Message[ifirstsep:]
+				refpathf := refpath[:strings.IndexRune(refpath, ':')]
+				if !ufs.FileExists(refpathf) {
+					for i := ifirstsep - 1; i > 0; i-- {
+						refpath = me.Message[i:]
+						if refpathf = refpath[:strings.IndexRune(refpath, ':')]; ufs.FileExists(refpathf) {
+							break
+						}
+					}
+				}
+				if ufs.FileExists(refpathf) && !filepath.IsAbs(refpathf) {
+					refpathf, _ = filepath.Abs(refpathf)
+				}
+				if ufs.FileExists(refpathf) {
+					cmd := EditorAction{Cmd: "zen.internal.openFileAt", Title: refpathf + refpath[strings.IndexRune(refpath, ':'):]}
+					cmd.Arguments = append(cmd.Arguments, cmd.Title)
+					cmd.Title = Strf("Jump to %s", filepath.Base(cmd.Title))
+					me.SrcActions = append(me.SrcActions, cmd)
+				}
+			}
+		}
+	}
 }
 
 type DiagItems []*DiagItem
@@ -74,18 +105,14 @@ type DiagJob struct {
 
 func (me *DiagJob) forgetAndMarkUpToDate(diagToolsIfLint Tools, workspaceFiles WorkspaceFiles) {
 	for _, filepath := range me.AffectedFilePaths {
-		// f := workspaceFiles[filepath]
 		f := workspaceFiles.Ensure(filepath)
-		if f != nil {
-			fd := &f.Diags.Build
-			if diagToolsIfLint != nil {
-				fd = &f.Diags.Lint
-			}
-			fd.Forget(diagToolsIfLint)
-			fd.UpToDate = true
+		fd := &f.Diags.Build
+		if diagToolsIfLint != nil {
+			fd = &f.Diags.Lint
 		}
+		fd.Forget(diagToolsIfLint)
+		fd.UpToDate = true
 	}
-
 }
 
 func (me *DiagJob) String() string { return me.Target.String() }
@@ -173,6 +200,7 @@ func (me *DiagBase) NewDiagItemFrom(srcRef *udev.SrcMsg, toolName string, fallba
 	if di.FileRef.FilePath == "" || !ufs.FileExists(di.FileRef.FilePath) {
 		di.FileRef.FilePath = fallbackFilePath
 	}
+	di.resetAndInferSrcActions()
 	return
 }
 

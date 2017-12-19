@@ -35,7 +35,6 @@ func (me *DiagBase) updateLintDiags(workspaceFiles WorkspaceFiles, diagTools Too
 			go me.Impl.RunLintJob(job)
 			job.forgetAndMarkUpToDate(diagTools, workspaceFiles)
 		}
-
 		var diagitems DiagItems
 		for diagitem := range await {
 			if diagitem != nil {

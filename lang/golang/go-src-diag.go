@@ -137,17 +137,18 @@ func (me *goDiag) RunBuildJobs(jobs z.DiagBuildJobs) (diags z.DiagItems) {
 
 func (me *goDiag) RunLintJob(job *z.DiagJobLint) {
 	defer job.Done()
-	pkg := job.Target.(*udevgo.Pkg)
+	jt, pkg := job.Tool, job.Target.(*udevgo.Pkg)
 	fallbackfilepath := me.fallbackFilePath(pkg)
 	var msgs udev.SrcMsgs
-	switch job.Tool.Name {
-	case "gosimple":
+	if jt == tools.gosimple {
 		msgs = udevgo.LintGoSimple(pkg.ImportPath)
-	case "golint":
+	} else if jt == tools.golint {
 		msgs = udevgo.LintGolint(pkg.ImportPath)
-	case "goconst":
+	} else if jt == tools.goconst {
 		msgs = udevgo.LintGoConst(pkg.Dir)
-	default:
+	} else if jt == tools.govet {
+		msgs = udevgo.LintGoVet(pkg.ImportPath)
+	} else {
 		msgs = append(msgs, &udev.SrcMsg{Msg: z.BadMsg("lint tool", job.Tool.Name)})
 	}
 	for _, srcref := range msgs {
