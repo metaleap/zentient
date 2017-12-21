@@ -137,6 +137,9 @@ func (me *goDiag) RunBuildJobs(jobs z.DiagBuildJobs) (diags z.DiagItems) {
 
 func (me *goDiag) RunLintJob(job *z.DiagJobLint) {
 	defer job.Done()
+	if !job.Tool.Installed {
+		return
+	}
 	jt, pkg := job.Tool, job.Target.(*udevgo.Pkg)
 	fallbackfilepath := me.fallbackFilePath(pkg)
 	var msgs udev.SrcMsgs
@@ -148,6 +151,20 @@ func (me *goDiag) RunLintJob(job *z.DiagJobLint) {
 		msgs = udevgo.LintGoConst(pkg.Dir)
 	} else if jt == tools.govet {
 		msgs = udevgo.LintGoVet(pkg.ImportPath)
+	} else if jt == tools.ineffassign {
+		msgs = udevgo.LintIneffAssign(pkg.Dir)
+	} else if jt == tools.maligned {
+		msgs = udevgo.LintMDempsky("maligned", string(pkg.ImportPath))
+	} else if jt == tools.unconvert {
+		msgs = udevgo.LintMDempsky("unconvert", pkg.ImportPath)
+	} else if jt == tools.errcheck {
+		msgs = udevgo.LintErrcheck(pkg.ImportPath)
+	} else if jt == tools.checkstruct {
+		msgs = udevgo.LintCheck("structcheck", pkg.ImportPath)
+	} else if jt == tools.checkalign {
+		msgs = udevgo.LintCheck("aligncheck", pkg.ImportPath)
+	} else if jt == tools.checkvar {
+		msgs = udevgo.LintCheck("varcheck", pkg.ImportPath)
 	} else {
 		msgs = append(msgs, &udev.SrcMsg{Msg: z.BadMsg("lint tool", job.Tool.Name)})
 	}

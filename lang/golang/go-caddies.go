@@ -2,6 +2,7 @@ package zgo
 
 import (
 	"strings"
+	"time"
 
 	"github.com/metaleap/go-util/dev/go"
 	"github.com/metaleap/zentient"
@@ -68,6 +69,7 @@ func caddyRunRefreshPkgs() {
 	}
 	caddyRefreshPkgs.OnStatusChanged()
 	if firstrun && (udevgo.PkgsByDir != nil) && (z.Lang.Diag != nil) {
+		time.Sleep(time.Millisecond * 1234)
 		z.Lang.Workspace.Lock()
 		defer z.Lang.Workspace.Unlock()
 		z.Lang.Diag.UpdateLintDiagsIfAndAsNeeded(z.Lang.Workspace.Files(), true)

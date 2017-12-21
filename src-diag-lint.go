@@ -15,7 +15,9 @@ func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(workspaceFiles WorkspaceFiles, 
 	if diagtools := me.knownDiags(autos); len(diagtools) > 0 {
 		var filepaths []string
 		for _, f := range workspaceFiles {
-			if f != nil && f.IsOpen && !f.Diags.Lint.UpToDate {
+			if len(f.Diags.Build.Items) > 0 {
+				return
+			} else if f.IsOpen && !f.Diags.Lint.UpToDate {
 				filepaths = append(filepaths, f.Path)
 			}
 		}
