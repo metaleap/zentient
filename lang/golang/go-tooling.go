@@ -36,12 +36,14 @@ type goTooling struct {
 	ineffassign *z.Tool
 	interfacer  *z.Tool
 	unparam     *z.Tool
+	unindent    *z.Tool
 	unconvert   *z.Tool
 	maligned    *z.Tool
 	goconst     *z.Tool
 	gosimple    *z.Tool
 	unused      *z.Tool
 	staticcheck *z.Tool
+	deadcode    *z.Tool
 }
 
 func (me *goTooling) onPreInit() {
@@ -66,12 +68,14 @@ func (me *goTooling) onPreInit() {
 	me.ineffassign = &z.Tool{Name: "ineffassign", Website: "http://github.com/gordonklaus/ineffassign#readme", Installed: udevgo.Has_ineffassign, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_INFO}
 	me.interfacer = &z.Tool{Name: "interfacer", Website: "http://github.com/mvdan/interfacer#readme", Installed: udevgo.Has_interfacer, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_INFO}
 	me.unparam = &z.Tool{Name: "unparam", Website: "http://github.com/mvdan/unparam#readme", Installed: udevgo.Has_unparam, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_INFO}
+	me.unindent = &z.Tool{Name: "unindent", Website: "http://github.com/mvdan/unindent#readme", Installed: udevgo.Has_unindent, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_INFO}
 	me.unconvert = &z.Tool{Name: "unconvert", Website: "http://github.com/mdempsky/unconvert#readme", Installed: udevgo.Has_unconvert, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_INFO}
 	me.maligned = &z.Tool{Name: "maligned", Website: "http://github.com/mdempsky/maligned#readme", Installed: udevgo.Has_maligned, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_INFO}
 	me.goconst = &z.Tool{Name: "goconst", Website: "http://github.com/jgautheron/goconst#readme", Installed: udevgo.Has_goconst, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_INFO}
 	me.gosimple = &z.Tool{Name: "gosimple", Website: "http://github.com/dominikh/go-tools#readme", Installed: udevgo.Has_gosimple, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_INFO}
 	me.unused = &z.Tool{Name: "unused", Website: "http://github.com/dominikh/go-tools#readme", Installed: udevgo.Has_unused, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_INFO}
 	me.staticcheck = &z.Tool{Name: "staticcheck", Website: "http://github.com/dominikh/go-tools#readme", Installed: udevgo.Has_staticcheck, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_INFO}
+	me.deadcode = &z.Tool{Name: "deadcode", Website: "http://github.com/remyoudompheng/go-misc/tree/master/deadcode#readme", Installed: udevgo.Has_deadcode, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_INFO}
 
 	me.all = z.Tools{
 		me.gorename,
@@ -91,12 +95,14 @@ func (me *goTooling) onPreInit() {
 		me.ineffassign,
 		me.interfacer,
 		me.unparam,
+		me.unindent,
 		me.unconvert,
 		me.maligned,
 		me.goconst,
 		me.gosimple,
 		me.unused,
 		me.staticcheck,
+		me.deadcode,
 	}
 	me.numInst = me.CountNumInst(me.all)
 }

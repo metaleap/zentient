@@ -285,6 +285,5 @@ func (me *DiagBase) send(onlyBuildDiags bool) {
 		}
 		resp.All[f.Path] = fdiagitems
 	}
-	println("SENDING")
 	send(&ipcResp{IpcID: IPCID_SRCDIAG_PUB, SrcDiags: resp})
 }

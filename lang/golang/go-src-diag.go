@@ -154,9 +154,9 @@ func (me *goDiag) RunLintJob(job *z.DiagJobLint) {
 	} else if jt == tools.ineffassign {
 		msgs = udevgo.LintIneffAssign(pkg.Dir)
 	} else if jt == tools.maligned {
-		msgs = udevgo.LintMDempsky("maligned", string(pkg.ImportPath))
+		msgs = udevgo.LintViaPkgImpPath("maligned", string(pkg.ImportPath), false)
 	} else if jt == tools.unconvert {
-		msgs = udevgo.LintMDempsky("unconvert", pkg.ImportPath)
+		msgs = udevgo.LintViaPkgImpPath("unconvert", pkg.ImportPath, false)
 	} else if jt == tools.errcheck {
 		msgs = udevgo.LintErrcheck(pkg.ImportPath)
 	} else if jt == tools.checkstruct {
@@ -165,6 +165,14 @@ func (me *goDiag) RunLintJob(job *z.DiagJobLint) {
 		msgs = udevgo.LintCheck("aligncheck", pkg.ImportPath)
 	} else if jt == tools.checkvar {
 		msgs = udevgo.LintCheck("varcheck", pkg.ImportPath)
+	} else if jt == tools.unparam {
+		msgs = udevgo.LintMvDan("unparam", pkg.ImportPath)
+	} else if jt == tools.interfacer {
+		msgs = udevgo.LintMvDan("interfacer", pkg.ImportPath)
+	} else if jt == tools.unindent {
+		msgs = udevgo.LintMvDan("unindent", pkg.ImportPath)
+	} else if jt == tools.deadcode {
+		msgs = udevgo.LintViaPkgImpPath("deadcode", pkg.ImportPath, true)
 	} else {
 		msgs = append(msgs, &udev.SrcMsg{Msg: z.BadMsg("lint tool", job.Tool.Name)})
 	}

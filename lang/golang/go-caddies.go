@@ -69,7 +69,7 @@ func caddyRunRefreshPkgs() {
 	}
 	caddyRefreshPkgs.OnStatusChanged()
 	if firstrun && (udevgo.PkgsByDir != nil) && (z.Lang.Diag != nil) {
-		time.Sleep(time.Millisecond * 1234)
+		time.Sleep(time.Millisecond * 123)
 		z.Lang.Workspace.Lock()
 		defer z.Lang.Workspace.Unlock()
 		z.Lang.Diag.UpdateLintDiagsIfAndAsNeeded(z.Lang.Workspace.Files(), true)
