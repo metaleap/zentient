@@ -250,11 +250,11 @@ func (me *DiagBase) onToggle(toolName string, resp *ipcResp) {
 		resp.ErrMsg = err.Error()
 	} else {
 		if tool.IsInAutoDiags() {
-			resp.Menu = &MenuResp{NoteInfo: Strf("The %s diagnostics tool `%s` will be run automatically on open/save.", Lang.Title, toolName)}
+			resp.Menu = &MenuResp{NoteInfo: Strf("The %s diagnostics tool `%s` will run automatically on open/save.", Lang.Title, toolName)}
 		} else {
-			resp.Menu = &MenuResp{NoteInfo: Strf("The %s diagnostics tool `%s` won't be run automatically on open/save, but may be invoked manually via the Zentient Main Menu.", Lang.Title, toolName)}
+			resp.Menu = &MenuResp{NoteInfo: Strf("The %s diagnostics tool `%s` won't run automatically on open/save.", Lang.Title, toolName)}
 		}
-		me.onToggled()
+		go me.onToggled()
 	}
 }
 
@@ -265,6 +265,7 @@ func (me *DiagBase) onToggled() {
 	for _, f := range files {
 		f.Diags.Lint.Forget(nil)
 	}
+	me.send(false)
 	me.Impl.UpdateLintDiagsIfAndAsNeeded(files, true)
 }
 

@@ -173,6 +173,10 @@ func (me *goDiag) RunLintJob(job *z.DiagJobLint) {
 		msgs = udevgo.LintMvDan("unindent", pkg.ImportPath)
 	} else if jt == tools.deadcode {
 		msgs = udevgo.LintViaPkgImpPath("deadcode", pkg.ImportPath, true)
+	} else if jt == tools.unused {
+		msgs = udevgo.LintHonnef("unused", pkg.ImportPath)
+	} else if jt == tools.staticcheck {
+		msgs = udevgo.LintHonnef("staticcheck", pkg.ImportPath)
 	} else {
 		msgs = append(msgs, &udev.SrcMsg{Msg: z.BadMsg("lint tool", job.Tool.Name)})
 	}
