@@ -14,7 +14,7 @@ type IDiag interface {
 	IMenuItems
 
 	KnownDiags() Tools
-	OnUpdateBuildDiags(WorkspaceFiles, []string) DiagBuildJobs
+	OnUpdateBuildDiags([]string) DiagBuildJobs
 	OnUpdateLintDiags(WorkspaceFiles, Tools, []string) DiagLintJobs
 	RunBuildJobs(DiagBuildJobs) DiagItems
 	RunLintJob(*DiagJobLint)
@@ -100,6 +100,7 @@ type IDiagJobTarget interface {
 type DiagJob struct {
 	AffectedFilePaths []string
 	Target            IDiagJobTarget
+	WorkspaceFiles    WorkspaceFiles
 }
 
 func (me *DiagJob) forgetPrevDiags(diagToolsIfLint Tools, setAutoUpToDateToTrueIfLint bool, workspaceFiles WorkspaceFiles) {
@@ -141,13 +142,13 @@ type DiagResp struct {
 func (me *DiagBase) Init() {
 	me.cmdListDiags = &MenuItem{
 		IpcID: IPCID_SRCDIAG_LIST,
-		Title: "Choose Auto-Diagnostics",
-		Desc:  Strf("Select which (out of %d) %s diagnostics tools should run automatically (on open and on save)", me.Impl.KnownDiags().Len(true), Lang.Title),
+		Title: "Choose Auto-Linters",
+		Desc:  Strf("Select which (out of %d) %s lintish tools should run automatically (on file open/save)", me.Impl.KnownDiags().Len(true), Lang.Title),
 	}
 	me.cmdListToggleAll = &MenuItem{}
 	me.cmdRunDiagsOther = &MenuItem{
 		IpcID: IPCID_SRCDIAG_RUN,
-		Title: "Run Non-Auto-Diagnostics Now",
+		Title: "Run Non-Auto-Linters Now",
 	}
 }
 
@@ -161,7 +162,7 @@ func (me *DiagBase) knownDiags(auto bool) (diags Tools) {
 }
 
 func (me *DiagBase) MenuCategory() string {
-	return "Diagnostics"
+	return "Linting"
 }
 
 func (me *DiagBase) MenuItems(srcLens *SrcLens) (menu MenuItems) {
@@ -170,7 +171,7 @@ func (me *DiagBase) MenuItems(srcLens *SrcLens) (menu MenuItems) {
 	if srcLens != nil && srcLens.FilePath != "" {
 		nonautodiags, srcfilepath := me.knownDiags(false), srcLens.FilePath
 		me.cmdRunDiagsOther.IpcArgs = srcfilepath
-		me.cmdRunDiagsOther.Desc = Strf("➜ run %d tool(s) on: %s", nonautodiags.Len(true), Lang.Workspace.PrettyPath(srcfilepath))
+		me.cmdRunDiagsOther.Desc = Strf("➜ run %d lintish tool(s) on: %s", nonautodiags.Len(true), Lang.Workspace.PrettyPath(srcfilepath))
 		me.menuItemsUpdateHint(nonautodiags, me.cmdRunDiagsOther)
 		menu = append(menu, me.cmdRunDiagsOther)
 	}
@@ -191,7 +192,7 @@ func (me *DiagBase) menuItemsUpdateHint(diags Tools, item *MenuItem) {
 	}
 }
 
-func (me *DiagBase) NewDiagItemFrom(srcRef *udev.SrcMsg, toolName string, fallbackFilePath string) (di *DiagItem) {
+func (me *DiagBase) NewDiagItemFrom(srcRef *udev.SrcMsg, toolName string, fallbackFilePath func() string) (di *DiagItem) {
 	di = &DiagItem{Msg: srcRef.Msg, ToolName: toolName}
 	di.Loc.Flag = srcRef.Flag
 	if srcRef.Pos2Ch > 0 && srcRef.Pos2Ln > 0 {
@@ -202,13 +203,13 @@ func (me *DiagBase) NewDiagItemFrom(srcRef *udev.SrcMsg, toolName string, fallba
 	}
 	if di.Loc.FilePath = srcRef.Ref; di.Loc.FilePath != "" && !filepath.IsAbs(di.Loc.FilePath) {
 		if absfilepath, err := filepath.Abs(di.Loc.FilePath); err != nil {
-			di.Loc.FilePath = fallbackFilePath
+			di.Loc.FilePath = fallbackFilePath()
 		} else {
 			di.Loc.FilePath = absfilepath
 		}
 	}
 	if di.Loc.FilePath == "" || !ufs.FileExists(di.Loc.FilePath) {
-		di.Loc.FilePath = fallbackFilePath
+		di.Loc.FilePath = fallbackFilePath()
 	}
 	di.resetAndInferSrcActions()
 	return
@@ -240,7 +241,7 @@ func (me *DiagBase) onRunManually(filePath string, resp *ipcResp) {
 func (me *DiagBase) onListAll(resp *ipcResp) {
 	resp.Menu = &MenuResp{SubMenu: &Menu{Desc: me.cmdListDiags.Desc}}
 	knowndiagsauto, knowndiagsmanual := me.knownDiags(true), me.knownDiags(false)
-	itemdesc := "Currently running automatically. ➜ Pick to turn this off."
+	itemdesc := "WILL run automatically on file open/save. ➜ Pick to turn this off."
 	for _, knowndiags := range []Tools{knowndiagsauto, knowndiagsmanual} {
 		for _, dt := range knowndiags {
 			item := &MenuItem{Title: dt.Name}
@@ -255,18 +256,18 @@ func (me *DiagBase) onListAll(resp *ipcResp) {
 			}
 			resp.Menu.SubMenu.Items = append(resp.Menu.SubMenu.Items, item)
 		}
-		itemdesc = "Not currently running automatically. ➜ Pick to turn this on."
+		itemdesc = "WON'T run automatically on file open/save. ➜ Pick to turn this on."
 	}
 
 	if len(resp.Menu.SubMenu.Items) > 0 {
 		if len(knowndiagsauto) > 0 {
 			me.cmdListToggleAll.IpcID = IPCID_SRCDIAG_AUTO_NONE
-			me.cmdListToggleAll.Title = "Disable All Auto-Diagnostics"
-			me.cmdListToggleAll.Desc = "➜ if picked, no diagnostics tools will ever run on open and on save."
+			me.cmdListToggleAll.Title = "Disable All Auto-Linters"
+			me.cmdListToggleAll.Desc = "➜ pick to have no lintish tools ever run on file open/save."
 		} else {
 			me.cmdListToggleAll.IpcID = IPCID_SRCDIAG_AUTO_ALL
-			me.cmdListToggleAll.Title = "Enable All Auto-Diagnostics"
-			me.cmdListToggleAll.Desc = "➜ if picked, all of the below diagnostics tools will run on open and on save."
+			me.cmdListToggleAll.Title = "Enable All Auto-Linters"
+			me.cmdListToggleAll.Desc = "➜ pick to have all of the below lintish tools run on file open/save."
 		}
 		resp.Menu.SubMenu.Items = append(MenuItems{me.cmdListToggleAll}, resp.Menu.SubMenu.Items...)
 	}
@@ -287,20 +288,20 @@ func (me *DiagBase) onToggleAll(enableAll bool, resp *ipcResp) {
 	if enableAll {
 		s = "all"
 	}
-	resp.Menu = &MenuResp{NoteInfo: Strf("From now on, %s known-and-installed %s diagnostics tools will run automatically on open/save.", s, Lang.Title)}
+	resp.Menu = &MenuResp{NoteInfo: Strf("From now on, %s known-and-installed %s lintish tools will run automatically on file open/save.", s, Lang.Title)}
 	go me.onToggled()
 }
 
 func (me *DiagBase) onToggle(toolName string, resp *ipcResp) {
 	me.cmdRunDiagsOther.Hint, me.cmdListDiags.Hint = "", ""
 	if diagtool := me.Impl.KnownDiags().ByName(toolName); diagtool == nil {
-		resp.ErrMsg = BadMsg(Lang.Title+" diagnostics tool name", toolName)
+		resp.ErrMsg = BadMsg(Lang.Title+" lintish tool name", toolName)
 	} else if err := diagtool.ToggleInAutoDiags(); err != nil {
 		resp.ErrMsg = err.Error()
 	} else if diagtool.IsInAutoDiags() {
-		resp.Menu = &MenuResp{NoteInfo: Strf("The %s diagnostics tool `%s` will run automatically on open/save.", Lang.Title, toolName)}
+		resp.Menu = &MenuResp{NoteInfo: Strf("The %s lintish tool `%s` will run automatically on file open/save.", Lang.Title, toolName)}
 	} else {
-		resp.Menu = &MenuResp{NoteInfo: Strf("The %s diagnostics tool `%s` won't run automatically on open/save.", Lang.Title, toolName)}
+		resp.Menu = &MenuResp{NoteInfo: Strf("The %s lintish tool `%s` won't run automatically on file open/save.", Lang.Title, toolName)}
 	}
 	go me.onToggled()
 }

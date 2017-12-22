@@ -88,6 +88,7 @@ type WorkspaceBase struct {
 
 	OnBeforeChanges WorkspaceChangesBefore `json:"-"`
 	OnAfterChanges  WorkspaceChangesAfter  `json:"-"`
+	ReadyToPoll     bool
 
 	dirs  WorkspaceDirs
 	files WorkspaceFiles
@@ -142,6 +143,7 @@ func (*WorkspaceBase) analyzeChanges(files WorkspaceFiles, upd *WorkspaceChanges
 }
 
 func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
+	me.ReadyToPoll = true
 	if upd != nil && upd.hasChanges() {
 		dirs, files := me.dirs, me.files
 		freshfiles, hasfreshfiles, dirschanged, needsfreshautolints := me.analyzeChanges(files, upd)
@@ -210,7 +212,7 @@ func (me *WorkspaceBase) PollFileEventsEvery(milliseconds int64) {
 	interval := time.Millisecond * time.Duration(milliseconds)
 	msg := &ipcResp{IpcID: IPCID_PROJ_POLLEVTS}
 	for {
-		if time.Sleep(interval); !me.pollingPaused {
+		if time.Sleep(interval); me.ReadyToPoll && !me.pollingPaused {
 			if !canSend() {
 				return
 			} else if err := send(msg); err != nil {

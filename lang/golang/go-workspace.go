@@ -17,9 +17,9 @@ type goWorkspace struct {
 	z.WorkspaceBase
 }
 
-func (me *goWorkspace) onBeforeChanges(upd *z.WorkspaceChanges, dirsChanged bool, newFiles []string, willAutoLint bool) {
+func (me *goWorkspace) onBeforeChanges(upd *z.WorkspaceChanges, dirsChanged bool, freshFiles []string, willAutoLint bool) {
 	if hasnewpkgs := false; udevgo.PkgsByDir != nil {
-		for _, nfp := range newFiles {
+		for _, nfp := range freshFiles {
 			if hasnewpkgs = (nil == udevgo.PkgsByDir[filepath.Dir(nfp)]); hasnewpkgs {
 				break
 			}

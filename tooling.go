@@ -27,7 +27,7 @@ func (me ToolCats) String() string {
 	case TOOLS_CAT_INTEL_TIPS:
 		return "Info Tips"
 	case TOOLS_CAT_DIAGS:
-		return "Diagnostics"
+		return "Linting / Diagnostics"
 	case TOOLS_CAT_EXTRAS_QUERY:
 		return "CodeQuery"
 	}

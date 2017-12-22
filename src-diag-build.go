@@ -39,9 +39,10 @@ func (me *DiagJobBuild) IsSortedPriorTo(cmp interface{}) bool {
 }
 
 func (me *DiagBase) UpdateBuildDiagsAsNeeded(workspaceFiles WorkspaceFiles, writtenFiles []string) {
-	if jobs := me.Impl.OnUpdateBuildDiags(workspaceFiles, writtenFiles); len(jobs) > 0 {
+	if jobs := me.Impl.OnUpdateBuildDiags(writtenFiles).WithoutDuplicates(); len(jobs) > 0 {
 		sort.Sort(jobs)
 		for _, job := range jobs {
+			job.WorkspaceFiles = workspaceFiles
 			job.forgetPrevDiags(nil, false, workspaceFiles)
 		}
 		go me.send(true)

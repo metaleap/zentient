@@ -1,6 +1,9 @@
 package zgo
 
 import (
+	"strings"
+	"time"
+
 	"github.com/metaleap/go-util/dev"
 	"github.com/metaleap/go-util/dev/go"
 	"github.com/metaleap/zentient"
@@ -30,7 +33,7 @@ func ensureBuildOrder(dis z.IDiagJobTarget, dat z.IDiagJobTarget) bool {
 	return dis.(*udevgo.Pkg).IsSortedPriorToByDeps(dat.(*udevgo.Pkg))
 }
 
-func (me *goDiag) onUpdateDiagsPkgJobs(_ z.WorkspaceFiles, filePaths []string) (jobs []z.DiagJob) {
+func (me *goDiag) onUpdateDiagsPkgJobs(filePaths []string) (jobs []z.DiagJob) {
 	if pkgs, shouldrefresh := udevgo.PkgsForFiles(filePaths...); len(pkgs) > 0 {
 		if shouldrefresh {
 			go caddyRunRefreshPkgs()
@@ -42,8 +45,8 @@ func (me *goDiag) onUpdateDiagsPkgJobs(_ z.WorkspaceFiles, filePaths []string) (
 	return
 }
 
-func (me *goDiag) OnUpdateBuildDiags(_ z.WorkspaceFiles, writtenFilePaths []string) (jobs z.DiagBuildJobs) {
-	if pkgjobs := me.onUpdateDiagsPkgJobs(nil, writtenFilePaths); len(pkgjobs) > 0 {
+func (me *goDiag) OnUpdateBuildDiags(writtenFilePaths []string) (jobs z.DiagBuildJobs) {
+	if pkgjobs := me.onUpdateDiagsPkgJobs(writtenFilePaths); len(pkgjobs) > 0 {
 		for _, pj := range pkgjobs {
 			jobs = append(jobs, &z.DiagJobBuild{DiagJob: pj, TargetCmp: ensureBuildOrder})
 			for _, dependant := range pj.Target.(*udevgo.Pkg).Dependants() {
@@ -52,13 +55,12 @@ func (me *goDiag) OnUpdateBuildDiags(_ z.WorkspaceFiles, writtenFilePaths []stri
 				}
 			}
 		}
-		jobs = jobs.WithoutDuplicates()
 	}
 	return
 }
 
 func (me *goDiag) OnUpdateLintDiags(workspaceFiles z.WorkspaceFiles, diagTools z.Tools, filePaths []string) (jobs z.DiagLintJobs) {
-	if pkgjobs := me.onUpdateDiagsPkgJobs(nil, filePaths); len(pkgjobs) > 0 {
+	if pkgjobs := me.onUpdateDiagsPkgJobs(filePaths); len(pkgjobs) > 0 {
 		for _, pj := range pkgjobs {
 			skippkg := false
 			for _, fpath := range pj.Target.(*udevgo.Pkg).GoFilePaths() {
@@ -76,13 +78,12 @@ func (me *goDiag) OnUpdateLintDiags(workspaceFiles z.WorkspaceFiles, diagTools z
 	return
 }
 
-func (*goDiag) fallbackFilePath(pkg *udevgo.Pkg) (filePath string) {
-	workspacefiles := z.Lang.Workspace.Files()
+func (*goDiag) fallbackFilePath(pkg *udevgo.Pkg, workspaceFiles z.WorkspaceFiles) (filePath string) {
 	for _, fp := range pkg.GoFilePaths() {
 		if filePath == "" {
 			filePath = fp
 		}
-		if workspacefile, _ := workspacefiles[fp]; workspacefile != nil {
+		if workspacefile, _ := workspaceFiles[fp]; workspacefile != nil {
 			if filePath = fp; workspacefile.IsOpen {
 				break
 			}
@@ -91,10 +92,10 @@ func (*goDiag) fallbackFilePath(pkg *udevgo.Pkg) (filePath string) {
 	return
 }
 
-func (me *goDiag) runBuildPkg(pkg *udevgo.Pkg) (diags z.DiagItems) {
+func (me *goDiag) runBuildPkg(pkg *udevgo.Pkg, workspaceFiles z.WorkspaceFiles) (diags z.DiagItems) {
 	if msgs := udev.CmdExecOnSrc(true, nil, "go", "install", pkg.ImportPath); len(msgs) > 0 {
 		diags = make(z.DiagItems, 0, len(msgs))
-		fallbackfilepath, skipmsg := me.fallbackFilePath(pkg), "package "+pkg.ImportPath+":"
+		skipmsg, fallbackfilepath := "package "+pkg.ImportPath+":", func() string { return me.fallbackFilePath(pkg, workspaceFiles) }
 		for _, srcref := range msgs {
 			if srcref.Msg != "too many errors" && !(srcref.Pos1Ch == 1 && srcref.Pos1Ln == 1 && srcref.Msg == skipmsg) {
 				diags = append(diags, me.NewDiagItemFrom(srcref, "", fallbackfilepath))
@@ -105,15 +106,16 @@ func (me *goDiag) runBuildPkg(pkg *udevgo.Pkg) (diags z.DiagItems) {
 }
 
 func (me *goDiag) RunBuildJobs(jobs z.DiagBuildJobs) (diags z.DiagItems) {
-	numjobs := len(jobs)
+	numjobs, starttime, numbuilt := len(jobs), time.Now(), 0
 	failed, skipped := make(map[string]bool, numjobs), make(map[string]bool, numjobs)
 	pkgnames := make([]string, 0, numjobs)
 	for i := 0; i < numjobs; i++ {
 		pkgnames = append(pkgnames, jobs[i].Target.(*udevgo.Pkg).ImportPath)
 	}
+	allpkgnames := strings.Join(pkgnames, "\n")
 
 	for i, pkgjob := range jobs {
-		caddyBuildOnRunning(numjobs, i, pkgnames)
+		caddyBuildOnRunning(numjobs, i, allpkgnames)
 		skip, pkg := false, pkgjob.Target.(*udevgo.Pkg)
 		if len(failed) > 0 {
 			for _, pdep := range pkg.Deps {
@@ -124,14 +126,18 @@ func (me *goDiag) RunBuildJobs(jobs z.DiagBuildJobs) (diags z.DiagItems) {
 			}
 		}
 		if !skip {
-			pkgdiags := me.runBuildPkg(pkg)
-			if diags, pkgjob.Succeeded = append(diags, pkgdiags...), len(pkgdiags) == 0; !pkgjob.Succeeded {
+			pkgdiags := me.runBuildPkg(pkg, pkgjob.WorkspaceFiles)
+			if pkgjob.Succeeded, diags = len(pkgdiags) == 0, append(diags, pkgdiags...); pkgjob.Succeeded {
+				numbuilt++
+			} else {
 				failed[pkg.ImportPath] = true
 			}
 		}
 	}
-	caddyBuildOnDone(failed, skipped, pkgnames)
-	go caddyRunRefreshPkgs()
+	caddyBuildOnDone(failed, skipped, pkgnames, time.Since(starttime))
+	if numbuilt > 0 {
+		go caddyRunRefreshPkgs()
+	}
 	return
 }
 
@@ -180,7 +186,7 @@ func (me *goDiag) RunLintJob(job *z.DiagJobLint) {
 		msgs = append(msgs, &udev.SrcMsg{Msg: z.BadMsg("lint tool", job.Tool.Name)})
 	}
 	if len(msgs) > 0 {
-		fallbackfilepath := me.fallbackFilePath(pkg)
+		fallbackfilepath := func() string { return me.fallbackFilePath(pkg, job.WorkspaceFiles) }
 		for _, srcref := range msgs {
 			srcref.Flag = int(job.Tool.DiagSev)
 			job.Yield(me.NewDiagItemFrom(srcref, job.Tool.Name, fallbackfilepath))

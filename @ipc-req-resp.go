@@ -55,7 +55,7 @@ func ipcDecodeReqAndRespond(jsonreq string) *ipcResp {
 }
 
 type ipcResp struct {
-	ReqID  int64  `json:"ri"`
+	ReqID  int64  `json:"ri,omitempty"`
 	ErrMsg string `json:"e,omitempty"`
 
 	IpcID       ipcIDs         `json:"ii,omitempty"`

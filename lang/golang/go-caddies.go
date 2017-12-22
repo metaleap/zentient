@@ -1,7 +1,6 @@
 package zgo
 
 import (
-	"strings"
 	"time"
 
 	"github.com/metaleap/go-util/dev/go"
@@ -25,15 +24,15 @@ func caddyBuildOnInit() {
 	caddyBuildJobs.OnStatusChanged()
 }
 
-func caddyBuildOnRunning(numJobs int, cur int, all []string) {
+func caddyBuildOnRunning(numJobs int, cur int, all string) {
 	caddyBuildJobs.Status.Flag, caddyBuildJobs.Status.Desc, caddyBuildJobs.Details =
-		z.CADDY_BUSY, z.Strf("Rebuilding Go packages: %d/%d…", cur+1, numJobs), strings.Join(all, "\n")
+		z.CADDY_BUSY, z.Strf("Rebuilding Go packages: %d/%d…", cur+1, numJobs), all
 	caddyBuildJobs.OnStatusChanged()
 }
 
-func caddyBuildOnDone(failed map[string]bool, skipped map[string]bool, all []string) {
+func caddyBuildOnDone(failed map[string]bool, skipped map[string]bool, all []string, timeTaken time.Duration) {
 	numbuilt := len(all) - (len(skipped) + len(failed))
-	caddyBuildJobs.Status.Desc = z.Strf("out of %d packages ➜ %d rebuilt, %d failed, %d skipped", len(all), numbuilt, len(failed), len(skipped))
+	caddyBuildJobs.Status.Desc = z.Strf("out of %d packages ➜ \n\t\t%d rebuilt, %d failed, %d skipped in %s", len(all), numbuilt, len(failed), len(skipped), timeTaken)
 	if len(failed) > 0 {
 		caddyBuildJobs.Status.Flag = z.CADDY_ERROR
 	} else {
@@ -69,7 +68,7 @@ func caddyRunRefreshPkgs() {
 	}
 	caddyRefreshPkgs.OnStatusChanged()
 	if firstrun && (udevgo.PkgsByDir != nil) && (z.Lang.Diag != nil) {
-		time.Sleep(time.Millisecond * 1234)
+		time.Sleep(time.Millisecond * 123)
 		z.Lang.Workspace.Lock()
 		defer z.Lang.Workspace.Unlock()
 		z.Lang.Diag.UpdateLintDiagsIfAndAsNeeded(z.Lang.Workspace.Files(), true)

@@ -46,6 +46,7 @@ func (me *DiagBase) updateLintDiags(workspaceFiles WorkspaceFiles, diagTools Too
 	if numjobs := len(jobs); numjobs > 0 {
 		numdone, await, descs := 0, make(chan *DiagItem), make([]string, numjobs)
 		for _, job := range jobs { // separate loop from the go-routines below to prevent concurrent-map-read+write as forgetPrevDiags() calls workspaceFiles.ensure()
+			job.WorkspaceFiles = workspaceFiles
 			job.forgetPrevDiags(diagTools, autos, workspaceFiles)
 		}
 		for i, job := range jobs {
@@ -62,7 +63,7 @@ func (me *DiagBase) updateLintDiags(workspaceFiles WorkspaceFiles, diagTools Too
 			}
 		}
 		for i, job := range jobs {
-			descs[i] += Strf("\n\t\t%s", job.timeTaken)
+			descs[i] += Strf(" \n\t\t%s", job.timeTaken)
 		}
 		go send(&ipcResp{IpcID: IPCID_SRCDIAG_FINISHED, ObjSnapshot: descs})
 	}
