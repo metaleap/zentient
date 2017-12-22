@@ -41,7 +41,7 @@ func (me WorkspaceFiles) Ensure(fpath string) (file *WorkspaceFile) {
 
 func (me WorkspaceFiles) HasBuildDiags(filePath string) (has bool) {
 	if f, _ := me[filePath]; f != nil {
-		has = f.Diags.Build.UpToDate && len(f.Diags.Build.Items) > 0
+		has = len(f.Diags.Build.Items) > 0
 	}
 	return
 }
@@ -55,14 +55,16 @@ type WorkspaceFile struct {
 	Path   string
 	IsOpen bool `json:",omitempty"`
 	Diags  struct {
-		Build Diags
-		Lint  Diags
+		Build            Diags
+		Lint             Diags
+		AutoLintUpToDate bool
 	}
 }
 
-func (me *WorkspaceFile) ForgetDiags() {
-	me.Diags.Build.Forget(nil)
-	me.Diags.Lint.Forget(nil)
+func (me *WorkspaceFile) resetDiags() {
+	me.Diags.Build.forget(nil)
+	me.Diags.Lint.forget(nil)
+	me.Diags.AutoLintUpToDate = false
 }
 
 type WorkspaceChanges struct {
@@ -183,7 +185,7 @@ func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 			files.Ensure(freshfilepath).IsOpen = true
 		}
 		for _, modfilepath := range upd.WrittenFiles {
-			files.Ensure(modfilepath).ForgetDiags()
+			files.Ensure(modfilepath).resetDiags()
 		}
 		if Lang.Diag != nil {
 			if len(upd.WrittenFiles) > 0 {

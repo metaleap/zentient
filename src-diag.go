@@ -23,13 +23,12 @@ type IDiag interface {
 }
 
 type Diags struct {
-	UpToDate bool      `json:",omitempty"`
-	Items    DiagItems `json:",omitempty"`
+	Items DiagItems `json:",omitempty"`
 }
 
-func (me *Diags) Forget(onlyFor Tools) {
+func (me *Diags) forget(onlyFor Tools) {
 	if len(onlyFor) == 0 {
-		me.UpToDate, me.Items = false, nil
+		me.Items = nil
 	} else {
 		for i := 0; i < len(me.Items); i++ {
 			if onlyFor.Has(me.Items[i].ToolName) {
@@ -44,22 +43,23 @@ func (me *Diags) Forget(onlyFor Tools) {
 type DiagItemsBy map[string]DiagItems
 
 type DiagItem struct {
-	ToolName   string
-	FileRef    SrcLens
-	Message    string
-	SrcActions []EditorAction
+	ToolName   string `json:",omitempty"`
+	Loc        SrcLens
+	Msg        string
+	SrcActions []EditorAction `json:",omitempty"`
+	Sticky     bool           `json:",omitempty"`
 }
 
 func (me *DiagItem) resetAndInferSrcActions() {
 	me.SrcActions = nil
-	if ilastcolon := strings.LastIndex(me.Message, ":"); ilastcolon > 0 {
-		if ilastnum := ustr.ToInt(me.Message[ilastcolon+1:]); ilastnum > 0 {
-			if ifirstsep := strings.IndexRune(me.Message, filepath.Separator); ifirstsep >= 0 {
-				refpath := me.Message[ifirstsep:]
+	if ilastcolon := strings.LastIndex(me.Msg, ":"); ilastcolon > 0 {
+		if ilastnum := ustr.ToInt(me.Msg[ilastcolon+1:]); ilastnum > 0 {
+			if ifirstsep := strings.IndexRune(me.Msg, filepath.Separator); ifirstsep >= 0 {
+				refpath := me.Msg[ifirstsep:]
 				refpathf := refpath[:strings.IndexRune(refpath, ':')]
 				if !ufs.FileExists(refpathf) {
 					for i := ifirstsep - 1; i > 0; i-- {
-						refpath = me.Message[i:]
+						refpath = me.Msg[i:]
 						if refpathf = refpath[:strings.IndexRune(refpath, ':')]; ufs.FileExists(refpathf) {
 							break
 						}
@@ -81,15 +81,14 @@ func (me *DiagItem) resetAndInferSrcActions() {
 
 type DiagItems []*DiagItem
 
-func (me DiagItems) propagate(lintDiags bool, workspaceFiles WorkspaceFiles) {
+func (me DiagItems) propagate(lintDiags bool, diagsSticky bool, workspaceFiles WorkspaceFiles) {
 	for _, diag := range me {
-		f := workspaceFiles.Ensure(diag.FileRef.FilePath)
+		f := workspaceFiles.Ensure(diag.Loc.FilePath)
 		fd := &f.Diags.Lint
 		if !lintDiags {
 			fd = &f.Diags.Build
 		}
-		fd.UpToDate = true
-		fd.Items = append(fd.Items, diag)
+		diag.Sticky, fd.Items = diagsSticky, append(fd.Items, diag)
 	}
 }
 
@@ -103,15 +102,14 @@ type DiagJob struct {
 	Target            IDiagJobTarget
 }
 
-func (me *DiagJob) forgetAndMarkUpToDate(diagToolsIfLint Tools, workspaceFiles WorkspaceFiles) {
+func (me *DiagJob) forgetPrevDiags(diagToolsIfLint Tools, workspaceFiles WorkspaceFiles) {
 	for _, filepath := range me.AffectedFilePaths {
-		f := workspaceFiles.Ensure(filepath)
-		fd := &f.Diags.Build
-		if diagToolsIfLint != nil {
-			fd = &f.Diags.Lint
+		f, forbuild := workspaceFiles.Ensure(filepath), len(diagToolsIfLint) == 0
+		if forbuild {
+			f.Diags.Build.forget(nil)
+			f.Diags.AutoLintUpToDate = false
 		}
-		fd.Forget(diagToolsIfLint)
-		fd.UpToDate = true
+		f.Diags.Lint.forget(diagToolsIfLint)
 	}
 }
 
@@ -184,23 +182,23 @@ func (me *DiagBase) menuItemsUpdateHint(diags Tools, item *MenuItem) {
 }
 
 func (me *DiagBase) NewDiagItemFrom(srcRef *udev.SrcMsg, toolName string, fallbackFilePath string) (di *DiagItem) {
-	di = &DiagItem{Message: srcRef.Msg, ToolName: toolName}
-	di.FileRef.Flag = srcRef.Flag
+	di = &DiagItem{Msg: srcRef.Msg, ToolName: toolName}
+	di.Loc.Flag = srcRef.Flag
 	if srcRef.Pos2Ch > 0 && srcRef.Pos2Ln > 0 {
-		di.FileRef.Range = &SrcRange{Start: SrcPos{Ln: srcRef.Pos1Ln, Col: srcRef.Pos1Ch},
+		di.Loc.Range = &SrcRange{Start: SrcPos{Ln: srcRef.Pos1Ln, Col: srcRef.Pos1Ch},
 			End: SrcPos{Ln: srcRef.Pos2Ln, Col: srcRef.Pos2Ch}}
 	} else {
-		di.FileRef.Pos = &SrcPos{Ln: srcRef.Pos1Ln, Col: srcRef.Pos1Ch}
+		di.Loc.Pos = &SrcPos{Ln: srcRef.Pos1Ln, Col: srcRef.Pos1Ch}
 	}
-	if di.FileRef.FilePath = srcRef.Ref; di.FileRef.FilePath != "" && !filepath.IsAbs(di.FileRef.FilePath) {
-		if absfilepath, err := filepath.Abs(di.FileRef.FilePath); err != nil {
-			di.FileRef.FilePath = fallbackFilePath
+	if di.Loc.FilePath = srcRef.Ref; di.Loc.FilePath != "" && !filepath.IsAbs(di.Loc.FilePath) {
+		if absfilepath, err := filepath.Abs(di.Loc.FilePath); err != nil {
+			di.Loc.FilePath = fallbackFilePath
 		} else {
-			di.FileRef.FilePath = absfilepath
+			di.Loc.FilePath = absfilepath
 		}
 	}
-	if di.FileRef.FilePath == "" || !ufs.FileExists(di.FileRef.FilePath) {
-		di.FileRef.FilePath = fallbackFilePath
+	if di.Loc.FilePath == "" || !ufs.FileExists(di.Loc.FilePath) {
+		di.Loc.FilePath = fallbackFilePath
 	}
 	di.resetAndInferSrcActions()
 	return
@@ -210,6 +208,8 @@ func (me *DiagBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	switch req.IpcID {
 	case IPCID_SRCDIAG_LIST:
 		me.onListAll(resp)
+	case IPCID_SRCDIAG_RUN:
+		me.onRunManually()
 	case IPCID_SRCDIAG_AUTO_TOGGLE:
 		me.onToggle(req.IpcArgs.(string), resp)
 	case IPCID_SRCDIAG_AUTO_ALL:
@@ -220,6 +220,10 @@ func (me *DiagBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 		return false
 	}
 	return true
+}
+
+func (me *DiagBase) onRunManually() {
+	me.Impl.UpdateLintDiagsIfAndAsNeeded(Lang.Workspace.Files(), false)
 }
 
 func (me *DiagBase) onListAll(resp *ipcResp) {
@@ -296,7 +300,8 @@ func (me *DiagBase) onToggled() {
 	defer Lang.Workspace.Unlock()
 	files := Lang.Workspace.Files()
 	for _, f := range files {
-		f.Diags.Lint.Forget(nil)
+		f.Diags.Lint.forget(nil)
+		f.Diags.AutoLintUpToDate = false
 	}
 	me.send(false)
 	me.Impl.UpdateLintDiagsIfAndAsNeeded(files, true)
