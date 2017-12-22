@@ -10,7 +10,30 @@ import (
 	"github.com/metaleap/zentient"
 )
 
-func (me *goExtras) runQueryGoDoc(srcLens *z.SrcLens, arg string, resp *z.ExtrasResp) {
+func (me *goExtras) runQuery_StructLayout(srcLens *z.SrcLens, arg string, resp *z.ExtrasResp) {
+	args := ustr.Split(arg, " ")
+	if len(args) == 1 && udevgo.PkgsByDir != nil && srcLens.FilePath != "" {
+		if pkg := udevgo.PkgsByDir[filepath.Dir(srcLens.FilePath)]; pkg != nil {
+			args = append([]string{pkg.ImportPath}, args[0])
+		}
+	}
+	if len(args) != 2 {
+		z.BadPanic("structlayout args (need 1 or 2)", arg)
+	}
+	if cmdout, cmderr, err := urun.CmdExec("structlayout", args[0], args[1]); err != nil {
+		panic(err)
+	} else if cmdout = ustr.Trim(cmdout); cmdout != "" || cmderr != "" {
+		resp.Desc = z.Strf("Results of `structlayout %s %s`, sizes are in bytes:", args[0], args[1])
+		resp.Warns = ustr.Split(cmderr, "\n")
+		for _, ln := range ustr.Split(cmdout, "\n") {
+			if ln = ustr.Trim(ln); ln != "" {
+				resp.InfoTips = append(resp.InfoTips, z.InfoTip{Value: ln})
+			}
+		}
+	}
+}
+
+func (me *goExtras) runQuery_GoDoc(srcLens *z.SrcLens, arg string, resp *z.ExtrasResp) {
 	if i1, i2 := ustr.Idx(arg, "."), ustr.Idx(arg, " "); i1 > 0 && (i2 < 0 || i2 > i1) {
 		arg = arg[:i1] + " " + arg[i1+1:]
 	}

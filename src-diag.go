@@ -225,18 +225,14 @@ func (me *DiagBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 func (me *DiagBase) onListAll(resp *ipcResp) {
 	resp.Menu = &MenuResp{SubMenu: &Menu{Desc: me.cmdListDiags.Desc}}
 	knowndiagsauto, knowndiagsmanual := me.knownDiags(true), me.knownDiags(false)
-
-	for isauto, knowndiags := range map[bool]Tools{true: knowndiagsauto, false: knowndiagsmanual} {
+	itemdesc := "Currently running automatically. ➜ Pick to turn this off."
+	for _, knowndiags := range []Tools{knowndiagsauto, knowndiagsmanual} {
 		for _, dt := range knowndiags {
 			item := &MenuItem{Title: dt.Name}
 			if dt.Installed {
 				item.Hint = "Installed  ·  " + dt.Website
 				item.IpcID, item.IpcArgs = IPCID_SRCDIAG_AUTO_TOGGLE, dt.Name
-				if isauto {
-					item.Desc = "Currently running automatically. ➜ Pick to turn this off."
-				} else {
-					item.Desc = "Not currently running automatically. ➜ Pick to turn this on."
-				}
+				item.Desc = itemdesc
 			} else {
 				item.Hint = "Not Installed"
 				item.Desc = "➜ " + dt.Website
@@ -244,6 +240,7 @@ func (me *DiagBase) onListAll(resp *ipcResp) {
 			}
 			resp.Menu.SubMenu.Items = append(resp.Menu.SubMenu.Items, item)
 		}
+		itemdesc = "Not currently running automatically. ➜ Pick to turn this on."
 	}
 
 	if len(resp.Menu.SubMenu.Items) > 0 {
