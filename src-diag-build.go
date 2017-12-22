@@ -42,7 +42,7 @@ func (me *DiagBase) UpdateBuildDiagsAsNeeded(workspaceFiles WorkspaceFiles, writ
 	if jobs := me.Impl.OnUpdateBuildDiags(workspaceFiles, writtenFiles); len(jobs) > 0 {
 		sort.Sort(jobs)
 		for _, job := range jobs {
-			job.forgetPrevDiags(nil, workspaceFiles)
+			job.forgetPrevDiags(nil, false, workspaceFiles)
 		}
 		go me.send(true)
 		diagitems := me.Impl.RunBuildJobs(jobs)

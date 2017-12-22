@@ -30,7 +30,7 @@ func ensureBuildOrder(dis z.IDiagJobTarget, dat z.IDiagJobTarget) bool {
 	return dis.(*udevgo.Pkg).IsSortedPriorToByDeps(dat.(*udevgo.Pkg))
 }
 
-func (me *goDiag) onUpdateDiagsPkgJobs(workspaceFiles z.WorkspaceFiles, filePaths []string) (jobs []z.DiagJob) {
+func (me *goDiag) onUpdateDiagsPkgJobs(_ z.WorkspaceFiles, filePaths []string) (jobs []z.DiagJob) {
 	if pkgs, shouldrefresh := udevgo.PkgsForFiles(filePaths...); len(pkgs) > 0 {
 		if shouldrefresh {
 			go caddyRunRefreshPkgs()
@@ -42,8 +42,8 @@ func (me *goDiag) onUpdateDiagsPkgJobs(workspaceFiles z.WorkspaceFiles, filePath
 	return
 }
 
-func (me *goDiag) OnUpdateBuildDiags(workspaceFiles z.WorkspaceFiles, writtenFilePaths []string) (jobs z.DiagBuildJobs) {
-	if pkgjobs := me.onUpdateDiagsPkgJobs(workspaceFiles, writtenFilePaths); len(pkgjobs) > 0 {
+func (me *goDiag) OnUpdateBuildDiags(_ z.WorkspaceFiles, writtenFilePaths []string) (jobs z.DiagBuildJobs) {
+	if pkgjobs := me.onUpdateDiagsPkgJobs(nil, writtenFilePaths); len(pkgjobs) > 0 {
 		for _, pj := range pkgjobs {
 			jobs = append(jobs, &z.DiagJobBuild{DiagJob: pj, TargetCmp: ensureBuildOrder})
 			for _, dependant := range pj.Target.(*udevgo.Pkg).Dependants() {
@@ -58,7 +58,7 @@ func (me *goDiag) OnUpdateBuildDiags(workspaceFiles z.WorkspaceFiles, writtenFil
 }
 
 func (me *goDiag) OnUpdateLintDiags(workspaceFiles z.WorkspaceFiles, diagTools z.Tools, filePaths []string) (jobs z.DiagLintJobs) {
-	if pkgjobs := me.onUpdateDiagsPkgJobs(workspaceFiles, filePaths); len(pkgjobs) > 0 {
+	if pkgjobs := me.onUpdateDiagsPkgJobs(nil, filePaths); len(pkgjobs) > 0 {
 		for _, pj := range pkgjobs {
 			skippkg := false
 			for _, fpath := range pj.Target.(*udevgo.Pkg).GoFilePaths() {
@@ -141,7 +141,6 @@ func (me *goDiag) RunLintJob(job *z.DiagJobLint) {
 		return
 	}
 	jt, pkg := job.Tool, job.Target.(*udevgo.Pkg)
-	fallbackfilepath := me.fallbackFilePath(pkg)
 	var msgs udev.SrcMsgs
 	if jt == tools.gosimple {
 		msgs = udevgo.LintGoSimple(pkg.ImportPath)
@@ -180,8 +179,11 @@ func (me *goDiag) RunLintJob(job *z.DiagJobLint) {
 	} else {
 		msgs = append(msgs, &udev.SrcMsg{Msg: z.BadMsg("lint tool", job.Tool.Name)})
 	}
-	for _, srcref := range msgs {
-		srcref.Flag = int(job.Tool.DiagSev)
-		job.Yield(me.NewDiagItemFrom(srcref, job.Tool.Name, fallbackfilepath))
+	if len(msgs) > 0 {
+		fallbackfilepath := me.fallbackFilePath(pkg)
+		for _, srcref := range msgs {
+			srcref.Flag = int(job.Tool.DiagSev)
+			job.Yield(me.NewDiagItemFrom(srcref, job.Tool.Name, fallbackfilepath))
+		}
 	}
 }

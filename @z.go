@@ -97,8 +97,8 @@ func Init() (err error) {
 		}
 	}
 	for _, c := range Lang.Caddies {
-		c.LangID = Lang.ID
 		c.onInit()
+		c.LangID = Lang.ID
 	}
 	return
 }

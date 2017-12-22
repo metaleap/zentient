@@ -102,14 +102,24 @@ type DiagJob struct {
 	Target            IDiagJobTarget
 }
 
-func (me *DiagJob) forgetPrevDiags(diagToolsIfLint Tools, workspaceFiles WorkspaceFiles) {
-	for _, filepath := range me.AffectedFilePaths {
-		f, forbuild := workspaceFiles.Ensure(filepath), len(diagToolsIfLint) == 0
-		if forbuild {
-			f.Diags.Build.forget(nil)
-			f.Diags.AutoLintUpToDate = false
+func (me *DiagJob) forgetPrevDiags(diagToolsIfLint Tools, setAutoUpToDateToTrueIfLint bool, workspaceFiles WorkspaceFiles) {
+	forbuild := len(diagToolsIfLint) == 0
+	var f *WorkspaceFile
+	for _, fpath := range me.AffectedFilePaths {
+		if setAutoUpToDateToTrueIfLint {
+			f = workspaceFiles.Ensure(fpath)
+		} else {
+			f = workspaceFiles[fpath]
 		}
-		f.Diags.Lint.forget(diagToolsIfLint)
+		if f != nil {
+			if forbuild {
+				f.Diags.Build.forget(nil)
+				f.Diags.AutoLintUpToDate = false
+			} else if setAutoUpToDateToTrueIfLint {
+				f.Diags.AutoLintUpToDate = true
+			}
+			f.Diags.Lint.forget(diagToolsIfLint)
+		}
 	}
 }
 
