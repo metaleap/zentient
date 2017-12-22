@@ -19,7 +19,7 @@ type IDiag interface {
 	RunBuildJobs(DiagBuildJobs) DiagItems
 	RunLintJob(*DiagJobLint)
 	UpdateBuildDiagsAsNeeded(WorkspaceFiles, []string)
-	UpdateLintDiagsIfAndAsNeeded(WorkspaceFiles, bool)
+	UpdateLintDiagsIfAndAsNeeded(WorkspaceFiles, bool, ...string)
 }
 
 type Diags struct {
@@ -159,8 +159,8 @@ func (me *DiagBase) MenuItems(srcLens *SrcLens) (menu MenuItems) {
 	menu = append(menu, me.cmdListDiags)
 	if srcLens != nil && srcLens.FilePath != "" {
 		nonautodiags, srcfilepath := me.knownDiags(false), srcLens.FilePath
-		srcfilepath = Lang.Workspace.PrettyPath(srcfilepath)
-		me.cmdRunDiagsOther.Desc = Strf("➜ run %d tool(s) on: %s", nonautodiags.Len(true), srcfilepath)
+		me.cmdRunDiagsOther.IpcArgs = srcfilepath
+		me.cmdRunDiagsOther.Desc = Strf("➜ run %d tool(s) on: %s", nonautodiags.Len(true), Lang.Workspace.PrettyPath(srcfilepath))
 		me.menuItemsUpdateHint(nonautodiags, me.cmdRunDiagsOther)
 		menu = append(menu, me.cmdRunDiagsOther)
 	}
@@ -209,7 +209,7 @@ func (me *DiagBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	case IPCID_SRCDIAG_LIST:
 		me.onListAll(resp)
 	case IPCID_SRCDIAG_RUN:
-		me.onRunManually()
+		me.onRunManually(req.IpcArgs.(string), resp)
 	case IPCID_SRCDIAG_AUTO_TOGGLE:
 		me.onToggle(req.IpcArgs.(string), resp)
 	case IPCID_SRCDIAG_AUTO_ALL:
@@ -222,8 +222,9 @@ func (me *DiagBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	return true
 }
 
-func (me *DiagBase) onRunManually() {
-	me.Impl.UpdateLintDiagsIfAndAsNeeded(Lang.Workspace.Files(), false)
+func (me *DiagBase) onRunManually(filePath string, resp *ipcResp) {
+	go me.Impl.UpdateLintDiagsIfAndAsNeeded(Lang.Workspace.Files(), false, filePath)
+	resp.Menu = &MenuResp{NoteInfo: Strf("All findings (if any) from analyzing %s (and possibly related files, if any) will show up shortly and remain until invalidated.", filepath.Base(filePath))}
 }
 
 func (me *DiagBase) onListAll(resp *ipcResp) {
@@ -264,8 +265,7 @@ func (me *DiagBase) onListAll(resp *ipcResp) {
 
 func (me *DiagBase) onToggleAll(enableAll bool, resp *ipcResp) {
 	me.cmdRunDiagsOther.Hint, me.cmdListDiags.Hint = "", ""
-	Prog.Cfg.AutoDiags = nil
-	if enableAll {
+	if Prog.Cfg.AutoDiags = nil; enableAll {
 		for _, diagtool := range me.Impl.KnownDiags() {
 			Prog.Cfg.AutoDiags = append(Prog.Cfg.AutoDiags, diagtool.Name)
 		}

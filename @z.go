@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	INTERVALMS_POLL_EDITORFILEEVENTS = 789
+	INTERVALMS_POLL_EDITORFILEEVENTS = 1234
 )
 
 var (
@@ -97,8 +97,8 @@ func Init() (err error) {
 		}
 	}
 	for _, c := range Lang.Caddies {
-		c.onInit()
 		c.LangID = Lang.ID
+		c.onInit()
 	}
 	return
 }
