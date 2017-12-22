@@ -81,7 +81,7 @@ type ListMenuBase struct {
 
 	cat   string
 	fdesc string
-	items []*MenuItem
+	items MenuItems
 }
 
 func (me *ListMenuBase) init(impl IListMenu, cat string, fdesc string) {
@@ -122,7 +122,7 @@ func (me *ListMenuBase) MenuCategory() string {
 	return me.cat
 }
 
-func (me *ListMenuBase) MenuItems(srcLens *SrcLens) []*MenuItem {
+func (me *ListMenuBase) MenuItems(srcLens *SrcLens) MenuItems {
 	const fhint = "(%v at last count)"
 	for _, item := range me.items {
 		fcount, filterid := "amount unknown", item.IpcArgs.(string)

@@ -67,7 +67,7 @@ func (me *ToolingBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	return true
 }
 
-func (me *ToolingBase) onListAllTools() (menu []*MenuItem) {
+func (me *ToolingBase) onListAllTools() (menu MenuItems) {
 	all := me.Impl.KnownTools()
 	for _, t := range all {
 		item := MenuItem{Title: t.Name, Desc: "➜ " + t.Website, Hint: "Installed", IpcArgs: t.Website}
@@ -89,7 +89,7 @@ func (me *ToolingBase) MenuCategory() string {
 	return "Tooling"
 }
 
-func (me *ToolingBase) MenuItems(srcLens *SrcLens) (menu []*MenuItem) {
+func (me *ToolingBase) MenuItems(srcLens *SrcLens) (menu MenuItems) {
 	menu = append(menu, me.cmdListAll)
 	return
 }

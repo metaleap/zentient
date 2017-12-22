@@ -9,15 +9,17 @@ import (
 type IMenuItems interface {
 	iDispatcher
 
-	MenuItems(*SrcLens) []*MenuItem
+	MenuItems(*SrcLens) MenuItems
 	MenuCategory() string
 }
 
 type Menu struct {
-	Desc     string      `json:"desc,omitempty"`
-	TopLevel bool        `json:"topLevel,omitempty"`
-	Items    []*MenuItem `json:"items"`
+	Desc     string    `json:"desc,omitempty"`
+	TopLevel bool      `json:"topLevel,omitempty"`
+	Items    MenuItems `json:"items"`
 }
+
+type MenuItems []*MenuItem
 
 type MenuItem struct {
 	IpcID    ipcIDs      `json:"ii,omitempty"`

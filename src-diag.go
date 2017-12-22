@@ -121,6 +121,7 @@ type DiagBase struct {
 	Impl IDiag
 
 	cmdListDiags     *MenuItem
+	cmdListToggleAll *MenuItem
 	cmdRunDiagsOther *MenuItem
 }
 
@@ -135,6 +136,7 @@ func (me *DiagBase) Init() {
 		Title: "Choose Auto-Diagnostics",
 		Desc:  Strf("Select which (out of %d) %s diagnostics tools should run automatically (on open and on save)", me.Impl.KnownDiags().Len(true), Lang.Title),
 	}
+	me.cmdListToggleAll = &MenuItem{}
 	me.cmdRunDiagsOther = &MenuItem{
 		IpcID: IPCID_SRCDIAG_RUN,
 		Title: "Run Non-Auto-Diagnostics Now",
@@ -154,13 +156,13 @@ func (me *DiagBase) MenuCategory() string {
 	return "Diagnostics"
 }
 
-func (me *DiagBase) MenuItems(srcLens *SrcLens) (menu []*MenuItem) {
+func (me *DiagBase) MenuItems(srcLens *SrcLens) (menu MenuItems) {
 	me.menuItemsUpdateHint(me.knownDiags(true), me.cmdListDiags)
 	menu = append(menu, me.cmdListDiags)
 	if srcLens != nil && srcLens.FilePath != "" {
 		nonautodiags, srcfilepath := me.knownDiags(false), srcLens.FilePath
 		srcfilepath = Lang.Workspace.PrettyPath(srcfilepath)
-		me.cmdRunDiagsOther.Desc = Strf("➜ run %d tools on: %s", nonautodiags.Len(true), srcfilepath)
+		me.cmdRunDiagsOther.Desc = Strf("➜ run %d tool(s) on: %s", nonautodiags.Len(true), srcfilepath)
 		me.menuItemsUpdateHint(nonautodiags, me.cmdRunDiagsOther)
 		menu = append(menu, me.cmdRunDiagsOther)
 	}
@@ -208,8 +210,12 @@ func (me *DiagBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	switch req.IpcID {
 	case IPCID_SRCDIAG_LIST:
 		me.onListAll(resp)
-	case IPCID_SRCDIAG_TOGGLE:
+	case IPCID_SRCDIAG_AUTO_TOGGLE:
 		me.onToggle(req.IpcArgs.(string), resp)
+	case IPCID_SRCDIAG_AUTO_ALL:
+		me.onToggleAll(true, resp)
+	case IPCID_SRCDIAG_AUTO_NONE:
+		me.onToggleAll(false, resp)
 	default:
 		return false
 	}
@@ -218,14 +224,15 @@ func (me *DiagBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 
 func (me *DiagBase) onListAll(resp *ipcResp) {
 	resp.Menu = &MenuResp{SubMenu: &Menu{Desc: me.cmdListDiags.Desc}}
-	isinautodiags := true
-	for _, kd := range []Tools{me.knownDiags(true), me.knownDiags(false)} {
-		for _, dt := range kd {
+	knowndiagsauto, knowndiagsmanual := me.knownDiags(true), me.knownDiags(false)
+
+	for isauto, knowndiags := range map[bool]Tools{true: knowndiagsauto, false: knowndiagsmanual} {
+		for _, dt := range knowndiags {
 			item := &MenuItem{Title: dt.Name}
 			if dt.Installed {
 				item.Hint = "Installed  ·  " + dt.Website
-				item.IpcID, item.IpcArgs = IPCID_SRCDIAG_TOGGLE, dt.Name
-				if isinautodiags {
+				item.IpcID, item.IpcArgs = IPCID_SRCDIAG_AUTO_TOGGLE, dt.Name
+				if isauto {
 					item.Desc = "Currently running automatically. ➜ Pick to turn this off."
 				} else {
 					item.Desc = "Not currently running automatically. ➜ Pick to turn this on."
@@ -237,25 +244,54 @@ func (me *DiagBase) onListAll(resp *ipcResp) {
 			}
 			resp.Menu.SubMenu.Items = append(resp.Menu.SubMenu.Items, item)
 		}
-		isinautodiags = false
+	}
+
+	if len(resp.Menu.SubMenu.Items) > 0 {
+		if len(knowndiagsauto) > 0 {
+			me.cmdListToggleAll.IpcID = IPCID_SRCDIAG_AUTO_NONE
+			me.cmdListToggleAll.Title = "Disable All Auto-Diagnostics"
+			me.cmdListToggleAll.Desc = "➜ if picked, no diagnostics tools will ever run on open and on save."
+		} else {
+			me.cmdListToggleAll.IpcID = IPCID_SRCDIAG_AUTO_ALL
+			me.cmdListToggleAll.Title = "Enable All Auto-Diagnostics"
+			me.cmdListToggleAll.Desc = "➜ if picked, all of the below diagnostics tools will run on open and on save."
+		}
+		resp.Menu.SubMenu.Items = append(MenuItems{me.cmdListToggleAll}, resp.Menu.SubMenu.Items...)
 	}
 	return
 }
 
+func (me *DiagBase) onToggleAll(enableAll bool, resp *ipcResp) {
+	me.cmdRunDiagsOther.Hint, me.cmdListDiags.Hint = "", ""
+	Prog.Cfg.AutoDiags = nil
+	if enableAll {
+		for _, diagtool := range me.Impl.KnownDiags() {
+			Prog.Cfg.AutoDiags = append(Prog.Cfg.AutoDiags, diagtool.Name)
+		}
+	}
+	if err := Prog.Cfg.Save(); err != nil {
+		resp.ErrMsg = err.Error()
+	}
+	s := "no"
+	if enableAll {
+		s = "all"
+	}
+	resp.Menu = &MenuResp{NoteInfo: Strf("From now on, %s known-and-installed %s diagnostics tools will run automatically on open/save.", s, Lang.Title)}
+	go me.onToggled()
+}
+
 func (me *DiagBase) onToggle(toolName string, resp *ipcResp) {
 	me.cmdRunDiagsOther.Hint, me.cmdListDiags.Hint = "", ""
-	if tool := me.Impl.KnownDiags().ByName(toolName); tool == nil {
+	if diagtool := me.Impl.KnownDiags().ByName(toolName); diagtool == nil {
 		resp.ErrMsg = BadMsg(Lang.Title+" diagnostics tool name", toolName)
-	} else if err := tool.ToggleInAutoDiags(); err != nil {
+	} else if err := diagtool.ToggleInAutoDiags(); err != nil {
 		resp.ErrMsg = err.Error()
+	} else if diagtool.IsInAutoDiags() {
+		resp.Menu = &MenuResp{NoteInfo: Strf("The %s diagnostics tool `%s` will run automatically on open/save.", Lang.Title, toolName)}
 	} else {
-		if tool.IsInAutoDiags() {
-			resp.Menu = &MenuResp{NoteInfo: Strf("The %s diagnostics tool `%s` will run automatically on open/save.", Lang.Title, toolName)}
-		} else {
-			resp.Menu = &MenuResp{NoteInfo: Strf("The %s diagnostics tool `%s` won't run automatically on open/save.", Lang.Title, toolName)}
-		}
-		go me.onToggled()
+		resp.Menu = &MenuResp{NoteInfo: Strf("The %s diagnostics tool `%s` won't run automatically on open/save.", Lang.Title, toolName)}
 	}
+	go me.onToggled()
 }
 
 func (me *DiagBase) onToggled() {

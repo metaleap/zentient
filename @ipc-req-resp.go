@@ -72,7 +72,7 @@ type ipcResp struct {
 func (me *ipcResp) postProcess() {
 	if me.Menu != nil && me.Menu.SubMenu != nil && me.Menu.SubMenu.Items == nil {
 		// handles better on the client-side (and UX-wise) --- instead of a "silent nothing", show an empty menu ("nothing to choose from")
-		me.Menu.SubMenu.Items = []*MenuItem{}
+		me.Menu.SubMenu.Items = MenuItems{}
 	}
 }
 

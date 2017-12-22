@@ -38,7 +38,7 @@ func (me *SrcModBase) Init() {
 	}
 }
 
-func (me *SrcModBase) MenuItems(srcLens *SrcLens) (cmds []*MenuItem) {
+func (me *SrcModBase) MenuItems(srcLens *SrcLens) (cmds MenuItems) {
 	if srcLens != nil {
 		srcfilepath, hint := srcLens.FilePath, "("+me.cmdFmtSetDef.Desc+" first)"
 		if me.hasFormatter() {
