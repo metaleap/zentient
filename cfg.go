@@ -15,6 +15,7 @@ type Config struct {
 	AutoDiags     []string          `json:",omitempty"`
 
 	err            error
+	recallFilePath string
 	filePath       string
 	timeLastLoaded int64
 }
@@ -35,6 +36,20 @@ func (me *Config) reload() {
 		}
 	}
 	return
+}
+
+func (me *Config) recall() {
+	me.recallFilePath = filepath.Join(Prog.dir.cache, Prog.name+".recall.json")
+	if ufs.FileExists(me.recallFilePath) {
+		umisc.JsonDecodeFromFile(me.recallFilePath, &Prog.recall)
+	}
+	if Prog.recall.i64 == nil {
+		Prog.recall.i64 = map[string]int64{}
+	}
+}
+
+func (me *Config) saveRecall() {
+	umisc.JsonEncodeToFile(&Prog.recall, me.recallFilePath)
 }
 
 func (me *Config) Save() error {

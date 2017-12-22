@@ -10,11 +10,11 @@ var (
 	extras goExtras
 
 	querierGoDoc = z.ExtrasItem{ID: "go_doc", Label: "go doc",
-		Description: "[package] [member name]", Detail: "➜ shows the specified item's summary description",
+		Description: "[package] [member-name]", Detail: "➜ shows the specified item's summary description",
 		QueryArg: "Query to `go doc`"}
 	querierStructlayout = z.ExtrasItem{ID: "structlayout", Label: "structlayout",
 		Description: "[package] struct-name", Detail: "➜ shows the specified struct's memory layout",
-		QueryArg: "Optionally specify a package, then the name of a struct type"}
+		QueryArg: "Specify (optionally) a package and (always) a struct type definition's name"}
 )
 
 func init() {

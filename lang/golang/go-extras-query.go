@@ -26,8 +26,9 @@ func (me *goExtras) runQuery_StructLayout(srcLens *z.SrcLens, arg string, resp *
 		resp.Desc = z.Strf("Results of `structlayout %s %s`, sizes are in bytes:", args[0], args[1])
 		resp.Warns = ustr.Split(cmderr, "\n")
 		for _, ln := range ustr.Split(cmdout, "\n") {
-			if ln = ustr.Trim(ln); ln != "" {
-				resp.InfoTips = append(resp.InfoTips, z.InfoTip{Value: ln})
+			if sfield, ssize := ustr.BreakOnLast(ln, ":"); sfield != "" {
+				sfname, sftype := ustr.BreakOn(sfield, " ")
+				resp.Items = append(resp.Items, z.ExtrasItem{Label: ustr.FirstNonEmpty(sfname, "—"), Description: sftype, Detail: ssize})
 			}
 		}
 	}
