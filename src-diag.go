@@ -193,7 +193,7 @@ func (me *DiagBase) menuItemsUpdateHint(diags Tools, item *MenuItem) {
 }
 
 func (me *DiagBase) NewDiagItemFrom(srcRef *udev.SrcMsg, toolName string, fallbackFilePath func() string) (di *DiagItem) {
-	di = &DiagItem{Msg: srcRef.Msg, ToolName: toolName}
+	di = &DiagItem{Msg: ustr.Trim(srcRef.Msg), ToolName: toolName}
 	di.Loc.Flag = srcRef.Flag
 	if srcRef.Pos2Ch > 0 && srcRef.Pos2Ln > 0 {
 		di.Loc.Range = &SrcRange{Start: SrcPos{Ln: srcRef.Pos1Ln, Col: srcRef.Pos1Ch},
