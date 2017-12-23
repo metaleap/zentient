@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/metaleap/go-util/dev"
 	"github.com/metaleap/go-util/dev/go"
 	"github.com/metaleap/go-util/str"
 	"github.com/metaleap/zentient"
@@ -57,7 +58,7 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 	if !tools.gogetdoc.Installed {
 		hovs = append(hovs, z.InfoTip{Value: tools.gogetdoc.NotInstalledMessage()})
 	} else {
-		if ggd = udevgo.Query_Gogetdoc(srcLens.FilePath, srcLens.SrcFull, offset); ggd != nil {
+		if ggd = udevgo.Query_Gogetdoc(srcLens.FilePath, srcLens.Txt, offset); ggd != nil {
 			ispkglocal := ustr.Pref(ggd.Pos, filepath.Dir(srcLens.FilePath))
 			if ggd.Err != "" {
 				hovs = append(hovs, z.InfoTip{Language: "plaintext", Value: ggd.Err})
@@ -97,7 +98,7 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 	}
 
 	if tools.godef.Installed && decl == nil {
-		if defdecl := udevgo.QueryDefDecl_GoDef(srcLens.FilePath, srcLens.SrcFull, offset); defdecl != "" {
+		if defdecl := udevgo.QueryDefDecl_GoDef(srcLens.FilePath, srcLens.Txt, offset); defdecl != "" {
 			decl = &z.InfoTip{Language: z.Lang.ID, Value: me.hoverDeclLineBreaks(defdecl)}
 			hovs = append([]z.InfoTip{*decl}, hovs...)
 		}
@@ -105,6 +106,41 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 	return
 }
 
-func (me *goSrcIntel) Symbols(srcLens *z.SrcLens, query string, curFileOnly bool) (all []z.SrcLens) {
-	return me.SrcIntelBase.Symbols(srcLens, query, curFileOnly)
+func (me *goSrcIntel) Symbols(srcLens *z.SrcLens, query string, curFileOnly bool) (all []*z.SrcLens) {
+	onerr := func(label string, detail string) []*z.SrcLens {
+		return []*z.SrcLens{&z.SrcLens{Flag: int(z.SYM_EVENT), Str: label, Txt: detail, FilePath: srcLens.FilePath, Pos: srcLens.Pos, Range: srcLens.Range}}
+	}
+	if !udevgo.Has_guru {
+		return onerr("Not installed: guru", "for more information, see: Zentient Main Menu / Tooling / guru.")
+	}
+	srcLens.EnsureSrcFull()
+	bytepos := srcLens_IfSrcFull_BytePosOfPackageName(srcLens)
+	gd, err := udevgo.QueryDesc_Guru(srcLens.FilePath, srcLens.Txt, ustr.FromInt(bytepos))
+	if err != nil {
+		return onerr("Error running guru:", err.Error())
+	} else if gd.Package == nil {
+		return onerr("Error running guru:", "not in a Go package")
+	}
+	fpathok := func(fp string) bool { return (!curFileOnly) || fp == srcLens.FilePath }
+	curpkgdir, numsyms := filepath.Dir(srcLens.FilePath), len(gd.Package.Members)
+	for _, pm := range gd.Package.Members {
+		numsyms += len(pm.Methods)
+	}
+	all = make([]*z.SrcLens, 0, numsyms)
+	for _, pm := range gd.Package.Members {
+		if srcref := udev.SrcMsgFromLn(pm.Pos); srcref != nil && fpathok(srcref.Ref) {
+			lens := &z.SrcLens{Flag: int(z.SYM_PACKAGE), Str: pm.Name, FilePath: srcref.Ref}
+			pmtype := udevgo.PkgImpPathsToNamesIn(pm.Type, curpkgdir)
+			switch pm.Kind {
+			case "const":
+				lens.Flag, lens.Txt = int(z.SYM_CONSTANT), "= "+pm.Value
+			case "var":
+				lens.Flag, lens.Txt = int(z.SYM_VARIABLE), pmtype
+			case "func":
+				lens.Flag, lens.Txt = int(z.SYM_FUNCTION), pmtype
+			}
+			all = append(all, lens)
+		}
+	}
+	return
 }

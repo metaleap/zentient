@@ -2,6 +2,7 @@ package zgo
 
 import (
 	"github.com/metaleap/go-util/dev/go"
+	"github.com/metaleap/go-util/str"
 	"github.com/metaleap/zentient"
 )
 
@@ -45,7 +46,7 @@ func (me *goSrcMod) RunRenamer(srcLens *z.SrcLens, newName string) (srcMods []*z
 		panic(err)
 	}
 	for _, fedit := range fileedits {
-		srcmod := z.SrcLens{SrcSel: fedit.Msg, FilePath: fedit.Ref, Range: &z.SrcRange{}}
+		srcmod := z.SrcLens{Str: fedit.Msg, FilePath: fedit.Ref, Range: &z.SrcRange{}}
 		srcmod.Range.Start.Col, srcmod.Range.Start.Ln = 1, fedit.Pos1Ln+1
 		srcmod.Range.End.Col, srcmod.Range.End.Ln = 1, fedit.Pos2Ln+1
 		srcMods = append(srcMods, &srcmod)
@@ -67,4 +68,13 @@ func (me *goSrcMod) RunFormatter(formatter *z.Tool, cmdName string, srcFilePath 
 	}
 
 	return formatter.Exec(cmdName, cmdargs, src)
+}
+
+func srcLens_IfSrcFull_BytePosOfPackageName(srcLens *z.SrcLens) (pos int) {
+	if ustr.Pref(srcLens.Txt, "package ") {
+		pos = 8
+	} else if idx := ustr.Idx(srcLens.Txt, "\npackage "); idx >= 0 {
+		pos = len([]byte(srcLens.Txt[:idx+9])) // need byte-pos not rune-pos
+	}
+	return
 }

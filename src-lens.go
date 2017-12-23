@@ -21,18 +21,18 @@ type SrcRange struct {
 }
 
 type SrcLens struct {
-	FilePath string    `json:"fp,omitempty"`
-	SrcFull  string    `json:"sf,omitempty"`
-	SrcSel   string    `json:"ss,omitempty"`
+	FilePath string    `json:"f,omitempty"`
+	Txt      string    `json:"t,omitempty"`
+	Str      string    `json:"s,omitempty"`
 	Pos      *SrcPos   `json:"p,omitempty"`
 	Range    *SrcRange `json:"r,omitempty"`
-	CrLf     bool      `json:"lf,omitempty"`
-	Flag     int       `json:"fl"` // don't omitempty
+	CrLf     bool      `json:"l,omitempty"`
+	Flag     int       `json:"e"` // don't omitempty
 }
 
-func (me *SrcLens) ensureSrcFull() {
-	if me.SrcFull == "" {
-		me.SrcFull = ufs.ReadTextFile(me.FilePath, true, "")
+func (me *SrcLens) EnsureSrcFull() {
+	if me.Txt == "" {
+		me.Txt = ufs.ReadTextFile(me.FilePath, true, "")
 	}
 }
 
@@ -40,17 +40,24 @@ func (me *SrcLens) ByteOffsetForPosWithRuneOffset(pos *SrcPos) int {
 	if !pos.byteoff {
 		pos.byteoff = true
 		if pos.Off > 1 {
-			me.ensureSrcFull()
+			me.EnsureSrcFull()
 			r := 1
-			for i := range me.SrcFull {
+			for i := range me.Txt {
 				if r == pos.Off {
 					pos.byteOff = i
 					return pos.byteOff
 				}
 				r++
 			}
-			pos.byteOff = len([]byte(me.SrcFull))
+			pos.byteOff = len([]byte(me.Txt))
 		}
 	}
 	return pos.byteOff
+}
+
+func (me *SrcLens) Ln() string {
+	if me.CrLf {
+		return "\r\n"
+	}
+	return "\n"
 }

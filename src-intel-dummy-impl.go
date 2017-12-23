@@ -19,22 +19,22 @@ func (_ *SrcIntelBase) ComplItems(srcLens *SrcLens) (all []SrcIntelCompl) {
 	return
 }
 
-func (me *SrcIntelBase) DefSym(srcLens *SrcLens) []SrcLens {
+func (me *SrcIntelBase) DefSym(srcLens *SrcLens) []*SrcLens {
 	return me.References(srcLens, true)
 }
 
-func (me *SrcIntelBase) DefType(srcLens *SrcLens) []SrcLens {
+func (me *SrcIntelBase) DefType(srcLens *SrcLens) []*SrcLens {
 	return me.References(srcLens, true)
 }
 
-func (me *SrcIntelBase) DefImpl(srcLens *SrcLens) []SrcLens {
+func (me *SrcIntelBase) DefImpl(srcLens *SrcLens) []*SrcLens {
 	return me.References(srcLens, true)
 }
 
 func (_ *SrcIntelBase) Highlights(srcLens *SrcLens, curWord string) (all []SrcRange) {
 	// bad implementation (will return buggy ranges with some exotic/unicode chars) but is meant to be overridden by a proper one anyway
-	srcLens.ensureSrcFull()
-	src := strings.ToUpper(srcLens.SrcFull)
+	srcLens.EnsureSrcFull()
+	src := strings.ToUpper(srcLens.Txt)
 	if curWord == "" && srcLens.Range != nil {
 		curWord = src[:srcLens.Range.End.Off-1][srcLens.Range.Start.Off-1:]
 	}
@@ -65,14 +65,14 @@ func (_ *SrcIntelBase) Hovers(srcLens *SrcLens) (all []InfoTip) {
 	return
 }
 
-func (*SrcIntelBase) References(srcLens *SrcLens, includeDeclaration bool) (all []SrcLens) {
+func (*SrcIntelBase) References(srcLens *SrcLens, includeDeclaration bool) (all []*SrcLens) {
 	all = append(all,
-		SrcLens{FilePath: srcLens.FilePath, Pos: &SrcPos{Col: 1, Ln: 3}},
-		SrcLens{FilePath: srcLens.FilePath, Pos: &SrcPos{Col: 2, Ln: 5}},
-		SrcLens{FilePath: srcLens.FilePath, Pos: &SrcPos{Col: 4, Ln: 8}},
-		SrcLens{FilePath: srcLens.FilePath, Pos: &SrcPos{Col: 7, Ln: 12}})
+		&SrcLens{FilePath: srcLens.FilePath, Pos: &SrcPos{Col: 1, Ln: 3}},
+		&SrcLens{FilePath: srcLens.FilePath, Pos: &SrcPos{Col: 2, Ln: 5}},
+		&SrcLens{FilePath: srcLens.FilePath, Pos: &SrcPos{Col: 4, Ln: 8}},
+		&SrcLens{FilePath: srcLens.FilePath, Pos: &SrcPos{Col: 7, Ln: 12}})
 	if includeDeclaration {
-		all = append(all, *srcLens)
+		all = append(all, srcLens)
 	}
 	return
 }
@@ -84,13 +84,13 @@ func (*SrcIntelBase) Signature(srcLens *SrcLens) *SrcIntelSigHelp {
 	return &sig
 }
 
-func (*SrcIntelBase) Symbols(srcLens *SrcLens, query string, curFileOnly bool) (all []SrcLens) {
+func (*SrcIntelBase) Symbols(srcLens *SrcLens, query string, curFileOnly bool) (all []*SrcLens) {
 	if curFileOnly {
 		const symMinInvalid = int(SYM_MIN_INVALID)
 		for i := 0; i < symMinInvalid; i++ {
 			all = append(all,
-				SrcLens{Flag: i, SrcSel: Symbol(i).String(), FilePath: srcLens.FilePath,
-					SrcFull: Strf("flag: %d", i), Pos: &SrcPos{Col: 1, Ln: i + 1},
+				&SrcLens{Flag: i, Str: "Str-Name:" + Symbol(i).String(), FilePath: srcLens.FilePath,
+					Txt: Strf("Txt-ContainerName: %d", i), Pos: &SrcPos{Col: 1, Ln: i + 1},
 				},
 			)
 		}

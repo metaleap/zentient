@@ -48,15 +48,15 @@ func (me *SrcModBase) MenuItems(srcLens *SrcLens) (cmds MenuItems) {
 			hint += "'" + Prog.Cfg.FormatterName + "'"
 		}
 
-		if isfp := srcfilepath != ""; isfp || srcLens.SrcFull != "" {
+		if isfp := srcfilepath != ""; isfp || srcLens.Txt != "" {
 			srcfilepath = Lang.Workspace.PrettyPath(srcfilepath)
 			if me.cmdFmtRunOnFile.Desc, me.cmdFmtRunOnFile.Hint = srcfilepath, hint; !isfp {
-				me.cmdFmtRunOnFile.Desc = srcLens.SrcFull
+				me.cmdFmtRunOnFile.Desc = srcLens.Txt
 			}
 			cmds = append(cmds, me.cmdFmtRunOnFile)
 		}
-		if srcLens.SrcSel != "" {
-			me.cmdFmtRunOnSel.Desc = srcLens.SrcSel
+		if srcLens.Str != "" {
+			me.cmdFmtRunOnSel.Desc = srcLens.Str
 			me.cmdFmtRunOnSel.Hint = hint
 			cmds = append(cmds, me.cmdFmtRunOnSel)
 		}
@@ -157,13 +157,13 @@ func (me *SrcModBase) onRunFormatter(req *ipcReq, resp *ipcResp) {
 	if !(ufs.FileExists(srcfilepath) && withfilepathcmdarg) {
 		srcfilepath = ""
 	}
-	src := &req.SrcLens.SrcSel
+	src := &req.SrcLens.Str
 	if *src == "" {
-		src = &req.SrcLens.SrcFull
+		src = &req.SrcLens.Txt
 	}
 	if (*src == "") && req.SrcLens.FilePath != "" && ufs.FileExists(req.SrcLens.FilePath) && !withfilepathcmdarg {
-		req.SrcLens.ensureSrcFull()
-		src = &req.SrcLens.SrcFull
+		req.SrcLens.EnsureSrcFull()
+		src = &req.SrcLens.Txt
 	}
 
 	if *src != "" {
