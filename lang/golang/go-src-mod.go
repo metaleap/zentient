@@ -2,7 +2,6 @@ package zgo
 
 import (
 	"github.com/metaleap/go-util/dev/go"
-	"github.com/metaleap/go-util/str"
 	"github.com/metaleap/zentient"
 )
 
@@ -68,13 +67,4 @@ func (me *goSrcMod) RunFormatter(formatter *z.Tool, cmdName string, srcFilePath 
 	}
 
 	return formatter.Exec(cmdName, cmdargs, src)
-}
-
-func srcLens_IfSrcFull_BytePosOfPackageName(srcLens *z.SrcLens) (pos int) {
-	if ustr.Pref(srcLens.Txt, "package ") {
-		pos = 8
-	} else if idx := ustr.Idx(srcLens.Txt, "\npackage "); idx >= 0 {
-		pos = len([]byte(srcLens.Txt[:idx+9])) // need byte-pos not rune-pos
-	}
-	return
 }

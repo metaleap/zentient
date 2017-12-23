@@ -195,22 +195,7 @@ func (me *DiagBase) menuItemsUpdateHint(diags Tools, item *MenuItem) {
 func (me *DiagBase) NewDiagItemFrom(srcRef *udev.SrcMsg, toolName string, fallbackFilePath func() string) (di *DiagItem) {
 	di = &DiagItem{Msg: ustr.Trim(srcRef.Msg), ToolName: toolName}
 	di.Loc.Flag = srcRef.Flag
-	if srcRef.Pos2Ch > 0 && srcRef.Pos2Ln > 0 {
-		di.Loc.Range = &SrcRange{Start: SrcPos{Ln: srcRef.Pos1Ln, Col: srcRef.Pos1Ch},
-			End: SrcPos{Ln: srcRef.Pos2Ln, Col: srcRef.Pos2Ch}}
-	} else {
-		di.Loc.Pos = &SrcPos{Ln: srcRef.Pos1Ln, Col: srcRef.Pos1Ch}
-	}
-	if di.Loc.FilePath = srcRef.Ref; di.Loc.FilePath != "" && !filepath.IsAbs(di.Loc.FilePath) {
-		if absfilepath, err := filepath.Abs(di.Loc.FilePath); err != nil {
-			di.Loc.FilePath = fallbackFilePath()
-		} else {
-			di.Loc.FilePath = absfilepath
-		}
-	}
-	if di.Loc.FilePath == "" || !ufs.FileExists(di.Loc.FilePath) {
-		di.Loc.FilePath = fallbackFilePath()
-	}
+	di.Loc.SetFrom(srcRef, fallbackFilePath)
 	di.resetAndInferSrcActions()
 	return
 }

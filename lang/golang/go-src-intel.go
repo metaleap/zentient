@@ -41,15 +41,6 @@ func (*goSrcIntel) hoverDeclLineBreaks(decl string) string {
 	return decl
 }
 
-func (*goSrcIntel) hoverShortenImpPaths(s string) string {
-	if islash := ustr.Idx(s, "/"); islash > 0 {
-		if idot := ustr.Idx(s[islash+1:], "."); idot > 0 && udevgo.ShortenImpPaths != nil {
-			return udevgo.ShortenImpPaths.Replace(s)
-		}
-	}
-	return s
-}
-
 func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 	var ggd *udevgo.Gogetdoc
 	var decl *z.InfoTip
@@ -59,7 +50,8 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 		hovs = append(hovs, z.InfoTip{Value: tools.gogetdoc.NotInstalledMessage()})
 	} else {
 		if ggd = udevgo.Query_Gogetdoc(srcLens.FilePath, srcLens.Txt, offset); ggd != nil {
-			ispkglocal := ustr.Pref(ggd.Pos, filepath.Dir(srcLens.FilePath))
+			curpkgdir := filepath.Dir(srcLens.FilePath)
+			ispkglocal := strings.HasPrefix(ggd.Pos, curpkgdir)
 			if ggd.Err != "" {
 				hovs = append(hovs, z.InfoTip{Language: "plaintext", Value: ggd.Err})
 			}
@@ -67,17 +59,17 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 				hovs = append(hovs, z.InfoTip{Language: "plaintext", Value: ggd.ErrMsgs})
 			}
 			if headline := ggd.ImpN; false && headline != "" && !ispkglocal {
-				headline = me.hoverShortenImpPaths(headline)
+				headline = udevgo.PkgImpPathsToNamesInLn(headline, curpkgdir)
 				hovs = append(hovs, z.InfoTip{Value: "### " + headline})
 			}
 			if ggd.Decl = me.hoverDeclLineBreaks(ggd.Decl); ggd.Decl != "" {
 				if ggd.ImpP != "" {
 					ggd.Decl = strings.Replace(ggd.Decl, ggd.ImpP+".", "", -1)
 				}
-				if ustr.Pref(ggd.Decl, "field ") { // ensure syntax-highlighting:
+				ggd.Decl = udevgo.PkgImpPathsToNamesInLn(ggd.Decl, curpkgdir)
+				if strings.HasPrefix(ggd.Decl, "field ") { // ensure syntax-highlighting:
 					ggd.Decl = z.Strf("//ℤ/ struct field:\n{ %s }\n//ℤ/ field context (tags etc.) not shown", ggd.Decl[6:])
 				}
-				ggd.Decl = me.hoverShortenImpPaths(ggd.Decl)
 				decl = &z.InfoTip{Language: z.Lang.ID, Value: ggd.Decl}
 				hovs = append(hovs, *decl)
 			}
@@ -96,7 +88,6 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 			}
 		}
 	}
-
 	if tools.godef.Installed && decl == nil {
 		if defdecl := udevgo.QueryDefDecl_GoDef(srcLens.FilePath, srcLens.Txt, offset); defdecl != "" {
 			decl = &z.InfoTip{Language: z.Lang.ID, Value: me.hoverDeclLineBreaks(defdecl)}
@@ -106,7 +97,7 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 	return
 }
 
-func (me *goSrcIntel) Symbols(srcLens *z.SrcLens, query string, curFileOnly bool) (all []*z.SrcLens) {
+func (me *goSrcIntel) Symbols(srcLens *z.SrcLens, query string, curFileOnly bool) (allsyms []*z.SrcLens) {
 	onerr := func(label string, detail string) []*z.SrcLens {
 		return []*z.SrcLens{&z.SrcLens{Flag: int(z.SYM_EVENT), Str: label, Txt: detail, FilePath: srcLens.FilePath, Pos: srcLens.Pos, Range: srcLens.Range}}
 	}
@@ -114,33 +105,67 @@ func (me *goSrcIntel) Symbols(srcLens *z.SrcLens, query string, curFileOnly bool
 		return onerr("Not installed: guru", "for more information, see: Zentient Main Menu / Tooling / guru.")
 	}
 	srcLens.EnsureSrcFull()
-	bytepos := srcLens_IfSrcFull_BytePosOfPackageName(srcLens)
+	bytepos := srcLens.ByteOffsetForFirstLineBeginningWith("package ")
 	gd, err := udevgo.QueryDesc_Guru(srcLens.FilePath, srcLens.Txt, ustr.FromInt(bytepos))
 	if err != nil {
 		return onerr("Error running guru:", err.Error())
 	} else if gd.Package == nil {
 		return onerr("Error running guru:", "not in a Go package")
 	}
+
+	// no more early-returns, now get busy
 	fpathok := func(fp string) bool { return (!curFileOnly) || fp == srcLens.FilePath }
-	curpkgdir, numsyms := filepath.Dir(srcLens.FilePath), len(gd.Package.Members)
+	curpkgdir, numsyms, fallbackfilepath := filepath.Dir(srcLens.FilePath), len(gd.Package.Members), func() string { return srcLens.FilePath }
+	allsyms = make([]*z.SrcLens, 0, numsyms)
 	for _, pm := range gd.Package.Members {
-		numsyms += len(pm.Methods)
-	}
-	all = make([]*z.SrcLens, 0, numsyms)
-	for _, pm := range gd.Package.Members {
+		ispmlisted := false
 		if srcref := udev.SrcMsgFromLn(pm.Pos); srcref != nil && fpathok(srcref.Ref) {
-			lens := &z.SrcLens{Flag: int(z.SYM_PACKAGE), Str: pm.Name, FilePath: srcref.Ref}
-			pmtype := udevgo.PkgImpPathsToNamesIn(pm.Type, curpkgdir)
+			pmtype, lens := pm.Type, &z.SrcLens{Str: pm.Name}
+			pmuntyped := strings.HasPrefix(pmtype, "untyped ")
+			if ispmlisted = true; pmuntyped {
+				pmtype = pmtype[8:]
+			}
+			pmtype = udevgo.PkgImpPathsToNamesInLn(pmtype, curpkgdir)
+			lens.SetFrom(srcref, fallbackfilepath)
 			switch pm.Kind {
 			case "const":
-				lens.Flag, lens.Txt = int(z.SYM_CONSTANT), "= "+pm.Value
+				if lens.Flag, lens.Txt = int(z.SYM_CONSTANT), pmtype+" = "+pm.Value; !pmuntyped {
+					lens.Flag = int(z.SYM_ENUMMEMBER)
+				}
 			case "var":
 				lens.Flag, lens.Txt = int(z.SYM_VARIABLE), pmtype
 			case "func":
-				lens.Flag, lens.Txt = int(z.SYM_FUNCTION), pmtype
+				fnargs, fnret := goSrcFuncDeclBreak(pmtype)
+				lens.Flag, lens.Txt = int(z.SYM_FUNCTION), udevgo.PkgImpPathsToNamesInLn(fnret, curpkgdir)
+				lens.Str += "  " + udevgo.PkgImpPathsToNamesInLn(strings.TrimPrefix(fnargs, "func"), curpkgdir)
 			}
-			all = append(all, lens)
+			allsyms = append(allsyms, lens)
 		}
+		for _, method := range pm.Methods {
+			if srcref := udev.SrcMsgFromLn(method.Pos); srcref != nil && fpathok(srcref.Ref) {
+				p1, p2 := strings.Index(method.Name, " ("), strings.Index(method.Name, ") ")
+				lens := &z.SrcLens{Flag: int(z.SYM_METHOD), Str: "▶   " + method.Name[p2+2:]}
+				lens.SetFrom(srcref, fallbackfilepath)
+				if !ispmlisted {
+					lens.Str = method.Name[:p2][p1+2:] + " " + lens.Str
+				}
+				lens.Str, lens.Txt = goSrcFuncDeclBreak(lens.Str)
+				lens.Str, lens.Txt = udevgo.PkgImpPathsToNamesInLn(lens.Str, curpkgdir), udevgo.PkgImpPathsToNamesInLn(lens.Txt, curpkgdir)
+				if i := strings.Index(lens.Str, "("); i > 0 {
+					lens.Str = lens.Str[:i] + "  " + lens.Str[i:]
+				}
+				allsyms = append(allsyms, lens)
+			}
+		}
+	}
+	return
+}
+
+func goSrcFuncDeclBreak(fndecl string) (fnargs string, fnret string) {
+	if i := strings.Index(fndecl, ") "); i <= 0 {
+		fnargs, fnret = fndecl, ""
+	} else {
+		fnargs, fnret = fndecl[:i+1], fndecl[i+2:]
 	}
 	return
 }
