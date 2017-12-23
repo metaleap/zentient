@@ -104,3 +104,7 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 	}
 	return
 }
+
+func (me *goSrcIntel) Symbols(srcLens *z.SrcLens, query string, curFileOnly bool) (all []z.SrcLens) {
+	return me.SrcIntelBase.Symbols(srcLens, query, curFileOnly)
+}

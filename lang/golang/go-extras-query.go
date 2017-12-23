@@ -23,8 +23,9 @@ func (me *goExtras) runQuery_StructLayout(srcLens *z.SrcLens, arg string, resp *
 	if cmdout, cmderr, err := urun.CmdExec("structlayout", args[0], args[1]); err != nil {
 		panic(err)
 	} else if cmdout = ustr.Trim(cmdout); cmdout != "" || cmderr != "" {
-		resp.Desc = z.Strf("Results of `structlayout %s %s`, sizes are in bytes:", args[0], args[1])
-		resp.Warns = ustr.Split(cmderr, "\n")
+		scmddesc := z.Strf("structlayout %s %s", args[0], args[1])
+		resp.Desc = z.Strf("Results of `%s`, sizes are in bytes:", scmddesc)
+		resp.Warns = ustr.Split(z.Strf("[%s]\n%s", scmddesc, cmderr), "\n")
 		for _, ln := range ustr.Split(cmdout, "\n") {
 			if sfield, ssize := ustr.BreakOnLast(ln, ":"); sfield != "" {
 				sfname, sftype := ustr.BreakOn(sfield, " ")
@@ -35,6 +36,9 @@ func (me *goExtras) runQuery_StructLayout(srcLens *z.SrcLens, arg string, resp *
 }
 
 func (me *goExtras) runQuery_GoDoc(srcLens *z.SrcLens, arg string, resp *z.ExtrasResp) {
+	if arg = ustr.Trim(arg); arg == "" {
+		return
+	}
 	if i1, i2 := ustr.Idx(arg, "."), ustr.Idx(arg, " "); i1 > 0 && (i2 < 0 || i2 > i1) {
 		arg = arg[:i1] + " " + arg[i1+1:]
 	}
@@ -51,6 +55,7 @@ func (me *goExtras) runQuery_GoDoc(srcLens *z.SrcLens, arg string, resp *z.Extra
 	if err != nil {
 		panic(err)
 	}
+	resp.Desc = z.Strf("Results of `go doc %s`:", ustr.Join(cmd, " "))
 	resp.Warns = uslice.StrFiltered(uslice.StrMap(ustr.Split(cmderr, "\n"), ustr.Trim),
 		func(s string) bool { return !ustr.Pref(s, "exit status ") })
 	resp.InfoTips = append(resp.InfoTips, z.InfoTip{Value: ustr.Trim(cmdout)})
