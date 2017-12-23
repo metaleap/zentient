@@ -120,17 +120,24 @@ func (me *goSrcIntel) Symbols(srcLens *z.SrcLens, query string, curFileOnly bool
 	for _, pm := range gd.Package.Members {
 		ispmlisted := false
 		if srcref := udev.SrcMsgFromLn(pm.Pos); srcref != nil && fpathok(srcref.Ref) {
-			pmtype, lens := pm.Type, &z.SrcLens{Str: pm.Name}
+			pmtype, lens := pm.Type, &z.SrcLens{Str: pm.Kind + " " + pm.Name}
 			pmuntyped := strings.HasPrefix(pmtype, "untyped ")
 			if ispmlisted = true; pmuntyped {
 				pmtype = pmtype[8:]
+			} else {
+				for ij1 := strings.Index(pmtype, ` "json:\"`); ij1 > 0; ij1 = strings.Index(pmtype, ` "json:\"`) {
+					if ij2 := strings.Index(pmtype[ij1+9:], `\""`); ij2 >= 0 {
+						pref, suff := pmtype[:ij1], pmtype[ij1+9+ij2+3:]
+						pmtype = pref + suff
+					}
+				}
 			}
 			pmtype = udevgo.PkgImpPathsToNamesInLn(pmtype, curpkgdir)
 			lens.SetFrom(srcref, fallbackfilepath)
 			switch pm.Kind {
 			case "const":
 				if lens.Flag, lens.Txt = int(z.SYM_CONSTANT), pmtype+" = "+pm.Value; !pmuntyped {
-					lens.Flag = int(z.SYM_ENUMMEMBER)
+					lens.Str, lens.Flag = "▶   "+pm.Name, int(z.SYM_NUMBER)
 				}
 			case "var":
 				lens.Flag, lens.Txt = int(z.SYM_VARIABLE), pmtype
@@ -138,6 +145,40 @@ func (me *goSrcIntel) Symbols(srcLens *z.SrcLens, query string, curFileOnly bool
 				fnargs, fnret := goSrcFuncDeclBreak(pmtype)
 				lens.Flag, lens.Txt = int(z.SYM_FUNCTION), udevgo.PkgImpPathsToNamesInLn(fnret, curpkgdir)
 				lens.Str += "  " + udevgo.PkgImpPathsToNamesInLn(strings.TrimPrefix(fnargs, "func"), curpkgdir)
+			case "type":
+				lens.Txt = pmtype
+				e := z.SYM_CLASS
+				switch pmtype {
+				case "float32", "float64", "float", "complex", "int64", "uint64":
+					e = z.SYM_NUMBER
+				case "int", "int8", "int16", "int32", "uint", "uint8", "uint16", "uint32":
+					e = z.SYM_ENUMMEMBER
+				case "rune", "string":
+					e = z.SYM_STRING
+				case "bool":
+					e = z.SYM_BOOLEAN
+				default:
+					found := false
+					for pref, enum := range map[string]z.Symbol{
+						"*":          z.SYM_NULL,
+						"map[":       z.SYM_OBJECT,
+						"[]":         z.SYM_ARRAY,
+						"func(":      z.SYM_EVENT,
+						"interface{": z.SYM_INTERFACE,
+						"struct{":    z.SYM_STRUCT,
+					} {
+						if found = strings.HasPrefix(pmtype, pref); found {
+							e = enum
+							break
+						}
+					}
+					if !found {
+						println(pmtype)
+					}
+				}
+				lens.Flag = int(e)
+			default:
+				z.BadPanic("guru.DescribeMember.Kind", pm.Kind)
 			}
 			allsyms = append(allsyms, lens)
 		}
