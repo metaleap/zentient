@@ -19,15 +19,15 @@ func (_ *SrcIntelBase) ComplItems(srcLens *SrcLens) (all []SrcIntelCompl) {
 	return
 }
 
-func (me *SrcIntelBase) DefSym(srcLens *SrcLens) []*SrcLens {
+func (me *SrcIntelBase) DefSym(srcLens *SrcLens) SrcLenses {
 	return me.References(srcLens, true)
 }
 
-func (me *SrcIntelBase) DefType(srcLens *SrcLens) []*SrcLens {
+func (me *SrcIntelBase) DefType(srcLens *SrcLens) SrcLenses {
 	return me.References(srcLens, true)
 }
 
-func (me *SrcIntelBase) DefImpl(srcLens *SrcLens) []*SrcLens {
+func (me *SrcIntelBase) DefImpl(srcLens *SrcLens) SrcLenses {
 	return me.References(srcLens, true)
 }
 
@@ -65,7 +65,7 @@ func (_ *SrcIntelBase) Hovers(srcLens *SrcLens) (all []InfoTip) {
 	return
 }
 
-func (*SrcIntelBase) References(srcLens *SrcLens, includeDeclaration bool) (all []*SrcLens) {
+func (*SrcIntelBase) References(srcLens *SrcLens, includeDeclaration bool) (all SrcLenses) {
 	all = append(all,
 		&SrcLens{FilePath: srcLens.FilePath, Pos: &SrcPos{Col: 1, Ln: 3}},
 		&SrcLens{FilePath: srcLens.FilePath, Pos: &SrcPos{Col: 2, Ln: 5}},
@@ -84,7 +84,7 @@ func (*SrcIntelBase) Signature(srcLens *SrcLens) *SrcIntelSigHelp {
 	return &sig
 }
 
-func (*SrcIntelBase) Symbols(srcLens *SrcLens, query string, curFileOnly bool) (all []*SrcLens) {
+func (*SrcIntelBase) Symbols(srcLens *SrcLens, query string, curFileOnly bool) (all SrcLenses) {
 	if curFileOnly {
 		const symMinInvalid = int(SYM_MIN_INVALID)
 		for i := 0; i < symMinInvalid; i++ {

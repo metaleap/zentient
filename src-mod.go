@@ -10,7 +10,7 @@ type ISrcMod interface {
 	CodeActions(*SrcLens) []EditorAction
 	DoesStdoutWithFilePathArg(*Tool) bool
 	KnownFormatters() Tools
-	RunRenamer(*SrcLens, string) []*SrcLens
+	RunRenamer(*SrcLens, string) SrcLenses
 	RunFormatter(*Tool, string, string, string) (string, string)
 }
 
@@ -85,7 +85,7 @@ func (*SrcModBase) CodeActions(srcLens *SrcLens) (all []EditorAction) {
 	return
 }
 
-func (*SrcModBase) RunRenamer(srcLens *SrcLens, newName string) (all []*SrcLens) {
+func (*SrcModBase) RunRenamer(srcLens *SrcLens, newName string) (all SrcLenses) {
 	panic(Strf("Rename not yet implemented for __%s__.", Lang.Title))
 }
 
@@ -182,7 +182,7 @@ func (me *SrcModBase) onRunFormatter(req *ipcReq, resp *ipcResp) {
 		resp.ErrMsg = stderr
 	} else {
 		*src = srcformatted
-		resp.SrcMods = []*SrcLens{req.SrcLens}
+		resp.SrcMods = SrcLenses{req.SrcLens}
 	}
 }
 

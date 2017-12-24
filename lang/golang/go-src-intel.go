@@ -2,6 +2,7 @@ package zgo
 
 import (
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/metaleap/go-util/dev"
@@ -107,9 +108,9 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 	return
 }
 
-func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (allsyms []*z.SrcLens) {
-	onerr := func(label string, detail string) []*z.SrcLens {
-		return []*z.SrcLens{&z.SrcLens{Flag: int(z.SYM_EVENT), Str: label, Txt: detail, FilePath: sL.FilePath, Pos: sL.Pos, Range: sL.Range}}
+func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (allsyms z.SrcLenses) {
+	onerr := func(label string, detail string) z.SrcLenses {
+		return z.SrcLenses{&z.SrcLens{Flag: int(z.SYM_EVENT), Str: label, Txt: detail, FilePath: sL.FilePath, Pos: sL.Pos, Range: sL.Range}}
 	}
 	if !udevgo.Has_guru {
 		return onerr("Not installed: guru", "for more information, see: Zentient Main Menu / Tooling / guru.")
@@ -125,13 +126,16 @@ func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (al
 	}
 
 	// no more early-returns, now get busy
-	anyfilegoes, curpkgdir := !curFileOnly, filepath.Dir(sL.FilePath)
-	allsyms = make([]*z.SrcLens, 0, len(gd.Package.Members)) // this will never be a 'good' cap here, but hey any number beats the default cap of 0..
+	if !curFileOnly {
+		sort.Sort(gd) // sort doesn't seem to help improve vsc's ctrl+t ux for now, but maybe in some future vsc release..
+	}
+	anyfilegoes, curpkgdir, numpms := !curFileOnly, filepath.Dir(sL.FilePath), len(gd.Package.Members)
+	query, allsyms = strings.ToLower(query), make(z.SrcLenses, 0, numpms) // numpms will never be a 'good' cap in any of these, but hey any number beats the default cap of 0..
 	for _, pm := range gd.Package.Members {
 		ispmlisted := false
-		if srcref := udev.SrcMsgFromLn(pm.Pos); srcref != nil && (anyfilegoes || srcref.Ref == sL.FilePath) {
+		if srcref := udev.SrcMsgFromLn(pm.Pos); srcref != nil && (anyfilegoes || srcref.Ref == sL.FilePath) && (query == "" || gd.Matches(pm, query)) {
 			ispmlisted = true
-			pmtype, sym := pm.Type, &z.SrcLens{Str: pm.Kind + " " + pm.Name}
+			pmtype, sym := pm.Type, &z.SrcLens{Str: pm.Name}
 			pmuntyped := strings.HasPrefix(pmtype, "untyped ")
 			{
 				if pmuntyped {
@@ -140,7 +144,7 @@ func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (al
 					next := func() int { return strings.Index(pmtype, ` "json:\"`) }
 					for ij1 := next(); ij1 > 0; ij1 = next() {
 						if ij2 := strings.Index(pmtype[ij1+9:], `\""`); ij2 >= 0 {
-							pref, suff := pmtype[:ij1], pmtype[ij1+9+ij2+3:]
+							pref, suff := pmtype[:ij1], pmtype[ij1+9+3+ij2:]
 							pmtype = pref + suff
 						} else {
 							break
@@ -158,7 +162,7 @@ func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (al
 			case "var":
 				sym.Flag, sym.Txt = int(z.SYM_VARIABLE), pmtype
 			case "func":
-				fnargs, fnret := goSrcFuncDeclBreak(pmtype)
+				fnargs, fnret := goSrcFuncSigBreak(pmtype)
 				sym.Flag, sym.Txt = int(z.SYM_FUNCTION), udevgo.PkgImpPathsToNamesInLn(fnret, curpkgdir)
 				sym.Str += "  " + udevgo.PkgImpPathsToNamesInLn(strings.TrimPrefix(fnargs, "func"), curpkgdir)
 			case "type":
@@ -186,7 +190,7 @@ func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (al
 			allsyms = append(allsyms, sym)
 		}
 		for _, method := range pm.Methods {
-			if isok := ispmlisted || !strings.HasPrefix(pm.Type, "interface{"); isok {
+			if isok := ispmlisted || !strings.HasPrefix(pm.Type, "interface{"); isok && (query == "" || strings.Contains(strings.ToLower(method.Name), query)) {
 				if srcref := udev.SrcMsgFromLn(method.Pos); srcref != nil && (anyfilegoes || srcref.Ref == sL.FilePath) {
 					p1, p2 := strings.Index(method.Name, " ("), strings.Index(method.Name, ") ")
 					methodtype, methodtitle := method.Name[:p2][p1+2:], method.Name[p2+2:]
@@ -195,18 +199,18 @@ func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (al
 						// guru reports an embedded interface's methods redundantly for each embedder, all pointing to the embeddee's original loc. we skip these
 						continue
 					}
-					if strings.HasPrefix(pm.Type, "struct{") && srcref.Pos1Ln > 0 && srcref.Pos1Ln <= len(srclns) {
+					if curFileOnly && srcref.Ref == sL.FilePath && strings.HasPrefix(pm.Type, "struct{") && srcref.Pos1Ln > 0 && srcref.Pos1Ln <= len(srclns) {
 						if srcln := srclns[srcref.Pos1Ln-1]; !strings.Contains(srcln, methodtype+") "+methodname+"(") {
-							// guru reports an embedded struct's methods redundantly for each embedder, all pointing to the embeddee's original loc. we skip these
+							// guru reports an embedded struct's methods redundantly for each embedder, all pointing to the embeddee's original loc. we skip these --- at least in "file symbols" mode
 							continue
 						}
 					}
 					lens := &z.SrcLens{Flag: int(z.SYM_METHOD), Str: "▶   " + methodtitle}
 					lens.SetFilePathAndPosOrRangeFrom(srcref, nil)
-					if !ispmlisted { // if method's receiver type not in the symbols listing, prepend it's name to the pretend-indentation
-						lens.Str = methodtype + " " + lens.Str
-					}
-					lens.Str, lens.Txt = goSrcFuncDeclBreak(lens.Str)
+					// if !ispmlisted { // if method's receiver type not in the symbols listing, prepend it's name to the pretend-indentation
+					lens.Str = methodtype + " " + lens.Str
+					// }
+					lens.Str, lens.Txt = goSrcFuncSigBreak(lens.Str)
 					lens.Str, lens.Txt = udevgo.PkgImpPathsToNamesInLn(lens.Str, curpkgdir), udevgo.PkgImpPathsToNamesInLn(lens.Txt, curpkgdir)
 					if i := strings.Index(lens.Str, "("); i > 0 { // insert some spacing between name and args
 						lens.Str = lens.Str[:i] + "  " + lens.Str[i:]
@@ -219,11 +223,11 @@ func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (al
 	return
 }
 
-func goSrcFuncDeclBreak(fndecl string) (fnargs string, fnret string) {
-	if i := strings.Index(fndecl, ") "); i <= 0 {
-		fnargs, fnret = fndecl, ""
-	} else {
-		fnargs, fnret = fndecl[:i+1], fndecl[i+2:]
+func goSrcFuncSigBreak(fnsig string) (fnargs string, fnret string) {
+	if i := strings.Index(fnsig, ") "); i > 0 { // func sig has return args
+		fnargs, fnret = fnsig[:i+1], fnsig[i+2:]
+	} else { // void func sig (has no return args)
+		fnargs, fnret = fnsig, " " // " " instead of "" circumvents a VScode quirk in its 'Workspace Symbols' UX
 	}
 	return
 }

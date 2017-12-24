@@ -32,7 +32,7 @@ func (me *goSrcMod) KnownFormatters() z.Tools {
 	return me.knownFormatters
 }
 
-func (me *goSrcMod) RunRenamer(srcLens *z.SrcLens, newName string) (srcMods []*z.SrcLens) {
+func (me *goSrcMod) RunRenamer(srcLens *z.SrcLens, newName string) (srcMods z.SrcLenses) {
 	if !tools.gorename.Installed {
 		panic(tools.gorename.NotInstalledMessage())
 	}

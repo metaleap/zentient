@@ -19,7 +19,6 @@ type IWorkspace interface {
 
 	Dirs() WorkspaceDirs
 	Files() WorkspaceFiles
-	PollFileEventsEvery(int64)
 	PrettyPath(string, ...string) string
 }
 
@@ -96,12 +95,12 @@ type WorkspaceBase struct {
 
 	OnBeforeChanges WorkspaceChangesBefore `json:"-"`
 	OnAfterChanges  WorkspaceChangesAfter  `json:"-"`
-	ReadyToPoll     bool
 
 	dirs  WorkspaceDirs
 	files WorkspaceFiles
 
-	pollingPaused bool
+	pollingStarted bool
+	pollingPaused  bool
 }
 
 func (me *WorkspaceBase) Init()                         { me.dirs, me.files = WorkspaceDirs{}, WorkspaceFiles{} }
@@ -151,7 +150,6 @@ func (*WorkspaceBase) analyzeChanges(files WorkspaceFiles, upd *WorkspaceChanges
 }
 
 func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
-	me.ReadyToPoll = true
 	if upd != nil && upd.HasChanges() {
 		dirs, files := me.dirs, me.files
 		freshfiles, hasfreshfiles, dirschanged, needsfreshautolints := me.analyzeChanges(files, upd)
@@ -210,17 +208,21 @@ func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 			me.OnAfterChanges(upd)
 		}
 	}
+	if !me.pollingStarted {
+		me.pollingStarted = true
+		go me.pollFileEventsEvery(1234)
+	}
 }
 
 func (me *WorkspaceBase) ObjSnap(_ string) interface{} { return me.Impl }
 
 func (me *WorkspaceBase) ObjSnapPrefix() string { return Lang.ID + ".proj." }
 
-func (me *WorkspaceBase) PollFileEventsEvery(milliseconds int64) {
+func (me *WorkspaceBase) pollFileEventsEvery(milliseconds int64) {
 	interval := time.Millisecond * time.Duration(milliseconds)
 	msg := &ipcResp{IpcID: IPCID_PROJ_POLLEVTS}
 	for {
-		if time.Sleep(interval); me.ReadyToPoll && !me.pollingPaused {
+		if time.Sleep(interval); !me.pollingPaused {
 			if !canSend() {
 				return
 			} else if err := send(msg); err != nil {

@@ -48,8 +48,6 @@ func Serve() (err error) {
 		go c.OnReady()
 	}
 
-	go Lang.Workspace.PollFileEventsEvery(INTERVALMS_POLL_EDITORFILEEVENTS)
-
 	// we don't directly wire up a json.Decoder to stdin but read individual lines in as strings first:
 	// - this enforces our line-delimited (rather than 'json-delimited') protocol
 	// - allows json-decoding in separate go-routine

@@ -15,10 +15,9 @@ func (me *PkgIntelBase) Init() {
 	me.ListMenuBase.init(me.Impl, "Packages", "Lists %s packages %s")
 }
 
-func (me *PkgIntelBase) IpcID(_ *ListFilter) ipcIDs {
+func (me *PkgIntelBase) IpcID(_ *ListFilter) IpcIDs {
 	return IPCID_MENUS_PKGS
 }
-
 func (me *PkgIntelBase) ObjSnapPrefix() string {
 	return Lang.ID + ".pkgIntel."
 }

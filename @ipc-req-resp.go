@@ -17,7 +17,7 @@ type IObjSnap interface {
 
 type ipcReq struct {
 	ReqID   int64       `json:"ri"`
-	IpcID   ipcIDs      `json:"ii"`
+	IpcID   IpcIDs      `json:"ii"`
 	IpcArgs interface{} `json:"ia"`
 
 	ProjUpd *WorkspaceChanges `json:"projUpd"`
@@ -58,11 +58,11 @@ type ipcResp struct {
 	ReqID  int64  `json:"ri,omitempty"`
 	ErrMsg string `json:"e,omitempty"`
 
-	IpcID       ipcIDs         `json:"ii,omitempty"`
+	IpcID       IpcIDs         `json:"ii,omitempty"`
 	Menu        *MenuResp      `json:"menu,omitempty"`
 	Extras      *ExtrasResp    `json:"extras,omitempty"`
 	SrcIntel    *srcIntelResp  `json:"srcIntel,omitempty"`
-	SrcMods     []*SrcLens     `json:"srcMods,omitempty"`
+	SrcMods     SrcLenses      `json:"srcMods,omitempty"`
 	SrcActions  []EditorAction `json:"srcActions,omitempty"`
 	SrcDiags    *DiagResp      `json:"srcDiags,omitempty"`
 	CaddyUpdate *Caddy         `json:"caddy,omitempty"`
@@ -95,7 +95,7 @@ func (me *ipcResp) to(req *ipcReq) {
 			return
 		}
 	}
-	if req.IpcID < IPCID_MENUS_MAIN || req.IpcID >= IPCID_MIN_INVALID {
+	if req.IpcID <= 0 || req.IpcID >= IPCID_MIN_INVALID {
 		me.ErrMsg = BadMsg("IpcID", req.IpcID.String())
 	} else {
 		me.ErrMsg = Strf("The requested feature `%s` wasn't yet implemented for __%s__.", req.IpcID, Lang.Title)

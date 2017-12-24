@@ -22,7 +22,7 @@ type Menu struct {
 type MenuItems []*MenuItem
 
 type MenuItem struct {
-	IpcID    ipcIDs      `json:"ii,omitempty"`
+	IpcID    IpcIDs      `json:"ii,omitempty"`
 	IpcArgs  interface{} `json:"ia,omitempty"`
 	Category string      `json:"c,omitempty"`
 	Title    string      `json:"t"`

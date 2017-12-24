@@ -24,6 +24,8 @@ type SrcRange struct {
 	End   SrcPos `json:"e,omitempty"`
 }
 
+type SrcLenses []*SrcLens
+
 type SrcLens struct {
 	FilePath string    `json:"f,omitempty"`
 	Txt      string    `json:"t,omitempty"`
