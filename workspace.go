@@ -75,12 +75,20 @@ type WorkspaceChanges struct {
 	WrittenFiles []string
 }
 
-type WorkspaceChangesBefore func(upd *WorkspaceChanges, dirsChanged bool, freshFiles []string, willAutoLint bool)
-type WorkspaceChangesAfter func(upd *WorkspaceChanges)
-
-func (me *WorkspaceChanges) hasChanges() bool {
-	return len(me.AddedDirs) > 0 || len(me.RemovedDirs) > 0 || len(me.OpenedFiles) > 0 || len(me.ClosedFiles) > 0 || len(me.WrittenFiles) > 0
+func (me *WorkspaceChanges) HasChanges() bool {
+	return me.HasDirChanges() || me.HasFileChanges()
 }
+
+func (me *WorkspaceChanges) HasDirChanges() bool {
+	return len(me.AddedDirs) > 0 || len(me.RemovedDirs) > 0
+}
+
+func (me *WorkspaceChanges) HasFileChanges() bool {
+	return len(me.OpenedFiles) > 0 || len(me.ClosedFiles) > 0 || len(me.WrittenFiles) > 0
+}
+
+type WorkspaceChangesBefore func(upd *WorkspaceChanges, freshFiles []string, willAutoLint bool)
+type WorkspaceChangesAfter func(upd *WorkspaceChanges)
 
 type WorkspaceBase struct {
 	mutex sync.Mutex
@@ -137,14 +145,14 @@ func (*WorkspaceBase) analyzeChanges(files WorkspaceFiles, upd *WorkspaceChanges
 			}
 		}
 	}
-	hasFreshFiles, dirsChanged = len(freshFiles) > 0, len(upd.AddedDirs) > 0 || len(upd.RemovedDirs) > 0
+	hasFreshFiles, dirsChanged = len(freshFiles) > 0, upd.HasDirChanges()
 	needsFreshAutoLints = hasFreshFiles || len(upd.WrittenFiles) > 0 || len(upd.OpenedFiles) > 0
 	return
 }
 
 func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 	me.ReadyToPoll = true
-	if upd != nil && upd.hasChanges() {
+	if upd != nil && upd.HasChanges() {
 		dirs, files := me.dirs, me.files
 		freshfiles, hasfreshfiles, dirschanged, needsfreshautolints := me.analyzeChanges(files, upd)
 
@@ -153,7 +161,7 @@ func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 			defer me.Unlock()
 		}
 		if me.OnBeforeChanges != nil {
-			me.OnBeforeChanges(upd, dirschanged, freshfiles, needsfreshautolints)
+			me.OnBeforeChanges(upd, freshfiles, needsfreshautolints)
 		}
 
 		if dirschanged {
@@ -167,7 +175,7 @@ func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 			}
 			for _, newdirpath := range upd.AddedDirs {
 				if dir, _ := dirs[newdirpath]; dir == nil {
-					dir = &WorkspaceDir{Path: newdirpath}
+					dir = &WorkspaceDir{Path: strings.TrimRight(newdirpath, "/\\")}
 					dirs[newdirpath] = dir
 				}
 			}

@@ -42,3 +42,9 @@ func (me *Caddy) PendingOrBusy() bool {
 func (me *Caddy) Ready() bool {
 	return me.ready
 }
+
+func (me *Caddy) WaitThen(do func()) {
+	for me.PendingOrBusy() {
+	}
+	go do()
+}

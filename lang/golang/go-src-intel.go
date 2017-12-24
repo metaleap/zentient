@@ -10,7 +10,17 @@ import (
 	"github.com/metaleap/zentient"
 )
 
-var srcIntel goSrcIntel
+var (
+	srcIntel     goSrcIntel
+	symsPatterns = map[string]z.Symbol{
+		"*":          z.SYM_NULL,
+		"map[":       z.SYM_OBJECT,
+		"[]":         z.SYM_ARRAY,
+		"func(":      z.SYM_EVENT,
+		"interface{": z.SYM_INTERFACE,
+		"struct{":    z.SYM_STRUCT,
+	}
+)
 
 func init() {
 	srcIntel.Impl, z.Lang.SrcIntel = &srcIntel, &srcIntel
@@ -105,6 +115,7 @@ func (me *goSrcIntel) Symbols(srcLens *z.SrcLens, query string, curFileOnly bool
 		return onerr("Not installed: guru", "for more information, see: Zentient Main Menu / Tooling / guru.")
 	}
 	srcLens.EnsureSrcFull()
+	srclns := strings.Split(srcLens.Txt, "\n")
 	bytepos := srcLens.ByteOffsetForFirstLineBeginningWith("package ")
 	gd, err := udevgo.QueryDesc_Guru(srcLens.FilePath, srcLens.Txt, ustr.FromInt(bytepos))
 	if err != nil {
@@ -156,27 +167,16 @@ func (me *goSrcIntel) Symbols(srcLens *z.SrcLens, query string, curFileOnly bool
 					e = z.SYM_NUMBER
 				case "int", "int8", "int16", "int32", "uint", "uint8", "uint16", "uint32":
 					e = z.SYM_ENUMMEMBER
-				case "rune", "string":
+				case "rune", "string", "[]byte":
 					e = z.SYM_STRING
 				case "bool":
 					e = z.SYM_BOOLEAN
 				default:
-					found := false
-					for pref, enum := range map[string]z.Symbol{
-						"*":          z.SYM_NULL,
-						"map[":       z.SYM_OBJECT,
-						"[]":         z.SYM_ARRAY,
-						"func(":      z.SYM_EVENT,
-						"interface{": z.SYM_INTERFACE,
-						"struct{":    z.SYM_STRUCT,
-					} {
-						if found = strings.HasPrefix(pmtype, pref); found {
+					for pref, enum := range symsPatterns {
+						if strings.HasPrefix(pmtype, pref) {
 							e = enum
 							break
 						}
-					}
-					if !found {
-						println(pmtype)
 					}
 				}
 				lens.Flag = int(e)
@@ -193,8 +193,8 @@ func (me *goSrcIntel) Symbols(srcLens *z.SrcLens, query string, curFileOnly bool
 				if strings.HasPrefix(pm.Type, "interface{") && !(strings.Contains(pm.Type, "{"+methodname+"(") || strings.Contains(pm.Type, "; "+methodname+"(")) {
 					continue
 				}
-				if strings.HasPrefix(pm.Type, "struct{") {
-					if srcln := srcLens.Ln(srcref.Pos1Ln); !strings.Contains(srcln, methodtype+") "+methodname+"(") {
+				if strings.HasPrefix(pm.Type, "struct{") && srcref.Pos1Ln > 0 && srcref.Pos1Ln <= len(srclns) {
+					if srcln := srclns[srcref.Pos1Ln-1]; !strings.Contains(srcln, methodtype+") "+methodname+"(") {
 						continue
 					}
 				}
@@ -203,7 +203,6 @@ func (me *goSrcIntel) Symbols(srcLens *z.SrcLens, query string, curFileOnly bool
 				if !ispmlisted {
 					lens.Str = methodtype + " " + lens.Str
 				}
-
 				lens.Str, lens.Txt = goSrcFuncDeclBreak(lens.Str)
 				lens.Str, lens.Txt = udevgo.PkgImpPathsToNamesInLn(lens.Str, curpkgdir), udevgo.PkgImpPathsToNamesInLn(lens.Txt, curpkgdir)
 				if i := strings.Index(lens.Str, "("); i > 0 {

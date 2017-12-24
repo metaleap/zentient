@@ -68,13 +68,6 @@ func (me *SrcLens) ByteOffsetForFirstLineBeginningWith(prefix string) int {
 	return -1
 }
 
-func (me *SrcLens) Ln(num1based int) (ln string) {
-	if lns := strings.Split(me.Txt, "\n"); me.Txt != "" && len(lns) >= num1based {
-		return lns[num1based-1]
-	}
-	return
-}
-
 func (me *SrcLens) SetFrom(srcRef *udev.SrcMsg, fallbackFilePath func() string) {
 	if srcRef.Pos2Ch > 0 && srcRef.Pos2Ln > 0 {
 		me.Range = &SrcRange{Start: SrcPos{Ln: srcRef.Pos1Ln, Col: srcRef.Pos1Ch},

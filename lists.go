@@ -57,7 +57,7 @@ type ListBase struct {
 func (me *ListBase) init(impl IList) {
 	me.impl = impl
 	me.listFilters = []*ListFilter{
-		&ListFilter{Title: "All", Desc: me.impl.UnfilteredDesc()},
+		{Title: "All", Desc: me.impl.UnfilteredDesc()},
 	}
 	me.listFilters = append(me.listFilters, me.impl.Filters()...)
 }
