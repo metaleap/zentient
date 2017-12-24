@@ -195,7 +195,7 @@ func (me *DiagBase) menuItemsUpdateHint(diags Tools, item *MenuItem) {
 func (me *DiagBase) NewDiagItemFrom(srcRef *udev.SrcMsg, toolName string, fallbackFilePath func() string) (di *DiagItem) {
 	di = &DiagItem{Msg: ustr.Trim(srcRef.Msg), ToolName: toolName}
 	di.Loc.Flag = srcRef.Flag
-	di.Loc.SetFrom(srcRef, fallbackFilePath)
+	di.Loc.SetFilePathAndPosOrRangeFrom(srcRef, fallbackFilePath)
 	di.resetAndInferSrcActions()
 	return
 }

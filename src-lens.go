@@ -60,15 +60,15 @@ func (me *SrcLens) ByteOffsetForPosWithRuneOffset(pos *SrcPos) int {
 }
 
 func (me *SrcLens) ByteOffsetForFirstLineBeginningWith(prefix string) int {
-	if l := len(prefix); strings.HasPrefix(me.Txt, prefix) {
-		return l
+	if strings.HasPrefix(me.Txt, prefix) {
+		return 0
 	} else if idx := strings.Index(me.Txt, "\n"+prefix); idx >= 0 {
-		return len([]byte(me.Txt[:idx+l+1])) // want byte-pos not rune-pos
+		return len([]byte(me.Txt[:idx+1])) // want byte-pos not rune-pos
 	}
 	return -1
 }
 
-func (me *SrcLens) SetFrom(srcRef *udev.SrcMsg, fallbackFilePath func() string) {
+func (me *SrcLens) SetFilePathAndPosOrRangeFrom(srcRef *udev.SrcMsg, fallbackFilePath func() string) {
 	if srcRef.Pos2Ch > 0 && srcRef.Pos2Ln > 0 {
 		me.Range = &SrcRange{Start: SrcPos{Ln: srcRef.Pos1Ln, Col: srcRef.Pos1Ch},
 			End: SrcPos{Ln: srcRef.Pos2Ln, Col: srcRef.Pos2Ch}}

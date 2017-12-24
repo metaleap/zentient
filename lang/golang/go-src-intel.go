@@ -107,17 +107,17 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 	return
 }
 
-func (me *goSrcIntel) Symbols(srcLens *z.SrcLens, query string, curFileOnly bool) (allsyms []*z.SrcLens) {
+func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (allsyms []*z.SrcLens) {
 	onerr := func(label string, detail string) []*z.SrcLens {
-		return []*z.SrcLens{&z.SrcLens{Flag: int(z.SYM_EVENT), Str: label, Txt: detail, FilePath: srcLens.FilePath, Pos: srcLens.Pos, Range: srcLens.Range}}
+		return []*z.SrcLens{&z.SrcLens{Flag: int(z.SYM_EVENT), Str: label, Txt: detail, FilePath: sL.FilePath, Pos: sL.Pos, Range: sL.Range}}
 	}
 	if !udevgo.Has_guru {
 		return onerr("Not installed: guru", "for more information, see: Zentient Main Menu / Tooling / guru.")
 	}
-	srcLens.EnsureSrcFull()
-	srclns := strings.Split(srcLens.Txt, "\n")
-	bytepos := srcLens.ByteOffsetForFirstLineBeginningWith("package ")
-	gd, err := udevgo.QueryDesc_Guru(srcLens.FilePath, srcLens.Txt, ustr.FromInt(bytepos))
+	sL.EnsureSrcFull()
+	srclns := strings.Split(sL.Txt, "\n")
+	bytepos := 8 + sL.ByteOffsetForFirstLineBeginningWith("package ")
+	gd, err := udevgo.QueryDesc_Guru(sL.FilePath, sL.Txt, ustr.FromInt(bytepos))
 	if err != nil {
 		return onerr("Error running guru:", err.Error())
 	} else if gd.Package == nil {
@@ -125,90 +125,94 @@ func (me *goSrcIntel) Symbols(srcLens *z.SrcLens, query string, curFileOnly bool
 	}
 
 	// no more early-returns, now get busy
-	fpathok := func(fp string) bool { return (!curFileOnly) || fp == srcLens.FilePath }
-	curpkgdir, numsyms, fallbackfilepath := filepath.Dir(srcLens.FilePath), len(gd.Package.Members), func() string { return srcLens.FilePath }
-	allsyms = make([]*z.SrcLens, 0, numsyms)
+	anyfilegoes, curpkgdir := !curFileOnly, filepath.Dir(sL.FilePath)
+	allsyms = make([]*z.SrcLens, 0, len(gd.Package.Members)) // this will never be a 'good' cap here, but hey any number beats the default cap of 0..
 	for _, pm := range gd.Package.Members {
 		ispmlisted := false
-		if srcref := udev.SrcMsgFromLn(pm.Pos); srcref != nil && fpathok(srcref.Ref) {
-			pmtype, lens := pm.Type, &z.SrcLens{Str: pm.Kind + " " + pm.Name}
+		if srcref := udev.SrcMsgFromLn(pm.Pos); srcref != nil && (anyfilegoes || srcref.Ref == sL.FilePath) {
+			ispmlisted = true
+			pmtype, sym := pm.Type, &z.SrcLens{Str: pm.Kind + " " + pm.Name}
 			pmuntyped := strings.HasPrefix(pmtype, "untyped ")
-			if ispmlisted = true; pmuntyped {
-				pmtype = pmtype[8:]
-			} else {
-				next := func() int { return strings.Index(pmtype, ` "json:\"`) }
-				for ij1 := next(); ij1 > 0; ij1 = next() {
-					if ij2 := strings.Index(pmtype[ij1+9:], `\""`); ij2 >= 0 {
-						pref, suff := pmtype[:ij1], pmtype[ij1+9+ij2+3:]
-						pmtype = pref + suff
-					} else {
-						break
-					}
-				}
-			}
-			pmtype = udevgo.PkgImpPathsToNamesInLn(pmtype, curpkgdir)
-			lens.SetFrom(srcref, fallbackfilepath)
-			switch pm.Kind {
-			case "const":
-				if lens.Flag, lens.Txt = int(z.SYM_CONSTANT), pmtype+" = "+pm.Value; !pmuntyped {
-					lens.Str, lens.Flag = "▶   "+pm.Name, int(z.SYM_NUMBER)
-				}
-			case "var":
-				lens.Flag, lens.Txt = int(z.SYM_VARIABLE), pmtype
-			case "func":
-				fnargs, fnret := goSrcFuncDeclBreak(pmtype)
-				lens.Flag, lens.Txt = int(z.SYM_FUNCTION), udevgo.PkgImpPathsToNamesInLn(fnret, curpkgdir)
-				lens.Str += "  " + udevgo.PkgImpPathsToNamesInLn(strings.TrimPrefix(fnargs, "func"), curpkgdir)
-			case "type":
-				lens.Txt = pmtype
-				e := z.SYM_CLASS
-				switch pmtype {
-				case "float32", "float64", "float", "complex", "int64", "uint64":
-					e = z.SYM_NUMBER
-				case "int", "int8", "int16", "int32", "uint", "uint8", "uint16", "uint32":
-					e = z.SYM_ENUMMEMBER
-				case "rune", "string", "[]byte":
-					e = z.SYM_STRING
-				case "bool":
-					e = z.SYM_BOOLEAN
-				default:
-					for pref, enum := range symsPatterns {
-						if strings.HasPrefix(pmtype, pref) {
-							e = enum
+			{
+				if pmuntyped {
+					pmtype = pmtype[8:]
+				} else if strings.HasPrefix(pmtype, "struct{") {
+					next := func() int { return strings.Index(pmtype, ` "json:\"`) }
+					for ij1 := next(); ij1 > 0; ij1 = next() {
+						if ij2 := strings.Index(pmtype[ij1+9:], `\""`); ij2 >= 0 {
+							pref, suff := pmtype[:ij1], pmtype[ij1+9+ij2+3:]
+							pmtype = pref + suff
+						} else {
 							break
 						}
 					}
 				}
-				lens.Flag = int(e)
+				pmtype = udevgo.PkgImpPathsToNamesInLn(pmtype, curpkgdir)
+			}
+			sym.SetFilePathAndPosOrRangeFrom(srcref, nil)
+			switch pm.Kind {
+			case "const":
+				if sym.Flag, sym.Txt = int(z.SYM_CONSTANT), pmtype+" = "+pm.Value; !pmuntyped {
+					sym.Str, sym.Flag = "▶   "+pm.Name, int(z.SYM_NUMBER)
+				}
+			case "var":
+				sym.Flag, sym.Txt = int(z.SYM_VARIABLE), pmtype
+			case "func":
+				fnargs, fnret := goSrcFuncDeclBreak(pmtype)
+				sym.Flag, sym.Txt = int(z.SYM_FUNCTION), udevgo.PkgImpPathsToNamesInLn(fnret, curpkgdir)
+				sym.Str += "  " + udevgo.PkgImpPathsToNamesInLn(strings.TrimPrefix(fnargs, "func"), curpkgdir)
+			case "type":
+				sym.Txt, sym.Flag = pmtype, int(z.SYM_CLASS)
+				switch pmtype {
+				case "float32", "float64", "float", "complex", "int64", "uint64":
+					sym.Flag = int(z.SYM_NUMBER)
+				case "int", "int8", "int16", "int32", "uint", "uint8", "uint16", "uint32":
+					sym.Flag = int(z.SYM_ENUMMEMBER)
+				case "rune", "string", "[]byte":
+					sym.Flag = int(z.SYM_STRING)
+				case "bool":
+					sym.Flag = int(z.SYM_BOOLEAN)
+				default:
+					for pref, enum := range symsPatterns {
+						if strings.HasPrefix(pmtype, pref) {
+							sym.Flag = int(enum)
+							break
+						}
+					}
+				}
 			default:
 				z.BadPanic("guru.DescribeMember.Kind", pm.Kind)
 			}
-			allsyms = append(allsyms, lens)
+			allsyms = append(allsyms, sym)
 		}
 		for _, method := range pm.Methods {
-			if isok, srcref := ispmlisted || !strings.HasPrefix(pm.Type, "interface{"), udev.SrcMsgFromLn(method.Pos); isok && srcref != nil && fpathok(srcref.Ref) {
-				p1, p2 := strings.Index(method.Name, " ("), strings.Index(method.Name, ") ")
-				methodtype, methodtitle := method.Name[:p2][p1+2:], method.Name[p2+2:]
-				methodname := strings.TrimSpace(methodtitle[:strings.Index(methodtitle, "(")])
-				if strings.HasPrefix(pm.Type, "interface{") && !(strings.Contains(pm.Type, "{"+methodname+"(") || strings.Contains(pm.Type, "; "+methodname+"(")) {
-					continue
-				}
-				if strings.HasPrefix(pm.Type, "struct{") && srcref.Pos1Ln > 0 && srcref.Pos1Ln <= len(srclns) {
-					if srcln := srclns[srcref.Pos1Ln-1]; !strings.Contains(srcln, methodtype+") "+methodname+"(") {
+			if isok := ispmlisted || !strings.HasPrefix(pm.Type, "interface{"); isok {
+				if srcref := udev.SrcMsgFromLn(method.Pos); srcref != nil && (anyfilegoes || srcref.Ref == sL.FilePath) {
+					p1, p2 := strings.Index(method.Name, " ("), strings.Index(method.Name, ") ")
+					methodtype, methodtitle := method.Name[:p2][p1+2:], method.Name[p2+2:]
+					methodname := strings.TrimSpace(methodtitle[:strings.Index(methodtitle, "(")])
+					if strings.HasPrefix(pm.Type, "interface{") && !(strings.Contains(pm.Type, "{"+methodname+"(") || strings.Contains(pm.Type, "; "+methodname+"(")) {
+						// guru reports an embedded interface's methods redundantly for each embedder, all pointing to the embeddee's original loc. we skip these
 						continue
 					}
+					if strings.HasPrefix(pm.Type, "struct{") && srcref.Pos1Ln > 0 && srcref.Pos1Ln <= len(srclns) {
+						if srcln := srclns[srcref.Pos1Ln-1]; !strings.Contains(srcln, methodtype+") "+methodname+"(") {
+							// guru reports an embedded struct's methods redundantly for each embedder, all pointing to the embeddee's original loc. we skip these
+							continue
+						}
+					}
+					lens := &z.SrcLens{Flag: int(z.SYM_METHOD), Str: "▶   " + methodtitle}
+					lens.SetFilePathAndPosOrRangeFrom(srcref, nil)
+					if !ispmlisted { // if method's receiver type not in the symbols listing, prepend it's name to the pretend-indentation
+						lens.Str = methodtype + " " + lens.Str
+					}
+					lens.Str, lens.Txt = goSrcFuncDeclBreak(lens.Str)
+					lens.Str, lens.Txt = udevgo.PkgImpPathsToNamesInLn(lens.Str, curpkgdir), udevgo.PkgImpPathsToNamesInLn(lens.Txt, curpkgdir)
+					if i := strings.Index(lens.Str, "("); i > 0 { // insert some spacing between name and args
+						lens.Str = lens.Str[:i] + "  " + lens.Str[i:]
+					}
+					allsyms = append(allsyms, lens)
 				}
-				lens := &z.SrcLens{Flag: int(z.SYM_METHOD), Str: "▶   " + methodtitle}
-				lens.SetFrom(srcref, fallbackfilepath)
-				if !ispmlisted {
-					lens.Str = methodtype + " " + lens.Str
-				}
-				lens.Str, lens.Txt = goSrcFuncDeclBreak(lens.Str)
-				lens.Str, lens.Txt = udevgo.PkgImpPathsToNamesInLn(lens.Str, curpkgdir), udevgo.PkgImpPathsToNamesInLn(lens.Txt, curpkgdir)
-				if i := strings.Index(lens.Str, "("); i > 0 {
-					lens.Str = lens.Str[:i] + "  " + lens.Str[i:]
-				}
-				allsyms = append(allsyms, lens)
 			}
 		}
 	}
