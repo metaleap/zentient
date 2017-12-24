@@ -68,11 +68,11 @@ func (me *SrcLens) ByteOffsetForFirstLineBeginningWith(prefix string) int {
 	return -1
 }
 
-func (me *SrcLens) Ln() string {
-	if me.CrLf {
-		return "\r\n"
+func (me *SrcLens) Ln(num1based int) (ln string) {
+	if lns := strings.Split(me.Txt, "\n"); me.Txt != "" && len(lns) >= num1based {
+		return lns[num1based-1]
 	}
-	return "\n"
+	return
 }
 
 func (me *SrcLens) SetFrom(srcRef *udev.SrcMsg, fallbackFilePath func() string) {

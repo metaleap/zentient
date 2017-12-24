@@ -125,10 +125,13 @@ func (me *goSrcIntel) Symbols(srcLens *z.SrcLens, query string, curFileOnly bool
 			if ispmlisted = true; pmuntyped {
 				pmtype = pmtype[8:]
 			} else {
-				for ij1 := strings.Index(pmtype, ` "json:\"`); ij1 > 0; ij1 = strings.Index(pmtype, ` "json:\"`) {
+				next := func() int { return strings.Index(pmtype, ` "json:\"`) }
+				for ij1 := next(); ij1 > 0; ij1 = next() {
 					if ij2 := strings.Index(pmtype[ij1+9:], `\""`); ij2 >= 0 {
 						pref, suff := pmtype[:ij1], pmtype[ij1+9+ij2+3:]
 						pmtype = pref + suff
+					} else {
+						break
 					}
 				}
 			}
@@ -183,13 +186,24 @@ func (me *goSrcIntel) Symbols(srcLens *z.SrcLens, query string, curFileOnly bool
 			allsyms = append(allsyms, lens)
 		}
 		for _, method := range pm.Methods {
-			if srcref := udev.SrcMsgFromLn(method.Pos); srcref != nil && fpathok(srcref.Ref) {
+			if isok, srcref := ispmlisted || !strings.HasPrefix(pm.Type, "interface{"), udev.SrcMsgFromLn(method.Pos); isok && srcref != nil && fpathok(srcref.Ref) {
 				p1, p2 := strings.Index(method.Name, " ("), strings.Index(method.Name, ") ")
-				lens := &z.SrcLens{Flag: int(z.SYM_METHOD), Str: "▶   " + method.Name[p2+2:]}
+				methodtype, methodtitle := method.Name[:p2][p1+2:], method.Name[p2+2:]
+				methodname := strings.TrimSpace(methodtitle[:strings.Index(methodtitle, "(")])
+				if strings.HasPrefix(pm.Type, "interface{") && !(strings.Contains(pm.Type, "{"+methodname+"(") || strings.Contains(pm.Type, "; "+methodname+"(")) {
+					continue
+				}
+				if strings.HasPrefix(pm.Type, "struct{") {
+					if srcln := srcLens.Ln(srcref.Pos1Ln); !strings.Contains(srcln, methodtype+") "+methodname+"(") {
+						continue
+					}
+				}
+				lens := &z.SrcLens{Flag: int(z.SYM_METHOD), Str: "▶   " + methodtitle}
 				lens.SetFrom(srcref, fallbackfilepath)
 				if !ispmlisted {
-					lens.Str = method.Name[:p2][p1+2:] + " " + lens.Str
+					lens.Str = methodtype + " " + lens.Str
 				}
+
 				lens.Str, lens.Txt = goSrcFuncDeclBreak(lens.Str)
 				lens.Str, lens.Txt = udevgo.PkgImpPathsToNamesInLn(lens.Str, curpkgdir), udevgo.PkgImpPathsToNamesInLn(lens.Txt, curpkgdir)
 				if i := strings.Index(lens.Str, "("); i > 0 {
