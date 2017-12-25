@@ -33,7 +33,7 @@ func ensureBuildOrder(dis z.IDiagJobTarget, dat z.IDiagJobTarget) bool {
 	return dis.(*udevgo.Pkg).IsSortedPriorToByDeps(dat.(*udevgo.Pkg))
 }
 
-func (me *goDiag) onUpdateDiagsPkgJobs(filePaths []string) (jobs []z.DiagJob) {
+func (me *goDiag) onUpdateDiagsPrepPkgJobs(filePaths []string) (jobs []z.DiagJob) {
 	if pkgs, shouldrefresh := udevgo.PkgsForFiles(filePaths...); len(pkgs) > 0 {
 		if shouldrefresh {
 			go caddyRunRefreshPkgs()
@@ -46,7 +46,7 @@ func (me *goDiag) onUpdateDiagsPkgJobs(filePaths []string) (jobs []z.DiagJob) {
 }
 
 func (me *goDiag) OnUpdateBuildDiags(writtenFilePaths []string) (jobs z.DiagBuildJobs) {
-	if pkgjobs := me.onUpdateDiagsPkgJobs(writtenFilePaths); len(pkgjobs) > 0 {
+	if pkgjobs := me.onUpdateDiagsPrepPkgJobs(writtenFilePaths); len(pkgjobs) > 0 {
 		for _, pj := range pkgjobs {
 			jobs = append(jobs, &z.DiagJobBuild{DiagJob: pj, TargetCmp: ensureBuildOrder})
 			for _, dependant := range pj.Target.(*udevgo.Pkg).Dependants() {
@@ -60,7 +60,7 @@ func (me *goDiag) OnUpdateBuildDiags(writtenFilePaths []string) (jobs z.DiagBuil
 }
 
 func (me *goDiag) OnUpdateLintDiags(workspaceFiles z.WorkspaceFiles, diagTools z.Tools, filePaths []string) (jobs z.DiagLintJobs) {
-	if pkgjobs := me.onUpdateDiagsPkgJobs(filePaths); len(pkgjobs) > 0 {
+	if pkgjobs := me.onUpdateDiagsPrepPkgJobs(filePaths); len(pkgjobs) > 0 {
 		for _, pj := range pkgjobs {
 			skippkg := false
 			for _, fpath := range pj.Target.(*udevgo.Pkg).GoFilePaths() {

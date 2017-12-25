@@ -54,6 +54,7 @@ func caddyBuildOnDone(failed map[string]bool, skipped map[string]bool, all []str
 }
 
 func caddyRunRefreshPkgs() {
+	caddyRefreshPkgs.ShouldReRunWhenNextDone = false
 	caddyRefreshPkgs.Status.Flag, caddyRefreshPkgs.Status.Desc, caddyRefreshPkgs.Details, caddyRefreshPkgs.UxActionID =
 		z.CADDY_BUSY, "refreshing", "", "zen.menus.main."+z.Lang.PkgIntel.MenuCategory()
 	caddyRefreshPkgs.OnStatusChanged()
@@ -72,5 +73,8 @@ func caddyRunRefreshPkgs() {
 		z.Lang.Workspace.Lock()
 		defer z.Lang.Workspace.Unlock()
 		z.Lang.Diag.UpdateLintDiagsIfAndAsNeeded(z.Lang.Workspace.Files(), true)
+	}
+	if caddyRefreshPkgs.ShouldReRunWhenNextDone {
+		go caddyRunRefreshPkgs()
 	}
 }

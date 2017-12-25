@@ -42,14 +42,14 @@ type SrcIntelCompl struct {
 }
 
 type SrcIntelDoc struct {
-	Value     string `json:"value"`
-	IsTrusted bool   `json:"isTrusted"`
+	Value     string `json:"value,omitempty"`
+	IsTrusted bool   `json:"isTrusted,omitempty"`
 }
 
 type SrcIntelSigHelp struct {
-	ActiveSignature int               `json:"activeSignature"`
-	ActiveParameter int               `json:"activeParameter"`
-	Signatures      []SrcIntelSigInfo `json:"signatures"`
+	ActiveSignature int               `json:"activeSignature,omitempty"`
+	ActiveParameter int               `json:"activeParameter,omitempty"`
+	Signatures      []SrcIntelSigInfo `json:"signatures,omitempty"`
 }
 
 type SrcIntelSigInfo struct {

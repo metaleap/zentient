@@ -210,7 +210,7 @@ func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 	}
 	if !me.pollingStarted {
 		me.pollingStarted = true
-		go me.pollFileEventsEvery(1234)
+		go me.pollFileEventsForever()
 	}
 }
 
@@ -218,14 +218,15 @@ func (me *WorkspaceBase) ObjSnap(_ string) interface{} { return me.Impl }
 
 func (me *WorkspaceBase) ObjSnapPrefix() string { return Lang.ID + ".proj." }
 
-func (me *WorkspaceBase) pollFileEventsEvery(milliseconds int64) {
-	interval := time.Millisecond * time.Duration(milliseconds)
-	msg := &ipcResp{IpcID: IPCID_PROJ_POLLEVTS}
+func (me *WorkspaceBase) pollFileEventsForever() {
+	interval := 1234 * time.Millisecond
+	msgraw, _ := json.Marshal(&ipcResp{IpcID: IPCID_PROJ_POLLEVTS})
+	msgraw = append(msgraw, '\n')
 	for {
 		if time.Sleep(interval); !me.pollingPaused {
 			if !canSend() {
 				return
-			} else if err := send(msg); err != nil {
+			} else if err := sendRaw(msgraw); err != nil {
 				return
 			}
 		}

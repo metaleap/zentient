@@ -20,6 +20,16 @@ func send(resp *ipcResp) (err error) {
 	return
 }
 
+func sendRaw(jsonResp []byte) (err error) {
+	Prog.pipeIO.mutex.Lock()
+	defer Prog.pipeIO.mutex.Unlock()
+
+	if _, err = Prog.pipeIO.stdoutWriter.Write(jsonResp); err == nil {
+		err = Prog.pipeIO.stdoutWriter.Flush()
+	}
+	return
+}
+
 func catch(set *error) {
 	Prog.pipeIO.stdinReadLn, Prog.pipeIO.stdoutWriter, Prog.pipeIO.stdoutEncoder = nil, nil, nil
 	if except := recover(); except != nil {

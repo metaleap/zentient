@@ -45,14 +45,18 @@ func (me *goWorkspace) onAfterChanges(upd *z.WorkspaceChanges) {
 }
 
 func (me *goWorkspace) onBeforeChanges(upd *z.WorkspaceChanges, freshFiles []string, willAutoLint bool) {
-	if hasnewpkgs := false; udevgo.PkgsByDir != nil {
-		for _, nfp := range freshFiles {
-			if hasnewpkgs = strings.ToLower(filepath.Ext(nfp)) == ".go" && (nil == udevgo.PkgsByDir[filepath.Dir(nfp)]); hasnewpkgs {
+	if hasnewpkgs := false; udevgo.PkgsByDir != nil && len(freshFiles) > 0 {
+		for _, ffp := range freshFiles {
+			if hasnewpkgs = strings.ToLower(filepath.Ext(ffp)) == ".go" && (nil == udevgo.PkgsByDir[filepath.Dir(ffp)]); hasnewpkgs {
 				break
 			}
 		}
 		if hasnewpkgs && caddyRefreshPkgs.Ready() {
-			caddyRefreshPkgs.WaitThen(caddyRunRefreshPkgs)
+			if caddyRefreshPkgs.PendingOrBusy() {
+				caddyRefreshPkgs.ShouldReRunWhenNextDone = true
+			} else {
+				go caddyRunRefreshPkgs()
+			}
 		}
 	}
 }

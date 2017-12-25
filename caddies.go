@@ -18,9 +18,10 @@ type Caddy struct {
 		Flag CaddyStatus
 		Desc string `json:",omitempty"`
 	}
-	Details    string `json:",omitempty"`
-	UxActionID string `json:",omitempty"`
-	ShowTitle  bool   `json:",omitempty"`
+	Details                 string `json:",omitempty"`
+	UxActionID              string `json:",omitempty"`
+	ShowTitle               bool   `json:",omitempty"`
+	ShouldReRunWhenNextDone bool   `json:"-"`
 
 	ready bool
 
@@ -41,10 +42,4 @@ func (me *Caddy) PendingOrBusy() bool {
 
 func (me *Caddy) Ready() bool {
 	return me.ready
-}
-
-func (me *Caddy) WaitThen(do func()) {
-	for me.PendingOrBusy() {
-	}
-	go do()
 }

@@ -19,7 +19,7 @@ var (
 		"[]":         z.SYM_ARRAY,
 		"func(":      z.SYM_EVENT,
 		"interface{": z.SYM_INTERFACE,
-		"struct{":    z.SYM_STRUCT,
+		"struct{":    z.SYM_CLASS,
 	}
 )
 
@@ -166,7 +166,7 @@ func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (al
 				sym.Flag, sym.Txt = int(z.SYM_FUNCTION), udevgo.PkgImpPathsToNamesInLn(fnret, curpkgdir)
 				sym.Str += "  " + udevgo.PkgImpPathsToNamesInLn(strings.TrimPrefix(fnargs, "func"), curpkgdir)
 			case "type":
-				sym.Txt, sym.Flag = pmtype, int(z.SYM_CLASS)
+				sym.Txt, sym.Flag = pmtype, int(z.SYM_TYPEPARAMETER)
 				switch pmtype {
 				case "float32", "float64", "float", "complex", "int64", "uint64":
 					sym.Flag = int(z.SYM_NUMBER)
@@ -205,10 +205,10 @@ func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (al
 							continue
 						}
 					}
-					lens := &z.SrcLens{Flag: int(z.SYM_METHOD), Str: "▶   " + methodtitle}
+					lens := &z.SrcLens{Flag: int(z.SYM_METHOD), Str: "▶  " + methodtitle}
 					lens.SetFilePathAndPosOrRangeFrom(srcref, nil)
 					// if !ispmlisted { // if method's receiver type not in the symbols listing, prepend it's name to the pretend-indentation
-					lens.Str = methodtype + " " + lens.Str
+					lens.Str = methodtype + "  " + lens.Str
 					// }
 					lens.Str, lens.Txt = goSrcFuncSigBreak(lens.Str)
 					lens.Str, lens.Txt = udevgo.PkgImpPathsToNamesInLn(lens.Str, curpkgdir), udevgo.PkgImpPathsToNamesInLn(lens.Txt, curpkgdir)
@@ -224,10 +224,21 @@ func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (al
 }
 
 func goSrcFuncSigBreak(fnsig string) (fnargs string, fnret string) {
-	if i := strings.Index(fnsig, ") "); i > 0 { // func sig has return args
-		fnargs, fnret = fnsig[:i+1], fnsig[i+2:]
-	} else { // void func sig (has no return args)
-		fnargs, fnret = fnsig, " " // " " instead of "" circumvents a VScode quirk in its 'Workspace Symbols' UX
+	fnargs, fnret = fnsig, " "
+	co, cc, pos := 0, 0, 0
+	for i, r := range fnsig {
+		if r == '(' {
+			co++
+		} else if r == ')' {
+			cc++
+		}
+		if cc > 0 && co > 0 && cc == co {
+			pos = i
+			break
+		}
+	}
+	if pos > 0 && pos < len(fnsig)-1 {
+		fnargs, fnret = fnsig[:pos+1], fnsig[pos+2:]
 	}
 	return
 }
