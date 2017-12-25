@@ -1,20 +1,5 @@
 package z
 
-func (_ *SrcIntelBase) ComplDetails(srcLens *SrcLens, itemText string) (cmpl *SrcIntelCompl) {
-	cmpl = &SrcIntelCompl{Detail: "Details for " + itemText}
-	cmpl.Documentation.IsTrusted, cmpl.Documentation.Value = true, "**Docs** for: `"+itemText+"`"
-	return
-}
-
-func (_ *SrcIntelBase) ComplItems(srcLens *SrcLens) (all []*SrcIntelCompl) {
-	all = make([]*SrcIntelCompl, CMPL_MIN_INVALID)
-	for i := 0; i < len(all); i++ {
-		cmplkind := Completion(i)
-		all[i] = &SrcIntelCompl{Kind: cmplkind, Label: cmplkind.String()}
-	}
-	return
-}
-
 func (me *SrcIntelBase) DefSym(srcLens *SrcLens) SrcLenses {
 	return me.References(srcLens, true)
 }

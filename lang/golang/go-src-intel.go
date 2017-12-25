@@ -40,7 +40,7 @@ type goSrcIntel struct {
 	z.SrcIntelBase
 }
 
-func (me *goSrcIntel) ComplItems(srcLens *z.SrcLens) (all []*z.SrcIntelCompl) {
+func (*goSrcIntel) ComplItems(srcLens *z.SrcLens) (all []*z.SrcIntelCompl) {
 	if !tools.gocode.Installed {
 		return
 	}
@@ -52,7 +52,7 @@ func (me *goSrcIntel) ComplItems(srcLens *z.SrcLens) (all []*z.SrcIntelCompl) {
 		all = make([]*z.SrcIntelCompl, 0, len(rawresp))
 		for _, raw := range rawresp {
 			if c, n, t := raw["class"], raw["name"], raw["type"]; n != "" {
-				cmpl := &z.SrcIntelCompl{Detail: t, Label: n, Documentation: z.SrcIntelDoc{IsTrusted: true, Value: c}, Kind: z.CMPL_COLOR, FilterText: strings.ToLower(n)}
+				cmpl := &z.SrcIntelCompl{Detail: t, Label: n, Kind: z.CMPL_COLOR, FilterText: strings.ToLower(n)}
 				switch c {
 				case "func":
 					cmpl.Kind = z.CMPL_FUNCTION
@@ -104,6 +104,32 @@ func (me *goSrcIntel) ComplItems(srcLens *z.SrcLens) (all []*z.SrcIntelCompl) {
 				all = append(all, cmpl)
 			}
 		}
+	}
+	return
+}
+
+func (_ *goSrcIntel) ComplDetails(srcLens *z.SrcLens, itemText string) (itemDoc *z.SrcIntelCompl) {
+	if !tools.gogetdoc.Installed {
+		return
+	}
+	pos := srcLens.ByteOffsetForPosWithRuneOffset(srcLens.Pos)
+	rs := srcLens.ByteOffsetForPosWithRuneOffset(&srcLens.Range.Start)
+	re := srcLens.ByteOffsetForPosWithRuneOffset(&srcLens.Range.End)
+	srcLens.Txt = srcLens.Txt[:rs] + itemText + srcLens.Txt[re:]
+	ggd := udevgo.Query_Gogetdoc(srcLens.FilePath, srcLens.Txt, ustr.FromInt(pos))
+	itemDoc = &z.SrcIntelCompl{
+		Documentation: &z.SrcIntelDoc{IsTrusted: true, Value: strings.TrimSpace(ggd.Doc)},
+	}
+	if ggd.Decl != "" {
+		itemDoc.Detail = ggd.Decl
+	}
+	if ggd.Err != "" {
+		itemDoc.Documentation.Value = ggd.Err
+	} else if ggd.ErrMsgs != "" {
+		itemDoc.Documentation.Value = ggd.ErrMsgs
+	}
+	if itemDoc.Documentation.Value == "" {
+		itemDoc.Documentation.Value = ggd.Name + " —— " + ggd.ImpP
 	}
 	return
 }

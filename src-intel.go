@@ -27,14 +27,14 @@ type srcIntelResp struct {
 }
 
 type SrcIntelCompl struct {
-	Label         string      `json:"label"`
-	Kind          Completion  `json:"kind,omitempty"`
-	Detail        string      `json:"detail,omitempty"`
-	Documentation SrcIntelDoc `json:"documentation,omitempty"`
-	SortText      string      `json:"sortText,omitempty"`
-	FilterText    string      `json:"filterText,omitempty"`
-	InsertText    string      `json:"insertText,omitempty"`
-	CommitChars   []string    `json:"commitCharacters,omitempty"`
+	Label         string       `json:"label"`
+	Kind          Completion   `json:"kind,omitempty"`
+	Detail        string       `json:"detail,omitempty"`
+	Documentation *SrcIntelDoc `json:"documentation,omitempty"`
+	SortText      string       `json:"sortText,omitempty"`
+	FilterText    string       `json:"filterText,omitempty"`
+	InsertText    string       `json:"insertText,omitempty"`
+	CommitChars   []string     `json:"commitCharacters,omitempty"`
 	// Range               Range      `json:"Range,omitempty"`
 	// AdditionalTextEdits []TextEdit `json:"additionalTextEdits,omitempty"`
 	// Command             Command    `json:"command,omitempty"`
@@ -143,6 +143,14 @@ func (me *SrcIntelBase) onSyms(req *ipcReq, resp *ipcResp) {
 		query, _ = req.IpcArgs.(string)
 	}
 	resp.SrcIntel.Refs = me.Impl.Symbols(req.SrcLens, query, req.IpcID == IPCID_SRCINTEL_SYMS_FILE)
+}
+
+func (_ *SrcIntelBase) ComplItems(srcLens *SrcLens) []*SrcIntelCompl {
+	return nil
+}
+
+func (_ *SrcIntelBase) ComplDetails(srcLens *SrcLens, itemText string) *SrcIntelCompl {
+	return nil
 }
 
 func (*SrcIntelBase) Highlights(srcLens *SrcLens, curWord string) SrcLenses {
