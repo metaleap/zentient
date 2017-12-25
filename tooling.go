@@ -15,6 +15,8 @@ const (
 	TOOLS_CAT_MOD_FMT
 	TOOLS_CAT_INTEL_TIPS
 	TOOLS_CAT_INTEL_SYMS
+	TOOLS_CAT_INTEL_HIGH
+	TOOLS_CAT_INTEL_CMPL
 	TOOLS_CAT_EXTRAS_QUERY
 	TOOLS_CAT_DIAGS
 )
@@ -28,7 +30,11 @@ func (me ToolCats) String() string {
 	case TOOLS_CAT_INTEL_TIPS:
 		return "Info Tips"
 	case TOOLS_CAT_INTEL_SYMS:
-		return "Symbol Lookup"
+		return "Symbol Search"
+	case TOOLS_CAT_INTEL_HIGH:
+		return "Contextual Highlighting"
+	case TOOLS_CAT_INTEL_CMPL:
+		return "Completion Suggest"
 	case TOOLS_CAT_DIAGS:
 		return "Linting / Diagnostics"
 	case TOOLS_CAT_EXTRAS_QUERY:

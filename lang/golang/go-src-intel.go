@@ -31,6 +31,14 @@ type goSrcIntel struct {
 	z.SrcIntelBase
 }
 
+func (*goSrcIntel) ComplItems(srcLens *z.SrcLens) (all []z.SrcIntelCompl) {
+	if !tools.gocode.Installed {
+		return
+	}
+
+	return
+}
+
 func (*goSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (all z.SrcLenses) {
 	if !tools.guru.Installed {
 		return
@@ -57,7 +65,7 @@ func (*goSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (all z.SrcLens
 			for _ = range string(srcraw[:bytepos]) {
 				length++
 			}
-			return length // won't work for multi-byte/unicode/etc: just bytepos, or even len(string(srcraw[:bytepos]))
+			return length // here's what *won't* work for multi-byte/unicode/etc: just bytepos, or even len(string(srcraw[:bytepos]))
 		}
 		var check func(num int, checks ...string) bool
 		check = func(num int, checks ...string) bool {
@@ -232,7 +240,7 @@ func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (al
 			case "var":
 				sym.Flag, sym.Txt = int(z.SYM_VARIABLE), pmtype
 			case "func":
-				fnargs, fnret := goSrcFuncSigBreak(pmtype)
+				fnargs, fnret := me.symFuncSigBreak(pmtype)
 				sym.Flag, sym.Txt = int(z.SYM_FUNCTION), udevgo.PkgImpPathsToNamesInLn(fnret, curpkgdir)
 				sym.Str += "  " + udevgo.PkgImpPathsToNamesInLn(strings.TrimPrefix(fnargs, "func"), curpkgdir)
 			case "type":
@@ -280,7 +288,7 @@ func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (al
 					// if !ispmlisted { // if method's receiver type not in the symbols listing, prepend it's name to the pretend-indentation
 					lens.Str = methodtype + "  " + lens.Str
 					// }
-					lens.Str, lens.Txt = goSrcFuncSigBreak(lens.Str)
+					lens.Str, lens.Txt = me.symFuncSigBreak(lens.Str)
 					lens.Str, lens.Txt = udevgo.PkgImpPathsToNamesInLn(lens.Str, curpkgdir), udevgo.PkgImpPathsToNamesInLn(lens.Txt, curpkgdir)
 					if i := strings.Index(lens.Str, "("); i > 0 { // insert some spacing between name and args
 						lens.Str = lens.Str[:i] + "  " + lens.Str[i:]
@@ -293,7 +301,7 @@ func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (al
 	return
 }
 
-func goSrcFuncSigBreak(fnsig string) (fnargs string, fnret string) {
+func (*goSrcIntel) symFuncSigBreak(fnsig string) (fnargs string, fnret string) {
 	fnargs, fnret = fnsig, " "
 	co, cc, pos := 0, 0, 0
 	for i, r := range fnsig {

@@ -24,6 +24,7 @@ type goTooling struct {
 	gogetdoc *z.Tool
 	godef    *z.Tool
 	guru     *z.Tool
+	gocode   *z.Tool
 
 	gorename *z.Tool
 
@@ -55,10 +56,11 @@ func (me *goTooling) onPreInit() {
 	// me.godoc = &z.Tool{Name: "godoc", Website: "http://golang.org/x/tools/cmd/godoc", Installed: udevgo.Has_godoc}
 	me.gogetdoc = &z.Tool{Name: "gogetdoc", Website: "http://github.com/zmb3/gogetdoc#readme", Installed: udevgo.Has_gogetdoc, Cats: []z.ToolCats{z.TOOLS_CAT_INTEL_TIPS}}
 	me.godef = &z.Tool{Name: "godef", Website: "http://github.com/rogpeppe/godef#readme", Installed: udevgo.Has_godef, Cats: []z.ToolCats{z.TOOLS_CAT_INTEL_TIPS}}
+	me.guru = &z.Tool{Name: "guru", Website: "http://golang.org/x/tools/cmd/guru", Installed: udevgo.Has_guru, Cats: []z.ToolCats{z.TOOLS_CAT_INTEL_TIPS, z.TOOLS_CAT_INTEL_SYMS, z.TOOLS_CAT_INTEL_HIGH}}
+	me.gocode = &z.Tool{Name: "gocode", Website: "http://github.com/nsf/gocode#readme", Installed: udevgo.Has_gocode, Cats: []z.ToolCats{z.TOOLS_CAT_INTEL_CMPL}}
 
 	me.gorename = &z.Tool{Name: "gorename", Website: "http://golang.org/x/tools/cmd/gorename", Installed: udevgo.Has_gorename, Cats: []z.ToolCats{z.TOOLS_CAT_MOD_REN}}
 
-	me.guru = &z.Tool{Name: "guru", Website: "http://golang.org/x/tools/cmd/guru", Installed: udevgo.Has_guru, Cats: []z.ToolCats{z.TOOLS_CAT_INTEL_TIPS, z.TOOLS_CAT_INTEL_SYMS}}
 	me.govet = &z.Tool{Name: "go vet", Website: "http://golang.org/cmd/vet/", Installed: true, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_WARN}
 	me.ineffassign = &z.Tool{Name: "ineffassign", Website: "http://github.com/gordonklaus/ineffassign#readme", Installed: udevgo.Has_ineffassign, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_WARN}
 	me.golint = &z.Tool{Name: "golint", Website: "http://github.com/golang/lint#readme", Installed: udevgo.Has_golint, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_INFO}
@@ -85,6 +87,7 @@ func (me *goTooling) onPreInit() {
 		me.gogetdoc,
 		me.godef,
 		me.guru,
+		me.gocode,
 		me.go_doc,
 		me.govet,
 		me.golint,
