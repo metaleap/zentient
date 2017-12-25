@@ -3,8 +3,8 @@ package z
 type ISrcIntel interface {
 	iDispatcher
 
-	ComplDetails(*SrcLens, string, *SrcIntelCompl)
-	ComplItems(*SrcLens) []SrcIntelCompl
+	ComplDetails(*SrcLens, string) *SrcIntelCompl
+	ComplItems(*SrcLens) []*SrcIntelCompl
 	DefSym(*SrcLens) SrcLenses
 	DefType(*SrcLens) SrcLenses
 	DefImpl(*SrcLens) SrcLenses
@@ -23,7 +23,7 @@ type SrcIntels struct {
 type srcIntelResp struct {
 	SrcIntels
 	Signature *SrcIntelSigHelp `json:"sig,omitempty"`
-	Cmpl      []SrcIntelCompl  `json:"cmpl,omitempty"`
+	Cmpl      []*SrcIntelCompl `json:"cmpl,omitempty"`
 }
 
 type SrcIntelCompl struct {
@@ -105,8 +105,9 @@ func (me *SrcIntelBase) onCmplItems(req *ipcReq, resp *ipcResp) {
 
 func (me *SrcIntelBase) onCmplDetails(req *ipcReq, resp *ipcResp) {
 	itemtext, _ := req.IpcArgs.(string)
-	resp.SrcIntel.Cmpl = make([]SrcIntelCompl, 1)
-	me.Impl.ComplDetails(req.SrcLens, itemtext, &(resp.SrcIntel.Cmpl[0]))
+	if cmpl := me.Impl.ComplDetails(req.SrcLens, itemtext); cmpl != nil {
+		resp.SrcIntel.Cmpl = []*SrcIntelCompl{cmpl}
+	}
 }
 
 func (me *SrcIntelBase) onDefinition(req *ipcReq, resp *ipcResp, def func(*SrcLens) SrcLenses) {

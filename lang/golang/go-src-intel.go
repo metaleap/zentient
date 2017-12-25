@@ -13,6 +13,14 @@ import (
 
 var (
 	srcIntel     goSrcIntel
+	cmplPatterns = map[string]z.Completion{
+		"*":          z.CMPL_UNIT,
+		"map[":       z.CMPL_VARIABLE,
+		"[]":         z.CMPL_VARIABLE,
+		"func(":      z.CMPL_EVENT,
+		"interface{": z.CMPL_INTERFACE,
+		"struct{":    z.CMPL_CLASS,
+	}
 	symsPatterns = map[string]z.Symbol{
 		"*":          z.SYM_NULL,
 		"map[":       z.SYM_OBJECT,
@@ -21,6 +29,7 @@ var (
 		"interface{": z.SYM_INTERFACE,
 		"struct{":    z.SYM_CLASS,
 	}
+	cmplCharsFunc = []string{"("}
 )
 
 func init() {
@@ -31,11 +40,71 @@ type goSrcIntel struct {
 	z.SrcIntelBase
 }
 
-func (*goSrcIntel) ComplItems(srcLens *z.SrcLens) (all []z.SrcIntelCompl) {
+func (me *goSrcIntel) ComplItems(srcLens *z.SrcLens) (all []*z.SrcIntelCompl) {
 	if !tools.gocode.Installed {
 		return
 	}
-
+	rawresp, err := udevgo.QueryCmplSugg_Gocode(srcLens.FilePath, srcLens.Txt, z.Strf("c%d", srcLens.Pos.Off-1))
+	if err != nil {
+		panic(err)
+	}
+	if len(rawresp) > 0 {
+		all = make([]*z.SrcIntelCompl, 0, len(rawresp))
+		for _, raw := range rawresp {
+			if c, n, t := raw["class"], raw["name"], raw["type"]; n != "" {
+				cmpl := &z.SrcIntelCompl{Detail: t, Label: n, Documentation: z.SrcIntelDoc{IsTrusted: true, Value: c}, Kind: z.CMPL_COLOR, FilterText: strings.ToLower(n)}
+				switch c {
+				case "func":
+					cmpl.Kind = z.CMPL_FUNCTION
+					cmpl.SortText = "9" + cmpl.Label
+					cmpl.CommitChars = cmplCharsFunc
+				case "package":
+					cmpl.Kind = z.CMPL_FOLDER
+					cmpl.SortText = "1" + cmpl.Label
+				case "var":
+					cmpl.Kind = z.CMPL_FIELD
+					cmpl.SortText = "4" + cmpl.Label
+				case "const":
+					cmpl.Kind = z.CMPL_CONSTANT
+					cmpl.SortText = "3" + cmpl.Label
+				case "type":
+					cmpl.SortText = "2" + cmpl.Label
+					switch t {
+					case "built-in":
+						switch n {
+						case "byte", "float32", "float64", "float", "complex64", "complex128", "int64", "uint64", "int", "int8", "int16", "int32", "uint", "uint8", "uint16", "uint32":
+							cmpl.Kind = z.CMPL_OPERATOR
+						case "string", "rune", "bool", "uintptr":
+							cmpl.Kind = z.CMPL_UNIT
+						default:
+							cmpl.Kind = z.CMPL_FILE
+						}
+					case "float32", "float64", "float", "complex64", "complex128", "int64", "uint64":
+						cmpl.Kind = z.CMPL_OPERATOR
+					case "int", "int8", "int16", "int32", "uint", "uint8", "uint16", "uint32":
+						cmpl.Kind = z.CMPL_ENUMMEMBER
+					case "string", "rune", "[]byte":
+						cmpl.Kind = z.CMPL_UNIT
+					case "struct":
+						cmpl.Kind = z.CMPL_CLASS
+					case "interface":
+						cmpl.Kind = z.CMPL_INTERFACE
+					default:
+						cmpl.Kind = z.CMPL_TYPEPARAMETER
+						for pref, ck := range cmplPatterns {
+							if strings.HasPrefix(t, pref) {
+								cmpl.Kind = ck
+								break
+							}
+						}
+					}
+				default:
+					cmpl.SortText = "0" + cmpl.Label
+				}
+				all = append(all, cmpl)
+			}
+		}
+	}
 	return
 }
 
@@ -246,7 +315,7 @@ func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (al
 			case "type":
 				sym.Txt, sym.Flag = pmtype, int(z.SYM_TYPEPARAMETER)
 				switch pmtype {
-				case "float32", "float64", "float", "complex", "int64", "uint64":
+				case "float32", "float64", "float", "complex64", "complex128", "int64", "uint64":
 					sym.Flag = int(z.SYM_NUMBER)
 				case "int", "int8", "int16", "int32", "uint", "uint8", "uint16", "uint32":
 					sym.Flag = int(z.SYM_ENUMMEMBER)
@@ -254,6 +323,8 @@ func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (al
 					sym.Flag = int(z.SYM_STRING)
 				case "bool":
 					sym.Flag = int(z.SYM_BOOLEAN)
+				case "uintptr":
+					sym.Flag = int(z.SYM_NULL)
 				default:
 					for pref, enum := range symsPatterns {
 						if strings.HasPrefix(pmtype, pref) {
