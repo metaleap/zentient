@@ -216,7 +216,7 @@ func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 
 func (me *WorkspaceBase) ObjSnap(_ string) interface{} { return me.Impl }
 
-func (me *WorkspaceBase) ObjSnapPrefix() string { return Lang.ID + ".proj." }
+func (*WorkspaceBase) ObjSnapPrefix() string { return Lang.ID + ".proj." }
 
 func (me *WorkspaceBase) pollFileEventsForever() {
 	interval := 1234 * time.Millisecond

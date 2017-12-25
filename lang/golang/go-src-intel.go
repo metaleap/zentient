@@ -50,42 +50,54 @@ func (*goSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (all z.SrcLens
 			}
 		}
 	}
-	// if len(srcrefs) == 0 && len(gw.Enclosing) > 0 {
-	// 	bpos2rpos := func(bytepos int) int {
-	// 		return bytepos // *technically* the below is "correcter" but *practically* we get the same off-by-n quirks with utf8 chars with the below as with the left.. thanks, guru, for friggin "byte offsets" everywhere
-	// 		var strbuf bytes.Buffer
-	// 		for byteidx, char := range req.Src {
-	// 			if byteidx >= bytepos {
-	// 				return strbuf.Len()
-	// 			}
-	// 			strbuf.WriteRune(char)
-	// 		}
-	// 		return bytepos
-	// 	}
-	// 	check := func(num int, checks ...string) bool {
-	// 		if ustr.AnyOf(gw.Enclosing[0].Description, checks[:num]...) {
-	// 			for _, syntaxnode := range gw.Enclosing {
-	// 				if ustr.AnyOf(syntaxnode.Description, checks[num:]...) {
-	// 					srcrefs = append(srcrefs, &udev.SrcMsg{Pos2Ln: bpos2rpos(syntaxnode.Start), Pos2Ch: bpos2rpos(syntaxnode.End)})
-	// 					return true
-	// 				}
-	// 			}
-	// 		}
-	// 		return false
-	// 	}
-	// 	if check(2, "defer statement", "return statement",
-	// 		"function literal", "function declaration") {
-	// 		return
-	// 	}
-	// 	if check(1, "break statement",
-	// 		"range loop", "for loop", "select statement", "switch statement") {
-	// 		return
-	// 	}
-	// 	if check(1, "continue statement",
-	// 		"range loop", "for loop") {
-	// 		return
-	// 	}
-	// }
+	if len(all) == 0 && len(gw.Enclosing) > 0 {
+		srcraw := []byte(srcLens.Txt)
+		bpos2rpos := func(bytepos int) int {
+			length := 0
+			for _ = range string(srcraw[:bytepos]) {
+				length++
+			}
+			return length // won't work for multi-byte/unicode/etc: just bytepos, or even len(string(srcraw[:bytepos]))
+		}
+		var check func(num int, checks ...string) bool
+		check = func(num int, checks ...string) bool {
+			if num <= 0 {
+				for _, chk := range checks {
+					if check(1, chk, chk) {
+						return true
+					}
+				}
+				return false
+			}
+			if ustr.AnyOf(gw.Enclosing[0].Description, checks[:num]...) {
+				for _, syntaxnode := range gw.Enclosing {
+					if ustr.AnyOf(syntaxnode.Description, checks[num:]...) {
+						all = append(all, &z.SrcLens{Range: &z.SrcRange{
+							Start: z.SrcPos{Off: 1 + bpos2rpos(syntaxnode.Start)}, End: z.SrcPos{Off: 1 + bpos2rpos(syntaxnode.End)}}})
+						return true
+					}
+				}
+			}
+			return false
+		}
+		if check(1, "break statement",
+			"range loop", "for loop", "select statement", "switch statement") {
+			return
+		}
+		if check(1, "case clause",
+			"select statement", "switch statement") {
+			return
+		}
+		if check(1, "continue statement",
+			"range loop", "for loop") {
+			return
+		}
+		if check(2, "defer statement", "return statement",
+			"function literal", "function declaration") {
+			return
+		}
+		check(-1, "if statement", "select statement", "switch statement", "go statement", "range loop", "for loop", "struct type", "interface type", "map type", "function type", "slice type", "type specification", "type declaration", "function declaration", "field/method/parameter", "field/method/parameter list", "function call", "function call (or conversion)", "basic literal", "composite literal", "variable declaration", "constant declaration")
+	}
 	return
 }
 
