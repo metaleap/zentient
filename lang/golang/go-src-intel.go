@@ -31,6 +31,64 @@ type goSrcIntel struct {
 	z.SrcIntelBase
 }
 
+func (*goSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (all z.SrcLenses) {
+	if !tools.guru.Installed {
+		return
+	}
+	byteoff := srcLens.ByteOffsetForPosWithRuneOffset(srcLens.Pos)
+	gw, err := udevgo.QueryWhat_Guru(srcLens.FilePath, srcLens.Txt, ustr.FromInt(byteoff))
+	if err != nil {
+		panic(err)
+	}
+	all = make(z.SrcLenses, 0, len(gw.SameIDs))
+	for _, sameid := range gw.SameIDs {
+		if srcref := udev.SrcMsgFromLn(sameid); srcref != nil {
+			sl := &z.SrcLens{}
+			if sl.SetFilePathAndPosOrRangeFrom(srcref, nil); sl.FilePath == srcLens.FilePath && (sl.Range != nil || sl.Pos != nil) {
+				sl.FilePath = ""
+				all = append(all, sl)
+			}
+		}
+	}
+	// if len(srcrefs) == 0 && len(gw.Enclosing) > 0 {
+	// 	bpos2rpos := func(bytepos int) int {
+	// 		return bytepos // *technically* the below is "correcter" but *practically* we get the same off-by-n quirks with utf8 chars with the below as with the left.. thanks, guru, for friggin "byte offsets" everywhere
+	// 		var strbuf bytes.Buffer
+	// 		for byteidx, char := range req.Src {
+	// 			if byteidx >= bytepos {
+	// 				return strbuf.Len()
+	// 			}
+	// 			strbuf.WriteRune(char)
+	// 		}
+	// 		return bytepos
+	// 	}
+	// 	check := func(num int, checks ...string) bool {
+	// 		if ustr.AnyOf(gw.Enclosing[0].Description, checks[:num]...) {
+	// 			for _, syntaxnode := range gw.Enclosing {
+	// 				if ustr.AnyOf(syntaxnode.Description, checks[num:]...) {
+	// 					srcrefs = append(srcrefs, &udev.SrcMsg{Pos2Ln: bpos2rpos(syntaxnode.Start), Pos2Ch: bpos2rpos(syntaxnode.End)})
+	// 					return true
+	// 				}
+	// 			}
+	// 		}
+	// 		return false
+	// 	}
+	// 	if check(2, "defer statement", "return statement",
+	// 		"function literal", "function declaration") {
+	// 		return
+	// 	}
+	// 	if check(1, "break statement",
+	// 		"range loop", "for loop", "select statement", "switch statement") {
+	// 		return
+	// 	}
+	// 	if check(1, "continue statement",
+	// 		"range loop", "for loop") {
+	// 		return
+	// 	}
+	// }
+	return
+}
+
 func (*goSrcIntel) hoverDeclLineBreaks(decl string) string {
 	if len(decl) > 50 && !strings.Contains(decl, "\n") {
 		dl, dr := decl[:6], decl[6:]
@@ -112,7 +170,7 @@ func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (al
 	onerr := func(label string, detail string) z.SrcLenses {
 		return z.SrcLenses{&z.SrcLens{Flag: int(z.SYM_EVENT), Str: label, Txt: detail, FilePath: sL.FilePath, Pos: sL.Pos, Range: sL.Range}}
 	}
-	if !udevgo.Has_guru {
+	if !tools.guru.Installed {
 		return onerr("Not installed: guru", "for more information, see: Zentient Main Menu / Tooling / guru.")
 	}
 	sL.EnsureSrcFull()

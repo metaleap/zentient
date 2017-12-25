@@ -71,12 +71,11 @@ func (me *SrcLens) ByteOffsetForFirstLineBeginningWith(prefix string) int {
 }
 
 func (me *SrcLens) SetFilePathAndPosOrRangeFrom(srcRef *udev.SrcMsg, fallbackFilePath func() string) {
-	if srcRef.Pos2Ch > 0 && srcRef.Pos2Ln > 0 {
-		me.Range = &SrcRange{Start: SrcPos{Ln: srcRef.Pos1Ln, Col: srcRef.Pos1Ch},
-			End: SrcPos{Ln: srcRef.Pos2Ln, Col: srcRef.Pos2Ch}}
-	} else {
-		me.Pos = &SrcPos{Ln: srcRef.Pos1Ln, Col: srcRef.Pos1Ch}
-	}
+	me.SetFilePathFrom(srcRef, fallbackFilePath)
+	me.SetPosOrRangeFrom(srcRef, true)
+}
+
+func (me *SrcLens) SetFilePathFrom(srcRef *udev.SrcMsg, fallbackFilePath func() string) {
 	if me.FilePath = srcRef.Ref; me.FilePath != "" && !filepath.IsAbs(me.FilePath) {
 		if absfilepath, err := filepath.Abs(me.FilePath); err == nil {
 			me.FilePath = absfilepath
@@ -86,5 +85,15 @@ func (me *SrcLens) SetFilePathAndPosOrRangeFrom(srcRef *udev.SrcMsg, fallbackFil
 	}
 	if (fallbackFilePath != nil) && (me.FilePath == "" || !ufs.FileExists(me.FilePath)) {
 		me.FilePath = fallbackFilePath()
+	}
+}
+
+func (me *SrcLens) SetPosOrRangeFrom(srcRef *udev.SrcMsg, preferRange bool) {
+	me.Pos, me.Range = nil, nil
+	if preferRange && srcRef.Pos2Ch > 0 && srcRef.Pos2Ln > 0 {
+		me.Range = &SrcRange{Start: SrcPos{Ln: srcRef.Pos1Ln, Col: srcRef.Pos1Ch},
+			End: SrcPos{Ln: srcRef.Pos2Ln, Col: srcRef.Pos2Ch}}
+	} else {
+		me.Pos = &SrcPos{Ln: srcRef.Pos1Ln, Col: srcRef.Pos1Ch}
 	}
 }
