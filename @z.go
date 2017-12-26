@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	"github.com/metaleap/go-util/fs"
@@ -56,6 +57,23 @@ func BadMsg(what string, which string) string {
 
 func BadPanic(what string, which string) {
 	panic(BadMsg(what, which))
+}
+
+func PrettifyPathsIn(s string) string {
+	if mod := false; strings.ContainsRune(s, filepath.Separator) {
+		words := strings.Split(s, " ")
+		for i := range words {
+			if strings.ContainsRune(words[i], filepath.Separator) {
+				if w := Lang.Workspace.PrettyPath(words[i]); w != words[i] {
+					mod, words[i] = true, w
+				}
+			}
+		}
+		if mod {
+			s = strings.Join(words, " ")
+		}
+	}
+	return s
 }
 
 func ToolsMsgGone(missing string) string {

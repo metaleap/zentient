@@ -573,5 +573,43 @@ func (*goSrcIntel) DefSym(srcLens *z.SrcLens) (defs z.SrcLenses) {
 }
 
 func (*goSrcIntel) DefType(srcLens *z.SrcLens) (defs z.SrcLenses) {
+	if !tools.guru.Installed {
+		return
+	}
+	var refloc *udev.SrcMsg
+	bytepos := srcLens.ByteOffsetForPosWithRuneOffset(srcLens.Pos)
+	spos := ustr.FromInt(bytepos)
+
+	if gd, _ := udevgo.QueryDesc_Guru(srcLens.FilePath, srcLens.Txt, spos); gd != nil {
+		if gd.Type != nil && len(gd.Type.NamePos) > 0 {
+			if rl := udev.SrcMsgFromLn(gd.Type.NamePos); rl != nil {
+				refloc = rl
+			}
+			// } else if gd.Value != nil && len(gd.Value.Type) > 0 {
+			// 	for ustr.Pref(gd.Value.Type, "map[") {
+			// 		gd.Value.Type = gd.Value.Type[ustr.Idx(gd.Value.Type, "]")+1:]
+			// 	}
+			// 	possiblyfullyqualified := strings.TrimLeft(strings.TrimPrefix(strings.TrimLeft(gd.Value.Type, "*"), "[]"), "*")
+			// 	pkgimppath, typename := ustr.BreakOnLast(possiblyfullyqualified, ".")
+			// 	pkgname := ustr.AfterLast(pkgimppath, "/", false)
+			// 	if udevgo.PkgsByImP != nil {
+			// 		if pkg := udevgo.PkgsByImP[pkgimppath]; pkg != nil && len(pkg.Name) > 0 {
+			// 			pkgname = pkg.Name
+			// 		}
+			// 	}
+			// 	hacky1 := "\n\nfunc Zen" + req.Id + " () *"
+			// 	hacky2 := " { return nil }\n"
+			// 	if len(pkgname) > 0 {
+			// 		hacky1 = hacky1 + pkgname + "."
+			// 	}
+			// 	req.Pos = umisc.Str(len(req.Src) + len(hacky1))
+			// 	req.Src = req.Src + hacky1 + typename + hacky2
+			// 	refloc = me.IntelDefLoc(req, false)
+		}
+	}
+	if refloc != nil {
+		defs = z.SrcLenses{&z.SrcLens{}}
+		defs[0].SetFilePathAndPosOrRangeFrom(refloc, nil)
+	}
 	return
 }

@@ -169,6 +169,7 @@ func (me *goPkgIntel) List(filters z.ListFilters) (results z.ListItems) {
 }
 
 func (me *goPkgIntel) ListItemToMenuItem(p z.IListItem) (item *z.MenuItem) {
+	descsmighthavepaths := false
 	if pkg, _ := p.(*udevgo.Pkg); pkg != nil {
 		delim, hints := " · ", []string{}
 		item = &z.MenuItem{Category: pkg.Name, Desc: pkg.Doc, Title: pkg.ImportPath}
@@ -176,24 +177,24 @@ func (me *goPkgIntel) ListItemToMenuItem(p z.IListItem) (item *z.MenuItem) {
 			item.Category = "  "
 		}
 		if len(pkg.Errs) > 0 {
-			item.Desc = ""
+			item.Desc, descsmighthavepaths = "", true
 			for _, e := range pkg.Errs {
 				item.Desc += delim + e.Msg
 			}
 		} else if pkg.Error != nil {
-			item.Desc = pkg.Error.Err
+			item.Desc, descsmighthavepaths = pkg.Error.Err, true
 		} else if len(pkg.DepsErrors) > 0 {
-			item.Desc = ""
+			item.Desc, descsmighthavepaths = "", true
 			for _, e := range pkg.DepsErrors {
 				item.Desc += delim + e.Err
 			}
 		}
 		if item.Desc == "" {
-			item.Desc = pkg.StaleReason
+			item.Desc, descsmighthavepaths = pkg.StaleReason, true
 		} else if strings.HasPrefix(item.Desc, delim) {
 			item.Desc = item.Desc[len(delim):]
 		} else if pref := "Package " + pkg.Name + " "; strings.HasPrefix(item.Desc, pref) {
-			item.Desc = item.Desc[len(pref):]
+			item.Desc, descsmighthavepaths = item.Desc[len(pref):], true
 		}
 		if pkgtarget := z.Lang.Workspace.PrettyPath(pkg.Target); me.isPkgCommand(pkg) && pkgtarget != "" {
 			if hint := "Target: " + pkgtarget; item.Desc == "" {
@@ -205,7 +206,7 @@ func (me *goPkgIntel) ListItemToMenuItem(p z.IListItem) (item *z.MenuItem) {
 
 		if suffix := ": " + pkg.StaleReason; me.isPkgStale(pkg) {
 			if item.Desc == pkg.StaleReason {
-				suffix = ""
+				suffix, descsmighthavepaths = "", true
 			}
 			hints = append(hints, "Stale"+suffix)
 		}
@@ -241,6 +242,9 @@ func (me *goPkgIntel) ListItemToMenuItem(p z.IListItem) (item *z.MenuItem) {
 		item.Hint = strings.Join(hints, delim)
 		item.IpcID = z.IPCID_OBJ_SNAPSHOT
 		item.IpcArgs = me.ObjSnapPrefix() + pkg.Dir
+	}
+	if descsmighthavepaths {
+		item.Desc = z.PrettifyPathsIn(item.Desc)
 	}
 	return
 }

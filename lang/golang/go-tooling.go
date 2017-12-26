@@ -80,14 +80,14 @@ func (me *goTooling) onPreInit() {
 	me.deadcode = &z.Tool{Name: "deadcode", Website: "http://github.com/remyoudompheng/go-misc/tree/master/deadcode#readme", Installed: udevgo.Has_deadcode, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_INFO}
 
 	me.all = z.Tools{
-		me.gorename,
 		me.gofmt,
 		me.goimports,
 		me.goreturns,
+		me.gorename,
+		me.gocode,
 		me.gogetdoc,
 		me.godef,
 		me.guru,
-		me.gocode,
 		me.go_doc,
 		me.govet,
 		me.golint,

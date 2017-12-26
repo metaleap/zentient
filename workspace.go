@@ -233,14 +233,18 @@ func (me *WorkspaceBase) pollFileEventsForever() {
 	}
 }
 
+func (*WorkspaceBase) prettyPathRel(path string, fsPath string) string {
+	if path != "" {
+		if rp, err := filepath.Rel(path, fsPath); err == nil && rp != "" && !strings.HasPrefix(rp, ".") {
+			return rp
+		}
+	}
+	return ""
+}
+
 func (me *WorkspaceBase) PrettyPath(fsPath string, otherEnvs ...string) string {
 	if fsPath != "" {
-		rel := func(path string) string {
-			if rp, err := filepath.Rel(path, fsPath); path != "" && err == nil && rp != "" && !strings.HasPrefix(rp, ".") {
-				return rp
-			}
-			return ""
-		}
+		rel := func(path string) string { return me.prettyPathRel(path, fsPath) }
 
 		candidates := []string{}
 		for _, d := range me.dirs {
