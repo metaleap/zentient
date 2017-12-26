@@ -539,3 +539,39 @@ func (*goSrcIntel) References(srcLens *z.SrcLens, includeDeclaration bool) (refs
 	}
 	return
 }
+
+func (*goSrcIntel) DefSym(srcLens *z.SrcLens) (defs z.SrcLenses) {
+	var refloc *udev.SrcMsg
+	bytepos := srcLens.ByteOffsetForPosWithRuneOffset(srcLens.Pos)
+	spos := ustr.FromInt(bytepos)
+
+	if refloc == nil && tools.godef.Installed {
+		refloc = udevgo.QueryDefLoc_Godef(srcLens.FilePath, srcLens.Txt, spos)
+	}
+	if refloc == nil && tools.gogetdoc.Installed {
+		refloc = udevgo.QueryDefLoc_Gogetdoc(srcLens.FilePath, srcLens.Txt, spos)
+	}
+	if refloc == nil && tools.guru.Installed {
+		if gd, _ := udevgo.QueryDesc_Guru(srcLens.FilePath, srcLens.Txt, spos); gd != nil {
+			if gd.Type != nil && len(gd.Type.NamePos) > 0 {
+				if rl := udev.SrcMsgFromLn(gd.Type.NamePos); rl != nil {
+					refloc = rl
+				}
+			}
+			if gd.Value != nil && len(gd.Value.ObjPos) > 0 {
+				if rl := udev.SrcMsgFromLn(gd.Value.ObjPos); rl != nil {
+					refloc = rl
+				}
+			}
+		}
+	}
+	if refloc != nil {
+		defs = z.SrcLenses{&z.SrcLens{}}
+		defs[0].SetFilePathAndPosOrRangeFrom(refloc, nil)
+	}
+	return
+}
+
+func (*goSrcIntel) DefType(srcLens *z.SrcLens) (defs z.SrcLenses) {
+	return
+}

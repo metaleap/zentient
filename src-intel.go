@@ -110,7 +110,7 @@ func (me *SrcIntelBase) onCmplDetails(req *ipcReq, resp *ipcResp) {
 	}
 }
 
-func (me *SrcIntelBase) onDefinition(req *ipcReq, resp *ipcResp, def func(*SrcLens) SrcLenses) {
+func (*SrcIntelBase) onDefinition(req *ipcReq, resp *ipcResp, def func(*SrcLens) SrcLenses) {
 	resp.SrcIntel.Refs = def(req.SrcLens)
 }
 
@@ -151,11 +151,19 @@ func (me *SrcIntelBase) onSyms(req *ipcReq, resp *ipcResp) {
 	resp.SrcIntel.Refs = me.Impl.Symbols(req.SrcLens, query, req.IpcID == IPCID_SRCINTEL_SYMS_FILE)
 }
 
-func (_ *SrcIntelBase) ComplItems(srcLens *SrcLens) []*SrcIntelCompl {
+func (*SrcIntelBase) ComplItems(srcLens *SrcLens) []*SrcIntelCompl {
 	return nil
 }
 
-func (_ *SrcIntelBase) ComplDetails(srcLens *SrcLens, itemText string) *SrcIntelCompl {
+func (*SrcIntelBase) ComplDetails(srcLens *SrcLens, itemText string) *SrcIntelCompl {
+	return nil
+}
+
+func (*SrcIntelBase) DefSym(srcLens *SrcLens) SrcLenses {
+	return nil
+}
+
+func (*SrcIntelBase) DefType(srcLens *SrcLens) SrcLenses {
 	return nil
 }
 

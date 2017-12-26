@@ -90,7 +90,7 @@ func (me *SrcLens) SetFilePathFrom(srcRef *udev.SrcMsg, fallbackFilePath func() 
 
 func (me *SrcLens) SetPosOrRangeFrom(srcRef *udev.SrcMsg, preferRange bool) {
 	me.Pos, me.Range = nil, nil
-	if preferRange && srcRef.Pos2Ch > 0 && srcRef.Pos2Ln > 0 {
+	if preferRange && srcRef.Pos2Ch > 0 && srcRef.Pos2Ln > 0 && srcRef.Pos1Ch > 0 && srcRef.Pos1Ln > 0 {
 		me.Range = &SrcRange{Start: SrcPos{Ln: srcRef.Pos1Ln, Col: srcRef.Pos1Ch},
 			End: SrcPos{Ln: srcRef.Pos2Ln, Col: srcRef.Pos2Ch}}
 	} else {

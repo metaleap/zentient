@@ -17,6 +17,7 @@ const (
 	TOOLS_CAT_INTEL_SYMS
 	TOOLS_CAT_INTEL_HIGH
 	TOOLS_CAT_INTEL_CMPL
+	TOOLS_CAT_INTEL_NAV
 	TOOLS_CAT_EXTRAS_QUERY
 	TOOLS_CAT_DIAGS
 )
@@ -35,6 +36,8 @@ func (me ToolCats) String() string {
 		return "Contextual Highlighting"
 	case TOOLS_CAT_INTEL_CMPL:
 		return "Completion Suggest"
+	case TOOLS_CAT_INTEL_NAV:
+		return "Lookups: Definition/Type/Interface/Implementations/References"
 	case TOOLS_CAT_DIAGS:
 		return "Linting / Diagnostics"
 	case TOOLS_CAT_EXTRAS_QUERY:
