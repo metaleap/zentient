@@ -38,7 +38,7 @@ func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(workspaceFiles WorkspaceFiles, 
 			me.updateLintDiags(workspaceFiles, diagtools, autos, filepaths).propagate(true, nonautos, workspaceFiles)
 		}
 	}
-	go me.send(false)
+	go me.send(workspaceFiles, false)
 }
 
 func (me *DiagBase) updateLintDiags(workspaceFiles WorkspaceFiles, diagTools Tools, autos bool, filePaths []string) (diagitems DiagItems) {

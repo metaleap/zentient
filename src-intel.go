@@ -167,6 +167,14 @@ func (*SrcIntelBase) Hovers(srcLens *SrcLens) []InfoTip {
 	return nil
 }
 
+func (*SrcIntelBase) References(srcLens *SrcLens, includeDeclaration bool) SrcLenses {
+	return nil
+}
+
+func (*SrcIntelBase) Signature(srcLens *SrcLens) *SrcIntelSigHelp {
+	return nil
+}
+
 func (*SrcIntelBase) Symbols(srcLens *SrcLens, query string, curFileOnly bool) SrcLenses {
 	return nil
 }

@@ -45,9 +45,9 @@ func (me *DiagBase) UpdateBuildDiagsAsNeeded(workspaceFiles WorkspaceFiles, writ
 			job.WorkspaceFiles = workspaceFiles
 			job.forgetPrevDiags(nil, false, workspaceFiles)
 		}
-		go me.send(true)
+		go me.send(workspaceFiles, true)
 		diagitems := me.Impl.RunBuildJobs(jobs)
 		diagitems.propagate(false, true, workspaceFiles)
 	}
-	go me.send(false)
+	go me.send(workspaceFiles, false)
 }

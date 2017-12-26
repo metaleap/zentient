@@ -294,26 +294,28 @@ func (me *DiagBase) onToggle(toolName string, resp *ipcResp) {
 func (me *DiagBase) onToggled() {
 	Lang.Workspace.Lock()
 	defer Lang.Workspace.Unlock()
-	files := Lang.Workspace.Files()
-	for _, f := range files {
+	workspaceFiles := Lang.Workspace.Files()
+	for _, f := range workspaceFiles {
 		f.Diags.Lint.forget(nil)
 		f.Diags.AutoLintUpToDate = false
 	}
-	me.send(false)
-	me.Impl.UpdateLintDiagsIfAndAsNeeded(files, true)
+	me.send(workspaceFiles, false)
+	me.Impl.UpdateLintDiagsIfAndAsNeeded(workspaceFiles, true)
 }
 
-func (me *DiagBase) send(onlyBuildDiags bool) {
-	files := Lang.Workspace.Files()
-	resp := &DiagResp{LangID: Lang.ID, All: make(DiagItemsBy, len(files))}
+func (me *DiagBase) send(workspaceFiles WorkspaceFiles, onlyBuildDiags bool) {
+	// if files == nil {
+	// 	files = Lang.Workspace.Files()
+	// }
+	resp := &DiagResp{LangID: Lang.ID, All: make(DiagItemsBy, len(workspaceFiles))}
 	if !onlyBuildDiags {
-		for _, f := range files {
+		for _, f := range workspaceFiles {
 			if onlyBuildDiags = len(f.Diags.Build.Items) > 0; onlyBuildDiags {
 				break
 			}
 		}
 	}
-	for _, f := range files {
+	for _, f := range workspaceFiles {
 		fdiagitems := f.Diags.Lint.Items
 		if onlyBuildDiags {
 			fdiagitems = f.Diags.Build.Items

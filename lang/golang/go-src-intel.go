@@ -309,14 +309,12 @@ func (me *goSrcIntel) Signature(srcLens *z.SrcLens) (sig *z.SrcIntelSigHelp) {
 	}
 	pos, posmax = -1, pos
 	for _, ge := range gw.Enclosing {
-		println(ge.Description)
 		if strings.HasPrefix(ge.Description, "function call") {
 			pos = ge.Start
 			break
 		}
 	}
 	if pos < 0 {
-		println("not in call")
 		sig = nil
 	} else {
 		poss := []int{}
@@ -520,6 +518,24 @@ func (*goSrcIntel) symFuncSigBreak(fnsig string) (fnargs string, fnret string) {
 	}
 	if pos > 0 && pos < len(fnsig)-1 {
 		fnargs, fnret = fnsig[:pos+1], fnsig[pos+2:]
+	}
+	return
+}
+
+func (*goSrcIntel) References(srcLens *z.SrcLens, includeDeclaration bool) (refs z.SrcLenses) {
+	if !tools.guru.Installed {
+		return
+	}
+	bytepos := srcLens.ByteOffsetForPosWithRuneOffset(srcLens.Pos)
+	if gr := udevgo.QueryRefs_Guru(srcLens.FilePath, srcLens.Txt, ustr.FromInt(bytepos)); len(gr) > 0 {
+		refs = make(z.SrcLenses, 0, len(gr))
+		for _, gref := range gr {
+			if srcref := udev.SrcMsgFromLn(gref.Pos); srcref != nil {
+				refloc := &z.SrcLens{}
+				refloc.SetFilePathAndPosOrRangeFrom(srcref, nil)
+				refs = append(refs, refloc)
+			}
+		}
 	}
 	return
 }
