@@ -119,17 +119,18 @@ func (me *goSrcIntel) ComplDetails(srcLens *z.SrcLens, itemText string) (itemDoc
 	itemDoc = &z.SrcIntelCompl{
 		Documentation: &z.SrcIntelDoc{IsTrusted: true},
 	}
-	if spos := ustr.FromInt(pos); tools.gogetdoc.Installed {
+	decl, spos := "", ustr.FromInt(pos)
+	if tools.gogetdoc.Installed {
 		ggd := udevgo.Query_Gogetdoc(srcLens.FilePath, srcLens.Txt, spos)
-		if ggd.Decl != "" {
-			itemDoc.Detail = udevgo.PkgImpPathsToNamesInLn(me.goFuncDeclLineBreaks(ggd.Decl, 23), filepath.Dir(srcLens.FilePath))
+		if decl = ggd.Decl; decl != "" {
+			decl = me.goFuncDeclLineBreaks(udevgo.PkgImpPathsToNamesInLn(decl, filepath.Dir(srcLens.FilePath)), 23)
 			for {
-				if i := strings.Index(itemDoc.Detail, " `"); i < 0 {
+				if i := strings.Index(decl, " `"); i < 0 {
 					break
-				} else if j := strings.Index(itemDoc.Detail[i+2:], "\"`"); j < 0 {
+				} else if j := strings.Index(decl[i+2:], "\"`"); j < 0 {
 					break
 				} else {
-					itemDoc.Detail = itemDoc.Detail[:i] + itemDoc.Detail[j+2+2+i:]
+					decl = decl[:i] + decl[j+2+2+i:]
 				}
 			}
 		}
@@ -138,15 +139,18 @@ func (me *goSrcIntel) ComplDetails(srcLens *z.SrcLens, itemText string) (itemDoc
 		} else if ggd.Err != "" {
 			itemDoc.Documentation.Value = ggd.Err
 		} else if ggd.ErrMsgs != "" {
-			itemDoc.Documentation.Value = ggd.ErrMsgs
-		}
-	} else if tools.godef.Installed {
-		if defdecl := udevgo.QueryDefDecl_GoDef(srcLens.FilePath, srcLens.Txt, spos); defdecl != "" {
-			itemDoc.Detail = me.goFuncDeclLineBreaks(defdecl, 23)
+			// typically uninteresting here, ie. parse errors from transient editing state
+			// itemDoc.Documentation.Value = ggd.ErrMsgs
 		}
 	}
+	if decl == "" && tools.godef.Installed {
+		if decl = udevgo.QueryDefDecl_GoDef(srcLens.FilePath, srcLens.Txt, spos); decl != "" {
+			decl = me.goFuncDeclLineBreaks(decl, 23)
+		}
+	}
+	itemDoc.Detail = me.goDeclSnip(decl)
 	if itemDoc.Documentation.Value == "" {
-		itemDoc.Documentation.Value = "…" // z.Strf("(No docs for `%s` — at least if inserted here)", ggd.Name)
+		itemDoc.Documentation.Value = " " // z.Strf("(No docs for `%s` — at least if inserted here)", ggd.Name)
 	}
 	return
 }
@@ -256,14 +260,15 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 			if ggd.Err != "" {
 				hovs = append(hovs, z.InfoTip{Language: "plaintext", Value: ggd.Err})
 			}
-			if ggd.ErrMsgs != "" {
-				hovs = append(hovs, z.InfoTip{Language: "plaintext", Value: ggd.ErrMsgs})
-			}
+			// if ggd.ErrMsgs != "" {
+			// 	// typically uninteresting here, ie. parse errors from transient editing state
+			// 	hovs = append(hovs, z.InfoTip{Language: "plaintext", Value: ggd.ErrMsgs})
+			// }
 			if headline := ggd.ImpN; false && headline != "" && !ispkglocal {
 				headline = udevgo.PkgImpPathsToNamesInLn(headline, curpkgdir)
 				hovs = append(hovs, z.InfoTip{Value: "### " + headline})
 			}
-			if ggd.Decl = me.goFuncDeclLineBreaks(ggd.Decl, 50); ggd.Decl != "" {
+			if ggd.Decl = me.goFuncDeclLineBreaks(ggd.Decl, 42); ggd.Decl != "" {
 				if ggd.ImpP != "" {
 					ggd.Decl = strings.Replace(ggd.Decl, ggd.ImpP+".", "", -1)
 				}
@@ -289,9 +294,9 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 			}
 		}
 	}
-	if tools.godef.Installed && decl == nil {
+	if decl == nil && tools.godef.Installed {
 		if defdecl := udevgo.QueryDefDecl_GoDef(srcLens.FilePath, srcLens.Txt, offset); defdecl != "" {
-			decl = &z.InfoTip{Language: z.Lang.ID, Value: me.goFuncDeclLineBreaks(defdecl, 50)}
+			decl = &z.InfoTip{Language: z.Lang.ID, Value: me.goFuncDeclLineBreaks(defdecl, 42)}
 			hovs = append([]z.InfoTip{*decl}, hovs...)
 		}
 	}
@@ -305,13 +310,13 @@ func (me *goSrcIntel) Signature(srcLens *z.SrcLens) (sig *z.SrcIntelSigHelp) {
 		sig0.Label, sig0.Documentation.Value = z.ToolsMsgGone("guru or one of gogetdoc/godef"), z.ToolsMsgMore("(tool name)")
 		return
 	}
-	pos := srcLens.ByteOffsetForPosWithRuneOffset(srcLens.Pos)
+	pos, posmax := srcLens.ByteOffsetForPosWithRuneOffset(srcLens.Pos), -1
 	gw, err := udevgo.QueryWhat_Guru(srcLens.FilePath, srcLens.Txt, ustr.FromInt(pos))
 	if err != nil {
 		sig0.Label, sig0.Documentation.Value = "Error running guru", err.Error()
 		return
 	}
-	pos = -1
+	pos, posmax = -1, pos
 	for _, ge := range gw.Enclosing {
 		if strings.HasPrefix(ge.Description, "function call") {
 			pos = ge.Start
@@ -321,39 +326,59 @@ func (me *goSrcIntel) Signature(srcLens *z.SrcLens) (sig *z.SrcIntelSigHelp) {
 	if pos < 0 {
 		sig = nil
 	} else {
-		for pos < len(srcLens.Txt)-1 && srcLens.Txt[pos+1] != '(' {
-			pos++
+		poss := []int{}
+		for mpos := pos; mpos < posmax; mpos++ {
+			if c := srcLens.Txt[mpos+1]; c == '(' {
+				poss = append(poss, mpos)
+			} else if l := len(poss); c == ')' && l > 1 {
+				poss = poss[:l-1]
+			}
 		}
-		if spos := ustr.FromInt(pos); tools.gogetdoc.Installed && 0 > 1 {
-			// ggd := udevgo.Query_Gogetdoc(srcLens.FilePath, srcLens.Txt, spos)
-			// if ggd.Decl != "" {
-			// 	itemDoc.Detail = udevgo.PkgImpPathsToNamesInLn(me.goFuncDeclLineBreaks(ggd.Decl, 123), filepath.Dir(srcLens.FilePath))
-			// 	for {
-			// 		if i := strings.Index(itemDoc.Detail, " `"); i < 0 {
-			// 			break
-			// 		} else if j := strings.Index(itemDoc.Detail[i+2:], "\"`"); j < 0 {
-			// 			break
-			// 		} else {
-			// 			itemDoc.Detail = itemDoc.Detail[:i] + itemDoc.Detail[j+2+2+i:]
-			// 		}
-			// 	}
-			// }
-			// if ggd.Doc != "" {
-			// 	itemDoc.Documentation.Value = strings.TrimSpace(ggd.Doc)
-			// } else if ggd.Err != "" {
-			// 	itemDoc.Documentation.Value = ggd.Err
-			// } else if ggd.ErrMsgs != "" {
-			// 	itemDoc.Documentation.Value = ggd.ErrMsgs
-			// }
-		} else if tools.godef.Installed {
-			if defdecl := udevgo.QueryDefDecl_GoDef(srcLens.FilePath, srcLens.Txt, spos); defdecl != "" {
-				sig0.Label, sig0.Documentation.Value = me.goFuncDeclLineBreaks(defdecl, 44), z.ToolsMsgGone("gogetdoc")
+		if len(poss) == 0 {
+			sig = nil
+		} else {
+			decl, spos := "", ustr.FromInt(poss[len(poss)-1])
+			if tools.gogetdoc.Installed {
+				ggd := udevgo.Query_Gogetdoc(srcLens.FilePath, srcLens.Txt, spos)
+				if decl = ggd.Decl; decl != "" {
+					decl = udevgo.PkgImpPathsToNamesInLn(decl, filepath.Dir(srcLens.FilePath))
+				}
+				if ggd.Doc != "" {
+					sig0.Documentation.Value = strings.TrimSpace(ggd.Doc)
+				} else if ggd.Err != "" {
+					sig0.Documentation.Value = ggd.Err
+				} else if ggd.ErrMsgs != "" {
+					// typically uninteresting here, ie. parse errors from transient editing state
+					// sig0.Documentation.Value = ggd.ErrMsgs
+				}
 			} else {
+				sig0.Documentation.Value = z.ToolsMsgGone("gogetdoc")
+			}
+			if decl == "" && tools.godef.Installed {
+				decl = udevgo.QueryDefDecl_GoDef(srcLens.FilePath, srcLens.Txt, spos)
+			}
+			if decl == "" {
 				sig = nil
+			} else {
+				sig0.Label = me.goDeclSnip(me.goFuncDeclLineBreaks(decl, 42))
 			}
 		}
 	}
 	return
+}
+
+func (*goSrcIntel) goDeclSnip(decl string) string {
+	if strings.HasPrefix(decl, "var ") {
+		decl = decl[4:]
+	} else if strings.HasPrefix(decl, "field ") {
+		decl = decl[6:]
+	}
+	if strings.HasPrefix(decl, "func ") {
+		decl = decl[5:]
+	} else if i, j := strings.Index(decl, " func("), strings.IndexRune(decl, ' '); i > 0 && i == j {
+		decl = decl[:i] + decl[i+5:]
+	}
+	return decl
 }
 
 func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (allsyms z.SrcLenses) {
