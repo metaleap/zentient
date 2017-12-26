@@ -54,8 +54,8 @@ func (me *goTooling) onPreInit() {
 
 	me.go_doc = &z.Tool{Name: "go doc", Website: "http://golang.org/cmd/doc/", Installed: true, Cats: []z.ToolCats{z.TOOLS_CAT_EXTRAS_QUERY}}
 	// me.godoc = &z.Tool{Name: "godoc", Website: "http://golang.org/x/tools/cmd/godoc", Installed: udevgo.Has_godoc}
-	me.gogetdoc = &z.Tool{Name: "gogetdoc", Website: "http://github.com/zmb3/gogetdoc#readme", Installed: udevgo.Has_gogetdoc, Cats: []z.ToolCats{z.TOOLS_CAT_INTEL_TIPS}}
-	me.godef = &z.Tool{Name: "godef", Website: "http://github.com/rogpeppe/godef#readme", Installed: udevgo.Has_godef, Cats: []z.ToolCats{z.TOOLS_CAT_INTEL_TIPS}}
+	me.gogetdoc = &z.Tool{Name: "gogetdoc", Website: "http://github.com/zmb3/gogetdoc#readme", Installed: udevgo.Has_gogetdoc, Cats: []z.ToolCats{z.TOOLS_CAT_INTEL_TIPS, z.TOOLS_CAT_INTEL_CMPL}}
+	me.godef = &z.Tool{Name: "godef", Website: "http://github.com/rogpeppe/godef#readme", Installed: udevgo.Has_godef, Cats: []z.ToolCats{z.TOOLS_CAT_INTEL_TIPS, z.TOOLS_CAT_INTEL_CMPL}}
 	me.guru = &z.Tool{Name: "guru", Website: "http://golang.org/x/tools/cmd/guru", Installed: udevgo.Has_guru, Cats: []z.ToolCats{z.TOOLS_CAT_INTEL_TIPS, z.TOOLS_CAT_INTEL_SYMS, z.TOOLS_CAT_INTEL_HIGH}}
 	me.gocode = &z.Tool{Name: "gocode", Website: "http://github.com/nsf/gocode#readme", Installed: udevgo.Has_gocode, Cats: []z.ToolCats{z.TOOLS_CAT_INTEL_CMPL}}
 

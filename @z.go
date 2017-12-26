@@ -58,6 +58,14 @@ func BadPanic(what string, which string) {
 	panic(BadMsg(what, which))
 }
 
+func ToolsMsgGone(missing string) string {
+	return "Not installed: " + missing
+}
+
+func ToolsMsgMore(missing string) string {
+	return "for more information, see: Zentient Main Menu / Tooling / " + missing
+}
+
 func Init() (err error) {
 	Prog.name = os.Args[0]
 	Prog.dir.config = filepath.Join(usys.UserDataDirPath(false), Prog.name)

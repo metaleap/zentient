@@ -109,33 +109,41 @@ func (*goSrcIntel) ComplItems(srcLens *z.SrcLens) (all []*z.SrcIntelCompl) {
 }
 
 func (me *goSrcIntel) ComplDetails(srcLens *z.SrcLens, itemText string) (itemDoc *z.SrcIntelCompl) {
-	if !tools.gogetdoc.Installed {
+	if !(tools.gogetdoc.Installed || tools.godef.Installed) {
 		return
 	}
 	pos := srcLens.ByteOffsetForPosWithRuneOffset(srcLens.Pos)
 	rs := srcLens.ByteOffsetForPosWithRuneOffset(&srcLens.Range.Start)
 	re := srcLens.ByteOffsetForPosWithRuneOffset(&srcLens.Range.End)
 	srcLens.Txt = srcLens.Txt[:rs] + itemText + srcLens.Txt[re:]
-	ggd := udevgo.Query_Gogetdoc(srcLens.FilePath, srcLens.Txt, ustr.FromInt(pos))
 	itemDoc = &z.SrcIntelCompl{
-		Documentation: &z.SrcIntelDoc{IsTrusted: true, Value: strings.TrimSpace(ggd.Doc)},
+		Documentation: &z.SrcIntelDoc{IsTrusted: true},
 	}
-	if ggd.Decl != "" {
-		itemDoc.Detail = udevgo.PkgImpPathsToNamesInLn(me.goFuncDeclLineBreaks(ggd.Decl, 23), filepath.Dir(srcLens.FilePath))
-		for {
-			if i := strings.Index(itemDoc.Detail, " `"); i < 0 {
-				break
-			} else if j := strings.Index(itemDoc.Detail[i+2:], "\"`"); j < 0 {
-				break
-			} else {
-				itemDoc.Detail = itemDoc.Detail[:i] + itemDoc.Detail[j+2+2+i:]
+	if spos := ustr.FromInt(pos); tools.gogetdoc.Installed {
+		ggd := udevgo.Query_Gogetdoc(srcLens.FilePath, srcLens.Txt, spos)
+		if ggd.Decl != "" {
+			itemDoc.Detail = udevgo.PkgImpPathsToNamesInLn(me.goFuncDeclLineBreaks(ggd.Decl, 23), filepath.Dir(srcLens.FilePath))
+			for {
+				if i := strings.Index(itemDoc.Detail, " `"); i < 0 {
+					break
+				} else if j := strings.Index(itemDoc.Detail[i+2:], "\"`"); j < 0 {
+					break
+				} else {
+					itemDoc.Detail = itemDoc.Detail[:i] + itemDoc.Detail[j+2+2+i:]
+				}
 			}
 		}
-	}
-	if ggd.Err != "" {
-		itemDoc.Documentation.Value = ggd.Err
-	} else if ggd.ErrMsgs != "" {
-		itemDoc.Documentation.Value = ggd.ErrMsgs
+		if ggd.Doc != "" {
+			itemDoc.Documentation.Value = strings.TrimSpace(ggd.Doc)
+		} else if ggd.Err != "" {
+			itemDoc.Documentation.Value = ggd.Err
+		} else if ggd.ErrMsgs != "" {
+			itemDoc.Documentation.Value = ggd.ErrMsgs
+		}
+	} else if tools.godef.Installed {
+		if defdecl := udevgo.QueryDefDecl_GoDef(srcLens.FilePath, srcLens.Txt, spos); defdecl != "" {
+			itemDoc.Detail = me.goFuncDeclLineBreaks(defdecl, 23)
+		}
 	}
 	if itemDoc.Documentation.Value == "" {
 		itemDoc.Documentation.Value = "…" // z.Strf("(No docs for `%s` — at least if inserted here)", ggd.Name)
@@ -290,12 +298,70 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 	return
 }
 
+func (me *goSrcIntel) Signature(srcLens *z.SrcLens) (sig *z.SrcIntelSigHelp) {
+	sig = &z.SrcIntelSigHelp{Signatures: []z.SrcIntelSigInfo{z.SrcIntelSigInfo{}}}
+	sig0 := &sig.Signatures[0]
+	if !(tools.guru.Installed && (tools.gogetdoc.Installed || tools.godef.Installed)) {
+		sig0.Label, sig0.Documentation.Value = z.ToolsMsgGone("guru or one of gogetdoc/godef"), z.ToolsMsgMore("(tool name)")
+		return
+	}
+	pos := srcLens.ByteOffsetForPosWithRuneOffset(srcLens.Pos)
+	gw, err := udevgo.QueryWhat_Guru(srcLens.FilePath, srcLens.Txt, ustr.FromInt(pos))
+	if err != nil {
+		sig0.Label, sig0.Documentation.Value = "Error running guru", err.Error()
+		return
+	}
+	pos = -1
+	for _, ge := range gw.Enclosing {
+		if strings.HasPrefix(ge.Description, "function call") {
+			pos = ge.Start
+			break
+		}
+	}
+	if pos < 0 {
+		sig = nil
+	} else {
+		for pos < len(srcLens.Txt)-1 && srcLens.Txt[pos+1] != '(' {
+			pos++
+		}
+		if spos := ustr.FromInt(pos); tools.gogetdoc.Installed && 0 > 1 {
+			// ggd := udevgo.Query_Gogetdoc(srcLens.FilePath, srcLens.Txt, spos)
+			// if ggd.Decl != "" {
+			// 	itemDoc.Detail = udevgo.PkgImpPathsToNamesInLn(me.goFuncDeclLineBreaks(ggd.Decl, 123), filepath.Dir(srcLens.FilePath))
+			// 	for {
+			// 		if i := strings.Index(itemDoc.Detail, " `"); i < 0 {
+			// 			break
+			// 		} else if j := strings.Index(itemDoc.Detail[i+2:], "\"`"); j < 0 {
+			// 			break
+			// 		} else {
+			// 			itemDoc.Detail = itemDoc.Detail[:i] + itemDoc.Detail[j+2+2+i:]
+			// 		}
+			// 	}
+			// }
+			// if ggd.Doc != "" {
+			// 	itemDoc.Documentation.Value = strings.TrimSpace(ggd.Doc)
+			// } else if ggd.Err != "" {
+			// 	itemDoc.Documentation.Value = ggd.Err
+			// } else if ggd.ErrMsgs != "" {
+			// 	itemDoc.Documentation.Value = ggd.ErrMsgs
+			// }
+		} else if tools.godef.Installed {
+			if defdecl := udevgo.QueryDefDecl_GoDef(srcLens.FilePath, srcLens.Txt, spos); defdecl != "" {
+				sig0.Label, sig0.Documentation.Value = me.goFuncDeclLineBreaks(defdecl, 44), z.ToolsMsgGone("gogetdoc")
+			} else {
+				sig = nil
+			}
+		}
+	}
+	return
+}
+
 func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (allsyms z.SrcLenses) {
 	onerr := func(label string, detail string) z.SrcLenses {
 		return z.SrcLenses{&z.SrcLens{Flag: int(z.SYM_EVENT), Str: label, Txt: detail, FilePath: sL.FilePath, Pos: sL.Pos, Range: sL.Range}}
 	}
 	if !tools.guru.Installed {
-		return onerr("Not installed: guru", "for more information, see: Zentient Main Menu / Tooling / guru.")
+		return onerr(z.ToolsMsgGone("guru"), z.ToolsMsgMore("guru"))
 	}
 	sL.EnsureSrcFull()
 	srclns := strings.Split(sL.Txt, "\n")

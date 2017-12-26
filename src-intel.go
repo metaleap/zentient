@@ -46,7 +46,7 @@ type SrcIntelDoc struct {
 }
 
 type SrcIntelSigHelp struct {
-	ActiveSignature int               `json:"activeSignature,omitempty"`
+	ActiveSignature int               `json:"activeSignature"`
 	ActiveParameter int               `json:"activeParameter,omitempty"`
 	Signatures      []SrcIntelSigInfo `json:"signatures,omitempty"`
 }
@@ -54,7 +54,7 @@ type SrcIntelSigHelp struct {
 type SrcIntelSigInfo struct {
 	Label         string             `json:"label"`
 	Documentation SrcIntelDoc        `json:"documentation,omitempty"`
-	Parameters    []SrcIntelSigParam `json:"parameters,omitempty"`
+	Parameters    []SrcIntelSigParam `json:"parameters"`
 }
 
 type SrcIntelSigParam struct {
@@ -134,7 +134,13 @@ func (me *SrcIntelBase) onReferences(req *ipcReq, resp *ipcResp) {
 }
 
 func (me *SrcIntelBase) onSignature(req *ipcReq, resp *ipcResp) {
-	resp.SrcIntel.Signature = me.Impl.Signature(req.SrcLens)
+	if resp.SrcIntel.Signature = me.Impl.Signature(req.SrcLens); resp.SrcIntel.Signature != nil {
+		for i := range resp.SrcIntel.Signature.Signatures { // vsc can't handle `null` for `parameters` but can handle `[]`
+			if resp.SrcIntel.Signature.Signatures[i].Documentation.IsTrusted = true; resp.SrcIntel.Signature.Signatures[i].Parameters == nil {
+				resp.SrcIntel.Signature.Signatures[i].Parameters = []SrcIntelSigParam{}
+			}
+		}
+	}
 }
 
 func (me *SrcIntelBase) onSyms(req *ipcReq, resp *ipcResp) {
