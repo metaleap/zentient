@@ -138,7 +138,7 @@ func (me *goSrcIntel) ComplDetails(srcLens *z.SrcLens, itemText string) (itemDoc
 		itemDoc.Documentation.Value = ggd.ErrMsgs
 	}
 	if itemDoc.Documentation.Value == "" {
-		itemDoc.Documentation.Value = ggd.Name + " —— " + ggd.ImpP
+		itemDoc.Documentation.Value = "…" // z.Strf("(No docs for `%s` — at least if inserted here)", ggd.Name)
 	}
 	return
 }
