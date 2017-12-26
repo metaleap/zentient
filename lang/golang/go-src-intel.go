@@ -121,18 +121,9 @@ func (me *goSrcIntel) ComplDetails(srcLens *z.SrcLens, itemText string) (itemDoc
 	}
 	decl, spos := "", ustr.FromInt(pos)
 	if tools.gogetdoc.Installed {
-		ggd := udevgo.Query_Gogetdoc(srcLens.FilePath, srcLens.Txt, spos)
+		ggd := udevgo.Query_Gogetdoc(srcLens.FilePath, srcLens.Txt, spos, true)
 		if decl = ggd.Decl; decl != "" {
 			decl = me.goFuncDeclLineBreaks(udevgo.PkgImpPathsToNamesInLn(decl, filepath.Dir(srcLens.FilePath)), 23)
-			for {
-				if i := strings.Index(decl, " `"); i < 0 {
-					break
-				} else if j := strings.Index(decl[i+2:], "\"`"); j < 0 {
-					break
-				} else {
-					decl = decl[:i] + decl[j+2+2+i:]
-				}
-			}
 		}
 		if ggd.Doc != "" {
 			itemDoc.Documentation.Value = strings.TrimSpace(ggd.Doc)
@@ -254,7 +245,7 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 	if !tools.gogetdoc.Installed {
 		hovs = append(hovs, z.InfoTip{Value: tools.gogetdoc.NotInstalledMessage()})
 	} else {
-		if ggd = udevgo.Query_Gogetdoc(srcLens.FilePath, srcLens.Txt, offset); ggd != nil {
+		if ggd = udevgo.Query_Gogetdoc(srcLens.FilePath, srcLens.Txt, offset, false); ggd != nil {
 			curpkgdir := filepath.Dir(srcLens.FilePath)
 			ispkglocal := strings.HasPrefix(ggd.Pos, curpkgdir)
 			if ggd.Err != "" {
@@ -318,12 +309,14 @@ func (me *goSrcIntel) Signature(srcLens *z.SrcLens) (sig *z.SrcIntelSigHelp) {
 	}
 	pos, posmax = -1, pos
 	for _, ge := range gw.Enclosing {
+		println(ge.Description)
 		if strings.HasPrefix(ge.Description, "function call") {
 			pos = ge.Start
 			break
 		}
 	}
 	if pos < 0 {
+		println("not in call")
 		sig = nil
 	} else {
 		poss := []int{}
@@ -339,7 +332,7 @@ func (me *goSrcIntel) Signature(srcLens *z.SrcLens) (sig *z.SrcIntelSigHelp) {
 		} else {
 			decl, spos := "", ustr.FromInt(poss[len(poss)-1])
 			if tools.gogetdoc.Installed {
-				ggd := udevgo.Query_Gogetdoc(srcLens.FilePath, srcLens.Txt, spos)
+				ggd := udevgo.Query_Gogetdoc(srcLens.FilePath, srcLens.Txt, spos, true)
 				if decl = ggd.Decl; decl != "" {
 					decl = udevgo.PkgImpPathsToNamesInLn(decl, filepath.Dir(srcLens.FilePath))
 				}
@@ -377,6 +370,19 @@ func (*goSrcIntel) goDeclSnip(decl string) string {
 		decl = decl[5:]
 	} else if i, j := strings.Index(decl, " func("), strings.IndexRune(decl, ' '); i > 0 && i == j {
 		decl = decl[:i] + decl[i+5:]
+	} else {
+		for {
+			if i = strings.Index(decl, " `"); i <= 0 {
+				if i = strings.Index(decl, "\t`"); i <= 0 {
+					break
+				}
+			}
+			if j = strings.Index(decl[i+2:], "\"`"); j <= 0 {
+				break
+			} else {
+				decl = decl[:i] + decl[j+2+2+i:]
+			}
+		}
 	}
 	return decl
 }
