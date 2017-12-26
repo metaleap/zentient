@@ -108,7 +108,7 @@ func (*goSrcIntel) ComplItems(srcLens *z.SrcLens) (all []*z.SrcIntelCompl) {
 	return
 }
 
-func (_ *goSrcIntel) ComplDetails(srcLens *z.SrcLens, itemText string) (itemDoc *z.SrcIntelCompl) {
+func (me *goSrcIntel) ComplDetails(srcLens *z.SrcLens, itemText string) (itemDoc *z.SrcIntelCompl) {
 	if !tools.gogetdoc.Installed {
 		return
 	}
@@ -121,7 +121,16 @@ func (_ *goSrcIntel) ComplDetails(srcLens *z.SrcLens, itemText string) (itemDoc 
 		Documentation: &z.SrcIntelDoc{IsTrusted: true, Value: strings.TrimSpace(ggd.Doc)},
 	}
 	if ggd.Decl != "" {
-		itemDoc.Detail = ggd.Decl
+		itemDoc.Detail = udevgo.PkgImpPathsToNamesInLn(me.goFuncDeclLineBreaks(ggd.Decl, 23), filepath.Dir(srcLens.FilePath))
+		for {
+			if i := strings.Index(itemDoc.Detail, " `"); i < 0 {
+				break
+			} else if j := strings.Index(itemDoc.Detail[i+2:], "\"`"); j < 0 {
+				break
+			} else {
+				itemDoc.Detail = itemDoc.Detail[:i] + itemDoc.Detail[j+2+2+i:]
+			}
+		}
 	}
 	if ggd.Err != "" {
 		itemDoc.Documentation.Value = ggd.Err
@@ -204,8 +213,8 @@ func (*goSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (all z.SrcLens
 	return
 }
 
-func (*goSrcIntel) hoverDeclLineBreaks(decl string) string {
-	if len(decl) > 50 && !strings.Contains(decl, "\n") {
+func (*goSrcIntel) goFuncDeclLineBreaks(decl string, maxlen int) string {
+	if len(decl) > maxlen && !strings.Contains(decl, "\n") {
 		dl, dr := decl[:6], decl[6:]
 		next := func() int { return strings.IndexRune(dr, '(') }
 		for i := next(); i >= 0; i = next() {
@@ -246,7 +255,7 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 				headline = udevgo.PkgImpPathsToNamesInLn(headline, curpkgdir)
 				hovs = append(hovs, z.InfoTip{Value: "### " + headline})
 			}
-			if ggd.Decl = me.hoverDeclLineBreaks(ggd.Decl); ggd.Decl != "" {
+			if ggd.Decl = me.goFuncDeclLineBreaks(ggd.Decl, 50); ggd.Decl != "" {
 				if ggd.ImpP != "" {
 					ggd.Decl = strings.Replace(ggd.Decl, ggd.ImpP+".", "", -1)
 				}
@@ -274,7 +283,7 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 	}
 	if tools.godef.Installed && decl == nil {
 		if defdecl := udevgo.QueryDefDecl_GoDef(srcLens.FilePath, srcLens.Txt, offset); defdecl != "" {
-			decl = &z.InfoTip{Language: z.Lang.ID, Value: me.hoverDeclLineBreaks(defdecl)}
+			decl = &z.InfoTip{Language: z.Lang.ID, Value: me.goFuncDeclLineBreaks(defdecl, 50)}
 			hovs = append([]z.InfoTip{*decl}, hovs...)
 		}
 	}
