@@ -159,6 +159,10 @@ func (*SrcIntelBase) ComplDetails(srcLens *SrcLens, itemText string) *SrcIntelCo
 	return nil
 }
 
+func (*SrcIntelBase) DefImpl(srcLens *SrcLens) SrcLenses {
+	return nil
+}
+
 func (*SrcIntelBase) DefSym(srcLens *SrcLens) SrcLenses {
 	return nil
 }

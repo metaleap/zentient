@@ -39,7 +39,11 @@ func (me *goDiag) onUpdateDiagsPrepPkgJobs(filePaths []string) (jobs []z.DiagJob
 			go caddyRunRefreshPkgs()
 		}
 		for _, pkg := range pkgs {
-			jobs = append(jobs, z.DiagJob{AffectedFilePaths: pkg.GoFilePaths(), Target: pkg})
+			if !(pkg.Standard || pkg.BinaryOnly) {
+				if pkggofilepaths := pkg.GoFilePaths(); len(pkggofilepaths) > 0 {
+					jobs = append(jobs, z.DiagJob{AffectedFilePaths: pkggofilepaths, Target: pkg})
+				}
+			}
 		}
 	}
 	return
