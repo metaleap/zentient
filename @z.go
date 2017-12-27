@@ -76,6 +76,17 @@ func PrettifyPathsIn(s string) string {
 	return s
 }
 
+func SendNotificationMessageToClient(level DiagSeverity, message string) (err error) {
+	ipcid := IPCID_NOTIFY_INFO
+	if level == DIAG_SEV_ERR {
+		ipcid = IPCID_NOTIFY_ERR
+	} else if level == DIAG_SEV_WARN {
+		ipcid = IPCID_NOTIFY_WARN
+	}
+	err = send(&ipcResp{IpcID: ipcid, ObjSnapshot: message})
+	return
+}
+
 func ToolsMsgGone(missingToolName string) string {
 	return "Not installed: " + missingToolName
 }

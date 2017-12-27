@@ -64,6 +64,7 @@ func (me *goExtras) runIntel_Guru(guruCmd string, srcLens *z.SrcLens, arg string
 					}
 				}
 				if len(udevgo.GuruScopeExclPkgs) > oldnumscopeexcl {
+					go z.SendNotificationMessageToClient(z.DIAG_SEV_WARN, z.Strf("guru complained about %d packages, re-running with those excluded: %v", len(errpkgimppaths), errpkgimppaths))
 					resp.Refs = nil
 					me.runIntel_Guru(guruCmd, srcLens, arg, resp)
 				}
