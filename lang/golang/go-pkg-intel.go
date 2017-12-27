@@ -106,9 +106,13 @@ func (me *goPkgIntel) onSrcLens(lf *z.ListFilter, srcLens *z.SrcLens) {
 					return uslice.StrHas(curpkg.Dependants(), p.(*udevgo.Pkg).ImportPath)
 				}
 			} else if isself {
-				lf.Pred = func(p z.IListItem) bool {
-					imppath := p.(*udevgo.Pkg).ImportPath
-					return imppath == curpkg.ImportPath || strings.HasPrefix(imppath, curpkg.ImportPath+"/")
+				lf.Pred = func(p z.IListItem) (iscurpkg bool) {
+					pkg := p.(*udevgo.Pkg)
+					imppath := pkg.ImportPath
+					if iscurpkg = imppath == curpkg.ImportPath || strings.HasPrefix(imppath, curpkg.ImportPath+"/"); iscurpkg {
+						pkg.CountLoC()
+					}
+					return
 				}
 			}
 		}
@@ -172,6 +176,9 @@ func (me *goPkgIntel) ListItemToMenuItem(p z.IListItem) (item *z.MenuItem) {
 	descsmighthavepaths := false
 	if pkg, _ := p.(*udevgo.Pkg); pkg != nil {
 		delim, hints := " · ", []string{}
+		if pkg.LoC > 0 {
+			hints = append(hints, z.Strf("%d LoC", pkg.LoC))
+		}
 		item = &z.MenuItem{Category: pkg.Name, Desc: pkg.Doc, Title: pkg.ImportPath}
 		if item.Category == "" {
 			item.Category = "  "

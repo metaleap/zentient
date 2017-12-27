@@ -10,6 +10,15 @@ import (
 	"github.com/metaleap/zentient"
 )
 
+var (
+	xQuerierGoDoc = z.ExtrasItem{ID: "go_doc", Label: "go doc",
+		Desc: "[package] [member-name]", Detail: "➜ shows the specified item's summary desc",
+		QueryArg: "Query to `go doc`"}
+	xQuerierStructlayout = z.ExtrasItem{ID: "structlayout", Label: "structlayout",
+		Desc: "[package] struct-name", Detail: "➜ shows the specified struct's memory layout",
+		QueryArg: "Specify (optionally) a package and (always) a struct type definition's name"}
+)
+
 func (me *goExtras) runQuery_StructLayout(srcLens *z.SrcLens, arg string, resp *z.ExtrasResp) {
 	args := ustr.Split(arg, " ")
 	if len(args) == 1 && udevgo.PkgsByDir != nil && srcLens.FilePath != "" {
@@ -25,11 +34,14 @@ func (me *goExtras) runQuery_StructLayout(srcLens *z.SrcLens, arg string, resp *
 	} else if cmdout = ustr.Trim(cmdout); cmdout != "" || cmderr != "" {
 		scmddesc := z.Strf("structlayout %s %s", args[0], args[1])
 		resp.Desc = z.Strf("Results of `%s`, sizes are in bytes:", scmddesc)
-		resp.Warns = ustr.Split(z.Strf("[%s]\n%s", scmddesc, cmderr), "\n")
-		for _, ln := range ustr.Split(cmdout, "\n") {
-			if sfield, ssize := ustr.BreakOnLast(ln, ":"); sfield != "" {
-				sfname, sftype := ustr.BreakOn(sfield, " ")
-				resp.Items = append(resp.Items, z.ExtrasItem{Label: ustr.FirstNonEmpty(sfname, "—"), Description: sftype, Detail: ssize})
+		if cmderr != "" {
+			resp.Warns = ustr.Split(z.Strf("[%s]\n%s", scmddesc, cmderr), "\n")
+		} else if cmdout != "" {
+			for _, ln := range ustr.Split(cmdout, "\n") {
+				if sfield, ssize := ustr.BreakOnLast(ln, ":"); sfield != "" {
+					sfname, sftype := ustr.BreakOn(sfield, " ")
+					resp.Items = append(resp.Items, z.ExtrasItem{Label: ustr.FirstNonEmpty(sfname, "—"), Desc: sftype, Detail: ssize})
+				}
 			}
 		}
 	}

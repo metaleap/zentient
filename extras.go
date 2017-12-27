@@ -10,11 +10,11 @@ type IExtras interface {
 }
 
 type ExtrasItem struct {
-	ID          string `json:"id"`
-	Label       string `json:"label"`
-	Description string `json:"description"`
-	Detail      string `json:"detail,omitempty"`
-	QueryArg    string `json:"arg,omitempty"`
+	ID       string `json:"id"`
+	Label    string `json:"label"`
+	Desc     string `json:"description"`
+	Detail   string `json:"detail,omitempty"`
+	QueryArg string `json:"arg,omitempty"`
 }
 
 type ExtrasResp struct {
@@ -32,7 +32,7 @@ func (*ExtrasBase) Init() {
 }
 
 func (me *ExtrasBase) dispatch(req *ipcReq, resp *ipcResp) bool {
-	resp.Extras = &ExtrasResp{}
+	resp.IpcID, resp.Extras = req.IpcID, &ExtrasResp{}
 	switch req.IpcID {
 	case IPCID_EXTRAS_INTEL_LIST:
 		me.onList(req, resp, false)
@@ -55,6 +55,20 @@ func (me *ExtrasBase) onList(req *ipcReq, resp *ipcResp, isQuery bool) {
 		list = me.Impl.ListQueryExtras
 	}
 	resp.Extras.Items = list()
+	for i := range resp.Extras.Items {
+		if item := &resp.Extras.Items[i]; item.Desc == "" {
+			if req.SrcLens.Str != "" {
+				item.Desc = req.SrcLens.Str
+			} else {
+				item.Desc = Strf("at %s in: ", req.SrcLens.Pos)
+				if req.SrcLens.Txt != "" {
+					item.Desc += req.SrcLens.Txt
+				} else {
+					item.Desc += Lang.Workspace.PrettyPath(req.SrcLens.FilePath)
+				}
+			}
+		}
+	}
 }
 
 func (me *ExtrasBase) onRun(req *ipcReq, resp *ipcResp, isQuery bool) {

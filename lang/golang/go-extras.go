@@ -8,13 +8,6 @@ import (
 
 var (
 	extras goExtras
-
-	querierGoDoc = z.ExtrasItem{ID: "go_doc", Label: "go doc",
-		Description: "[package] [member-name]", Detail: "➜ shows the specified item's summary description",
-		QueryArg: "Query to `go doc`"}
-	querierStructlayout = z.ExtrasItem{ID: "structlayout", Label: "structlayout",
-		Description: "[package] struct-name", Detail: "➜ shows the specified struct's memory layout",
-		QueryArg: "Specify (optionally) a package and (always) a struct type definition's name"}
 )
 
 func init() {
@@ -26,27 +19,32 @@ type goExtras struct {
 }
 
 func (me *goExtras) ListIntelExtras() (all []z.ExtrasItem) {
+	all = []z.ExtrasItem{xIntelGuruCallees, xIntelGuruCallers, xIntelGuruCallstack, xIntelGuruFreevars, xIntelGuruErrtypes, xIntelGuruPointsto, xIntelGuruChanpeers}
 	return
 }
 
 func (me *goExtras) ListQueryExtras() (all []z.ExtrasItem) {
-	all = append(all, querierGoDoc, querierStructlayout)
+	all = []z.ExtrasItem{xQuerierGoDoc, xQuerierStructlayout}
 	return
 }
 
 func (me *goExtras) RunIntelExtra(srcLens *z.SrcLens, id string, arg string, resp *z.ExtrasResp) {
+	var runner func(srcLens *z.SrcLens, arg string, resp *z.ExtrasResp)
 	switch id {
 	default:
 		z.BadPanic("CodeIntel ID", id)
+	}
+	if runner != nil {
+		runner(srcLens, strings.TrimSpace(arg), resp)
 	}
 }
 
 func (me *goExtras) RunQueryExtra(srcLens *z.SrcLens, id string, arg string, resp *z.ExtrasResp) {
 	var runner func(srcLens *z.SrcLens, arg string, resp *z.ExtrasResp)
 	switch id {
-	case querierGoDoc.ID:
+	case xQuerierGoDoc.ID:
 		runner = me.runQuery_GoDoc
-	case querierStructlayout.ID:
+	case xQuerierStructlayout.ID:
 		runner = me.runQuery_StructLayout
 	default:
 		z.BadPanic("CodeQuery ID", id)

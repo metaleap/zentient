@@ -19,6 +19,13 @@ type SrcPos struct {
 	byteoff bool
 }
 
+func (me *SrcPos) String() string {
+	if me.Ln > 0 && me.Col > 0 {
+		return Strf("%d,%d", me.Ln, me.Col)
+	}
+	return Strf("#%d", me.Off-1)
+}
+
 type SrcRange struct {
 	Start SrcPos `json:"s"`
 	End   SrcPos `json:"e,omitempty"`
