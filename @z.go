@@ -76,12 +76,16 @@ func PrettifyPathsIn(s string) string {
 	return s
 }
 
-func ToolsMsgGone(missing string) string {
-	return "Not installed: " + missing
+func ToolsMsgGone(missingToolName string) string {
+	return "Not installed: " + missingToolName
 }
 
-func ToolsMsgMore(missing string) string {
-	return "for more information, see: Zentient Main Menu / Tooling / " + missing
+func ToolsMsgMore(missingToolName string) string {
+	return "for more information, see: Zentient Main Menu / Tooling / " + missingToolName
+}
+
+func ToolGonePanic(missingToolName string) {
+	panic(Strf("%s — %s", ToolsMsgGone(missingToolName), ToolsMsgMore(missingToolName)))
 }
 
 func Init() (err error) {

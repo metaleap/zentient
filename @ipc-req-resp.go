@@ -81,8 +81,8 @@ func (me *ipcResp) onResponseReady() {
 		me.ErrMsg = Strf("%v", except)
 	}
 	if me.ErrMsg != "" {
-		me.ErrMsg = Strf("[%s] %s", Prog.name, me.ErrMsg)
-		//	zero out almost-everything for a leaner response
+		me.ErrMsg = Strf("[%s] %s", Prog.name, strings.TrimPrefix(me.ErrMsg, Prog.name+": "))
+		//	zero out almost-everything for a leaner response. req-ID is only added in afterwards anyways
 		*me = ipcResp{ErrMsg: me.ErrMsg}
 	}
 }

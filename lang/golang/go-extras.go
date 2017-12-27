@@ -19,7 +19,7 @@ type goExtras struct {
 }
 
 func (me *goExtras) ListIntelExtras() (all []z.ExtrasItem) {
-	all = []z.ExtrasItem{xIntelGuruCallees, xIntelGuruCallers, xIntelGuruCallstack, xIntelGuruFreevars, xIntelGuruErrtypes, xIntelGuruPointsto, xIntelGuruChanpeers}
+	all = []z.ExtrasItem{xIntelGuruCallees, xIntelGuruCallers, xIntelGuruCallstack, xIntelGuruFreevars, xIntelGuruErrtypes, xIntelGuruPointees, xIntelGuruChanpeers}
 	return
 }
 
@@ -29,13 +29,10 @@ func (me *goExtras) ListQueryExtras() (all []z.ExtrasItem) {
 }
 
 func (me *goExtras) RunIntelExtra(srcLens *z.SrcLens, id string, arg string, resp *z.ExtrasResp) {
-	var runner func(srcLens *z.SrcLens, arg string, resp *z.ExtrasResp)
-	switch id {
-	default:
+	if strings.HasPrefix(id, "guru.") {
+		me.runIntel_Guru(id[5:], srcLens, strings.TrimSpace(arg), resp)
+	} else {
 		z.BadPanic("CodeIntel ID", id)
-	}
-	if runner != nil {
-		runner(srcLens, strings.TrimSpace(arg), resp)
 	}
 }
 

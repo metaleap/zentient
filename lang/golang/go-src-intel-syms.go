@@ -34,9 +34,7 @@ func (*goSrcIntel) References(srcLens *z.SrcLens, includeDeclaration bool) (refs
 		refs = make(z.SrcLenses, 0, len(gr))
 		for _, gref := range gr {
 			if srcref := udev.SrcMsgFromLn(gref.Pos); srcref != nil {
-				refloc := &z.SrcLens{}
-				refloc.SetFilePathAndPosOrRangeFrom(srcref, nil)
-				refs = append(refs, refloc)
+				refs.AddFrom(srcref, nil)
 			}
 		}
 	}
@@ -69,8 +67,7 @@ func (*goSrcIntel) DefSym(srcLens *z.SrcLens) (defs z.SrcLenses) {
 		}
 	}
 	if refloc != nil {
-		defs = z.SrcLenses{&z.SrcLens{}}
-		defs[0].SetFilePathAndPosOrRangeFrom(refloc, nil)
+		defs.AddFrom(refloc, nil)
 	}
 	return
 }
@@ -120,8 +117,7 @@ func (me *goSrcIntel) DefType(srcLens *z.SrcLens) (defs z.SrcLenses) {
 		}
 	}
 	if refloc != nil {
-		defs = z.SrcLenses{&z.SrcLens{}}
-		defs[0].SetFilePathAndPosOrRangeFrom(refloc, nil)
+		defs.AddFrom(refloc, nil)
 	}
 	return
 }
@@ -136,18 +132,14 @@ func (*goSrcIntel) DefImpl(srcLens *z.SrcLens) (defs z.SrcLenses) {
 			addtypes := func(impltypes []gurujson.ImplementsType) {
 				for _, it := range impltypes {
 					if srcref := udev.SrcMsgFromLn(it.Pos); srcref != nil {
-						refloc := &z.SrcLens{}
-						refloc.SetFilePathAndPosOrRangeFrom(srcref, nil)
-						defs = append(defs, refloc)
+						defs.AddFrom(srcref, nil)
 					}
 				}
 			}
 			addmethods := func(methods []gurujson.DescribeMethod) {
 				for _, m := range methods {
 					if srcref := udev.SrcMsgFromLn(m.Pos); srcref != nil {
-						refloc := &z.SrcLens{}
-						refloc.SetFilePathAndPosOrRangeFrom(srcref, nil)
-						defs = append(defs, refloc)
+						defs.AddFrom(srcref, nil)
 					}
 				}
 			}
@@ -177,10 +169,8 @@ func (*goSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (all z.SrcLens
 	all = make(z.SrcLenses, 0, len(gw.SameIDs))
 	for _, sameid := range gw.SameIDs {
 		if srcref := udev.SrcMsgFromLn(sameid); srcref != nil {
-			sl := &z.SrcLens{}
-			if sl.SetFilePathAndPosOrRangeFrom(srcref, nil); sl.FilePath == srcLens.FilePath && (sl.Range != nil || sl.Pos != nil) {
+			if sl := all.AddFrom(srcref, nil); sl.FilePath == srcLens.FilePath && (sl.Range != nil || sl.Pos != nil) {
 				sl.FilePath = ""
-				all = append(all, sl)
 			}
 		}
 	}
@@ -334,8 +324,8 @@ func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (al
 							continue
 						}
 					}
-					lens := &z.SrcLens{Flag: int(z.SYM_METHOD), Str: "▶  " + methodtitle}
-					lens.SetFilePathAndPosOrRangeFrom(srcref, nil)
+					lens := allsyms.AddFrom(srcref, nil)
+					lens.Flag, lens.Str = int(z.SYM_METHOD), "▶  "+methodtitle
 					// if !ispmlisted { // if method's receiver type not in the symbols listing, prepend it's name to the pretend-indentation
 					lens.Str = methodtype + "  " + lens.Str
 					// }
@@ -344,7 +334,6 @@ func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (al
 					if i := strings.Index(lens.Str, "("); i > 0 { // insert some spacing between name and args
 						lens.Str = lens.Str[:i] + "  " + lens.Str[i:]
 					}
-					allsyms = append(allsyms, lens)
 				}
 			}
 		}
