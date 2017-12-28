@@ -2,6 +2,7 @@ package z
 
 import (
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -17,9 +18,18 @@ type ISettings interface {
 
 type Settings []*Setting
 
+func (me Settings) ById(id string) *Setting {
+	for _, s := range me {
+		if s.Id == id {
+			return s
+		}
+	}
+	return nil
+}
+
 func (me Settings) numCust() (n int) {
 	for _, s := range me {
-		if s.ValCfg != nil && s.ValCfg != s.ValDef {
+		if s.ValCfg != nil {
 			n++
 		}
 	}
@@ -35,11 +45,13 @@ func (me Settings) titles() (all []string) {
 }
 
 type Setting struct {
-	ID     string
-	Title  string
-	Desc   string
-	ValCfg interface{}
-	ValDef interface{}
+	Id         string
+	Title      string
+	Desc       string
+	ValCfg     interface{}
+	ValDef     interface{}
+	OnChanging func(newVal interface{}) `json:"-"`
+	OnChanged  func(oldVal interface{}) `json:"-"`
 
 	menuItem *MenuItem
 }
@@ -51,8 +63,16 @@ func (me *Setting) Val() interface{} {
 	return me.ValDef
 }
 
-func (me *Setting) ValStr() (val string) {
-	val, _ = me.Val().(string)
+func (me *Setting) valStr() (val string) {
+	v := me.Val()
+	switch vx := v.(type) {
+	case string:
+		val = vx
+	case []string:
+		val = strings.Join(vx, " ")
+	default:
+		val = Strf("%v", vx)
+	}
 	return
 }
 
@@ -81,8 +101,17 @@ func (me *Config) reload() {
 				me.timeLastLoaded = time.Now().UnixNano()
 				if Lang.Settings != nil && me.Internal != nil {
 					for _, ks := range Lang.Settings.KnownSettings() {
-						if val, ok := me.Internal[ks.ID]; ok {
-							ks.ValCfg = val
+						if val, ok := me.Internal[ks.Id]; ok {
+							switch vx := val.(type) {
+							case []interface{}:
+								strs := make([]string, len(vx))
+								for i := range vx {
+									strs[i] = vx[i].(string)
+								}
+								ks.ValCfg = strs
+							default:
+								ks.ValCfg = val
+							}
 						}
 					}
 					me.Internal = nil
@@ -111,8 +140,8 @@ func (me *Config) Save() (err error) {
 	if Lang.Settings != nil {
 		me.Internal = map[string]interface{}{}
 		for _, ks := range Lang.Settings.KnownSettings() {
-			if ks.ValCfg != nil && ks.ValCfg != ks.ValDef {
-				me.Internal[ks.ID] = ks.ValCfg
+			if ks.ValCfg != nil {
+				me.Internal[ks.Id] = ks.ValCfg
 			}
 		}
 		if len(me.Internal) == 0 {
@@ -146,6 +175,9 @@ func (me *SettingsBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	switch req.IpcID {
 	case IPCID_CFG_LIST:
 		me.onListAll(resp.withMenu())
+	case IPCID_CFG_SET:
+		args := req.IpcArgs.(map[string]interface{})
+		me.onSet(args["id"].(string), args["val"].(string), resp.withMenu())
 	case IPCID_CFG_RESETALL:
 		if num, err := me.onResetAll(); err != nil {
 			resp.ErrMsg = err.Error()
@@ -158,20 +190,62 @@ func (me *SettingsBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	return true
 }
 
+func (me *SettingsBase) onSet(cfgId string, cfgVal string, menu *MenuResp) {
+	info, setting := "changed", me.Impl.KnownSettings().ById(cfgId)
+	if setting == nil {
+		BadPanic("setting ID", cfgId)
+	}
+	var err error
+	var newval interface{}
+	if cfgVal = strings.TrimSpace(cfgVal); cfgVal == "" {
+		info = "reset"
+	} else {
+		switch setting.ValDef.(type) {
+		case string:
+			newval = cfgVal
+		case []string:
+			newval = strings.Split(cfgVal, " ")
+		case bool:
+			newval, err = strconv.ParseBool(cfgVal)
+		case int64:
+			newval, err = strconv.ParseInt(cfgVal, 10, 64)
+		case uint64:
+			newval, err = strconv.ParseUint(cfgVal, 10, 64)
+		case float64:
+			newval, err = strconv.ParseFloat(cfgVal, 64)
+		default:
+			BadPanic(Strf("setting'%s'.ValDef.(type)", setting.Id), Strf("%T", setting.ValDef))
+		}
+		if err == nil && setting.OnChanging != nil {
+			setting.OnChanging(newval)
+		}
+	}
+	if oldval := setting.ValCfg; err == nil {
+		setting.ValCfg = newval
+		if err = Prog.Cfg.Save(); err == nil {
+			if menu.NoteInfo = Strf("Setting `%s` was successfully %s.", setting.Title, info); setting.OnChanged != nil {
+				go setting.OnChanged(oldval)
+			}
+		}
+	}
+	if err != nil {
+		panic(err)
+	}
+}
+
 func (me *SettingsBase) onListAll(menu *MenuResp) {
 	menu.SubMenu = &Menu{Desc: Strf("%s — %s:", me.MenuCategory(), me.cmdListAll.Title)}
 	for _, ks := range me.Impl.KnownSettings() {
-		svdef := Strf("%v", ks.ValDef)
-		if ks.ValDef == nil || svdef == "" {
-			svdef = "(empty)"
+		svdef, svcur := "(empty)", "(default)"
+		if ks.ValDef != nil && ks.ValDef != "" {
+			svdef = Strf("%v", ks.ValDef)
 		}
-		svcur := Strf("%v", ks.ValCfg)
-		if ks.ValCfg == nil || svcur == "" {
-			svcur = "(default)"
+		if ks.ValCfg != nil && ks.ValCfg != "" {
+			svcur = Strf("%v", ks.ValCfg)
 		}
-		ks.menuItem.Hint = Strf("Default: %s  ·  Current: %s", svdef, svcur)
-		ks.menuItem.IpcArgs = map[string]interface{}{"id": ks.ID, "val": MenuItemIpcArgPrompt{Placeholder: ks.Desc,
-			Prompt: "Clear to reset.", Value: ks.ValStr()}}
+		ks.menuItem.Hint = Strf("Default: %s — Current: %s", svdef, svcur)
+		ks.menuItem.IpcArgs = map[string]interface{}{"id": ks.Id, "val": MenuItemIpcArgPrompt{Placeholder: ks.Desc,
+			Prompt: "Specify as instructed, or clear to reset.", Value: ks.valStr()}}
 		menu.SubMenu.Items = append(menu.SubMenu.Items, ks.menuItem)
 	}
 }
