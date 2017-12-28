@@ -25,6 +25,7 @@ var (
 		Extras    IExtras
 		PkgIntel  IPkgIntel
 		Caddies   []*Caddy
+		Settings  ISettings
 		Tooling   ITooling
 		Workspace IWorkspace
 	}
@@ -112,7 +113,7 @@ func Init() (err error) {
 	if Prog.Cfg.reload(); Prog.Cfg.err == nil {
 		Prog.Cfg.recall()
 		wellknowndispatchers := []iDispatcher{
-			&mainMenu{}, Lang.Workspace, Lang.SrcIntel, Lang.Diag, Lang.SrcMod, Lang.Extras, Lang.PkgIntel, Lang.Tooling,
+			Lang.SrcIntel, Lang.Workspace, Lang.Diag, Lang.SrcMod, Lang.Extras, Lang.PkgIntel, Lang.Tooling, Lang.Settings, &mainMenu{},
 		}
 		for _, disp := range wellknowndispatchers {
 			if disp != nil {
@@ -125,7 +126,7 @@ func Init() (err error) {
 		}
 
 		wellknownmenus := []IMenuItems{
-			Lang.Diag, Lang.SrcMod, Lang.PkgIntel, Lang.Tooling,
+			Lang.Diag, Lang.SrcMod, Lang.PkgIntel, Lang.Settings, Lang.Tooling,
 		}
 		for _, menu := range wellknownmenus {
 			if menu != nil {

@@ -32,7 +32,7 @@ func (*ExtrasBase) Init() {
 }
 
 func (me *ExtrasBase) dispatch(req *ipcReq, resp *ipcResp) bool {
-	resp.IpcID, resp.Extras = req.IpcID, &ExtrasResp{}
+	resp.Extras = &ExtrasResp{}
 	switch req.IpcID {
 	case IPCID_EXTRAS_INTEL_LIST:
 		me.onList(req, resp, false)
@@ -46,6 +46,7 @@ func (me *ExtrasBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 		resp.Extras = nil
 		return false
 	}
+	resp.IpcID = req.IpcID
 	return true
 }
 
