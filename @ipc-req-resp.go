@@ -102,6 +102,21 @@ func (me *ipcResp) to(req *ipcReq) {
 	}
 }
 
+func (me *ipcResp) withExtras() *ipcResp {
+	me.Extras = &ExtrasResp{}
+	return me
+}
+
+func (me *ipcResp) withMenu() *MenuResp {
+	me.Menu = &MenuResp{}
+	return me.Menu
+}
+
+func (me *ipcResp) withSrcIntel() *ipcResp {
+	me.SrcIntel = &srcIntelResp{}
+	return me
+}
+
 type EditorAction struct {
 	Title     string        `json:"title"`
 	Cmd       string        `json:"command"`

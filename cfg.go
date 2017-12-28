@@ -2,6 +2,7 @@ package z
 
 import (
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/metaleap/go-util"
@@ -126,32 +127,53 @@ func (me *Config) Save() (err error) {
 type SettingsBase struct {
 	Impl ISettings
 
-	menuItems   MenuItems
+	cmdListAll  *MenuItem
 	cmdResetAll *MenuItem
 }
 
 func (me *SettingsBase) Init() {
 	if Lang.Settings != nil {
-		me.menuItems = MenuItems{&MenuItem{Title: "Reset All", Hint: Strf("%s-Specific Settings", Lang.Title), IpcID: IPCID_CFG_RESETALL}}
-		for _, ks := range Lang.Settings.KnownSettings() {
-			ks.menuItem = &MenuItem{Title: ks.Title, Desc: ks.Desc, IpcArgs: ks.ID}
-			me.menuItems = append(me.menuItems, ks.menuItem)
+		ks := me.Impl.KnownSettings()
+		me.cmdListAll = &MenuItem{IpcID: IPCID_CFG_LIST, Title: Strf("%s-Specific", Lang.Title), Hint: Strf("%d setting(s)", len(ks)), Desc: Strf("Customize: %s", strings.Join(ks.titles(), " · "))}
+		me.cmdResetAll = &MenuItem{IpcID: IPCID_CFG_RESETALL, Title: "Reset All", Hint: Strf("%s-Specific Settings", Lang.Title)}
+		for _, s := range ks {
+			s.menuItem = &MenuItem{Title: s.Title, Desc: s.Desc, IpcID: IPCID_CFG_SET}
 		}
 	}
 }
 
 func (me *SettingsBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	switch req.IpcID {
+	case IPCID_CFG_LIST:
+		me.onListAll(resp.withMenu())
 	case IPCID_CFG_RESETALL:
 		if num, err := me.onResetAll(); err != nil {
 			resp.ErrMsg = err.Error()
 		} else {
-			resp.Menu = &MenuResp{NoteInfo: Strf("%d customized setting(s) just reset to factory defaults.", num)}
+			resp.withMenu().NoteInfo = Strf("%d customized setting(s) just reset to factory defaults.", num)
 		}
 	default:
 		return false
 	}
 	return true
+}
+
+func (me *SettingsBase) onListAll(menu *MenuResp) {
+	menu.SubMenu = &Menu{Desc: Strf("%s — %s:", me.MenuCategory(), me.cmdListAll.Title)}
+	for _, ks := range me.Impl.KnownSettings() {
+		svdef := Strf("%v", ks.ValDef)
+		if ks.ValDef == nil || svdef == "" {
+			svdef = "(empty)"
+		}
+		svcur := Strf("%v", ks.ValCfg)
+		if ks.ValCfg == nil || svcur == "" {
+			svcur = "(default)"
+		}
+		ks.menuItem.Hint = Strf("Default: %s  ·  Current: %s", svdef, svcur)
+		ks.menuItem.IpcArgs = map[string]interface{}{"id": ks.ID, "val": MenuItemIpcArgPrompt{Placeholder: ks.Desc,
+			Prompt: "Clear to reset.", Value: ks.ValStr()}}
+		menu.SubMenu.Items = append(menu.SubMenu.Items, ks.menuItem)
+	}
 }
 
 func (me *SettingsBase) onResetAll() (num int, err error) {
@@ -164,11 +186,15 @@ func (me *SettingsBase) onResetAll() (num int, err error) {
 	return
 }
 
-func (me *SettingsBase) MenuItems(*SrcLens) MenuItems {
-	if len(me.menuItems) > 0 {
-		me.menuItems[0].Desc = Strf("Forgets %d current customization(s)", Lang.Settings.KnownSettings().numCust())
+func (me *SettingsBase) MenuItems(*SrcLens) (menuItems MenuItems) {
+	if Lang.Settings != nil {
+		menuItems = MenuItems{me.cmdListAll}
+		if num := Lang.Settings.KnownSettings().numCust(); num > 0 || true {
+			me.cmdResetAll.Desc = Strf("Forgets %d current customization(s)", num)
+			menuItems = append(menuItems, me.cmdResetAll)
+		}
 	}
-	return me.menuItems
+	return
 }
 
 func (*SettingsBase) MenuCategory() string {

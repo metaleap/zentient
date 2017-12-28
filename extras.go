@@ -32,18 +32,16 @@ func (*ExtrasBase) Init() {
 }
 
 func (me *ExtrasBase) dispatch(req *ipcReq, resp *ipcResp) bool {
-	resp.Extras = &ExtrasResp{}
 	switch req.IpcID {
 	case IPCID_EXTRAS_INTEL_LIST:
-		me.onList(req, resp, false)
+		me.onList(req, resp.withExtras(), false)
 	case IPCID_EXTRAS_QUERY_LIST:
-		me.onList(req, resp, true)
+		me.onList(req, resp.withExtras(), true)
 	case IPCID_EXTRAS_INTEL_RUN:
-		me.onRun(req, resp, false)
+		me.onRun(req, resp.withExtras(), false)
 	case IPCID_EXTRAS_QUERY_RUN:
-		me.onRun(req, resp, true)
+		me.onRun(req, resp.withExtras(), true)
 	default:
-		resp.Extras = nil
 		return false
 	}
 	resp.IpcID = req.IpcID

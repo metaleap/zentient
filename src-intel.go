@@ -70,30 +70,28 @@ func (*SrcIntelBase) Init() {
 }
 
 func (me *SrcIntelBase) dispatch(req *ipcReq, resp *ipcResp) bool {
-	resp.SrcIntel = &srcIntelResp{}
 	switch req.IpcID {
 	case IPCID_SRCINTEL_HOVER:
-		me.onHover(req, resp)
+		me.onHover(req, resp.withSrcIntel())
 	case IPCID_SRCINTEL_SYMS_FILE, IPCID_SRCINTEL_SYMS_PROJ:
-		me.onSyms(req, resp)
+		me.onSyms(req, resp.withSrcIntel())
 	case IPCID_SRCINTEL_CMPL_ITEMS:
-		me.onCmplItems(req, resp)
+		me.onCmplItems(req, resp.withSrcIntel())
 	case IPCID_SRCINTEL_CMPL_DETAILS:
-		me.onCmplDetails(req, resp)
+		me.onCmplDetails(req, resp.withSrcIntel())
 	case IPCID_SRCINTEL_HIGHLIGHTS:
-		me.onHighlights(req, resp)
+		me.onHighlights(req, resp.withSrcIntel())
 	case IPCID_SRCINTEL_SIGNATURE:
-		me.onSignature(req, resp)
+		me.onSignature(req, resp.withSrcIntel())
 	case IPCID_SRCINTEL_REFERENCES:
-		me.onReferences(req, resp)
+		me.onReferences(req, resp.withSrcIntel())
 	case IPCID_SRCINTEL_DEFIMPL:
-		me.onDefinition(req, resp, me.Impl.DefImpl)
+		me.onDefinition(req, resp.withSrcIntel(), me.Impl.DefImpl)
 	case IPCID_SRCINTEL_DEFSYM:
-		me.onDefinition(req, resp, me.Impl.DefSym)
+		me.onDefinition(req, resp.withSrcIntel(), me.Impl.DefSym)
 	case IPCID_SRCINTEL_DEFTYPE:
-		me.onDefinition(req, resp, me.Impl.DefType)
+		me.onDefinition(req, resp.withSrcIntel(), me.Impl.DefType)
 	default:
-		resp.SrcIntel = nil
 		return false
 	}
 	return true
