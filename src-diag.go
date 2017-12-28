@@ -167,7 +167,6 @@ func (me *DiagBase) MenuCategory() string {
 
 func (me *DiagBase) MenuItems(srcLens *SrcLens) (menu MenuItems) {
 	me.menuItemsUpdateHint(me.knownDiags(true), me.cmdListDiags)
-	menu = append(menu, me.cmdListDiags)
 	if srcLens != nil && srcLens.FilePath != "" {
 		nonautodiags, srcfilepath := me.knownDiags(false), srcLens.FilePath
 		me.cmdRunDiagsOther.IpcArgs = srcfilepath
@@ -175,6 +174,7 @@ func (me *DiagBase) MenuItems(srcLens *SrcLens) (menu MenuItems) {
 		me.menuItemsUpdateHint(nonautodiags, me.cmdRunDiagsOther)
 		menu = append(menu, me.cmdRunDiagsOther)
 	}
+	menu = append(menu, me.cmdListDiags)
 	return
 }
 
@@ -218,9 +218,14 @@ func (me *DiagBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	return true
 }
 
+var onRunManuallyInfoNoteAlreadyShownOnceInThisSession = false
+
 func (me *DiagBase) onRunManually(filePath string, resp *ipcResp) {
 	go me.Impl.UpdateLintDiagsIfAndAsNeeded(Lang.Workspace.Files(), false, filePath)
-	resp.Menu = &MenuResp{NoteInfo: Strf("All findings (if any) from analyzing %s (and possibly related files, if any) will show up shortly and remain until invalidated.", filepath.Base(filePath))}
+	if !onRunManuallyInfoNoteAlreadyShownOnceInThisSession {
+		onRunManuallyInfoNoteAlreadyShownOnceInThisSession = true
+		resp.Menu = &MenuResp{NoteInfo: Strf("All findings (if any) from analyzing %s (and possibly related files, if any) will show up shortly and remain visible until invalidated.", filepath.Base(filePath))}
+	}
 }
 
 func (me *DiagBase) onListAll(resp *ipcResp) {
