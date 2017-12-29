@@ -64,7 +64,22 @@ func (me *Setting) Val() interface{} {
 	return me.ValDef
 }
 
-func (me *Setting) valStr() (val string) {
+func (me *Setting) ValBool() (val bool) {
+	val, _ = me.Val().(bool)
+	return
+}
+
+func (me *Setting) ValInt() (val int64) {
+	val, _ = me.Val().(int64)
+	return
+}
+
+func (me *Setting) ValUInt() (val uint64) {
+	val, _ = me.Val().(uint64)
+	return
+}
+
+func (me *Setting) ValStr() (val string) {
 	v := me.Val()
 	switch vx := v.(type) {
 	case string:
@@ -74,6 +89,11 @@ func (me *Setting) valStr() (val string) {
 	default:
 		val = Strf("%v", vx)
 	}
+	return
+}
+
+func (me *Setting) ValStrs() (val []string) {
+	val, _ = me.Val().([]string)
 	return
 }
 
@@ -110,10 +130,21 @@ func (me *Config) reload() {
 									strs[i] = vx[i].(string)
 								}
 								ks.ValCfg = strs
+							case float64:
+								switch ks.ValDef.(type) {
+								case int64:
+									ks.ValCfg = (int64)(vx)
+								case uint64:
+									ks.ValCfg = (uint64)(vx)
+								default:
+									ks.ValCfg = vx
+								}
 							default:
 								ks.ValCfg = val
 							}
-							ks.OnReloaded()
+							if ks.OnReloaded != nil {
+								ks.OnReloaded()
+							}
 						}
 					}
 					me.Internal = nil
@@ -165,8 +196,9 @@ type SettingsBase struct {
 func (me *SettingsBase) Init() {
 	if Lang.Settings != nil {
 		ks := me.Impl.KnownSettings()
-		me.cmdListAll = &MenuItem{IpcID: IPCID_CFG_LIST, Title: Strf("%s-Specific", Lang.Title), Hint: Strf("%d setting(s)", len(ks)), Desc: Strf("Customize: %s", strings.Join(ks.titles(), " · "))}
+		me.cmdListAll = &MenuItem{IpcID: IPCID_CFG_LIST, Title: Strf("%s-Specific", Lang.Title), Hint: Strf("%d setting(s)", len(ks)), Desc: Strf("Customize ➜ %s", strings.Join(ks.titles(), " · "))}
 		me.cmdResetAll = &MenuItem{IpcID: IPCID_CFG_RESETALL, Title: "Reset All", Hint: Strf("%s-Specific Settings", Lang.Title)}
+		me.cmdResetAll.Confirm = Strf("Are you sure you want to %s %s?", me.cmdResetAll.Title, me.cmdResetAll.Hint)
 		for _, s := range ks {
 			s.menuItem = &MenuItem{Title: s.Title, Desc: s.Desc, IpcID: IPCID_CFG_SET}
 		}
@@ -247,7 +279,7 @@ func (me *SettingsBase) onListAll(menu *MenuResp) {
 		}
 		ks.menuItem.Hint = Strf("Default: %s — Current: %s", svdef, svcur)
 		ks.menuItem.IpcArgs = map[string]interface{}{"id": ks.Id, "val": MenuItemIpcArgPrompt{Placeholder: ks.Desc,
-			Prompt: "Specify as instructed, or clear to reset.", Value: ks.valStr()}}
+			Prompt: "Specify as instructed, or clear to reset.", Value: ks.ValStr()}}
 		menu.SubMenu.Items = append(menu.SubMenu.Items, ks.menuItem)
 	}
 }
@@ -265,7 +297,7 @@ func (me *SettingsBase) onResetAll() (num int, err error) {
 func (me *SettingsBase) MenuItems(*SrcLens) (menuItems MenuItems) {
 	if Lang.Settings != nil {
 		menuItems = MenuItems{me.cmdListAll}
-		if num := Lang.Settings.KnownSettings().numCust(); num > 0 || true {
+		if num := Lang.Settings.KnownSettings().numCust(); num > 0 {
 			me.cmdResetAll.Desc = Strf("Forgets %d current customization(s)", num)
 			menuItems = append(menuItems, me.cmdResetAll)
 		}

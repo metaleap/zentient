@@ -215,19 +215,20 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 }
 
 func (me *goSrcIntel) Signature(srcLens *z.SrcLens) (sig *z.SrcIntelSigHelp) {
-	sig = &z.SrcIntelSigHelp{Signatures: []z.SrcIntelSigInfo{z.SrcIntelSigInfo{}}}
+	sig = &z.SrcIntelSigHelp{Signatures: []z.SrcIntelSigInfo{{}}}
 	sig0 := &sig.Signatures[0]
 	if !(tools.guru.Installed && (tools.gogetdoc.Installed || tools.godef.Installed)) {
 		sig0.Label, sig0.Documentation.Value = z.ToolsMsgGone("guru or one of gogetdoc/godef"), z.ToolsMsgMore("(tool name)")
 		return
 	}
-	pos, posmax := srcLens.ByteOffsetForPosWithRuneOffset(srcLens.Pos), -1
+	pos := srcLens.ByteOffsetForPosWithRuneOffset(srcLens.Pos)
 	gw, err := udevgo.QueryWhat_Guru(srcLens.FilePath, srcLens.Txt, ustr.FromInt(pos))
 	if err != nil {
 		sig0.Label, sig0.Documentation.Value = "Error running guru", err.Error()
 		return
 	}
-	pos, posmax = -1, pos
+	posmax := pos
+	pos = -1
 	for _, ge := range gw.Enclosing {
 		if strings.HasPrefix(ge.Description, "function call") {
 			pos = ge.Start

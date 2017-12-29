@@ -18,30 +18,30 @@ type goSettings struct {
 
 	allSettings      z.Settings
 	cfgGuruScopeExcl *z.Setting
+	cfgGuruScopeMin  *z.Setting
 }
 
 func (me *goSettings) onChangedGuruScopeExcl(oldVal interface{}) {
-	mod, guruscopeexclpkgs := false, udevgo.GuruScopeExclPkgs
 	if oldval, _ := oldVal.([]string); len(oldval) > 0 {
-		mod = true
 		for _, oldpat := range oldval {
-			guruscopeexclpkgs[oldpat] = false
-			delete(guruscopeexclpkgs, oldpat)
+			udevgo.GuruScopeExclPkgs[oldpat] = false
+			delete(udevgo.GuruScopeExclPkgs, oldpat)
 		}
 	}
 	if newval, _ := me.cfgGuruScopeExcl.ValCfg.([]string); len(newval) > 0 {
 		for _, pat := range newval {
-			mod, guruscopeexclpkgs[pat] = true, true
+			udevgo.GuruScopeExclPkgs[pat] = true
 		}
-	}
-	if mod {
-		udevgo.GuruScopeExclPkgs = guruscopeexclpkgs
 	}
 }
 
 func (me *goSettings) onReloadedGuruScopeExcl() {
 	me.onChangedGuruScopeExcl(nil)
 }
+
+/*
+github.com/golamb/... github.com/capnproto/... github.com/robertkrimen/... github.com/metaleap/go-opengl/... github.com/metro-cloud-opc/... github.com/arangodb/... github.com/waigani/... github.com/metaleap/go-misctools/... github.com/remyoudompheng/... github.com/jackc/... github.com/metaleap/go-geo-names/... fake.git.metrosystems.net/... github.com/go-forks/... github.com/coffeemug/... github.com/golang/dep/... github.com/sirupsen/... labix.org/... sourcegraph.com/... github.com/juju/... github.com/metaleap/go-util/... github.com/glycerine/... github.com/metaleap/gonad-coreimp/...
+*/
 
 func (*goSettings) onChangingGuruScopeExcl(newVal interface{}) {
 	if patterns := newVal.([]string); udevgo.PkgsByImP == nil {
@@ -69,9 +69,10 @@ func (*goSettings) onChangingGuruScopeExcl(newVal interface{}) {
 }
 
 func (me *goSettings) onPreInit() {
-	me.cfgGuruScopeExcl = &z.Setting{Id: "cfgGuruScopeExcl", ValDef: []string{}, Title: "Guru Exclusions", Desc: "Package patterns (`some/pkg/path/...`) to always exclude from guru `-scope`, space-delimited"}
+	me.cfgGuruScopeExcl = &z.Setting{Id: "cfgGuruScopeExcl", ValDef: []string{}, Title: "Guru Pointer-Analysis: Scopes Exclusions", Desc: "Package patterns (`some/pkg/path/...`) to always exclude from guru `-scope`, space-delimited"}
 	me.cfgGuruScopeExcl.OnChanging, me.cfgGuruScopeExcl.OnChanged, me.cfgGuruScopeExcl.OnReloaded = me.onChangingGuruScopeExcl, me.onChangedGuruScopeExcl, me.onReloadedGuruScopeExcl
-	me.allSettings = []*z.Setting{me.cfgGuruScopeExcl}
+	me.cfgGuruScopeMin = &z.Setting{Id: "cfgGuruScopeMin", ValDef: false, Title: "Guru Pointer-Analysis: Minimal Scopes", Desc: "If `true`, CodeIntel queries scope to current-and-subordinate packages instead of workspace"}
+	me.allSettings = []*z.Setting{me.cfgGuruScopeMin, me.cfgGuruScopeExcl}
 }
 
 func (me *goSettings) KnownSettings() z.Settings {

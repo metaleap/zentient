@@ -1,6 +1,8 @@
 package zgo
 
 import (
+	"path/filepath"
+
 	"github.com/metaleap/go-util/dev"
 	"github.com/metaleap/go-util/dev/go"
 	"github.com/metaleap/go-util/str"
@@ -28,16 +30,30 @@ func (me *goExtras) runIntel_Guru(guruCmd string, srcLens *z.SrcLens, arg string
 	if !tools.guru.Installed {
 		z.ToolGonePanic("guru")
 	}
-	var err error
 	bpos := srcLens.ByteOffsetForPosWithRuneOffset(srcLens.Pos)
 	bp1, bp2 := ustr.FromInt(bpos), ""
 	if srcLens.Range != nil {
 		bpos1, bpos2 := srcLens.ByteOffsetForPosWithRuneOffset(&srcLens.Range.Start), srcLens.ByteOffsetForPosWithRuneOffset(&srcLens.Range.End)
 		bp1, bp2 = ustr.FromInt(bpos1), ustr.FromInt(bpos2)
 	}
+	guruscope := ""
+	if settings.cfgGuruScopeMin.ValBool() {
+		pkgs, shouldrefresh := udevgo.PkgsForFiles(srcLens.FilePath)
+		for _, pkg := range pkgs {
+			guruscope = pkg.ImportPath + "/..."
+			break
+		}
+		if guruscope == "" {
+			go caddyRunRefreshPkgs()
+			panic("Not part of a Go package: " + filepath.Base(srcLens.FilePath))
+		} else if shouldrefresh {
+			go caddyRunRefreshPkgs()
+		}
+	}
+	var err error
 	switch guruCmd {
 	case "callees":
-		if gcs, e := udevgo.QueryCallees_Guru(srcLens.FilePath, srcLens.Txt, bp1, bp2); e != nil {
+		if gcs, e := udevgo.QueryCallees_Guru(srcLens.FilePath, srcLens.Txt, bp1, bp2, guruscope); e != nil {
 			err = e
 		} else {
 			resp.Refs = make(z.SrcLenses, 0, len(gcs.Callees))
