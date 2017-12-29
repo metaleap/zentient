@@ -43,11 +43,11 @@ func (me *goExtras) runIntel_Guru(guruCmd string, srcLens *z.SrcLens, arg string
 			guruscope = pkg.ImportPath + "/..."
 			break
 		}
-		if guruscope == "" {
+		if nope := guruscope == ""; nope || shouldrefresh {
 			go caddyRunRefreshPkgs()
-			panic("Not part of a Go package: " + filepath.Base(srcLens.FilePath))
-		} else if shouldrefresh {
-			go caddyRunRefreshPkgs()
+			if nope {
+				panic("Not part of a Go package: " + filepath.Base(srcLens.FilePath))
+			}
 		}
 	}
 	var err error
