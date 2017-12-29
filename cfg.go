@@ -52,6 +52,7 @@ type Setting struct {
 	ValDef     interface{}
 	OnChanging func(newVal interface{}) `json:"-"`
 	OnChanged  func(oldVal interface{}) `json:"-"`
+	OnReloaded func()                   `json:"-"`
 
 	menuItem *MenuItem
 }
@@ -112,6 +113,7 @@ func (me *Config) reload() {
 							default:
 								ks.ValCfg = val
 							}
+							ks.OnReloaded()
 						}
 					}
 					me.Internal = nil

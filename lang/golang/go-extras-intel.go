@@ -3,7 +3,6 @@ package zgo
 import (
 	"github.com/metaleap/go-util/dev"
 	"github.com/metaleap/go-util/dev/go"
-	"github.com/metaleap/go-util/slice"
 	"github.com/metaleap/go-util/str"
 	"github.com/metaleap/zentient"
 )
@@ -54,14 +53,11 @@ func (me *goExtras) runIntel_Guru(guruCmd string, srcLens *z.SrcLens, arg string
 	if err != nil {
 		errmsg, chkmsg := err.Error(), "guru: couldn't load packages due to errors: "
 		if cml, i := len(chkmsg), ustr.Idx(errmsg, chkmsg); i >= 0 {
-			/*guru: couldn't load packages due to errors: github.com/metaleap/go-opengl/cmd/gogl-minimal-app-glfw3, github.com/metaleap/go-opengl/util, github.com/metaleap/go-opengl/cmd/opengl-minimal-app-glfw3 and 7 more*/
 			oldnumscopeexcl, errpkgimppaths := len(udevgo.GuruScopeExclPkgs), ustr.Split(errmsg[i+cml:], ", ")
 			if len(errpkgimppaths) > 0 {
 				errpkgimppaths[len(errpkgimppaths)-1] = ustr.Before(errpkgimppaths[len(errpkgimppaths)-1], " ", false)
 				for _, epkg := range errpkgimppaths {
-					if !uslice.StrHas(udevgo.GuruScopeExclPkgs, epkg) {
-						udevgo.GuruScopeExclPkgs = append(udevgo.GuruScopeExclPkgs, epkg)
-					}
+					udevgo.GuruScopeExclPkgs[epkg] = true
 				}
 				if len(udevgo.GuruScopeExclPkgs) > oldnumscopeexcl {
 					go z.SendNotificationMessageToClient(z.DIAG_SEV_WARN, z.Strf("guru complained about %d packages, re-running with those excluded: %v", len(errpkgimppaths), errpkgimppaths))
