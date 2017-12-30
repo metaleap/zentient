@@ -18,6 +18,7 @@ func (me *PkgIntelBase) Init() {
 func (me *PkgIntelBase) IpcID(_ *ListFilter) IpcIDs {
 	return IPCID_MENUS_PKGS
 }
+
 func (me *PkgIntelBase) ObjSnapPrefix() string {
 	return Lang.ID + ".pkgIntel."
 }

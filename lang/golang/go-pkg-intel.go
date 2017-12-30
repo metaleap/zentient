@@ -176,8 +176,8 @@ func (me *goPkgIntel) ListItemToMenuItem(p z.IListItem) (item *z.MenuItem) {
 	descsmighthavepaths := false
 	if pkg, _ := p.(*udevgo.Pkg); pkg != nil {
 		delim, hints := " · ", []string{}
-		if pkg.LoC > 0 {
-			hints = append(hints, z.Strf("%d LoC", pkg.LoC))
+		if pkg.ApproxLoC > 0 {
+			hints = append(hints, z.Strf("~%d LoC", pkg.ApproxLoC))
 		}
 		item = &z.MenuItem{Category: pkg.Name, Desc: pkg.Doc, Title: pkg.ImportPath}
 		if item.Category == "" {
@@ -262,7 +262,10 @@ func (me *goPkgIntel) Filters() []*z.ListFilter {
 
 func (me *goPkgIntel) ObjSnap(pkgDir string) interface{} {
 	if udevgo.PkgsByDir != nil {
-		return udevgo.PkgsByDir[pkgDir]
+		if pkg := udevgo.PkgsByDir[pkgDir]; pkg != nil {
+			pkg.CountLoC()
+			return pkg
+		}
 	}
 	return nil
 }

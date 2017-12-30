@@ -63,7 +63,7 @@ type ToolingBase struct {
 func (me *ToolingBase) Init() {
 	me.cmdListAll = &MenuItem{
 		IpcID: IPCID_MENUS_TOOLS,
-		Title: Strf("List Known & Supported %s Tools", Lang.Title),
+		Title: Strf("Known %s Tools", Lang.Title),
 		Desc:  Strf("All currently supported %s tools and their installation info", Lang.Title),
 		Hint:  Strf("(%d of %d installed)", me.Impl.NumInst(), me.Impl.NumTotal()),
 	}

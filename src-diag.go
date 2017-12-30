@@ -224,7 +224,7 @@ func (me *DiagBase) onRunManually(filePath string, resp *ipcResp) {
 	go me.Impl.UpdateLintDiagsIfAndAsNeeded(Lang.Workspace.Files(), false, filePath)
 	if !onRunManuallyInfoNoteAlreadyShownOnceInThisSession {
 		onRunManuallyInfoNoteAlreadyShownOnceInThisSession = true
-		resp.Menu = &MenuResp{NoteInfo: Strf("All findings (if any) from analyzing %s (and possibly related files, if any) will show up shortly and remain visible until invalidated.", filepath.Base(filePath))}
+		resp.Menu = &MenuResp{NoteInfo: Strf("All findings (if any) from analyzing %s (and possibly related files, depending on the tool) will show up shortly and remain visible until invalidated.", filepath.Base(filePath))}
 	}
 }
 
