@@ -112,7 +112,7 @@ func (me *goSrcIntel) ComplDetails(srcLens *z.SrcLens, itemText string) (itemDoc
 	}
 	decl, spos := "", ustr.FromInt(pos)
 	if tools.gogetdoc.Installed {
-		ggd := udevgo.Query_Gogetdoc(srcLens.FilePath, srcLens.Txt, spos, true)
+		ggd := udevgo.Query_Gogetdoc(srcLens.FilePath, srcLens.Txt, spos, true, true)
 		if decl = ggd.Decl; decl != "" {
 			decl = me.goFuncDeclLineBreaks(udevgo.PkgImpPathsToNamesInLn(decl, filepath.Dir(srcLens.FilePath)), 23)
 		}
@@ -128,14 +128,9 @@ func (me *goSrcIntel) ComplDetails(srcLens *z.SrcLens, itemText string) (itemDoc
 	if decl == "" && tools.godef.Installed {
 		if decl = udevgo.QueryDefDecl_GoDef(srcLens.FilePath, srcLens.Txt, spos); decl != "" {
 			decl = me.goFuncDeclLineBreaks(decl, 23)
-		} else {
-			decl = "?"
 		}
 	}
 	itemDoc.Detail = me.goDeclSnip(decl)
-	if itemDoc.Documentation.Value == "" {
-		itemDoc.Documentation.Value = " " // z.Strf("(No docs for `%s` — at least if inserted here)", ggd.Name)
-	}
 	return
 }
 
@@ -168,7 +163,7 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 	if !tools.gogetdoc.Installed {
 		hovs = append(hovs, z.InfoTip{Value: tools.gogetdoc.NotInstalledMessage()})
 	} else {
-		if ggd = udevgo.Query_Gogetdoc(srcLens.FilePath, srcLens.Txt, offset, false); ggd != nil {
+		if ggd = udevgo.Query_Gogetdoc(srcLens.FilePath, srcLens.Txt, offset, false, true); ggd != nil {
 			curpkgdir := filepath.Dir(srcLens.FilePath)
 			ispkglocal := strings.HasPrefix(ggd.Pos, curpkgdir)
 			if ggd.Err != "" {
@@ -254,7 +249,7 @@ func (me *goSrcIntel) Signature(srcLens *z.SrcLens) (sig *z.SrcIntelSigHelp) {
 		} else {
 			decl, spos := "", ustr.FromInt(poss[len(poss)-1])
 			if tools.gogetdoc.Installed {
-				ggd := udevgo.Query_Gogetdoc(srcLens.FilePath, srcLens.Txt, spos, true)
+				ggd := udevgo.Query_Gogetdoc(srcLens.FilePath, srcLens.Txt, spos, true, true)
 				if decl = ggd.Decl; decl != "" {
 					decl = udevgo.PkgImpPathsToNamesInLn(decl, filepath.Dir(srcLens.FilePath))
 				}
