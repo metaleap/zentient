@@ -38,6 +38,15 @@ func (me WorkspaceFiles) Ensure(fpath string) (file *WorkspaceFile) {
 	return
 }
 
+func (me WorkspaceFiles) AnyBuildDiags() (has bool) {
+	for _, f := range me {
+		if has = len(f.Diags.Build.Items) > 0; has {
+			break
+		}
+	}
+	return
+}
+
 func (me WorkspaceFiles) HasBuildDiags(filePath string) (has bool) {
 	if f, _ := me[filePath]; f != nil {
 		has = len(f.Diags.Build.Items) > 0

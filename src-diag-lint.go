@@ -43,11 +43,14 @@ func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(workspaceFiles WorkspaceFiles, 
 
 func (me *DiagBase) updateLintDiags(workspaceFiles WorkspaceFiles, diagTools Tools, autos bool, filePaths []string) (diagitems DiagItems) {
 	jobs := me.Impl.OnUpdateLintDiags(workspaceFiles, diagTools, filePaths)
-	if numjobs := len(jobs); numjobs > 0 {
+	if numjobs, nonautos := len(jobs), !autos; numjobs > 0 {
 		numdone, await, descs := 0, make(chan *DiagItem), make([]string, numjobs)
 		for _, job := range jobs { // separate loop from the go-routines below to prevent concurrent-map-read+write as forgetPrevDiags() calls workspaceFiles.ensure()
 			job.WorkspaceFiles = workspaceFiles
 			job.forgetPrevDiags(diagTools, autos, workspaceFiles)
+		}
+		if me.send(workspaceFiles, false); nonautos {
+			onRunManuallyAlreadyCurrentlyRunning = true
 		}
 		for i, job := range jobs {
 			job.lintChan, job.timeStarted = await, time.Now()
@@ -66,6 +69,9 @@ func (me *DiagBase) updateLintDiags(workspaceFiles WorkspaceFiles, diagTools Too
 			descs[i] += Strf(" \n\t\t%s", job.timeTaken)
 		}
 		go send(&ipcResp{IpcID: IPCID_SRCDIAG_FINISHED, ObjSnapshot: descs})
+		if nonautos {
+			onRunManuallyAlreadyCurrentlyRunning = false
+		}
 	}
 	return
 }

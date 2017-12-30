@@ -74,7 +74,7 @@ func serveIncomingReq(jsonreq string) {
 
 	// err only covers: either resp couldn't be json-encoded, or stdout write/flush problem:
 	// both would indicate bigger problems --- still recover()ed in Serve(), but program-ending.
-	// any other kind of error, above ipcDecodeReqAndRespond will record into resp.ErrMsg to report it back to the client and the program stays running
+	// any other kind of error, above ipcDecodeReqAndRespond call will record into resp.ErrMsg to report it back to the client and the program stays running
 	if err := send(resp); err != nil {
 		panic(err)
 	}
