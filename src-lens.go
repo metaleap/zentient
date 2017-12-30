@@ -34,9 +34,11 @@ type SrcRange struct {
 type SrcLenses []*SrcLens
 
 func (me *SrcLenses) AddFrom(srcRefLoc *udev.SrcMsg, fallbackFilePath func() string) (lens *SrcLens) {
-	lens = &SrcLens{}
-	lens.SetFilePathAndPosOrRangeFrom(srcRefLoc, fallbackFilePath)
-	(*me) = append(*me, lens)
+	if srcRefLoc != nil {
+		lens = &SrcLens{}
+		lens.SetFilePathAndPosOrRangeFrom(srcRefLoc, fallbackFilePath)
+		(*me) = append(*me, lens)
+	}
 	return
 }
 

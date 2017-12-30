@@ -18,13 +18,13 @@ type goExtras struct {
 	z.ExtrasBase
 }
 
-func (me *goExtras) ListIntelExtras() (all []z.ExtrasItem) {
-	all = []z.ExtrasItem{xIntelGuruCallees, xIntelGuruCallers, xIntelGuruCallstack, xIntelGuruFreevars, xIntelGuruErrtypes, xIntelGuruPointees, xIntelGuruChanpeers}
+func (me *goExtras) ListIntelExtras() (all []*z.ExtrasItem) {
+	all = []*z.ExtrasItem{&xIntelGuruCallers, &xIntelGuruCallees, &xIntelGuruCallstack, &xIntelGuruFreevars, &xIntelGuruErrtypes, &xIntelGuruPointees, &xIntelGuruChanpeers}
 	return
 }
 
-func (me *goExtras) ListQueryExtras() (all []z.ExtrasItem) {
-	all = []z.ExtrasItem{xQuerierGoDoc, xQuerierStructlayout}
+func (me *goExtras) ListQueryExtras() (all []*z.ExtrasItem) {
+	all = []*z.ExtrasItem{&xQuerierGoDoc, &xQuerierStructlayout}
 	return
 }
 

@@ -40,7 +40,7 @@ func (me *goExtras) runQuery_StructLayout(srcLens *z.SrcLens, arg string, resp *
 			for _, ln := range ustr.Split(cmdout, "\n") {
 				if sfield, ssize := ustr.BreakOnLast(ln, ":"); sfield != "" {
 					sfname, sftype := ustr.BreakOn(sfield, " ")
-					resp.Items = append(resp.Items, z.ExtrasItem{Label: ustr.FirstNonEmpty(sfname, "—"), Desc: sftype, Detail: ssize})
+					resp.Items = append(resp.Items, &z.ExtrasItem{Label: ustr.FirstNonEmpty(sfname, "—"), Desc: sftype, Detail: ssize})
 				}
 			}
 		}
@@ -70,5 +70,5 @@ func (me *goExtras) runQuery_GoDoc(srcLens *z.SrcLens, arg string, resp *z.Extra
 	resp.Desc = z.Strf("Results of `go doc %s`:", ustr.Join(cmd, " "))
 	resp.Warns = uslice.StrFiltered(uslice.StrMap(ustr.Split(cmderr, "\n"), ustr.Trim),
 		func(s string) bool { return !ustr.Pref(s, "exit status ") })
-	resp.InfoTips = append(resp.InfoTips, z.InfoTip{Value: ustr.Trim(cmdout)})
+	resp.Info = append(resp.Info, z.InfoTip{Value: ustr.Trim(cmdout)})
 }

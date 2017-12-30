@@ -3,8 +3,8 @@ package z
 type IExtras interface {
 	iDispatcher
 
-	ListIntelExtras() []ExtrasItem
-	ListQueryExtras() []ExtrasItem
+	ListIntelExtras() []*ExtrasItem
+	ListQueryExtras() []*ExtrasItem
 	RunIntelExtra(*SrcLens, string, string, *ExtrasResp)
 	RunQueryExtra(*SrcLens, string, string, *ExtrasResp)
 }
@@ -15,13 +15,14 @@ type ExtrasItem struct {
 	Desc     string `json:"description"`
 	Detail   string `json:"detail,omitempty"`
 	QueryArg string `json:"arg,omitempty"`
+	FilePos  string `json:"fPos,omitempty"`
 }
 
 type ExtrasResp struct {
 	SrcIntels
-	Items []ExtrasItem `json:"items,omitempty"`
-	Warns []string     `json:"warns,omitempty"`
-	Desc  string       `json:"desc,omitempty"`
+	Items []*ExtrasItem `json:",omitempty"`
+	Warns []string      `json:",omitempty"`
+	Desc  string        `json:",omitempty"`
 }
 
 type ExtrasBase struct {
@@ -55,7 +56,7 @@ func (me *ExtrasBase) onList(req *ipcReq, resp *ipcResp, isQuery bool) {
 	}
 	resp.Extras.Items = list()
 	for i := range resp.Extras.Items {
-		if item := &resp.Extras.Items[i]; item.Desc == "" {
+		if item := resp.Extras.Items[i]; item.Desc == "" {
 			if req.SrcLens.Str != "" {
 				item.Desc = req.SrcLens.Str
 			} else {

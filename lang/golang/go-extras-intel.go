@@ -53,14 +53,36 @@ func (me *goExtras) runIntel_Guru(guruCmd string, srcLens *z.SrcLens, arg string
 	var err error
 	switch guruCmd {
 	case "callees":
+		resp.Desc = xIntelGuruCallees.Detail
 		if gcs, e := udevgo.QueryCallees_Guru(srcLens.FilePath, srcLens.Txt, bp1, bp2, guruscope); e != nil {
 			err = e
 		} else {
 			resp.Refs = make(z.SrcLenses, 0, len(gcs.Callees))
 			for _, gc := range gcs.Callees {
-				if srcref := udev.SrcMsgFromLn(gc.Pos); srcref != nil {
-					resp.Refs.AddFrom(srcref, nil)
-				}
+				resp.Refs.AddFrom(udev.SrcMsgFromLn(gc.Pos), nil)
+			}
+		}
+	case "callers":
+		resp.Desc = xIntelGuruCallers.Detail
+		if gcs, e := udevgo.QueryCallers_Guru(srcLens.FilePath, srcLens.Txt, bp1, bp2, guruscope); e != nil {
+			err = e
+		} else {
+			resp.Refs = make(z.SrcLenses, 0, len(gcs))
+			for _, gc := range gcs {
+				resp.Refs.AddFrom(udev.SrcMsgFromLn(gc.Pos), nil)
+			}
+		}
+	case "callstack":
+		resp.Desc = xIntelGuruCallstack.Detail
+		curpkgdir := filepath.Dir(srcLens.FilePath)
+		if gcs, e := udevgo.QueryCallstack_Guru(srcLens.FilePath, srcLens.Txt, bp1, bp2, guruscope); e != nil {
+			err = e
+		} else {
+			resp.Desc = udevgo.PkgImpPathsToNamesInLn(gcs.Target, curpkgdir) + " ➜ " + xIntelGuruCallstack.Detail
+			resp.Items = make([]*z.ExtrasItem, 0, len(gcs.Callers))
+			for _, gc := range gcs.Callers {
+				resp.Items = append([]*z.ExtrasItem{&z.ExtrasItem{Desc: gc.Desc, Label: udevgo.PkgImpPathsToNamesInLn(gc.Caller, curpkgdir),
+					Detail: z.Lang.Workspace.PrettyPath(gc.Pos), FilePos: gc.Pos}}, resp.Items...)
 			}
 		}
 	default:

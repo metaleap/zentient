@@ -20,14 +20,14 @@ type ISrcIntel interface {
 }
 
 type SrcIntels struct {
-	InfoTips []InfoTip `json:"tips,omitempty"`
-	Refs     SrcLenses `json:"refs,omitempty"`
+	Info []InfoTip `json:",omitempty"`
+	Refs SrcLenses `json:",omitempty"`
 }
 
 type srcIntelResp struct {
 	SrcIntels
-	Signature *SrcIntelSigHelp `json:"sig,omitempty"`
-	Cmpl      SrcIntelCompls   `json:"cmpl,omitempty"`
+	Sig  *SrcIntelSigHelp `json:",omitempty"`
+	Cmpl SrcIntelCompls   `json:",omitempty"`
 }
 
 type SrcIntelCompl struct {
@@ -138,7 +138,7 @@ func (me *SrcIntelBase) onHighlights(req *ipcReq, resp *ipcResp) {
 }
 
 func (me *SrcIntelBase) onHover(req *ipcReq, resp *ipcResp) {
-	resp.SrcIntel.InfoTips = me.Impl.Hovers(req.SrcLens)
+	resp.SrcIntel.Info = me.Impl.Hovers(req.SrcLens)
 }
 
 func (me *SrcIntelBase) onReferences(req *ipcReq, resp *ipcResp) {
@@ -152,10 +152,10 @@ func (me *SrcIntelBase) onReferences(req *ipcReq, resp *ipcResp) {
 }
 
 func (me *SrcIntelBase) onSignature(req *ipcReq, resp *ipcResp) {
-	if resp.SrcIntel.Signature = me.Impl.Signature(req.SrcLens); resp.SrcIntel.Signature != nil {
-		for i := range resp.SrcIntel.Signature.Signatures { // vsc can't handle `null` for `parameters` but can handle `[]`
-			if resp.SrcIntel.Signature.Signatures[i].Documentation.IsTrusted = true; resp.SrcIntel.Signature.Signatures[i].Parameters == nil {
-				resp.SrcIntel.Signature.Signatures[i].Parameters = []SrcIntelSigParam{}
+	if resp.SrcIntel.Sig = me.Impl.Signature(req.SrcLens); resp.SrcIntel.Sig != nil {
+		for i := range resp.SrcIntel.Sig.Signatures { // vsc can't handle `null` for `parameters` but can handle `[]`
+			if resp.SrcIntel.Sig.Signatures[i].Documentation.IsTrusted = true; resp.SrcIntel.Sig.Signatures[i].Parameters == nil {
+				resp.SrcIntel.Sig.Signatures[i].Parameters = []SrcIntelSigParam{}
 			}
 		}
 	}

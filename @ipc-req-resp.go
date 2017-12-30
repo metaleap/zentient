@@ -55,16 +55,16 @@ func ipcDecodeReqAndRespond(jsonreq string) *ipcResp {
 }
 
 type ipcResp struct {
-	ReqID  int64  `json:"ri,omitempty"`
-	ErrMsg string `json:"e,omitempty"`
+	IpcID  IpcIDs `json:"i,omitempty"`
+	ReqID  int64  `json:"r,omitempty"`
+	ErrMsg string `json:"err,omitempty"`
 
-	IpcID       IpcIDs         `json:"ii,omitempty"`
-	Menu        *MenuResp      `json:"menu,omitempty"`
-	Extras      *ExtrasResp    `json:"extras,omitempty"`
-	SrcIntel    *srcIntelResp  `json:"srcIntel,omitempty"`
+	SrcIntel    *srcIntelResp  `json:"sI,omitempty"`
+	SrcDiags    *DiagResp      `json:"srcDiags,omitempty"`
 	SrcMods     SrcLenses      `json:"srcMods,omitempty"`
 	SrcActions  []EditorAction `json:"srcActions,omitempty"`
-	SrcDiags    *DiagResp      `json:"srcDiags,omitempty"`
+	Extras      *ExtrasResp    `json:"extras,omitempty"`
+	Menu        *MenuResp      `json:"menu,omitempty"`
 	CaddyUpdate *Caddy         `json:"caddy,omitempty"`
 	ObjSnapshot interface{}    `json:"obj,omitempty"`
 }
