@@ -1,10 +1,14 @@
 package z
 
+import (
+	"sort"
+)
+
 type ISrcIntel interface {
 	iDispatcher
 
 	ComplDetails(*SrcLens, string) *SrcIntelCompl
-	ComplItems(*SrcLens) []*SrcIntelCompl
+	ComplItems(*SrcLens) SrcIntelCompls
 	DefSym(*SrcLens) SrcLenses
 	DefType(*SrcLens) SrcLenses
 	DefImpl(*SrcLens) SrcLenses
@@ -23,7 +27,7 @@ type SrcIntels struct {
 type srcIntelResp struct {
 	SrcIntels
 	Signature *SrcIntelSigHelp `json:"sig,omitempty"`
-	Cmpl      []*SrcIntelCompl `json:"cmpl,omitempty"`
+	Cmpl      SrcIntelCompls   `json:"cmpl,omitempty"`
 }
 
 type SrcIntelCompl struct {
@@ -35,10 +39,14 @@ type SrcIntelCompl struct {
 	FilterText    string       `json:"filterText,omitempty"`
 	InsertText    string       `json:"insertText,omitempty"`
 	CommitChars   []string     `json:"commitCharacters,omitempty"`
-	// Range               Range      `json:"Range,omitempty"`
-	// AdditionalTextEdits []TextEdit `json:"additionalTextEdits,omitempty"`
-	// Command             Command    `json:"command,omitempty"`
+	SortPrio      int          `json:"-"`
 }
+
+type SrcIntelCompls []*SrcIntelCompl
+
+func (me SrcIntelCompls) Len() int               { return len(me) }
+func (me SrcIntelCompls) Swap(i int, j int)      { me[i], me[j] = me[j], me[i] }
+func (me SrcIntelCompls) Less(i int, j int) bool { return me[i].SortPrio < me[j].SortPrio }
 
 type SrcIntelDoc struct {
 	Value     string `json:"value,omitempty"`
@@ -99,12 +107,24 @@ func (me *SrcIntelBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 
 func (me *SrcIntelBase) onCmplItems(req *ipcReq, resp *ipcResp) {
 	resp.SrcIntel.Cmpl = me.Impl.ComplItems(req.SrcLens)
+	var shouldsort bool
+	for _, c := range resp.SrcIntel.Cmpl {
+		if shouldsort = c.SortPrio != 0; shouldsort {
+			break
+		}
+	}
+	if shouldsort {
+		sort.Sort(resp.SrcIntel.Cmpl)
+		for i, c := range resp.SrcIntel.Cmpl {
+			c.SortText = Strf("%03d", i)
+		}
+	}
 }
 
 func (me *SrcIntelBase) onCmplDetails(req *ipcReq, resp *ipcResp) {
 	itemtext, _ := req.IpcArgs.(string)
 	if cmpl := me.Impl.ComplDetails(req.SrcLens, itemtext); cmpl != nil {
-		resp.SrcIntel.Cmpl = []*SrcIntelCompl{cmpl}
+		resp.SrcIntel.Cmpl = SrcIntelCompls{cmpl}
 	}
 }
 
@@ -149,7 +169,7 @@ func (me *SrcIntelBase) onSyms(req *ipcReq, resp *ipcResp) {
 	resp.SrcIntel.Refs = me.Impl.Symbols(req.SrcLens, query, req.IpcID == IPCID_SRCINTEL_SYMS_FILE)
 }
 
-func (*SrcIntelBase) ComplItems(srcLens *SrcLens) []*SrcIntelCompl {
+func (*SrcIntelBase) ComplItems(srcLens *SrcLens) SrcIntelCompls {
 	return nil
 }
 

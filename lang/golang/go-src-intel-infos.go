@@ -20,6 +20,8 @@ var (
 		"struct{":    z.CMPL_CLASS,
 	}
 	cmplCharsFunc = []string{"("}
+	cmplCharsDot  = []string{"."}
+	cmplCharsCtor = []string{"{"}
 )
 
 func init() {
@@ -30,7 +32,7 @@ type goSrcIntel struct {
 	z.SrcIntelBase
 }
 
-func (*goSrcIntel) ComplItems(srcLens *z.SrcLens) (all []*z.SrcIntelCompl) {
+func (*goSrcIntel) ComplItems(srcLens *z.SrcLens) (all z.SrcIntelCompls) {
 	if !tools.gocode.Installed {
 		return
 	}
@@ -39,26 +41,25 @@ func (*goSrcIntel) ComplItems(srcLens *z.SrcLens) (all []*z.SrcIntelCompl) {
 		panic(err)
 	}
 	if len(rawresp) > 0 {
-		all = make([]*z.SrcIntelCompl, 0, len(rawresp))
+		all = make(z.SrcIntelCompls, 0, len(rawresp))
 		for _, raw := range rawresp {
 			if c, n, t := raw["class"], raw["name"], raw["type"]; n != "" && !(c == "import" && strings.Contains(n, "/internal/")) {
 				cmpl := &z.SrcIntelCompl{Detail: t, Label: n, Kind: z.CMPL_COLOR, FilterText: strings.ToLower(n)}
 				switch c {
 				case "func":
 					cmpl.Kind = z.CMPL_FUNCTION
-					cmpl.SortText = "4" + cmpl.Label
 					cmpl.CommitChars = cmplCharsFunc
 				case "package", "import":
 					cmpl.Kind = z.CMPL_FOLDER
-					cmpl.SortText = "1" + cmpl.Label
+					cmpl.CommitChars = cmplCharsDot
 				case "var":
 					cmpl.Kind = z.CMPL_FIELD
-					cmpl.SortText = "3" + cmpl.Label
+					cmpl.CommitChars = cmplCharsDot
 				case "const":
 					cmpl.Kind = z.CMPL_CONSTANT
-					cmpl.SortText = "2" + cmpl.Label
+					cmpl.CommitChars = cmplCharsDot
 				case "type":
-					cmpl.SortText = "9" + cmpl.Label
+					cmpl.CommitChars = cmplCharsCtor
 					switch t {
 					case "built-in":
 						switch n {
@@ -90,7 +91,6 @@ func (*goSrcIntel) ComplItems(srcLens *z.SrcLens) (all []*z.SrcIntelCompl) {
 					}
 				default:
 					cmpl.Detail = "CMPLCLS:[" + c + "]\n" + cmpl.Detail
-					cmpl.SortText = "0" + cmpl.Label
 				}
 				all = append(all, cmpl)
 			}
