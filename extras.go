@@ -56,16 +56,14 @@ func (me *ExtrasBase) onList(req *ipcReq, resp *ipcResp, isQuery bool) {
 	}
 	resp.Extras.Items = list()
 	for i := range resp.Extras.Items {
-		if item := resp.Extras.Items[i]; item.Desc == "" {
-			if req.SrcLens.Str != "" {
-				item.Desc = req.SrcLens.Str
+		if item := resp.Extras.Items[i]; req.SrcLens.Str != "" {
+			item.Desc = "`" + req.SrcLens.Str + "`"
+		} else {
+			item.Desc = Strf("at %s in: ", req.SrcLens.Pos)
+			if req.SrcLens.Txt != "" {
+				item.Desc += "`" + req.SrcLens.Txt + "`"
 			} else {
-				item.Desc = Strf("at %s in: ", req.SrcLens.Pos)
-				if req.SrcLens.Txt != "" {
-					item.Desc += req.SrcLens.Txt
-				} else {
-					item.Desc += Lang.Workspace.PrettyPath(req.SrcLens.FilePath)
-				}
+				item.Desc += Lang.Workspace.PrettyPath(req.SrcLens.FilePath)
 			}
 		}
 	}

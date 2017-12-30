@@ -34,7 +34,9 @@ func (me *goExtras) runIntel_Guru(guruCmd string, srcLens *z.SrcLens, arg string
 	bp1, bp2 := ustr.FromInt(bpos), ""
 	if srcLens.Range != nil {
 		bpos1, bpos2 := srcLens.ByteOffsetForPosWithRuneOffset(&srcLens.Range.Start), srcLens.ByteOffsetForPosWithRuneOffset(&srcLens.Range.End)
-		bp1, bp2 = ustr.FromInt(bpos1), ustr.FromInt(bpos2)
+		if bp1 = ustr.FromInt(bpos1); bpos2 != bpos1 {
+			bp2 = ustr.FromInt(bpos2)
+		}
 	}
 	guruscope := ""
 	if settings.cfgGuruScopeMin.ValBool() {
@@ -46,11 +48,12 @@ func (me *goExtras) runIntel_Guru(guruCmd string, srcLens *z.SrcLens, arg string
 		if nope := guruscope == ""; nope || shouldrefresh {
 			go caddyRunRefreshPkgs()
 			if nope {
-				panic("Not part of a Go package: " + filepath.Base(srcLens.FilePath))
+				panic("Not part of a Go package: " + filepath.Base(srcLens.FilePath) + " (or wait a few seconds until PackageTracker status icon indicates readiness).")
 			}
 		}
 	}
 	var err error
+	curpkgdir := filepath.Dir(srcLens.FilePath)
 	switch guruCmd {
 	case "callees":
 		resp.Desc = xIntelGuruCallees.Detail
@@ -72,9 +75,19 @@ func (me *goExtras) runIntel_Guru(guruCmd string, srcLens *z.SrcLens, arg string
 				resp.Refs.AddFrom(udev.SrcMsgFromLn(gc.Pos), nil)
 			}
 		}
+	case "freevars":
+		resp.Desc = xIntelGuruFreevars.Label + " ➜ " + xIntelGuruFreevars.Detail
+		if gfvs, e := udevgo.QueryFreevars_Guru(srcLens.FilePath, srcLens.Txt, bp1, bp2); e != nil {
+			err = e
+		} else {
+			resp.Items = make([]*z.ExtrasItem, 0, len(gfvs))
+			for _, gfv := range gfvs {
+				resp.Items = append([]*z.ExtrasItem{&z.ExtrasItem{Desc: udevgo.PkgImpPathsToNamesInLn(gfv.Type, curpkgdir), Label: gfv.Ref,
+					Detail: z.Lang.Workspace.PrettyPath(gfv.Pos), FilePos: gfv.Pos}}, resp.Items...)
+			}
+		}
 	case "callstack":
 		resp.Desc = xIntelGuruCallstack.Detail
-		curpkgdir := filepath.Dir(srcLens.FilePath)
 		if gcs, e := udevgo.QueryCallstack_Guru(srcLens.FilePath, srcLens.Txt, bp1, bp2, guruscope); e != nil {
 			err = e
 		} else {
@@ -83,6 +96,22 @@ func (me *goExtras) runIntel_Guru(guruCmd string, srcLens *z.SrcLens, arg string
 			for _, gc := range gcs.Callers {
 				resp.Items = append([]*z.ExtrasItem{&z.ExtrasItem{Desc: gc.Desc, Label: udevgo.PkgImpPathsToNamesInLn(gc.Caller, curpkgdir),
 					Detail: z.Lang.Workspace.PrettyPath(gc.Pos), FilePos: gc.Pos}}, resp.Items...)
+			}
+		}
+	case "whicherrs":
+		resp.Desc = xIntelGuruErrtypes.Detail
+		if gwe, e := udevgo.QueryWhicherrs_Guru(srcLens.FilePath, srcLens.Txt, bp1, bp2, guruscope); e != nil {
+			err = e
+		} else {
+			for _, gwec := range gwe.Constants {
+				resp.Refs.AddFrom(udev.SrcMsgFromLn(gwec), nil)
+			}
+			for _, gweg := range gwe.Globals {
+				resp.Refs.AddFrom(udev.SrcMsgFromLn(gweg), nil)
+			}
+			for _, gwet := range gwe.Types {
+				println(gwet.Type)
+				resp.Refs.AddFrom(udev.SrcMsgFromLn(gwet.Position), nil)
 			}
 		}
 	default:

@@ -33,9 +33,7 @@ func (*goSrcIntel) References(srcLens *z.SrcLens, includeDeclaration bool) (refs
 	if gr := udevgo.QueryRefs_Guru(srcLens.FilePath, srcLens.Txt, ustr.FromInt(bytepos)); len(gr) > 0 {
 		refs = make(z.SrcLenses, 0, len(gr))
 		for _, gref := range gr {
-			if srcref := udev.SrcMsgFromLn(gref.Pos); srcref != nil {
-				refs.AddFrom(srcref, nil)
-			}
+			refs.AddFrom(udev.SrcMsgFromLn(gref.Pos), nil)
 		}
 	}
 	return
@@ -66,9 +64,7 @@ func (*goSrcIntel) DefSym(srcLens *z.SrcLens) (defs z.SrcLenses) {
 			}
 		}
 	}
-	if refloc != nil {
-		defs.AddFrom(refloc, nil)
-	}
+	defs.AddFrom(refloc, nil)
 	return
 }
 
@@ -116,9 +112,7 @@ func (me *goSrcIntel) DefType(srcLens *z.SrcLens) (defs z.SrcLenses) {
 			return me.DefSym(srcLens)
 		}
 	}
-	if refloc != nil {
-		defs.AddFrom(refloc, nil)
-	}
+	defs.AddFrom(refloc, nil)
 	return
 }
 
@@ -131,16 +125,12 @@ func (*goSrcIntel) DefImpl(srcLens *z.SrcLens) (defs z.SrcLenses) {
 		if defs = make(z.SrcLenses, 0, len(gi.AssignableFrom)+len(gi.AssignableTo)+len(gi.AssignableFromPtr)+len(gi.AssignableFromMethod)+len(gi.AssignableFromPtrMethod)+len(gi.AssignableToMethod)); cap(defs) > 0 {
 			addtypes := func(impltypes []gurujson.ImplementsType) {
 				for _, it := range impltypes {
-					if srcref := udev.SrcMsgFromLn(it.Pos); srcref != nil {
-						defs.AddFrom(srcref, nil)
-					}
+					defs.AddFrom(udev.SrcMsgFromLn(it.Pos), nil)
 				}
 			}
 			addmethods := func(methods []gurujson.DescribeMethod) {
 				for _, m := range methods {
-					if srcref := udev.SrcMsgFromLn(m.Pos); srcref != nil {
-						defs.AddFrom(srcref, nil)
-					}
+					defs.AddFrom(udev.SrcMsgFromLn(m.Pos), nil)
 				}
 			}
 			if gi.Method != nil {
@@ -168,10 +158,8 @@ func (*goSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (all z.SrcLens
 	}
 	all = make(z.SrcLenses, 0, len(gw.SameIDs))
 	for _, sameid := range gw.SameIDs {
-		if srcref := udev.SrcMsgFromLn(sameid); srcref != nil {
-			if sl := all.AddFrom(srcref, nil); sl.FilePath == srcLens.FilePath && (sl.Range != nil || sl.Pos != nil) {
-				sl.FilePath = ""
-			}
+		if sl := all.AddFrom(udev.SrcMsgFromLn(sameid), nil); sl != nil && sl.FilePath == srcLens.FilePath && (sl.Range != nil || sl.Pos != nil) {
+			sl.FilePath = ""
 		}
 	}
 	if len(all) == 0 && len(gw.Enclosing) > 0 {
