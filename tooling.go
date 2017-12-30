@@ -1,10 +1,9 @@
 package z
 
 import (
-	"strings"
-
 	"github.com/metaleap/go-util/run"
 	"github.com/metaleap/go-util/slice"
+	"strings"
 )
 
 type ToolCats uint8

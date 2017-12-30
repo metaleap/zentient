@@ -41,24 +41,24 @@ func (*goSrcIntel) ComplItems(srcLens *z.SrcLens) (all []*z.SrcIntelCompl) {
 	if len(rawresp) > 0 {
 		all = make([]*z.SrcIntelCompl, 0, len(rawresp))
 		for _, raw := range rawresp {
-			if c, n, t := raw["class"], raw["name"], raw["type"]; n != "" {
+			if c, n, t := raw["class"], raw["name"], raw["type"]; n != "" && !(c == "import" && strings.Contains(n, "/internal/")) {
 				cmpl := &z.SrcIntelCompl{Detail: t, Label: n, Kind: z.CMPL_COLOR, FilterText: strings.ToLower(n)}
 				switch c {
 				case "func":
 					cmpl.Kind = z.CMPL_FUNCTION
-					cmpl.SortText = "9" + cmpl.Label
+					cmpl.SortText = "4" + cmpl.Label
 					cmpl.CommitChars = cmplCharsFunc
-				case "package":
+				case "package", "import":
 					cmpl.Kind = z.CMPL_FOLDER
 					cmpl.SortText = "1" + cmpl.Label
 				case "var":
 					cmpl.Kind = z.CMPL_FIELD
-					cmpl.SortText = "4" + cmpl.Label
+					cmpl.SortText = "3" + cmpl.Label
 				case "const":
 					cmpl.Kind = z.CMPL_CONSTANT
-					cmpl.SortText = "3" + cmpl.Label
-				case "type":
 					cmpl.SortText = "2" + cmpl.Label
+				case "type":
+					cmpl.SortText = "9" + cmpl.Label
 					switch t {
 					case "built-in":
 						switch n {
@@ -89,6 +89,7 @@ func (*goSrcIntel) ComplItems(srcLens *z.SrcLens) (all []*z.SrcIntelCompl) {
 						}
 					}
 				default:
+					cmpl.Detail = "CMPLCLS:[" + c + "]\n" + cmpl.Detail
 					cmpl.SortText = "0" + cmpl.Label
 				}
 				all = append(all, cmpl)
@@ -127,6 +128,8 @@ func (me *goSrcIntel) ComplDetails(srcLens *z.SrcLens, itemText string) (itemDoc
 	if decl == "" && tools.godef.Installed {
 		if decl = udevgo.QueryDefDecl_GoDef(srcLens.FilePath, srcLens.Txt, spos); decl != "" {
 			decl = me.goFuncDeclLineBreaks(decl, 23)
+		} else {
+			decl = "?"
 		}
 	}
 	itemDoc.Detail = me.goDeclSnip(decl)
