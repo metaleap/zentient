@@ -224,6 +224,13 @@ func (me *SettingsBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	return true
 }
 
+func (me *SettingsBase) KnownSettings() Settings {
+	if Lang.Diag == nil {
+		return nil
+	}
+	return Settings{cfgLintStickiness}
+}
+
 func (me *SettingsBase) onSet(cfgId string, cfgVal string, menu *MenuResp) {
 	info, setting := "changed", me.Impl.KnownSettings().ById(cfgId)
 	if setting == nil {

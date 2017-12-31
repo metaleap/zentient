@@ -76,5 +76,5 @@ func (me *goSettings) onPreInit() {
 }
 
 func (me *goSettings) KnownSettings() z.Settings {
-	return me.allSettings
+	return append(me.allSettings, me.SettingsBase.KnownSettings()...)
 }

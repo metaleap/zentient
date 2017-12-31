@@ -21,6 +21,8 @@ type IDiag interface {
 	RunLintJob(*DiagJobLint)
 	UpdateBuildDiagsAsNeeded(WorkspaceFiles, []string)
 	UpdateLintDiagsIfAndAsNeeded(WorkspaceFiles, bool, ...string)
+
+	send(WorkspaceFiles, bool)
 }
 
 type Diags struct {
@@ -43,11 +45,12 @@ func (me *Diags) forget(onlyFor Tools) {
 type DiagItemsBy map[string]DiagItems
 
 type DiagItem struct {
-	Cat        string `json:",omitempty"`
-	Loc        SrcLens
-	Msg        string
-	SrcActions []EditorAction `json:",omitempty"`
-	Sticky     bool           `json:",omitempty"`
+	Cat         string `json:",omitempty"`
+	Loc         SrcLens
+	Msg         string
+	SrcActions  []EditorAction `json:",omitempty"`
+	StickyForce bool           `json:"-"`
+	StickyAuto  bool           `json:"Sticky,omitempty"`
 }
 
 func (me *DiagItem) resetAndInferSrcActions() {
@@ -88,7 +91,11 @@ func (me DiagItems) propagate(lintDiags bool, diagsSticky bool, workspaceFiles W
 		if !lintDiags {
 			fd = &f.Diags.Build
 		}
-		diag.Sticky, fd.Items = diagsSticky, append(fd.Items, diag)
+		if diag.StickyForce, fd.Items = diagsSticky, append(fd.Items, diag); diagsSticky {
+			diag.StickyAuto = true
+		} else {
+			diag.StickyAuto = uint64(diag.Loc.Flag) <= cfgLintStickiness.ValUInt()
+		}
 	}
 }
 
@@ -202,7 +209,7 @@ func (me *DiagBase) MenuItems(srcLens *SrcLens) (menu MenuItems) {
 				if l := len(dsf.Diags.Lint.Items); l > 0 {
 					hiddenlintfiles[dsf] = true
 					for _, lintdiag := range dsf.Diags.Lint.Items {
-						if !lintdiag.Sticky {
+						if !(lintdiag.StickyAuto) {
 							hiddenlintnum, hiddenlintcats[lintdiag.Cat] = hiddenlintnum+1, true
 						}
 					}
@@ -281,7 +288,7 @@ func (me *DiagBase) onPeekHidden(approxNum int, resp *MenuResp) {
 	for _, f := range workspacefiles {
 		if (!f.IsOpen) && len(f.Diags.Lint.Items) > 0 {
 			for _, lintdiag := range f.Diags.Lint.Items {
-				if !lintdiag.Sticky {
+				if !lintdiag.StickyAuto {
 					resp.Refs = append(resp.Refs, &lintdiag.Loc)
 				}
 			}
