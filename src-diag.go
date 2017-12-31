@@ -34,8 +34,7 @@ func (me *Diags) forget(onlyFor Tools) {
 		for i := 0; i < len(me.Items); i++ {
 			if onlyFor.Has(me.Items[i].Cat) {
 				pre, post := me.Items[:i], me.Items[i+1:]
-				me.Items = append(pre, post...)
-				i--
+				i, me.Items = i-1, append(pre, post...)
 			}
 		}
 	}
