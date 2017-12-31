@@ -53,7 +53,7 @@ func (me *goSrcMod) RunRenamer(srcLens *z.SrcLens, newName string) (srcMods z.Sr
 	return
 }
 
-func (me *goSrcMod) RunFormatter(formatter *z.Tool, cmdName string, srcFilePath string, src string) (string, string) {
+func (me *goSrcMod) RunFormatter(formatter *z.Tool, cmdName string, _ *z.SrcFormattingClientPrefs, srcFilePath string, src string) (string, string) {
 	if formatter != tools.gofmt && formatter != tools.goimports && formatter != tools.goreturns {
 		z.BadPanic("formatting tool", formatter.Name)
 	}

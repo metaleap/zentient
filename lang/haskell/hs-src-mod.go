@@ -1,6 +1,7 @@
 package zhs
 
 import (
+	"github.com/metaleap/go-util/str"
 	"github.com/metaleap/zentient"
 )
 
@@ -30,16 +31,20 @@ func (me *hsSrcMod) KnownFormatters() z.Tools {
 	return me.knownFormatters
 }
 
-func (me *hsSrcMod) RunFormatter(formatter *z.Tool, cmdName string, srcFilePath string, src string) (string, string) {
+func (me *hsSrcMod) RunFormatter(formatter *z.Tool, cmdName string, clientPrefs *z.SrcFormattingClientPrefs, srcFilePath string, src string) (string, string) {
 	if formatter != tools.brittany && formatter != tools.hindent && formatter != tools.stylishhaskell {
 		z.BadPanic("formatting tool", formatter.Name)
 	}
 
+	tabsize := "4"
+	if clientPrefs != nil && clientPrefs.TabSize != nil {
+		tabsize = ustr.FromInt(*clientPrefs.TabSize)
+	}
 	var cmdargs []string
 	if formatter == tools.hindent {
-		cmdargs = append(cmdargs, "--no-force-newline", "--sort-imports", "--indent-size", "4")
+		cmdargs = append(cmdargs, "--no-force-newline", "--sort-imports", "--indent-size", tabsize)
 	} else if formatter == tools.brittany {
-		cmdargs = append(cmdargs, "--indent", "4")
+		cmdargs = append(cmdargs, "--indent", tabsize)
 	}
 	if srcFilePath != "" {
 		cmdargs = append(cmdargs, srcFilePath)

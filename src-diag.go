@@ -209,7 +209,7 @@ func (me *DiagBase) MenuItems(srcLens *SrcLens) (menu MenuItems) {
 				if l := len(dsf.Diags.Lint.Items); l > 0 {
 					hiddenlintfiles[dsf] = true
 					for _, lintdiag := range dsf.Diags.Lint.Items {
-						if !(lintdiag.StickyAuto) {
+						if !lintdiag.StickyAuto {
 							hiddenlintnum, hiddenlintcats[lintdiag.Cat] = hiddenlintnum+1, true
 						}
 					}

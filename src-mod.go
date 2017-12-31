@@ -11,7 +11,7 @@ type ISrcMod interface {
 	DoesStdoutWithFilePathArg(*Tool) bool
 	KnownFormatters() Tools
 	RunRenamer(*SrcLens, string) SrcLenses
-	RunFormatter(*Tool, string, string, string) (string, string)
+	RunFormatter(*Tool, string, *SrcFormattingClientPrefs, string, string) (string, string)
 }
 
 type SrcModBase struct {
@@ -20,6 +20,11 @@ type SrcModBase struct {
 	cmdFmtRunOnSel  *MenuItem
 
 	Impl ISrcMod
+}
+
+type SrcFormattingClientPrefs struct {
+	InsertSpaces *bool
+	TabSize      *int
 }
 
 func (me *SrcModBase) Init() {
@@ -81,7 +86,6 @@ func (*SrcModBase) DoesStdoutWithFilePathArg(*Tool) bool {
 }
 
 func (*SrcModBase) CodeActions(srcLens *SrcLens) (all []EditorAction) {
-	all = append(all, EditorAction{Title: "Open Zentient Main Menu", Cmd: "zen.menus.main", Hint: "Should open the main Palette menu"})
 	return
 }
 
@@ -129,23 +133,29 @@ func (me *SrcModBase) onRename(req *ipcReq, resp *ipcResp) {
 }
 
 func (me *SrcModBase) onRunFormatter(req *ipcReq, resp *ipcResp) {
-	var hasopt = false
-	opt, _ := req.IpcArgs.(map[string]interface{})
-	if opt != nil {
-		_, tabSize := opt["tabSize"]
-		_, insertSpaces := opt["insertSpaces"]
-		hasopt = tabSize || insertSpaces
-	}
-	if !hasopt {
+	optraw, _ := req.IpcArgs.(map[string]interface{})
+	var prefs *SrcFormattingClientPrefs
+	if optraw != nil {
+		tabSize, ok1 := optraw["tabSize"].(float64)
+		insertSpaces, ok2 := optraw["insertSpaces"].(bool)
+		if ok1 || ok2 {
+			if prefs = (&SrcFormattingClientPrefs{}); ok2 {
+				prefs.InsertSpaces = &insertSpaces
+			}
+			if tabsize := int(tabSize); ok1 {
+				prefs.TabSize = &tabsize
+			}
+		}
+	} else {
 		resp.Menu = &MenuResp{}
 	}
 
 	formatter := me.Impl.KnownFormatters().ByName(Prog.Cfg.FormatterName)
 	if formatter == nil {
 		if resp.Menu == nil {
-			resp.ErrMsg = "Select a Default Formatter first via the Zentient 'Palette' menu."
+			resp.ErrMsg = "Select a Default Formatter first via the Zentient Main Menu."
 		} else {
-			resp.Menu.NoteWarn = "Select a Default Formatter first, either via the Zentient 'Palette' menu or:"
+			resp.Menu.NoteWarn = "Select a Default Formatter first, either via the Zentient Main Menu or:"
 			resp.IpcID = IPCID_SRCMOD_FMT_SETDEFMENU
 			resp.Menu.UxActionLabel = Strf("Pick your preferred Zentient default %s formatter…", Lang.Title)
 		}
@@ -178,7 +188,7 @@ func (me *SrcModBase) onRunFormatter(req *ipcReq, resp *ipcResp) {
 		cmdname = Prog.Cfg.FormatterProg
 	}
 
-	if srcformatted, stderr := me.Impl.RunFormatter(formatter, cmdname, srcfilepath, *src); stderr != "" {
+	if srcformatted, stderr := me.Impl.RunFormatter(formatter, cmdname, prefs, srcfilepath, *src); stderr != "" {
 		resp.ErrMsg = stderr
 	} else {
 		*src = srcformatted
