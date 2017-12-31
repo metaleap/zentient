@@ -10,20 +10,22 @@ import (
 )
 
 var (
-	xIntelGuruCallees = z.ExtrasItem{ID: "guru.callees", Label: "Callees",
-		Detail: "For this function / method call, lists possible implementations to which it might dispatch."}
-	xIntelGuruCallers = z.ExtrasItem{ID: "guru.callers", Label: "Callers",
-		Detail: "For this function / method implementation, lists possible callers."}
-	xIntelGuruCallstack = z.ExtrasItem{ID: "guru.callstack", Label: "Call Stack",
-		Detail: "For this function / method, shows an arbitrary path to the root of the call graph."}
-	xIntelGuruFreevars = z.ExtrasItem{ID: "guru.freevars", Label: "Free Variables",
-		Detail: "For this selection, lists variables referenced but not defined within it."}
-	xIntelGuruErrtypes = z.ExtrasItem{ID: "guru.whicherrs", Label: "Error Types",
-		Detail: "For this `error` value, lists its possible types."}
-	xIntelGuruPointees = z.ExtrasItem{ID: "guru.pointsto", Label: "Pointees",
-		Detail: "For this pointer-typed / container-typed expression, lists possible associated types / symbols."}
-	xIntelGuruChanpeers = z.ExtrasItem{ID: "guru.peers", Label: "Channel Peers",
-		Detail: "For this `<-` operation's channel, lists associated allocations, sends, receives and closes."}
+	xIntelGuruCallers = z.ExtrasItem{ID: "guru.callers", Label: "❬guru❭ — Callers",
+		Detail: "For this function / method implementation ➜ find possible callers."}
+	xIntelGuruCallees = z.ExtrasItem{ID: "guru.callees", Label: "❬guru❭ — Callees",
+		Detail: "For this function / method call ➜ find possible implementations to which it might dispatch."}
+	xIntelGuruCallstack = z.ExtrasItem{ID: "guru.callstack", Label: "❬guru❭ — Call Stack",
+		Detail: "For this function / method ➜ find an arbitrary path from a `main` call-graph root."}
+	xIntelGuruFreevars = z.ExtrasItem{ID: "guru.freevars", Label: "❬guru❭ — Free Variables",
+		Detail: "For this selection ➜ find variables referenced but not defined within it."}
+	xIntelGuruErrtypes = z.ExtrasItem{ID: "guru.whicherrs", Label: "❬guru❭ — Error Types",
+		Detail: "For this `error` value ➜ find its possible types."}
+	xIntelGuruPointeeTypes = z.ExtrasItem{ID: "guru.pointsto.types", Label: "❬guru❭ — Pointees (Types)",
+		Detail: "For this reference-typed expression ➜ find underlying types."}
+	xIntelGuruPointeeVals = z.ExtrasItem{ID: "guru.pointsto.vals", Label: "❬guru❭ — Pointees (Allocations)",
+		Detail: "For this reference-typed expression ➜ find related allocations."}
+	xIntelGuruChanpeers = z.ExtrasItem{ID: "guru.peers", Label: "❬guru❭ — Channel Peers",
+		Detail: "For this `<-` operator's channel ➜ find associated allocations, sends, receives and closes."}
 )
 
 func (me *goExtras) runIntel_Guru(guruCmd string, srcLens *z.SrcLens, arg string, resp *z.ExtrasResp) {
@@ -45,11 +47,16 @@ func (me *goExtras) runIntel_Guru(guruCmd string, srcLens *z.SrcLens, arg string
 			guruscope = pkg.ImportPath + "/..."
 			break
 		}
-		if nope := guruscope == ""; nope || shouldrefresh {
+		if nope, notyet := (guruscope == ""), (udevgo.PkgsByImP == nil); nope || shouldrefresh {
 			go caddyRunRefreshPkgs()
 			if nope {
-				panic("Not part of a Go package: " + filepath.Base(srcLens.FilePath) + " (or wait a few seconds until PackageTracker status icon indicates readiness).")
+				if notyet {
+					resp.Warns = append(resp.Warns, "PackageTracker not yet ready — try again in a few seconds.")
+				} else {
+					panic("Not part of a Go package: " + filepath.Base(srcLens.FilePath) + ".")
+				}
 			}
+			return
 		}
 	}
 	var err error
@@ -91,7 +98,7 @@ func (me *goExtras) runIntel_Guru(guruCmd string, srcLens *z.SrcLens, arg string
 		if gcs, e := udevgo.QueryCallstack_Guru(srcLens.FilePath, srcLens.Txt, bp1, bp2, guruscope); e != nil {
 			err = e
 		} else {
-			resp.Desc = udevgo.PkgImpPathsToNamesInLn(gcs.Target, curpkgdir) + " ➜ " + xIntelGuruCallstack.Detail
+			resp.Desc = udevgo.PkgImpPathsToNamesInLn(gcs.Target, curpkgdir) + " ➜ " + xIntelGuruCallstack.Label
 			resp.Items = make([]*z.ExtrasItem, 0, len(gcs.Callers))
 			for _, gc := range gcs.Callers {
 				resp.Items = append([]*z.ExtrasItem{&z.ExtrasItem{Desc: gc.Desc, Label: udevgo.PkgImpPathsToNamesInLn(gc.Caller, curpkgdir),
@@ -110,8 +117,27 @@ func (me *goExtras) runIntel_Guru(guruCmd string, srcLens *z.SrcLens, arg string
 				resp.Refs.AddFrom(udev.SrcMsgFromLn(gweg), nil)
 			}
 			for _, gwet := range gwe.Types {
-				println(gwet.Type)
 				resp.Refs.AddFrom(udev.SrcMsgFromLn(gwet.Position), nil)
+			}
+		}
+	case "pointsto.types", "pointsto.vals":
+		ispt, ispv := guruCmd == "pointsto.types", guruCmd == "pointsto.vals"
+		if ispt {
+			resp.Desc = xIntelGuruPointeeTypes.Detail
+		} else if ispv {
+			resp.Desc = xIntelGuruPointeeVals.Detail
+		}
+		if gpts, e := udevgo.QueryPointsto_Guru(srcLens.FilePath, srcLens.Txt, bp1, bp2, guruscope); e != nil {
+			err = e
+		} else {
+			for _, gpt := range gpts {
+				if ispt {
+					resp.Refs.AddFrom(udev.SrcMsgFromLn(gpt.NamePos), nil)
+				} else if ispv {
+					for _, gptl := range gpt.Labels {
+						resp.Refs.AddFrom(udev.SrcMsgFromLn(gptl.Pos), nil)
+					}
+				}
 			}
 		}
 	default:
@@ -120,6 +146,7 @@ func (me *goExtras) runIntel_Guru(guruCmd string, srcLens *z.SrcLens, arg string
 	if err != nil {
 		errmsg, chkmsg := err.Error(), "guru: couldn't load packages due to errors: "
 		if cml, i := len(chkmsg), ustr.Idx(errmsg, chkmsg); i >= 0 {
+			err = nil
 			oldnumscopeexcl, errpkgimppaths := len(udevgo.GuruScopeExclPkgs), ustr.Split(errmsg[i+cml:], ", ")
 			if len(errpkgimppaths) > 0 {
 				errpkgimppaths[len(errpkgimppaths)-1] = ustr.Before(errpkgimppaths[len(errpkgimppaths)-1], " ", false)
@@ -132,9 +159,10 @@ func (me *goExtras) runIntel_Guru(guruCmd string, srcLens *z.SrcLens, arg string
 					me.runIntel_Guru(guruCmd, srcLens, arg, resp)
 				}
 			}
+		} else {
+			resp.Warns = append(resp.Warns, err.Error())
 		}
-	}
-	if err != nil {
-		panic(err)
+	} else if len(resp.Info) == 0 && resp.Items == nil && len(resp.Warns) == 0 && len(resp.Refs) == 0 {
+		resp.Items = []*z.ExtrasItem{}
 	}
 }

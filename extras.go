@@ -20,9 +20,9 @@ type ExtrasItem struct {
 
 type ExtrasResp struct {
 	SrcIntels
-	Items []*ExtrasItem `json:",omitempty"`
-	Warns []string      `json:",omitempty"`
-	Desc  string        `json:",omitempty"`
+	Items []*ExtrasItem
+	Warns []string `json:",omitempty"`
+	Desc  string   `json:",omitempty"`
 }
 
 type ExtrasBase struct {

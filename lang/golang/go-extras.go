@@ -19,7 +19,7 @@ type goExtras struct {
 }
 
 func (me *goExtras) ListIntelExtras() (all []*z.ExtrasItem) {
-	all = []*z.ExtrasItem{&xIntelGuruCallers, &xIntelGuruCallees, &xIntelGuruCallstack, &xIntelGuruFreevars, &xIntelGuruErrtypes, &xIntelGuruPointees, &xIntelGuruChanpeers}
+	all = []*z.ExtrasItem{&xIntelGuruCallers, &xIntelGuruCallees, &xIntelGuruCallstack, &xIntelGuruFreevars, &xIntelGuruErrtypes, &xIntelGuruPointeeTypes, &xIntelGuruPointeeVals, &xIntelGuruChanpeers}
 	return
 }
 
