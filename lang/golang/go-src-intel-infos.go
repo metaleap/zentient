@@ -19,9 +19,6 @@ var (
 		"interface{": z.CMPL_INTERFACE,
 		"struct{":    z.CMPL_CLASS,
 	}
-	cmplCharsFunc = []string{"(", ","}
-	cmplCharsDot  = []string{".", ","}
-	cmplCharsCtor = []string{"{", ","}
 )
 
 func init() {
@@ -48,18 +45,13 @@ func (*goSrcIntel) ComplItems(srcLens *z.SrcLens) (all z.SrcIntelCompls) {
 				switch c {
 				case "func":
 					cmpl.Kind = z.CMPL_FUNCTION
-					cmpl.CommitChars = cmplCharsFunc
 				case "package", "import":
 					cmpl.Kind = z.CMPL_FOLDER
-					cmpl.CommitChars = cmplCharsDot
 				case "var":
 					cmpl.Kind = z.CMPL_FIELD
-					cmpl.CommitChars = cmplCharsDot
 				case "const":
 					cmpl.Kind = z.CMPL_CONSTANT
-					cmpl.CommitChars = cmplCharsDot
 				case "type":
-					cmpl.CommitChars = cmplCharsCtor
 					switch t {
 					case "built-in":
 						switch n {
