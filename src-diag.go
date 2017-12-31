@@ -136,6 +136,7 @@ type DiagBase struct {
 	cmdRunDiagsOnOpenFiles  *MenuItem
 	cmdRunDiagsOnKnownFiles *MenuItem
 	cmdForgetAllDiags       *MenuItem
+	cmdPeekHiddenDiags      *MenuItem
 }
 
 type DiagResp struct {
@@ -154,6 +155,7 @@ func (me *DiagBase) Init() {
 	me.cmdRunDiagsOnKnownFiles = &MenuItem{IpcID: IPCID_SRCDIAG_RUN_ALLFILES, Title: me.cmdRunDiagsOnCurFile.Title, tag: "known"}
 	me.cmdRunDiagsOnOpenFiles = &MenuItem{IpcID: IPCID_SRCDIAG_RUN_OPENFILES, Title: me.cmdRunDiagsOnCurFile.Title, tag: "opened"}
 	me.cmdForgetAllDiags = &MenuItem{IpcID: IPCID_SRCDIAG_FORGETALL, Title: Strf("Forget All Currently Known %s Diagnostics", Lang.Title)}
+	me.cmdPeekHiddenDiags = &MenuItem{IpcID: IPCID_SRCDIAG_PEEKHIDDEN, Title: Strf("Peek Potentially Hidden %s Lints", Lang.Title)}
 }
 
 func (me *DiagBase) knownDiags(auto bool) (diags Tools) {
@@ -193,13 +195,35 @@ func (me *DiagBase) MenuItems(srcLens *SrcLens) (menu MenuItems) {
 		}
 	}
 	if ds := workspacefiles.diagsSummary(); ds != nil {
+		hiddenlintnum, hiddenlintfiles, hiddenlintcats := 0, map[*WorkspaceFile]bool{}, map[string]bool{}
 		me.cmdForgetAllDiags.Hint = Strf("for %d file(s) in %d folder(s)",
 			len(ds.files), workspacefiles.NumDirs(func(f *WorkspaceFile) bool { return ds.files[f] }))
 		for dsf := range ds.files {
-			me.cmdForgetAllDiags.Hint += " — " + filepath.Base(dsf.Path)
+			if me.cmdForgetAllDiags.Hint += " — " + filepath.Base(dsf.Path); !dsf.IsOpen {
+				if l := len(dsf.Diags.Lint.Items); l > 0 {
+					hiddenlintfiles[dsf] = true
+					for _, lintdiag := range dsf.Diags.Lint.Items {
+						if !lintdiag.Sticky {
+							hiddenlintnum, hiddenlintcats[lintdiag.ToolName] = hiddenlintnum+1, true
+						}
+					}
+				}
+			}
 		}
-		me.cmdForgetAllDiags.Desc = Strf("Clears %d build-on-save diagnostic(s) and %d lint diagnostic(s)", ds.numBuild, ds.numLint)
+		me.cmdForgetAllDiags.Desc = Strf("Clears %d lint(s) and %d build-on-save diagnostic(s) ", ds.numLint, ds.numBuild)
 		menu = append(menu, me.cmdForgetAllDiags)
+		if me.cmdPeekHiddenDiags.IpcArgs = hiddenlintnum; hiddenlintnum > 0 {
+			me.cmdPeekHiddenDiags.Hint = Strf("for %d file(s) in %d folder(s)",
+				len(hiddenlintfiles), workspacefiles.NumDirs(func(f *WorkspaceFile) bool { return hiddenlintfiles[f] }))
+			for hlf := range hiddenlintfiles {
+				me.cmdPeekHiddenDiags.Hint += " — " + filepath.Base(hlf.Path)
+			}
+			me.cmdPeekHiddenDiags.Desc = Strf("%d possibly hidden lint(s) from", hiddenlintnum)
+			for toolname := range hiddenlintcats {
+				me.cmdPeekHiddenDiags.Desc += " — " + toolname
+			}
+			menu = append(menu, me.cmdPeekHiddenDiags)
+		}
 	}
 	return
 }
@@ -238,6 +262,8 @@ func (me *DiagBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 		me.onRunManually([]string{}, resp)
 	case IPCID_SRCDIAG_FORGETALL:
 		me.onForgetAll()
+	case IPCID_SRCDIAG_PEEKHIDDEN:
+		me.onPeekHidden(int(req.IpcArgs.(float64)), resp.withMenu())
 	case IPCID_SRCDIAG_AUTO_TOGGLE:
 		me.onToggle(req.IpcArgs.(string), resp)
 	case IPCID_SRCDIAG_AUTO_ALL:
@@ -248,6 +274,20 @@ func (me *DiagBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 		return false
 	}
 	return true
+}
+
+func (me *DiagBase) onPeekHidden(approxNum int, resp *MenuResp) {
+	workspacefiles := Lang.Workspace.Files()
+	resp.Refs = make(SrcLenses, 0, approxNum)
+	for _, f := range workspacefiles {
+		if (!f.IsOpen) && len(f.Diags.Lint.Items) > 0 {
+			for _, lintdiag := range f.Diags.Lint.Items {
+				if !lintdiag.Sticky {
+					resp.Refs = append(resp.Refs, &lintdiag.Loc)
+				}
+			}
+		}
+	}
 }
 
 func (me *DiagBase) onForgetAll() {

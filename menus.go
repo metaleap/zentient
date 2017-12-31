@@ -40,11 +40,12 @@ type MenuItemIpcArgPrompt struct {
 }
 
 type MenuResp struct {
-	SubMenu       *Menu  `json:"menu,omitempty"`
-	WebsiteURL    string `json:"url,omitempty"`
-	NoteInfo      string `json:"info,omitempty"`
-	NoteWarn      string `json:"warn,omitempty"`
-	UxActionLabel string `json:"uxActionLabel,omitempty"`
+	SubMenu       *Menu     `json:",omitempty"`
+	WebsiteURL    string    `json:",omitempty"`
+	NoteInfo      string    `json:",omitempty"`
+	NoteWarn      string    `json:",omitempty"`
+	UxActionLabel string    `json:",omitempty"`
+	Refs          SrcLenses `json:",omitempty"`
 }
 
 type mainMenu struct {
