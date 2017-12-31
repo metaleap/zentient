@@ -36,8 +36,8 @@ type SrcIntelCompl struct {
 	Documentation *SrcIntelDoc `json:"documentation,omitempty"`
 	Detail        string       `json:"detail,omitempty"`
 	SortText      string       `json:"sortText,omitempty"`
-	FilterText    string       `json:"filterText,omitempty"`
-	InsertText    string       `json:"insertText,omitempty"`
+	// FilterText    string       `json:"filterText,omitempty"`
+	// InsertText    string       `json:"insertText,omitempty"`
 	// CommitChars   []string     `json:"commitCharacters,omitempty"` // basically in all languages always operator/separator/punctuation (that is, "non-identifier") chars --- no need to send them for each item, for each language --- the client-side will do it
 	SortPrio int `json:"-"`
 }

@@ -41,7 +41,7 @@ func (*goSrcIntel) ComplItems(srcLens *z.SrcLens) (all z.SrcIntelCompls) {
 		all = make(z.SrcIntelCompls, 0, len(rawresp))
 		for _, raw := range rawresp {
 			if c, n, t := raw["class"], raw["name"], raw["type"]; n != "" && !(c == "import" && strings.Contains(n, "/internal/")) {
-				cmpl := &z.SrcIntelCompl{Detail: t, Label: n, Kind: z.CMPL_COLOR, FilterText: strings.ToLower(n)}
+				cmpl := &z.SrcIntelCompl{Detail: t, Label: n, Kind: z.CMPL_COLOR}
 				switch c {
 				case "func":
 					cmpl.Kind = z.CMPL_FUNCTION
