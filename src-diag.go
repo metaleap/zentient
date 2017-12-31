@@ -32,7 +32,7 @@ func (me *Diags) forget(onlyFor Tools) {
 		me.Items = nil
 	} else {
 		for i := 0; i < len(me.Items); i++ {
-			if onlyFor.Has(me.Items[i].ToolName) {
+			if onlyFor.Has(me.Items[i].Cat) {
 				pre, post := me.Items[:i], me.Items[i+1:]
 				me.Items = append(pre, post...)
 				i--
@@ -44,7 +44,7 @@ func (me *Diags) forget(onlyFor Tools) {
 type DiagItemsBy map[string]DiagItems
 
 type DiagItem struct {
-	ToolName   string `json:",omitempty"`
+	Cat        string `json:",omitempty"`
 	Loc        SrcLens
 	Msg        string
 	SrcActions []EditorAction `json:",omitempty"`
@@ -204,7 +204,7 @@ func (me *DiagBase) MenuItems(srcLens *SrcLens) (menu MenuItems) {
 					hiddenlintfiles[dsf] = true
 					for _, lintdiag := range dsf.Diags.Lint.Items {
 						if !lintdiag.Sticky {
-							hiddenlintnum, hiddenlintcats[lintdiag.ToolName] = hiddenlintnum+1, true
+							hiddenlintnum, hiddenlintcats[lintdiag.Cat] = hiddenlintnum+1, true
 						}
 					}
 				}
@@ -243,7 +243,7 @@ func (me *DiagBase) menuItemsUpdateHint(diags Tools, item *MenuItem) {
 }
 
 func (me *DiagBase) NewDiagItemFrom(srcRef *udev.SrcMsg, toolName string, fallbackFilePath func() string) (di *DiagItem) {
-	di = &DiagItem{Msg: ustr.Trim(srcRef.Msg), ToolName: toolName}
+	di = &DiagItem{Msg: ustr.Trim(srcRef.Msg), Cat: toolName}
 	di.Loc.Flag = srcRef.Flag
 	di.Loc.SetFilePathAndPosOrRangeFrom(srcRef, fallbackFilePath)
 	di.resetAndInferSrcActions()
