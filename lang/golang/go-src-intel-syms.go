@@ -166,7 +166,7 @@ func (*goSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (all z.SrcLens
 		srcraw := []byte(srcLens.Txt)
 		bpos2rpos := func(bytepos int) int {
 			length := 0
-			for _ = range string(srcraw[:bytepos]) {
+			for range string(srcraw[:bytepos]) {
 				length++
 			}
 			return length // here's what *won't* work for multi-byte/unicode/etc: just bytepos, or even len(string(srcraw[:bytepos]))

@@ -49,7 +49,8 @@ func (me *DiagBase) updateLintDiags(workspaceFiles WorkspaceFiles, diagTools Too
 			job.WorkspaceFiles = workspaceFiles
 			job.forgetPrevDiags(diagTools, autos, workspaceFiles)
 		}
-		if me.send(workspaceFiles, false); nonautos {
+		go me.send(workspaceFiles, false)
+		if nonautos {
 			onRunManuallyAlreadyCurrentlyRunning = true
 		}
 		for i, job := range jobs {

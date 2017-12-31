@@ -135,6 +135,7 @@ type DiagBase struct {
 	cmdRunDiagsOnCurFile    *MenuItem
 	cmdRunDiagsOnOpenFiles  *MenuItem
 	cmdRunDiagsOnKnownFiles *MenuItem
+	cmdForgetAllDiags       *MenuItem
 }
 
 type DiagResp struct {
@@ -152,6 +153,7 @@ func (me *DiagBase) Init() {
 	me.cmdRunDiagsOnCurFile = &MenuItem{IpcID: IPCID_SRCDIAG_RUN_CURFILE, Title: Strf("Run Other %s Linters Now", Lang.Title)}
 	me.cmdRunDiagsOnKnownFiles = &MenuItem{IpcID: IPCID_SRCDIAG_RUN_ALLFILES, Title: me.cmdRunDiagsOnCurFile.Title, tag: "known"}
 	me.cmdRunDiagsOnOpenFiles = &MenuItem{IpcID: IPCID_SRCDIAG_RUN_OPENFILES, Title: me.cmdRunDiagsOnCurFile.Title, tag: "opened"}
+	me.cmdForgetAllDiags = &MenuItem{IpcID: IPCID_SRCDIAG_FORGETALL, Title: Strf("Forget All Currently Known %s Diagnostics", Lang.Title)}
 }
 
 func (me *DiagBase) knownDiags(auto bool) (diags Tools) {
@@ -169,24 +171,35 @@ func (me *DiagBase) MenuCategory() string {
 
 func (me *DiagBase) MenuItems(srcLens *SrcLens) (menu MenuItems) {
 	menu = make(MenuItems, 0, 5)
-	me.menuItemsUpdateHint(me.knownDiags(true), me.cmdListDiags)
-	menu = append(menu, me.cmdListDiags)
-	nonautodiags, srcfilepath, workspacefiles := me.knownDiags(false), srcLens.FilePath, Lang.Workspace.Files()
+	autodiags, nonautodiags, srcfilepath, workspacefiles := me.knownDiags(true), me.knownDiags(false), srcLens.FilePath, Lang.Workspace.Files()
+	if len(autodiags) > 0 {
+		me.menuItemsUpdateHint(autodiags, me.cmdListDiags)
+		menu = append(menu, me.cmdListDiags)
+	}
 	if numnonautos := nonautodiags.Len(true); numnonautos > 0 {
 		if srcLens != nil && srcLens.FilePath != "" {
 			me.cmdRunDiagsOnCurFile.IpcArgs = srcfilepath
-			me.cmdRunDiagsOnCurFile.Desc = Strf("➜ run %d lintish tool(s) on: %s", numnonautos, Lang.Workspace.PrettyPath(srcfilepath))
+			me.cmdRunDiagsOnCurFile.Desc = Strf("➜ on: %s", Lang.Workspace.PrettyPath(srcfilepath))
 			me.menuItemsUpdateHint(nonautodiags, me.cmdRunDiagsOnCurFile)
 			menu = append(menu, me.cmdRunDiagsOnCurFile)
 		}
 		for menuitem, wfps := range map[*MenuItem][]string{me.cmdRunDiagsOnOpenFiles: workspacefiles.FilePathsOpened(), me.cmdRunDiagsOnKnownFiles: workspacefiles.FilePathsKnown()} {
 			if l := len(wfps); l > 0 && (l > 1 || wfps[0] != srcfilepath) {
-				menuitem.Desc = Strf("➜ run %d lintish tool(s) on: %d currently-%s file(s) in %d folder(s)", numnonautos, l, menuitem.tag, workspacefiles.NumDirs(menuitem == me.cmdRunDiagsOnOpenFiles))
-				wfps = uslice.StrMap(wfps, filepath.Base)
-				menuitem.Hint = strings.Join(wfps, " · ")
+				menuitem.Desc = Strf("➜ on: %d currently-%s %s source file(s) in %d folder(s)",
+					l, menuitem.tag, Lang.Title, workspacefiles.NumDirs(func(f *WorkspaceFile) bool { return f.IsOpen || menuitem != me.cmdRunDiagsOnOpenFiles }))
+				menuitem.Hint = strings.Join(uslice.StrMap(wfps, filepath.Base), " · ")
 				menu = append(menu, menuitem)
 			}
 		}
+	}
+	if ds := workspacefiles.diagsSummary(); ds != nil {
+		me.cmdForgetAllDiags.Hint = Strf("for %d file(s) in %d folder(s)",
+			len(ds.files), workspacefiles.NumDirs(func(f *WorkspaceFile) bool { return ds.files[f] }))
+		for dsf := range ds.files {
+			me.cmdForgetAllDiags.Hint += " — " + filepath.Base(dsf.Path)
+		}
+		me.cmdForgetAllDiags.Desc = Strf("Clears %d build-on-save diagnostic(s) and %d lint diagnostic(s)", ds.numBuild, ds.numLint)
+		menu = append(menu, me.cmdForgetAllDiags)
 	}
 	return
 }
@@ -218,11 +231,13 @@ func (me *DiagBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	case IPCID_SRCDIAG_LIST:
 		me.onListAll(resp)
 	case IPCID_SRCDIAG_RUN_CURFILE:
-		me.onRunManually(resp, []string{req.IpcArgs.(string)})
+		me.onRunManually([]string{req.IpcArgs.(string)}, resp)
 	case IPCID_SRCDIAG_RUN_OPENFILES:
-		me.onRunManually(resp, nil)
+		me.onRunManually(nil, resp)
 	case IPCID_SRCDIAG_RUN_ALLFILES:
-		me.onRunManually(resp, []string{})
+		me.onRunManually([]string{}, resp)
+	case IPCID_SRCDIAG_FORGETALL:
+		me.onForgetAll()
 	case IPCID_SRCDIAG_AUTO_TOGGLE:
 		me.onToggle(req.IpcArgs.(string), resp)
 	case IPCID_SRCDIAG_AUTO_ALL:
@@ -235,9 +250,17 @@ func (me *DiagBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	return true
 }
 
+func (me *DiagBase) onForgetAll() {
+	workspacefiles := Lang.Workspace.Files()
+	for _, f := range workspacefiles {
+		f.resetDiags()
+	}
+	go me.send(workspacefiles, false)
+}
+
 var onRunManuallyInfoNoteAlreadyShownOnceInThisSession, onRunManuallyAlreadyCurrentlyRunning = false, false
 
-func (me *DiagBase) onRunManually(resp *ipcResp, filePaths []string) {
+func (me *DiagBase) onRunManually(filePaths []string, resp *ipcResp) {
 	if onRunManuallyAlreadyCurrentlyRunning {
 		resp.Menu = &MenuResp{NoteWarn: "Declined: previous batch of lintish jobs still running, please wait until those have finished."}
 	} else {
@@ -248,7 +271,7 @@ func (me *DiagBase) onRunManually(resp *ipcResp, filePaths []string) {
 			filePaths = workspacefiles.FilePathsKnown()
 		}
 		go me.Impl.UpdateLintDiagsIfAndAsNeeded(workspacefiles, false, filePaths...)
-		if workspacefiles.AnyBuildDiags() {
+		if workspacefiles.HaveAnyDiags(true, false) {
 			resp.Menu = &MenuResp{NoteWarn: "Any lintish findings will not display as long as the currently shown build problems remain unresolved in the workspace."}
 		} else if !onRunManuallyInfoNoteAlreadyShownOnceInThisSession {
 			onRunManuallyInfoNoteAlreadyShownOnceInThisSession = true
@@ -338,7 +361,7 @@ func (me *DiagBase) onToggled() {
 
 func (me *DiagBase) send(workspaceFiles WorkspaceFiles, onlyBuildDiags bool) {
 	resp := &DiagResp{LangID: Lang.ID, All: make(DiagItemsBy, len(workspaceFiles))}
-	onlyBuildDiags = onlyBuildDiags || workspaceFiles.AnyBuildDiags()
+	onlyBuildDiags = onlyBuildDiags || workspaceFiles.HaveAnyDiags(true, false)
 	for _, f := range workspaceFiles {
 		fdiagitems := f.Diags.Lint.Items
 		if onlyBuildDiags {

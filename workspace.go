@@ -38,13 +38,32 @@ func (me WorkspaceFiles) Ensure(fpath string) (file *WorkspaceFile) {
 	return
 }
 
-func (me WorkspaceFiles) AnyBuildDiags() (has bool) {
+type diagsSummary struct {
+	numBuild int
+	numLint  int
+	files    map[*WorkspaceFile]bool
+}
+
+func (me WorkspaceFiles) diagsSummary() *diagsSummary {
+	s := &diagsSummary{files: make(map[*WorkspaceFile]bool, len(me))}
 	for _, f := range me {
-		if has = len(f.Diags.Build.Items) > 0; has {
-			break
+		if nb, nl := len(f.Diags.Build.Items), len(f.Diags.Lint.Items); nb > 0 || nl > 0 {
+			s.numBuild, s.numLint, s.files[f] = s.numBuild+nb, s.numLint+nl, true
 		}
 	}
-	return
+	if s.numBuild == 0 && s.numLint == 0 {
+		return nil
+	}
+	return s
+}
+
+func (me WorkspaceFiles) HaveAnyDiags(buildDiags bool, lintDiags bool) bool {
+	for _, f := range me {
+		if lb, ll := len(f.Diags.Build.Items), len(f.Diags.Lint.Items); (buildDiags && lb > 0) || (lintDiags && ll > 0) {
+			return true
+		}
+	}
+	return false
 }
 
 func (me WorkspaceFiles) HasBuildDiags(filePath string) (has bool) {
@@ -78,10 +97,10 @@ func (me WorkspaceFiles) FilePathsKnown() (all []string) {
 	return
 }
 
-func (me WorkspaceFiles) NumDirs(openedOnly bool) int {
+func (me WorkspaceFiles) NumDirs(incl func(*WorkspaceFile) bool) int {
 	filedirs := make(map[string]bool, len(me))
 	for _, f := range me {
-		if f.IsOpen || (!openedOnly) {
+		if incl == nil || incl(f) {
 			filedirs[filepath.Dir(f.Path)] = true
 		}
 	}
