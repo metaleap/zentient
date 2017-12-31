@@ -59,6 +59,35 @@ func (me WorkspaceFiles) exists(fpath string) bool {
 	return f != nil
 }
 
+func (me WorkspaceFiles) FilePathsOpened() (all []string) {
+	all = make([]string, 0, len(me))
+	for _, f := range me {
+		if f.IsOpen {
+			all = append(all, f.Path)
+		}
+	}
+	return
+}
+
+func (me WorkspaceFiles) FilePathsKnown() (all []string) {
+	var i int
+	all = make([]string, len(me))
+	for fp, _ := range me {
+		all[i], i = fp, i+1
+	}
+	return
+}
+
+func (me WorkspaceFiles) NumDirs(openedOnly bool) int {
+	filedirs := make(map[string]bool, len(me))
+	for _, f := range me {
+		if f.IsOpen || (!openedOnly) {
+			filedirs[filepath.Dir(f.Path)] = true
+		}
+	}
+	return len(filedirs)
+}
+
 type WorkspaceFile struct {
 	Path   string
 	IsOpen bool `json:",omitempty"`

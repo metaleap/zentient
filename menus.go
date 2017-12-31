@@ -29,6 +29,8 @@ type MenuItem struct {
 	Desc     string      `json:"d,omitempty"`
 	Hint     string      `json:"h,omitempty"`
 	Confirm  string      `json:"q,omitempty"`
+
+	tag string
 }
 
 type MenuItemIpcArgPrompt struct {

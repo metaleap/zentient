@@ -25,8 +25,8 @@ type SrcModBase struct {
 func (me *SrcModBase) Init() {
 	me.cmdFmtSetDef = &MenuItem{
 		IpcID: IPCID_SRCMOD_FMT_SETDEFMENU,
-		Title: "Choose Default Formatter",
-		Desc:  Strf("Specify your preferred default %s source formatter", Lang.Title),
+		Title: Strf("Choose Default %s Formatter", Lang.Title),
+		Desc:  "Specify your preferred default source formatter",
 	}
 	me.cmdFmtRunOnFile = &MenuItem{
 		IpcID: IPCID_SRCMOD_FMT_RUNONFILE,
