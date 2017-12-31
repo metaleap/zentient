@@ -10,6 +10,8 @@ import (
 	"github.com/metaleap/zentient"
 )
 
+const _PKG_NOT_READY_MSG = "Package Tracker not yet ready — try again in a few seconds."
+
 var pkgIntel goPkgIntel
 
 func init() {

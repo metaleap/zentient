@@ -42,16 +42,15 @@ func (me *goExtras) runIntel_Guru(guruCmd string, srcLens *z.SrcLens, arg string
 	}
 	guruscope := ""
 	if settings.cfgGuruScopeMin.ValBool() {
-		pkgs, shouldrefresh := udevgo.PkgsForFiles(srcLens.FilePath)
-		for _, pkg := range pkgs {
-			guruscope = pkg.ImportPath + "/..."
-			break
+		pkgimppath, shouldrefresh := udevgo.GuruMinimalScopeFor(srcLens.FilePath)
+		if pkgimppath != "" {
+			guruscope = pkgimppath + "/..."
 		}
 		if nope, notyet := (guruscope == ""), (udevgo.PkgsByImP == nil); nope || shouldrefresh {
 			go caddyRunRefreshPkgs()
 			if nope {
 				if notyet {
-					resp.Warns = append(resp.Warns, "PackageTracker not yet ready — try again in a few seconds.")
+					resp.Warns = append(resp.Warns, _PKG_NOT_READY_MSG)
 				} else {
 					panic("Not part of a Go package: " + filepath.Base(srcLens.FilePath) + ".")
 				}

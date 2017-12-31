@@ -19,9 +19,9 @@ var (
 		"interface{": z.CMPL_INTERFACE,
 		"struct{":    z.CMPL_CLASS,
 	}
-	cmplCharsFunc = []string{"("}
-	cmplCharsDot  = []string{"."}
-	cmplCharsCtor = []string{"{"}
+	cmplCharsFunc = []string{"(", ","}
+	cmplCharsDot  = []string{".", ","}
+	cmplCharsCtor = []string{"{", ","}
 )
 
 func init() {

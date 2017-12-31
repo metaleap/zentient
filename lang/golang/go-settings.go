@@ -45,7 +45,7 @@ github.com/golamb/... github.com/capnproto/... github.com/robertkrimen/... githu
 
 func (*goSettings) onChangingGuruScopeExcl(newVal interface{}) {
 	if patterns := newVal.([]string); udevgo.PkgsByImP == nil {
-		panic("PackageTracker not yet live — try again in a few seconds.")
+		panic(_PKG_NOT_READY_MSG)
 	} else {
 		for _, pat := range patterns {
 			if pkg := udevgo.PkgsByImP[pat]; pkg == nil {
