@@ -10,21 +10,21 @@ import (
 )
 
 var (
-	xIntelGuruCallers = z.ExtrasItem{ID: "guru.callers", Label: "❬guru❭ — Callers",
+	xIntelGuruCallers = z.ExtrasItem{ID: "guru.callers", Label: "❲guru❳ — Callers",
 		Detail: "For this function / method implementation ➜ find possible callers."}
-	xIntelGuruCallees = z.ExtrasItem{ID: "guru.callees", Label: "❬guru❭ — Callees",
+	xIntelGuruCallees = z.ExtrasItem{ID: "guru.callees", Label: "❲guru❳ — Callees",
 		Detail: "For this function / method call ➜ find possible implementations to which it might dispatch."}
-	xIntelGuruCallstack = z.ExtrasItem{ID: "guru.callstack", Label: "❬guru❭ — Call Stack",
+	xIntelGuruCallstack = z.ExtrasItem{ID: "guru.callstack", Label: "❲guru❳ — Call Stack",
 		Detail: "For this function / method ➜ find an arbitrary path from a `main` call-graph root."}
-	xIntelGuruFreevars = z.ExtrasItem{ID: "guru.freevars", Label: "❬guru❭ — Free Variables",
+	xIntelGuruFreevars = z.ExtrasItem{ID: "guru.freevars", Label: "❲guru❳ — Free Variables",
 		Detail: "For this selection ➜ find variables referenced but not defined within it."}
-	xIntelGuruErrtypes = z.ExtrasItem{ID: "guru.whicherrs", Label: "❬guru❭ — Error Types",
+	xIntelGuruErrtypes = z.ExtrasItem{ID: "guru.whicherrs", Label: "❲guru❳ — Error Types",
 		Detail: "For this `error` value ➜ find its possible types."}
-	xIntelGuruPointeeTypes = z.ExtrasItem{ID: "guru.pointsto.types", Label: "❬guru❭ — Pointees (Types)",
+	xIntelGuruPointeeTypes = z.ExtrasItem{ID: "guru.pointsto.types", Label: "❲guru❳ — Pointees (Types)",
 		Detail: "For this reference-typed expression ➜ find underlying types."}
-	xIntelGuruPointeeVals = z.ExtrasItem{ID: "guru.pointsto.vals", Label: "❬guru❭ — Pointees (Allocations)",
+	xIntelGuruPointeeVals = z.ExtrasItem{ID: "guru.pointsto.vals", Label: "❲guru❳ — Pointees (Allocations)",
 		Detail: "For this reference-typed expression ➜ find related allocations."}
-	xIntelGuruChanpeers = z.ExtrasItem{ID: "guru.peers", Label: "❬guru❭ — Channel Peers",
+	xIntelGuruChanpeers = z.ExtrasItem{ID: "guru.peers", Label: "❲guru❳ — Channel Peers",
 		Detail: "For this `<-` operator's channel ➜ find associated allocations, sends, receives and closes."}
 )
 

@@ -69,9 +69,9 @@ func (*goSettings) onChangingGuruScopeExcl(newVal interface{}) {
 }
 
 func (me *goSettings) onPreInit() {
-	me.cfgGuruScopeExcl = &z.Setting{Id: "cfgGuruScopeExcl", ValDef: []string{}, Title: "Guru Pointer-Analysis: Scopes Exclusions", Desc: "Package patterns (`some/pkg/path/...`) to always exclude from guru `-scope`, space-delimited"}
+	me.cfgGuruScopeExcl = &z.Setting{Id: "cfgGuruScopeExcl", ValDef: []string{}, Title: "Guru: Scopes Exclusions", Desc: "Package patterns (`some/pkg/path/...`) to always exclude from guru `-scope`, space-delimited"}
 	me.cfgGuruScopeExcl.OnChanging, me.cfgGuruScopeExcl.OnChanged, me.cfgGuruScopeExcl.OnReloaded = me.onChangingGuruScopeExcl, me.onChangedGuruScopeExcl, me.onReloadedGuruScopeExcl
-	me.cfgGuruScopeMin = &z.Setting{Id: "cfgGuruScopeMin", ValDef: false, Title: "Guru Pointer-Analysis: Minimal Scopes", Desc: "If `true`, CodeIntel queries scope to current-and-subordinate packages instead of workspace"}
+	me.cfgGuruScopeMin = &z.Setting{Id: "cfgGuruScopeMin", ValDef: false, Title: "Guru: Minimal Scopes", Desc: "If `true`, CodeIntel queries scope to current-and-subordinate packages instead of workspace"}
 	me.allSettings = []*z.Setting{me.cfgGuruScopeMin, me.cfgGuruScopeExcl}
 }
 
