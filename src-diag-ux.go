@@ -129,6 +129,7 @@ func (me *DiagJob) String() string { return me.Target.String() }
 
 type DiagResp struct {
 	All    DiagItemsBy
+	FixUps FixUpsByFile
 	LangID string
 }
 

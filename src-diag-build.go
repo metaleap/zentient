@@ -37,6 +37,8 @@ type DiagJobBuild struct {
 	diags     DiagItems
 }
 
+type FixUpsByFile map[string][]*FixUp
+
 type FixUp struct {
 	Name      string
 	Item      string
@@ -54,7 +56,14 @@ func (me *DiagJobBuild) IsSortedPriorTo(cmp interface{}) bool {
 	return me.Target.IsSortedPriorTo(c.Target)
 }
 
-func (*DiagBase) onFixUps([]*FixUp) {
+func (me *DiagBase) onFixUps(all []*FixUp) {
+	if len(all) > 0 {
+		fixups := make(FixUpsByFile, len(all))
+		for _, fix := range all {
+			fixups[fix.Mod.FilePath] = append(fixups[fix.Mod.FilePath], fix)
+		}
+		send(&ipcResp{IpcID: IPCID_SRCDIAG_PUB, SrcDiags: &DiagResp{FixUps: fixups, LangID: Lang.ID}})
+	}
 }
 
 func (*DiagBase) FixUps(DiagItems, func([]*FixUp)) {

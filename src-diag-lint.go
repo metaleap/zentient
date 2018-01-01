@@ -20,7 +20,7 @@ type IDiagLint interface {
 func init() {
 	if cfgLintStickiness == nil {
 		cfgLintStickiness = &Setting{Id: "cfgLintStickiness", Title: "Sticky-Lints Level", ValDef: uint64(0),
-			Desc: "Lints shown even for closed files ➜ 0: errors only — 1: and warnings — 2: and infos — 3: and hints."}
+			Desc: "Lints showing for closed files ➜ 0: errors only — 1: and warnings — 2: and infos — 3: and hints."}
 		cfgLintStickiness.OnChanging = func(nv interface{}) {
 			if l, ok := nv.(uint64); (!ok) || l > 3 {
 				panic("Wanted: a level of at-least 0 and at-most 3.")

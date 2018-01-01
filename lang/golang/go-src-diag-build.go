@@ -98,7 +98,7 @@ func (me *goDiag) tryFixupImpNotFound(d *z.DiagItem) (fix *z.FixUp) {
 	pref, i := "cannot find package \"", strings.Index(d.Msg, "\" in any of:")
 	if strings.HasPrefix(d.Msg, pref) && i > len(pref) {
 		badimpname := d.Msg[:i][len(pref):]
-		fix = &z.FixUp{Name: "Remove Bad Imports", Item: badimpname, ModDropLn: true}
+		fix = &z.FixUp{Name: "Removes invalid imports", Item: badimpname, ModDropLn: true}
 		fix.Mod.FilePath, fix.Mod.Pos = d.Loc.FilePath, d.Loc.Pos
 	}
 	return
