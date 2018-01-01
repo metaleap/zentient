@@ -126,7 +126,7 @@ func Init() (err error) {
 		}
 
 		wellknownmenus := []IMenuItems{
-			Lang.Diag, Lang.SrcMod, Lang.PkgIntel, Lang.Settings, Lang.Tooling,
+			Lang.SrcMod, Lang.Diag, Lang.PkgIntel, Lang.Settings, Lang.Tooling,
 		}
 		for _, menu := range wellknownmenus {
 			if menu != nil {

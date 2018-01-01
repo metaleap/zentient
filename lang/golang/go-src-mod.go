@@ -28,6 +28,11 @@ func (me *goSrcMod) onPostInit() {
 		z.Prog.Cfg.FormatterName = "gofmt"
 	}
 }
+
+func (*goSrcMod) DoesStdoutWithFilePathArg(*z.Tool) bool {
+	return true
+}
+
 func (me *goSrcMod) KnownFormatters() z.Tools {
 	return me.knownFormatters
 }

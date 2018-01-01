@@ -81,10 +81,6 @@ func (*SrcModBase) MenuCategory() string {
 	return "Formatting"
 }
 
-func (*SrcModBase) DoesStdoutWithFilePathArg(*Tool) bool {
-	return true
-}
-
 func (*SrcModBase) CodeActions(srcLens *SrcLens) (all []EditorAction) {
 	return
 }
@@ -188,11 +184,10 @@ func (me *SrcModBase) onRunFormatter(req *ipcReq, resp *ipcResp) {
 		cmdname = Prog.Cfg.FormatterProg
 	}
 
-	if srcformatted, stderr := me.Impl.RunFormatter(formatter, cmdname, prefs, srcfilepath, *src); stderr != "" {
+	if srcformatted, stderr := me.Impl.RunFormatter(formatter, cmdname, prefs, srcfilepath, *src); srcformatted != "" {
+		*src, resp.SrcMods = srcformatted, SrcLenses{req.SrcLens}
+	} else if stderr != "" {
 		resp.ErrMsg = stderr
-	} else {
-		*src = srcformatted
-		resp.SrcMods = SrcLenses{req.SrcLens}
 	}
 }
 
