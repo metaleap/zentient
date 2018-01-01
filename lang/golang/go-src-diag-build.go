@@ -76,21 +76,8 @@ func (me *goDiag) RunBuildJobs(jobs z.DiagBuildJobs) (diags z.DiagItems) {
 	return
 }
 
-func (me *goDiag) FixUps(diags z.DiagItems, yield func([]*z.FixUp)) {
-	fixups := []z.FixerUpper{me.tryFixupImpNotFound}
-	fixes := make([]*z.FixUp, 0, len(diags))
-	for _, d := range diags {
-		for _, f := range fixups {
-			if fix := f(d); fix != nil {
-				fixes = append(fixes, fix)
-			} else {
-				println(d.Msg)
-			}
-		}
-	}
-	if len(fixes) > 0 {
-		yield(fixes)
-	}
+func (me *goDiag) FixerUppers() []z.FixerUpper {
+	return []z.FixerUpper{me.tryFixupImpNotFound}
 }
 
 func (me *goDiag) tryFixupImpNotFound(d *z.DiagItem) (fix *z.FixUp) {
@@ -98,8 +85,8 @@ func (me *goDiag) tryFixupImpNotFound(d *z.DiagItem) (fix *z.FixUp) {
 	pref, i := "cannot find package \"", strings.Index(d.Msg, "\" in any of:")
 	if strings.HasPrefix(d.Msg, pref) && i > len(pref) {
 		badimpname := d.Msg[:i][len(pref):]
-		fix = &z.FixUp{Name: "Removes invalid imports", Item: badimpname, ModDropLn: true}
-		fix.Mod.FilePath, fix.Mod.Pos = d.Loc.FilePath, d.Loc.Pos
+		fix = &z.FixUp{Name: "Removes invalid imports", Items: []string{badimpname}}
+		fix.Edits.AddEdit_DeleteLine(d.Loc.FilePath, d.Loc.Pos)
 	}
 	return
 }

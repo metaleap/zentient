@@ -7,7 +7,7 @@ import (
 type FixerUpper func(*DiagItem) *FixUp
 
 type IDiagBuild interface {
-	FixUps(DiagItems, func([]*FixUp))
+	FixerUppers() []FixerUpper
 	OnUpdateBuildDiags([]string) DiagBuildJobs
 	RunBuildJobs(DiagBuildJobs) DiagItems
 	UpdateBuildDiagsAsNeeded(WorkspaceFiles, []string)
@@ -40,10 +40,15 @@ type DiagJobBuild struct {
 type FixUpsByFile map[string][]*FixUp
 
 type FixUp struct {
-	Name      string
-	Item      string
-	Mod       SrcLens
-	ModDropLn bool
+	Name  string
+	Items []string
+	Edits SrcModEdits
+}
+
+type FixUps struct {
+	FilePath string
+	Desc     map[string][]string
+	Edits    SrcModEdits
 }
 
 func (me *DiagJobBuild) Yield(diag *DiagItem) { me.diags = append(me.diags, diag) }
@@ -56,17 +61,38 @@ func (me *DiagJobBuild) IsSortedPriorTo(cmp interface{}) bool {
 	return me.Target.IsSortedPriorTo(c.Target)
 }
 
-func (me *DiagBase) onFixUps(all []*FixUp) {
-	if len(all) > 0 {
-		fixups := make(FixUpsByFile, len(all))
-		for _, fix := range all {
-			fixups[fix.Mod.FilePath] = append(fixups[fix.Mod.FilePath], fix)
-		}
-		send(&ipcResp{IpcID: IPCID_SRCDIAG_PUB, SrcDiags: &DiagResp{FixUps: fixups, LangID: Lang.ID}})
-	}
-}
+func (*DiagBase) FixerUppers() []FixerUpper { return nil }
 
-func (*DiagBase) FixUps(DiagItems, func([]*FixUp)) {
+func (me *DiagBase) fixUps(diags DiagItems) {
+	fixers := me.Impl.FixerUppers()
+	if len(fixers) == 0 {
+		return
+	}
+	fixupsbyfile := FixUpsByFile{}
+	for _, d := range diags {
+		for _, f := range fixers {
+			if fixup := f(d); fixup != nil && len(fixup.Edits) > 0 {
+				fixupsbyfile[d.Loc.FilePath] = append(fixupsbyfile[d.Loc.FilePath], fixup)
+			}
+		}
+	}
+	if len(fixupsbyfile) > 0 {
+		dr := &DiagResp{LangID: Lang.ID, FixUps: make([]*FixUps, 0, len(fixupsbyfile))}
+		for filepath, filefixups := range fixupsbyfile {
+			fixups := &FixUps{FilePath: filepath, Desc: map[string][]string{}}
+			for _, fixup := range filefixups {
+				fixups.Desc[fixup.Name] = append(fixups.Desc[fixup.Name], fixup.Items...)
+				fixups.Edits = append(fixups.Edits, fixup.Edits...)
+			}
+			dropped := fixups.Edits.DropConflictingEdits()
+			if len(dropped) > 0 {
+				println(Strf("%#v", dropped))
+			}
+			sort.Sort(fixups.Edits)
+			dr.FixUps = append(dr.FixUps, fixups)
+		}
+		send(&ipcResp{IpcID: IPCID_SRCDIAG_PUB, SrcDiags: dr})
+	}
 }
 
 func (me *DiagBase) UpdateBuildDiagsAsNeeded(workspaceFiles WorkspaceFiles, writtenFiles []string) {
@@ -80,7 +106,7 @@ func (me *DiagBase) UpdateBuildDiagsAsNeeded(workspaceFiles WorkspaceFiles, writ
 		diagitems := me.Impl.RunBuildJobs(jobs)
 		diagitems.propagate(false, true, workspaceFiles)
 		if len(diagitems) > 0 {
-			go me.Impl.FixUps(diagitems, me.onFixUps)
+			go me.fixUps(diagitems)
 		}
 	}
 	go me.send(workspaceFiles, false)

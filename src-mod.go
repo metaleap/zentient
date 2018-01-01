@@ -14,6 +14,48 @@ type ISrcMod interface {
 	RunFormatter(*Tool, string, *SrcFormattingClientPrefs, string, string) (string, string)
 }
 
+type SrcModEdits []SrcModEdit
+
+func (me *SrcModEdits) DropConflictingEdits() (droppedOffenders []SrcModEdit) {
+	all, mod := *me, false
+	for again := true; again; {
+		again = false
+		for i, disedit := range all {
+			for j, datedit := range all {
+				if i != j && disedit.At.OverlapsWith(datedit.At) {
+					droppedOffenders = append(droppedOffenders, all[i])
+					pref, suff := all[:i], all[i+1:]
+					again, mod, all = true, true, append(pref, suff...)
+					break
+				}
+			}
+			if again {
+				break
+			}
+		}
+	}
+	if mod {
+		*me = all
+	}
+	return
+}
+
+func (me SrcModEdits) Len() int               { return len(me) }
+func (me SrcModEdits) Swap(i int, j int)      { me[i], me[j] = me[j], me[i] }
+func (me SrcModEdits) Less(i int, j int) bool { return me[i].At.Start.ComesBehind(&me[j].At.End) }
+
+func (me *SrcModEdits) AddEdit_DeleteLine(srcFilePath string, lineAt *SrcPos) {
+	var lens = SrcLens{SrcLoc: SrcLoc{FilePath: srcFilePath, Pos: lineAt}}
+	lens.EnsureSrcFull()
+	edit := SrcModEdit{}
+	*me = append(*me, edit)
+}
+
+type SrcModEdit struct {
+	At  *SrcRange
+	Val string // if not empty: inserts if At is pos, replaces if At is range. if empty: deletes if At range is range, errors if At is pos.
+}
+
 type SrcModBase struct {
 	cmdFmtSetDef    *MenuItem
 	cmdFmtRunOnFile *MenuItem

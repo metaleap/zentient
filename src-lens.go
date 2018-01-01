@@ -19,6 +19,29 @@ type SrcPos struct {
 	byteoff bool
 }
 
+func (oneRangeStart *SrcPos) ComesBehind(anotherRangeEnd *SrcPos) bool {
+	return oneRangeStart.Off >= anotherRangeEnd.Off ||
+		oneRangeStart.byteOff >= anotherRangeEnd.byteOff ||
+		oneRangeStart.Ln >= anotherRangeEnd.Ln ||
+		(oneRangeStart.Ln == anotherRangeEnd.Ln && oneRangeStart.Col >= anotherRangeEnd.Col)
+}
+
+func (me *SrcPos) EquivTo(pos *SrcPos) bool {
+	if me.byteoff && pos.byteoff {
+		return me.byteOff == pos.byteOff
+	} else if me.Off > 0 && pos.Off > 0 {
+		return me.Off == pos.Off
+	}
+	return me.Ln == pos.Ln && me.Col == pos.Col
+}
+
+func (me *SrcPos) IsBetween(sr *SrcRange) bool {
+	if sr.IsEmpty() {
+		return me.EquivTo(&sr.Start)
+	}
+	return me.ComesBehind(&sr.Start) && sr.End.ComesBehind(me)
+}
+
 func (me *SrcPos) String() string {
 	if me.Ln > 0 && me.Col > 0 {
 		return Strf("%d,%d", me.Ln, me.Col)
@@ -29,6 +52,15 @@ func (me *SrcPos) String() string {
 type SrcRange struct {
 	Start SrcPos `json:"s"`
 	End   SrcPos `json:"e,omitempty"`
+}
+
+func (me *SrcRange) IsEmpty() bool {
+	return me.Start.EquivTo(&me.End) || (me.End.Col == 0 && me.End.Ln == 0 && me.End.Off == 0)
+}
+
+func (me *SrcRange) OverlapsWith(sr *SrcRange) bool {
+	return (!me.Start.EquivTo(&sr.End) || me.End.EquivTo(&sr.Start)) &&
+		(me.Start.IsBetween(sr) || me.End.IsBetween(sr) || sr.Start.IsBetween(me) || sr.End.IsBetween(me))
 }
 
 type SrcLocs []*SrcLoc
