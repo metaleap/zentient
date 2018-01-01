@@ -66,7 +66,7 @@ func (me *goExtras) runIntel_Guru(guruCmd string, srcLens *z.SrcLens, arg string
 		if gcs, e := udevgo.QueryCallees_Guru(srcLens.FilePath, srcLens.Txt, bp1, bp2, guruscope); e != nil {
 			err = e
 		} else {
-			resp.Refs = make(z.SrcLenses, 0, len(gcs.Callees))
+			resp.Refs = make(z.SrcLocs, 0, len(gcs.Callees))
 			for _, gc := range gcs.Callees {
 				resp.Refs.AddFrom(udev.SrcMsgFromLn(gc.Pos), nil)
 			}
@@ -76,7 +76,7 @@ func (me *goExtras) runIntel_Guru(guruCmd string, srcLens *z.SrcLens, arg string
 		if gcs, e := udevgo.QueryCallers_Guru(srcLens.FilePath, srcLens.Txt, bp1, bp2, guruscope); e != nil {
 			err = e
 		} else {
-			resp.Refs = make(z.SrcLenses, 0, len(gcs))
+			resp.Refs = make(z.SrcLocs, 0, len(gcs))
 			for _, gc := range gcs {
 				resp.Refs.AddFrom(udev.SrcMsgFromLn(gc.Pos), nil)
 			}

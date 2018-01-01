@@ -38,9 +38,10 @@ type DiagJobBuild struct {
 }
 
 type FixUp struct {
-	Name string
-	Item string
-	Mod  SrcLens
+	Name      string
+	Item      string
+	Mod       SrcLens
+	ModDropLn bool
 }
 
 func (me *DiagJobBuild) Yield(diag *DiagItem) { me.diags = append(me.diags, diag) }

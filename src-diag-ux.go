@@ -40,7 +40,7 @@ type DiagItemsBy map[string]DiagItems
 
 type DiagItem struct {
 	Cat         string `json:",omitempty"`
-	Loc         SrcLens
+	Loc         SrcLoc
 	Msg         string
 	SrcActions  []EditorAction `json:",omitempty"`
 	StickyForce bool           `json:"-"`
@@ -155,7 +155,7 @@ func (me *DiagBase) Init() {
 	me.cmdRunDiagsOnKnownFiles = &MenuItem{IpcID: IPCID_SRCDIAG_RUN_ALLFILES, Title: me.cmdRunDiagsOnCurFile.Title, tag: "known"}
 	me.cmdRunDiagsOnOpenFiles = &MenuItem{IpcID: IPCID_SRCDIAG_RUN_OPENFILES, Title: me.cmdRunDiagsOnCurFile.Title, tag: "opened"}
 	me.cmdForgetAllDiags = &MenuItem{IpcID: IPCID_SRCDIAG_FORGETALL, Title: Strf("Forget All Currently Known %s Diagnostics", Lang.Title)}
-	me.cmdPeekHiddenDiags = &MenuItem{IpcID: IPCID_SRCDIAG_PEEKHIDDEN, Title: Strf("Peek Potentially Hidden %s Lints", Lang.Title)}
+	me.cmdPeekHiddenDiags = &MenuItem{IpcID: IPCID_SRCDIAG_PEEKHIDDEN, Title: Strf("Peek Hidden %s Lints", Lang.Title)}
 }
 
 func (me *DiagBase) MenuCategory() string {
@@ -209,7 +209,7 @@ func (me *DiagBase) MenuItems(srcLens *SrcLens) (menu MenuItems) {
 			for hlf := range hiddenlintfiles {
 				me.cmdPeekHiddenDiags.Hint += " — " + filepath.Base(hlf.Path)
 			}
-			me.cmdPeekHiddenDiags.Desc = Strf("%d possibly hidden lint(s) from", hiddenlintnum)
+			me.cmdPeekHiddenDiags.Desc = Strf("%d hidden lint(s) from", hiddenlintnum)
 			for toolname := range hiddenlintcats {
 				me.cmdPeekHiddenDiags.Desc += " — " + toolname
 			}
@@ -269,7 +269,7 @@ func (me *DiagBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 
 func (me *DiagBase) onPeekHidden(approxNum int, resp *MenuResp) {
 	workspacefiles := Lang.Workspace.Files()
-	resp.Refs = make(SrcLenses, 0, approxNum)
+	resp.Refs = make(SrcLocs, 0, approxNum)
 	for _, f := range workspacefiles {
 		if (!f.IsOpen) && len(f.Diags.Lint.Items) > 0 {
 			for _, lintdiag := range f.Diags.Lint.Items {

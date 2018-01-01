@@ -31,6 +31,24 @@ type SrcRange struct {
 	End   SrcPos `json:"e,omitempty"`
 }
 
+type SrcLocs []*SrcLoc
+
+func (me *SrcLocs) AddFrom(srcRefLoc *udev.SrcMsg, fallbackFilePath func() string) (loc *SrcLoc) {
+	if srcRefLoc != nil {
+		loc = &SrcLoc{}
+		loc.SetFilePathAndPosOrRangeFrom(srcRefLoc, fallbackFilePath)
+		(*me) = append(*me, loc)
+	}
+	return
+}
+
+type SrcLoc struct {
+	Flag     int       `json:"e"` // don't omitempty
+	FilePath string    `json:"f,omitempty"`
+	Pos      *SrcPos   `json:"p,omitempty"`
+	Range    *SrcRange `json:"r,omitempty"`
+}
+
 type SrcLenses []*SrcLens
 
 func (me *SrcLenses) AddFrom(srcRefLoc *udev.SrcMsg, fallbackFilePath func() string) (lens *SrcLens) {
@@ -43,13 +61,10 @@ func (me *SrcLenses) AddFrom(srcRefLoc *udev.SrcMsg, fallbackFilePath func() str
 }
 
 type SrcLens struct {
-	FilePath string    `json:"f,omitempty"`
-	Txt      string    `json:"t,omitempty"`
-	Str      string    `json:"s,omitempty"`
-	Pos      *SrcPos   `json:"p,omitempty"`
-	Range    *SrcRange `json:"r,omitempty"`
-	CrLf     bool      `json:"l,omitempty"`
-	Flag     int       `json:"e"` // don't omitempty
+	SrcLoc
+	Txt  string `json:"t,omitempty"`
+	Str  string `json:"s,omitempty"`
+	CrLf bool   `json:"l,omitempty"`
 }
 
 func (me *SrcLens) EnsureSrcFull() {
@@ -86,12 +101,12 @@ func (me *SrcLens) ByteOffsetForFirstLineBeginningWith(prefix string) int {
 	return -1
 }
 
-func (me *SrcLens) SetFilePathAndPosOrRangeFrom(srcRef *udev.SrcMsg, fallbackFilePath func() string) {
+func (me *SrcLoc) SetFilePathAndPosOrRangeFrom(srcRef *udev.SrcMsg, fallbackFilePath func() string) {
 	me.SetFilePathFrom(srcRef, fallbackFilePath)
 	me.SetPosOrRangeFrom(srcRef, true)
 }
 
-func (me *SrcLens) SetFilePathFrom(srcRef *udev.SrcMsg, fallbackFilePath func() string) {
+func (me *SrcLoc) SetFilePathFrom(srcRef *udev.SrcMsg, fallbackFilePath func() string) {
 	if me.FilePath = srcRef.Ref; me.FilePath != "" && !filepath.IsAbs(me.FilePath) {
 		if absfilepath, err := filepath.Abs(me.FilePath); err == nil {
 			me.FilePath = absfilepath
@@ -104,7 +119,7 @@ func (me *SrcLens) SetFilePathFrom(srcRef *udev.SrcMsg, fallbackFilePath func() 
 	}
 }
 
-func (me *SrcLens) SetPosOrRangeFrom(srcRef *udev.SrcMsg, preferRange bool) {
+func (me *SrcLoc) SetPosOrRangeFrom(srcRef *udev.SrcMsg, preferRange bool) {
 	me.Pos, me.Range = nil, nil
 	if preferRange && srcRef.Pos2Ch > 0 && srcRef.Pos2Ln > 0 && srcRef.Pos1Ch > 0 && srcRef.Pos1Ln > 0 {
 		me.Range = &SrcRange{Start: SrcPos{Ln: srcRef.Pos1Ln, Col: srcRef.Pos1Ch},

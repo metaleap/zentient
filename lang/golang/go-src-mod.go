@@ -50,7 +50,7 @@ func (me *goSrcMod) RunRenamer(srcLens *z.SrcLens, newName string) (srcMods z.Sr
 		panic(err)
 	}
 	for _, fedit := range fileedits {
-		srcmod := z.SrcLens{Str: fedit.Msg, FilePath: fedit.Ref, Range: &z.SrcRange{}}
+		srcmod := z.SrcLens{Str: fedit.Msg, SrcLoc: z.SrcLoc{FilePath: fedit.Ref, Range: &z.SrcRange{}}}
 		srcmod.Range.Start.Col, srcmod.Range.Start.Ln = 1, fedit.Pos1Ln+1
 		srcmod.Range.End.Col, srcmod.Range.End.Ln = 1, fedit.Pos2Ln+1
 		srcMods = append(srcMods, &srcmod)

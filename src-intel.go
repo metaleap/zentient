@@ -9,25 +9,26 @@ type ISrcIntel interface {
 
 	ComplDetails(*SrcLens, string) *SrcIntelCompl
 	ComplItems(*SrcLens) SrcIntelCompls
-	DefSym(*SrcLens) SrcLenses
-	DefType(*SrcLens) SrcLenses
-	DefImpl(*SrcLens) SrcLenses
-	Highlights(*SrcLens, string) SrcLenses
+	DefSym(*SrcLens) SrcLocs
+	DefType(*SrcLens) SrcLocs
+	DefImpl(*SrcLens) SrcLocs
+	Highlights(*SrcLens, string) SrcLocs
 	Hovers(*SrcLens) []InfoTip
-	References(*SrcLens, bool) SrcLenses
+	References(*SrcLens, bool) SrcLocs
 	Signature(*SrcLens) *SrcIntelSigHelp
 	Symbols(*SrcLens, string, bool) SrcLenses
 }
 
 type SrcIntels struct {
 	Info []InfoTip `json:",omitempty"`
-	Refs SrcLenses `json:",omitempty"`
+	Refs SrcLocs   `json:",omitempty"`
 }
 
 type srcIntelResp struct {
 	SrcIntels
 	Sig  *SrcIntelSigHelp `json:",omitempty"`
 	Cmpl SrcIntelCompls   `json:",omitempty"`
+	Syms SrcLenses        `json:",omitempty"`
 }
 
 type SrcIntelCompl struct {
@@ -128,7 +129,7 @@ func (me *SrcIntelBase) onCmplDetails(req *ipcReq, resp *ipcResp) {
 	}
 }
 
-func (*SrcIntelBase) onDefinition(req *ipcReq, resp *ipcResp, def func(*SrcLens) SrcLenses) {
+func (*SrcIntelBase) onDefinition(req *ipcReq, resp *ipcResp, def func(*SrcLens) SrcLocs) {
 	resp.SrcIntel.Refs = def(req.SrcLens)
 }
 
@@ -166,7 +167,7 @@ func (me *SrcIntelBase) onSyms(req *ipcReq, resp *ipcResp) {
 	if req.IpcID == IPCID_SRCINTEL_SYMS_PROJ {
 		query, _ = req.IpcArgs.(string)
 	}
-	resp.SrcIntel.Refs = me.Impl.Symbols(req.SrcLens, query, req.IpcID == IPCID_SRCINTEL_SYMS_FILE)
+	resp.SrcIntel.Syms = me.Impl.Symbols(req.SrcLens, query, req.IpcID == IPCID_SRCINTEL_SYMS_FILE)
 }
 
 func (*SrcIntelBase) ComplItems(srcLens *SrcLens) SrcIntelCompls {

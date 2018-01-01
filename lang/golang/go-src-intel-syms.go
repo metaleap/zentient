@@ -25,13 +25,13 @@ var (
 	}
 )
 
-func (*goSrcIntel) References(srcLens *z.SrcLens, includeDeclaration bool) (refs z.SrcLenses) {
+func (*goSrcIntel) References(srcLens *z.SrcLens, includeDeclaration bool) (refs z.SrcLocs) {
 	if !tools.guru.Installed {
 		return
 	}
 	bytepos := srcLens.ByteOffsetForPosWithRuneOffset(srcLens.Pos)
 	if gr := udevgo.QueryRefs_Guru(srcLens.FilePath, srcLens.Txt, ustr.FromInt(bytepos)); len(gr) > 0 {
-		refs = make(z.SrcLenses, 0, len(gr))
+		refs = make(z.SrcLocs, 0, len(gr))
 		for _, gref := range gr {
 			refs.AddFrom(udev.SrcMsgFromLn(gref.Pos), nil)
 		}
@@ -39,7 +39,7 @@ func (*goSrcIntel) References(srcLens *z.SrcLens, includeDeclaration bool) (refs
 	return
 }
 
-func (*goSrcIntel) DefSym(srcLens *z.SrcLens) (defs z.SrcLenses) {
+func (*goSrcIntel) DefSym(srcLens *z.SrcLens) (defs z.SrcLocs) {
 	var refloc *udev.SrcMsg
 	bytepos := srcLens.ByteOffsetForPosWithRuneOffset(srcLens.Pos)
 	spos := ustr.FromInt(bytepos)
@@ -68,7 +68,7 @@ func (*goSrcIntel) DefSym(srcLens *z.SrcLens) (defs z.SrcLenses) {
 	return
 }
 
-func (me *goSrcIntel) DefType(srcLens *z.SrcLens) (defs z.SrcLenses) {
+func (me *goSrcIntel) DefType(srcLens *z.SrcLens) (defs z.SrcLocs) {
 	if !tools.guru.Installed {
 		return
 	}
@@ -116,13 +116,13 @@ func (me *goSrcIntel) DefType(srcLens *z.SrcLens) (defs z.SrcLenses) {
 	return
 }
 
-func (*goSrcIntel) DefImpl(srcLens *z.SrcLens) (defs z.SrcLenses) {
+func (*goSrcIntel) DefImpl(srcLens *z.SrcLens) (defs z.SrcLocs) {
 	if !tools.guru.Installed {
 		return
 	}
 	bytepos := srcLens.ByteOffsetForPosWithRuneOffset(srcLens.Pos)
 	if gi := udevgo.QueryImpl_Guru(srcLens.FilePath, srcLens.Txt, ustr.FromInt(bytepos)); gi != nil {
-		if defs = make(z.SrcLenses, 0, len(gi.AssignableFrom)+len(gi.AssignableTo)+len(gi.AssignableFromPtr)+len(gi.AssignableFromMethod)+len(gi.AssignableFromPtrMethod)+len(gi.AssignableToMethod)); cap(defs) > 0 {
+		if defs = make(z.SrcLocs, 0, len(gi.AssignableFrom)+len(gi.AssignableTo)+len(gi.AssignableFromPtr)+len(gi.AssignableFromMethod)+len(gi.AssignableFromPtrMethod)+len(gi.AssignableToMethod)); cap(defs) > 0 {
 			addtypes := func(impltypes []gurujson.ImplementsType) {
 				for _, it := range impltypes {
 					defs.AddFrom(udev.SrcMsgFromLn(it.Pos), nil)
@@ -147,7 +147,7 @@ func (*goSrcIntel) DefImpl(srcLens *z.SrcLens) (defs z.SrcLenses) {
 	return
 }
 
-func (*goSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (all z.SrcLenses) {
+func (*goSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (all z.SrcLocs) {
 	if !tools.guru.Installed {
 		return
 	}
@@ -156,7 +156,7 @@ func (*goSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (all z.SrcLens
 	if err != nil {
 		panic(err)
 	}
-	all = make(z.SrcLenses, 0, len(gw.SameIDs))
+	all = make(z.SrcLocs, 0, len(gw.SameIDs))
 	for _, sameid := range gw.SameIDs {
 		if sl := all.AddFrom(udev.SrcMsgFromLn(sameid), nil); sl != nil && sl.FilePath == srcLens.FilePath && (sl.Range != nil || sl.Pos != nil) {
 			sl.FilePath = ""
@@ -184,8 +184,7 @@ func (*goSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (all z.SrcLens
 			if ustr.AnyOf(gw.Enclosing[0].Description, checks[:num]...) {
 				for _, syntaxnode := range gw.Enclosing {
 					if ustr.AnyOf(syntaxnode.Description, checks[num:]...) {
-						all = append(all, &z.SrcLens{Range: &z.SrcRange{
-							Start: z.SrcPos{Off: 1 + bpos2rpos(syntaxnode.Start)}, End: z.SrcPos{Off: 1 + bpos2rpos(syntaxnode.End)}}})
+						all = append(all, &z.SrcLoc{Range: &z.SrcRange{Start: z.SrcPos{Off: 1 + bpos2rpos(syntaxnode.Start)}, End: z.SrcPos{Off: 1 + bpos2rpos(syntaxnode.End)}}})
 						return true
 					}
 				}
@@ -215,7 +214,8 @@ func (*goSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (all z.SrcLens
 
 func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (allsyms z.SrcLenses) {
 	onerr := func(label string, detail string) z.SrcLenses {
-		return z.SrcLenses{&z.SrcLens{Flag: int(z.SYM_EVENT), Str: label, Txt: detail, FilePath: sL.FilePath, Pos: sL.Pos, Range: sL.Range}}
+		return z.SrcLenses{&z.SrcLens{Str: label, Txt: detail,
+			SrcLoc: z.SrcLoc{FilePath: sL.FilePath, Flag: int(z.SYM_EVENT), Pos: sL.Pos, Range: sL.Range}}}
 	}
 	if !tools.guru.Installed {
 		return onerr(z.ToolsMsgGone("guru"), z.ToolsMsgMore("guru"))
