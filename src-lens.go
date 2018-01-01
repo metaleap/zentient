@@ -107,9 +107,21 @@ func (me *SrcLens) EnsureSrcFull() {
 	}
 }
 
-func (me *SrcLens) ByteOffsetForPosWithRuneOffset(pos *SrcPos) int {
+func (me *SrcLens) ByteOffsetForPos(pos *SrcPos) int {
 	if !pos.byteoff {
 		pos.byteoff = true
+		if pos.Off == 0 && pos.Col > 0 && pos.Ln > 0 {
+			ln := 1
+			for _, r := range me.Txt {
+				if ln == pos.Ln {
+					break
+				} else if r == '\n' {
+					ln++
+				}
+				pos.Off++
+			}
+			pos.Off += pos.Col
+		}
 		if pos.Off > 1 {
 			me.EnsureSrcFull()
 			r := 1
@@ -133,6 +145,16 @@ func (me *SrcLens) ByteOffsetForFirstLineBeginningWith(prefix string) int {
 		return len([]byte(me.Txt[:idx+1])) // want byte-pos not rune-pos
 	}
 	return -1
+}
+
+func (me *SrcLens) Rune1OffsetForByte0Offset(byte0off int) (rune1off int) {
+	for byteoff, _ := range me.Txt {
+		rune1off++
+		if byteoff >= byte0off {
+			return
+		}
+	}
+	return
 }
 
 func (me *SrcLoc) SetFilePathAndPosOrRangeFrom(srcRef *udev.SrcMsg, fallbackFilePath func() string) {

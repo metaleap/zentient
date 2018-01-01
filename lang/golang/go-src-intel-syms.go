@@ -29,7 +29,7 @@ func (*goSrcIntel) References(srcLens *z.SrcLens, includeDeclaration bool) (refs
 	if !tools.guru.Installed {
 		return
 	}
-	bytepos := srcLens.ByteOffsetForPosWithRuneOffset(srcLens.Pos)
+	bytepos := srcLens.ByteOffsetForPos(srcLens.Pos)
 	if gr := udevgo.QueryRefs_Guru(srcLens.FilePath, srcLens.Txt, ustr.FromInt(bytepos)); len(gr) > 0 {
 		refs = make(z.SrcLocs, 0, len(gr))
 		for _, gref := range gr {
@@ -41,7 +41,7 @@ func (*goSrcIntel) References(srcLens *z.SrcLens, includeDeclaration bool) (refs
 
 func (*goSrcIntel) DefSym(srcLens *z.SrcLens) (defs z.SrcLocs) {
 	var refloc *udev.SrcMsg
-	bytepos := srcLens.ByteOffsetForPosWithRuneOffset(srcLens.Pos)
+	bytepos := srcLens.ByteOffsetForPos(srcLens.Pos)
 	spos := ustr.FromInt(bytepos)
 
 	if refloc == nil && tools.godef.Installed {
@@ -73,7 +73,7 @@ func (me *goSrcIntel) DefType(srcLens *z.SrcLens) (defs z.SrcLocs) {
 		return
 	}
 	var refloc *udev.SrcMsg
-	bytepos := srcLens.ByteOffsetForPosWithRuneOffset(srcLens.Pos)
+	bytepos := srcLens.ByteOffsetForPos(srcLens.Pos)
 	spos := ustr.FromInt(bytepos)
 
 	if gd, _ := udevgo.QueryDesc_Guru(srcLens.FilePath, srcLens.Txt, spos); gd != nil {
@@ -120,7 +120,7 @@ func (*goSrcIntel) DefImpl(srcLens *z.SrcLens) (defs z.SrcLocs) {
 	if !tools.guru.Installed {
 		return
 	}
-	bytepos := srcLens.ByteOffsetForPosWithRuneOffset(srcLens.Pos)
+	bytepos := srcLens.ByteOffsetForPos(srcLens.Pos)
 	if gi := udevgo.QueryImpl_Guru(srcLens.FilePath, srcLens.Txt, ustr.FromInt(bytepos)); gi != nil {
 		if defs = make(z.SrcLocs, 0, len(gi.AssignableFrom)+len(gi.AssignableTo)+len(gi.AssignableFromPtr)+len(gi.AssignableFromMethod)+len(gi.AssignableFromPtrMethod)+len(gi.AssignableToMethod)); cap(defs) > 0 {
 			addtypes := func(impltypes []gurujson.ImplementsType) {
@@ -151,7 +151,7 @@ func (*goSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (all z.SrcLocs
 	if !tools.guru.Installed {
 		return
 	}
-	byteoff := srcLens.ByteOffsetForPosWithRuneOffset(srcLens.Pos)
+	byteoff := srcLens.ByteOffsetForPos(srcLens.Pos)
 	gw, err := udevgo.QueryWhat_Guru(srcLens.FilePath, srcLens.Txt, ustr.FromInt(byteoff))
 	if err != nil {
 		panic(err)

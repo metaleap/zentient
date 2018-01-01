@@ -95,9 +95,9 @@ func (me *goSrcIntel) ComplDetails(srcLens *z.SrcLens, itemText string) (itemDoc
 	if !(tools.gogetdoc.Installed || tools.godef.Installed) {
 		return
 	}
-	pos := srcLens.ByteOffsetForPosWithRuneOffset(srcLens.Pos)
-	rs := srcLens.ByteOffsetForPosWithRuneOffset(&srcLens.Range.Start)
-	re := srcLens.ByteOffsetForPosWithRuneOffset(&srcLens.Range.End)
+	pos := srcLens.ByteOffsetForPos(srcLens.Pos)
+	rs := srcLens.ByteOffsetForPos(&srcLens.Range.Start)
+	re := srcLens.ByteOffsetForPos(&srcLens.Range.End)
 	srcLens.Txt = srcLens.Txt[:rs] + itemText + srcLens.Txt[re:]
 	itemDoc = &z.SrcIntelCompl{
 		Documentation: &z.SrcIntelDoc{IsTrusted: true},
@@ -150,7 +150,7 @@ func (*goSrcIntel) goFuncDeclLineBreaks(decl string, maxlen int) string {
 func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 	var ggd *udevgo.Gogetdoc
 	var decl *z.InfoTip
-	offset := z.Strf("%d", srcLens.ByteOffsetForPosWithRuneOffset(srcLens.Pos))
+	offset := z.Strf("%d", srcLens.ByteOffsetForPos(srcLens.Pos))
 
 	if !tools.gogetdoc.Installed {
 		hovs = append(hovs, z.InfoTip{Value: tools.gogetdoc.NotInstalledMessage()})
@@ -211,7 +211,7 @@ func (me *goSrcIntel) Signature(srcLens *z.SrcLens) (sig *z.SrcIntelSigHelp) {
 		sig0.Label, sig0.Documentation.Value = z.ToolsMsgGone("guru or one of gogetdoc/godef"), z.ToolsMsgMore("(tool name)")
 		return
 	}
-	pos := srcLens.ByteOffsetForPosWithRuneOffset(srcLens.Pos)
+	pos := srcLens.ByteOffsetForPos(srcLens.Pos)
 	gw, err := udevgo.QueryWhat_Guru(srcLens.FilePath, srcLens.Txt, ustr.FromInt(pos))
 	if err != nil {
 		sig0.Label, sig0.Documentation.Value = "Error running guru", err.Error()

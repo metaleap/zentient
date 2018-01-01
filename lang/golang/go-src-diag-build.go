@@ -81,10 +81,15 @@ func (me *goDiag) FixerUppers() []z.FixerUpper {
 }
 
 func (me *goDiag) tryFixupImpNotFound(d *z.DiagItem) (fix *z.FixUp) {
-	//cannot find package "foo" in any of:
-	pref, i := "cannot find package \"", strings.Index(d.Msg, "\" in any of:")
-	if strings.HasPrefix(d.Msg, pref) && i > len(pref) {
-		badimpname := d.Msg[:i][len(pref):]
+	var badimpname string
+	if pref1, i1 := "cannot find package \"", strings.Index(d.Msg, "\" in any of:"); strings.HasPrefix(d.Msg, pref1) && i1 > len(pref1) {
+		//cannot find package "foo" in any of:
+		badimpname = d.Msg[:i1][len(pref1):]
+	} else if pref2, i2 := "invalid import path: \"", strings.LastIndex(d.Msg, "\""); strings.HasPrefix(d.Msg, pref2) && i2 > len(pref2) {
+		//invalid import path: "moyhoar hoaryya baddabam fam"
+		badimpname = d.Msg[:i2][len(pref2):]
+	}
+	if badimpname != "" {
 		fix = &z.FixUp{Name: "Removes invalid imports", Items: []string{badimpname}}
 		fix.Edits.AddEdit_DeleteLine(d.Loc.FilePath, d.Loc.Pos)
 	}

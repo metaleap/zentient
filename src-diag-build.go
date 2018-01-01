@@ -86,7 +86,7 @@ func (me *DiagBase) fixUps(diags DiagItems) {
 			}
 			dropped := fixups.Edits.DropConflictingEdits()
 			if len(dropped) > 0 {
-				println(Strf("%#v", dropped))
+				println(Strf("DROPPPPED:%#v", dropped))
 			}
 			sort.Sort(fixups.Edits)
 			dr.FixUps = append(dr.FixUps, fixups)

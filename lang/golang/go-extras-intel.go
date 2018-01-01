@@ -32,10 +32,10 @@ func (me *goExtras) runIntel_Guru(guruCmd string, srcLens *z.SrcLens, arg string
 	if !tools.guru.Installed {
 		z.ToolGonePanic("guru")
 	}
-	bpos := srcLens.ByteOffsetForPosWithRuneOffset(srcLens.Pos)
+	bpos := srcLens.ByteOffsetForPos(srcLens.Pos)
 	bp1, bp2 := ustr.FromInt(bpos), ""
 	if srcLens.Range != nil {
-		bpos1, bpos2 := srcLens.ByteOffsetForPosWithRuneOffset(&srcLens.Range.Start), srcLens.ByteOffsetForPosWithRuneOffset(&srcLens.Range.End)
+		bpos1, bpos2 := srcLens.ByteOffsetForPos(&srcLens.Range.Start), srcLens.ByteOffsetForPos(&srcLens.Range.End)
 		if bp1 = ustr.FromInt(bpos1); bpos2 != bpos1 {
 			bp2 = ustr.FromInt(bpos2)
 		}

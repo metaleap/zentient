@@ -1,6 +1,8 @@
 package z
 
 import (
+	"strings"
+
 	"github.com/metaleap/go-util/fs"
 )
 
@@ -42,10 +44,21 @@ func (me SrcModEdits) Len() int               { return len(me) }
 func (me SrcModEdits) Swap(i int, j int)      { me[i], me[j] = me[j], me[i] }
 func (me SrcModEdits) Less(i int, j int) bool { return me[i].At.Start.ComesBehind(&me[j].At.End) }
 
-func (me *SrcModEdits) AddEdit_DeleteLine(srcFilePath string, lineAt *SrcPos) {
-	var lens = SrcLens{SrcLoc: SrcLoc{FilePath: srcFilePath, Pos: lineAt}}
+func (*SrcModEdits) lensForNewEdit(srcFilePath string) *SrcLens {
+	var lens = SrcLens{SrcLoc: SrcLoc{FilePath: srcFilePath}}
 	lens.EnsureSrcFull()
-	edit := SrcModEdit{}
+	return &lens
+}
+
+func (me *SrcModEdits) AddEdit_DeleteLine(srcFilePath string, lineAt *SrcPos) {
+	lens := me.lensForNewEdit(srcFilePath)
+	lens.Pos = lineAt
+	edit := SrcModEdit{At: &SrcRange{}}
+	bo := lens.ByteOffsetForPos(lens.Pos)
+	bo = strings.LastIndex(lens.Txt[:bo], "\n") + 1
+	edit.At.Start.Off = lens.Rune1OffsetForByte0Offset(bo)
+	bo2 := strings.IndexRune(lens.Txt[bo:], '\n') + 1
+	edit.At.End.Off = lens.Rune1OffsetForByte0Offset(bo + bo2)
 	*me = append(*me, edit)
 }
 
