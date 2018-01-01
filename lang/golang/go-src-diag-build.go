@@ -77,10 +77,44 @@ func (me *goDiag) RunBuildJobs(jobs z.DiagBuildJobs) (diags z.DiagItems) {
 }
 
 func (me *goDiag) FixerUppers() []z.FixerUpper {
-	return []z.FixerUpper{me.tryFixupImpNotFound}
+	return []z.FixerUpper{me.tryFixImpNotFound, me.tryFixImpMissing}
 }
 
-func (me *goDiag) tryFixupImpNotFound(d *z.DiagItem) (fix *z.FixUp) {
+func (me *goDiag) tryFixImpMissing(d *z.DiagItem) (fix *z.FixUp) {
+	//undefined: strings
+	pref := "undefined: "
+	if pkgs := udevgo.PkgsByImP; strings.HasPrefix(d.Msg, pref) && pkgs != nil {
+		if pkgname := d.Msg[len(pref):]; len(pkgname) > 0 {
+			pkg := pkgs[pkgname]
+			if pkg == nil || pkg.Name != pkgname {
+				for _, p := range pkgs {
+					if p.Name == pkgname {
+						pkg = p
+						break
+					}
+				}
+			}
+			if pkg != nil {
+				fix = &z.FixUp{Name: "Add missing imports", Items: []string{pkgname}}
+				fix.Edits.AddEdit_Insert(d.Loc.FilePath, func(srclens *z.SrcLens, set *z.SrcPos) (ins string) {
+					if i := strings.Index(srclens.Txt, "\nimport (\n"); i > 0 {
+						idot, j := strings.IndexRune(pkg.ImportPath, '.'), strings.Index(srclens.Txt[i:], "\n)\n")
+						if ins = z.Strf("\t%#v\n", pkg.ImportPath); j > 0 && idot >= 0 && idot < strings.IndexRune(pkg.ImportPath, '/') {
+							i = i + j
+						} else {
+							i += 9
+						}
+						set.Off = srclens.Rune1OffsetForByte0Offset(i + 1)
+					}
+					return
+				})
+			}
+		}
+	}
+	return
+}
+
+func (me *goDiag) tryFixImpNotFound(d *z.DiagItem) (fix *z.FixUp) {
 	var badimpname string
 	if pref1, i1 := "cannot find package \"", strings.Index(d.Msg, "\" in any of:"); strings.HasPrefix(d.Msg, pref1) && i1 > len(pref1) {
 		//cannot find package "foo" in any of:
@@ -88,6 +122,8 @@ func (me *goDiag) tryFixupImpNotFound(d *z.DiagItem) (fix *z.FixUp) {
 	} else if pref2, i2 := "invalid import path: \"", strings.LastIndex(d.Msg, "\""); strings.HasPrefix(d.Msg, pref2) && i2 > len(pref2) {
 		//invalid import path: "moyhoar hoaryya baddabam fam"
 		badimpname = d.Msg[:i2][len(pref2):]
+	} else if pref3, i3 := "imported and not used: \"", strings.LastIndex(d.Msg, "\""); strings.HasPrefix(d.Msg, pref3) && i3 > len(pref3) {
+		badimpname = d.Msg[:i3][len(pref3):]
 	}
 	if badimpname != "" {
 		fix = &z.FixUp{Name: "Removes invalid imports", Items: []string{badimpname}}

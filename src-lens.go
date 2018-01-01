@@ -28,8 +28,10 @@ func (oneRangeStart *SrcPos) ComesBehind(anotherRangeEnd *SrcPos) bool {
 }
 
 func (me *SrcPos) EquivTo(pos *SrcPos) bool {
-	return (me.Off > 0 && me.Off == pos.Off) ||
-		(me.Ln == pos.Ln && me.Col == pos.Col)
+	if me.Off > 0 && pos.Off > 0 {
+		return me.Off == pos.Off
+	}
+	return me.Ln == pos.Ln && me.Col == pos.Col
 }
 
 func (me *SrcPos) IsBetween(sr *SrcRange) bool {

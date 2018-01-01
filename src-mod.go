@@ -20,19 +20,12 @@ type SrcModEdits []SrcModEdit
 
 func (me *SrcModEdits) DropConflictingEdits() (droppedOffenders []SrcModEdit) {
 	all := *me
-	for again := true; again; {
-		again = false
-		for i, disedit := range all {
-			for j, datedit := range all {
-				if i != j && disedit.At.OverlapsWith(datedit.At) {
-					droppedOffenders = append(droppedOffenders, all[i])
-					pref, suff := all[:i], all[i+1:]
-					again, all = true, append(pref, suff...)
-					break
-				}
-			}
-			if again {
-				break
+	for i := 0; i < len(all); i++ {
+		for disedit, j := all[i], i+1; j < len(all); j++ {
+			if datedit := all[j]; disedit.At.OverlapsWith(datedit.At) {
+				droppedOffenders = append(droppedOffenders, all[j])
+				pref, suff := all[:j], all[j+1:]
+				j, all = j-1, append(pref, suff...)
 			}
 		}
 	}
@@ -60,6 +53,15 @@ func (me *SrcModEdits) AddEdit_DeleteLine(srcFilePath string, lineAt *SrcPos) {
 	bo2 := strings.IndexRune(lens.Txt[bo:], '\n') + 1
 	edit.At.End.Off = lens.Rune1OffsetForByte0Offset(bo + bo2)
 	*me = append(*me, edit)
+}
+
+func (me *SrcModEdits) AddEdit_Insert(srcFilePath string, atPos func(*SrcLens, *SrcPos) string) {
+	lens := me.lensForNewEdit(srcFilePath)
+	edit := SrcModEdit{At: &SrcRange{}}
+	if ins := atPos(lens, &edit.At.Start); ins != "" {
+		edit.Val = ins
+		*me = append(*me, edit)
+	}
 }
 
 type SrcModEdit struct {

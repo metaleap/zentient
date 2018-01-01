@@ -49,6 +49,7 @@ type FixUps struct {
 	FilePath string
 	Desc     map[string][]string
 	Edits    SrcModEdits
+	Dropped  []SrcModEdit
 }
 
 func (me *DiagJobBuild) Yield(diag *DiagItem) { me.diags = append(me.diags, diag) }
@@ -84,9 +85,8 @@ func (me *DiagBase) fixUps(diags DiagItems) {
 				fixups.Desc[fixup.Name] = append(fixups.Desc[fixup.Name], fixup.Items...)
 				fixups.Edits = append(fixups.Edits, fixup.Edits...)
 			}
-			dropped := fixups.Edits.DropConflictingEdits()
-			if len(dropped) > 0 {
-				println(Strf("DROPPPPED:%#v", dropped))
+			if fixups.Dropped = fixups.Edits.DropConflictingEdits(); fixups.Dropped == nil { // be nice to the client-side here..
+				fixups.Dropped = []SrcModEdit{}
 			}
 			sort.Sort(fixups.Edits)
 			dr.FixUps = append(dr.FixUps, fixups)
