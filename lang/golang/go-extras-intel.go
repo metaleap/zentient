@@ -139,6 +139,18 @@ func (me *goExtras) runIntel_Guru(guruCmd string, srcLens *z.SrcLens, arg string
 				}
 			}
 		}
+	case "peers":
+		resp.Desc = xIntelGuruChanpeers.Detail
+		if gp, e := udevgo.QueryPeers_Guru(srcLens.FilePath, srcLens.Txt, bp1, bp2, guruscope); e != nil {
+			err = e
+		} else {
+			resp.Desc = udevgo.PkgImpPathsToNamesInLn(gp.Type, curpkgdir) + " ➜ " + xIntelGuruChanpeers.Label
+			for _, locs := range [][]string{gp.Allocs, gp.Closes, gp.Receives, gp.Sends} {
+				for _, loc := range locs {
+					resp.Refs.AddFrom(udev.SrcMsgFromLn(loc), nil)
+				}
+			}
+		}
 	default:
 		z.BadPanic("`guru` command", guruCmd)
 	}
