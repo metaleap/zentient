@@ -4,6 +4,15 @@ import (
 	"sort"
 )
 
+type FixerUpper func(*DiagItem) *FixUp
+
+type IDiagBuild interface {
+	FixUps(DiagItems, func([]*FixUp))
+	OnUpdateBuildDiags([]string) DiagBuildJobs
+	RunBuildJobs(DiagBuildJobs) DiagItems
+	UpdateBuildDiagsAsNeeded(WorkspaceFiles, []string)
+}
+
 type DiagBuildJobs []*DiagJobBuild
 
 func (me DiagBuildJobs) Len() int               { return len(me) }
@@ -28,6 +37,12 @@ type DiagJobBuild struct {
 	diags     DiagItems
 }
 
+type FixUp struct {
+	Name string
+	Item string
+	Mod  SrcLens
+}
+
 func (me *DiagJobBuild) Yield(diag *DiagItem) { me.diags = append(me.diags, diag) }
 
 func (me *DiagJobBuild) IsSortedPriorTo(cmp interface{}) bool {
@@ -36,6 +51,12 @@ func (me *DiagJobBuild) IsSortedPriorTo(cmp interface{}) bool {
 		return me.TargetCmp(me.Target, c.Target)
 	}
 	return me.Target.IsSortedPriorTo(c.Target)
+}
+
+func (*DiagBase) onFixUps([]*FixUp) {
+}
+
+func (*DiagBase) FixUps(DiagItems, func([]*FixUp)) {
 }
 
 func (me *DiagBase) UpdateBuildDiagsAsNeeded(workspaceFiles WorkspaceFiles, writtenFiles []string) {
@@ -48,6 +69,9 @@ func (me *DiagBase) UpdateBuildDiagsAsNeeded(workspaceFiles WorkspaceFiles, writ
 		go me.send(workspaceFiles, true)
 		diagitems := me.Impl.RunBuildJobs(jobs)
 		diagitems.propagate(false, true, workspaceFiles)
+		if len(diagitems) > 0 {
+			go me.Impl.FixUps(diagitems, me.onFixUps)
+		}
 	}
 	go me.send(workspaceFiles, false)
 }

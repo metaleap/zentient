@@ -10,6 +10,13 @@ var (
 	cfgLintStickiness *Setting
 )
 
+type IDiagLint interface {
+	KnownLinters() Tools
+	OnUpdateLintDiags(WorkspaceFiles, Tools, []string) DiagLintJobs
+	RunLintJob(*DiagJobLint)
+	UpdateLintDiagsIfAndAsNeeded(WorkspaceFiles, bool, ...string)
+}
+
 func init() {
 	if cfgLintStickiness == nil {
 		cfgLintStickiness = &Setting{Id: "cfgLintStickiness", Title: "Sticky-Lints Level", ValDef: uint64(0),
@@ -47,8 +54,17 @@ func (me *DiagJobLint) Done() {
 	me.lintChan <- nil
 }
 
+func (me *DiagBase) knownLinters(auto bool) (diags Tools) {
+	for _, dt := range me.Impl.KnownLinters() {
+		if dt.IsInAutoDiags() == auto {
+			diags = append(diags, dt)
+		}
+	}
+	return
+}
+
 func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(workspaceFiles WorkspaceFiles, autos bool, onlyFilePaths ...string) {
-	if nonautos, diagtools := !autos, me.knownDiags(autos); len(diagtools) > 0 {
+	if nonautos, diagtools := !autos, me.knownLinters(autos); len(diagtools) > 0 {
 		var filepaths []string
 		for _, f := range workspaceFiles {
 			if autos && len(f.Diags.Build.Items) > 0 {

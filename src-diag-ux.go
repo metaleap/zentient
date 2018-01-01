@@ -12,15 +12,9 @@ import (
 )
 
 type IDiag interface {
+	IDiagBuild
+	IDiagLint
 	IMenuItems
-
-	KnownDiags() Tools
-	OnUpdateBuildDiags([]string) DiagBuildJobs
-	OnUpdateLintDiags(WorkspaceFiles, Tools, []string) DiagLintJobs
-	RunBuildJobs(DiagBuildJobs) DiagItems
-	RunLintJob(*DiagJobLint)
-	UpdateBuildDiagsAsNeeded(WorkspaceFiles, []string)
-	UpdateLintDiagsIfAndAsNeeded(WorkspaceFiles, bool, ...string)
 
 	send(WorkspaceFiles, bool)
 }
@@ -133,6 +127,11 @@ func (me *DiagJob) forgetPrevDiags(diagToolsIfLint Tools, setAutoUpToDateToTrueI
 
 func (me *DiagJob) String() string { return me.Target.String() }
 
+type DiagResp struct {
+	All    DiagItemsBy
+	LangID string
+}
+
 type DiagBase struct {
 	Impl IDiag
 
@@ -145,16 +144,11 @@ type DiagBase struct {
 	cmdPeekHiddenDiags      *MenuItem
 }
 
-type DiagResp struct {
-	All    DiagItemsBy
-	LangID string
-}
-
 func (me *DiagBase) Init() {
 	me.cmdListDiags = &MenuItem{
 		IpcID: IPCID_SRCDIAG_LIST,
 		Title: Strf("Choose %s Auto-Linters", Lang.Title),
-		Desc:  Strf("Select which (out of %d) lintish tools should run automatically (on file open/save)", me.Impl.KnownDiags().Len(true)),
+		Desc:  Strf("Select which (out of %d) lintish tools should run automatically (on file open/save)", me.Impl.KnownLinters().Len(true)),
 	}
 	me.cmdListToggleAll = &MenuItem{}
 	me.cmdRunDiagsOnCurFile = &MenuItem{IpcID: IPCID_SRCDIAG_RUN_CURFILE, Title: Strf("Run Other %s Linters Now", Lang.Title)}
@@ -164,22 +158,13 @@ func (me *DiagBase) Init() {
 	me.cmdPeekHiddenDiags = &MenuItem{IpcID: IPCID_SRCDIAG_PEEKHIDDEN, Title: Strf("Peek Potentially Hidden %s Lints", Lang.Title)}
 }
 
-func (me *DiagBase) knownDiags(auto bool) (diags Tools) {
-	for _, dt := range me.Impl.KnownDiags() {
-		if dt.IsInAutoDiags() == auto {
-			diags = append(diags, dt)
-		}
-	}
-	return
-}
-
 func (me *DiagBase) MenuCategory() string {
 	return "Linting"
 }
 
 func (me *DiagBase) MenuItems(srcLens *SrcLens) (menu MenuItems) {
 	menu = make(MenuItems, 0, 5)
-	autodiags, nonautodiags, srcfilepath, workspacefiles := me.knownDiags(true), me.knownDiags(false), srcLens.FilePath, Lang.Workspace.Files()
+	autodiags, nonautodiags, srcfilepath, workspacefiles := me.knownLinters(true), me.knownLinters(false), srcLens.FilePath, Lang.Workspace.Files()
 	if len(autodiags) > 0 {
 		me.menuItemsUpdateHint(autodiags, me.cmdListDiags)
 		menu = append(menu, me.cmdListDiags)
@@ -243,7 +228,7 @@ func (me *DiagBase) menuItemsUpdateHint(diags Tools, item *MenuItem) {
 		if len(toolnames) == 0 {
 			item.Hint = "(none)"
 		} else {
-			item.Hint = Strf("(%d/%d)  · %s", len(diags), len(me.Impl.KnownDiags()), strings.Join(toolnames, " · "))
+			item.Hint = Strf("(%d/%d)  · %s", len(diags), len(me.Impl.KnownLinters()), strings.Join(toolnames, " · "))
 		}
 	}
 }
@@ -328,7 +313,7 @@ func (me *DiagBase) onRunManually(filePaths []string, resp *ipcResp) {
 
 func (me *DiagBase) onListAll(resp *ipcResp) {
 	resp.Menu = &MenuResp{SubMenu: &Menu{Desc: me.cmdListDiags.Desc}}
-	knowndiagsauto, knowndiagsmanual := me.knownDiags(true), me.knownDiags(false)
+	knowndiagsauto, knowndiagsmanual := me.knownLinters(true), me.knownLinters(false)
 	itemdesc := "WILL run automatically on file open/save. ➜ Pick to turn this off."
 	for _, knowndiags := range []Tools{knowndiagsauto, knowndiagsmanual} {
 		for _, dt := range knowndiags {
@@ -365,7 +350,7 @@ func (me *DiagBase) onListAll(resp *ipcResp) {
 func (me *DiagBase) onToggleAll(enableAll bool, resp *ipcResp) {
 	me.cmdRunDiagsOnCurFile.Hint, me.cmdListDiags.Hint = "", ""
 	if Prog.Cfg.AutoDiags = nil; enableAll {
-		for _, diagtool := range me.Impl.KnownDiags() {
+		for _, diagtool := range me.Impl.KnownLinters() {
 			Prog.Cfg.AutoDiags = append(Prog.Cfg.AutoDiags, diagtool.Name)
 		}
 	}
@@ -382,7 +367,7 @@ func (me *DiagBase) onToggleAll(enableAll bool, resp *ipcResp) {
 
 func (me *DiagBase) onToggle(toolName string, resp *ipcResp) {
 	me.cmdRunDiagsOnCurFile.Hint, me.cmdListDiags.Hint = "", ""
-	if diagtool := me.Impl.KnownDiags().ByName(toolName); diagtool == nil {
+	if diagtool := me.Impl.KnownLinters().ByName(toolName); diagtool == nil {
 		resp.ErrMsg = BadMsg(Lang.Title+" lintish tool name", toolName)
 	} else if err := diagtool.ToggleInAutoDiags(); err != nil {
 		resp.ErrMsg = err.Error()
