@@ -17,7 +17,7 @@ type ISrcMod interface {
 type SrcModEdits []SrcModEdit
 
 func (me *SrcModEdits) DropConflictingEdits() (droppedOffenders []SrcModEdit) {
-	all, mod := *me, false
+	all := *me
 	for again := true; again; {
 		again = false
 		for i, disedit := range all {
@@ -25,7 +25,7 @@ func (me *SrcModEdits) DropConflictingEdits() (droppedOffenders []SrcModEdit) {
 				if i != j && disedit.At.OverlapsWith(datedit.At) {
 					droppedOffenders = append(droppedOffenders, all[i])
 					pref, suff := all[:i], all[i+1:]
-					again, mod, all = true, true, append(pref, suff...)
+					again, all = true, append(pref, suff...)
 					break
 				}
 			}
@@ -34,9 +34,7 @@ func (me *SrcModEdits) DropConflictingEdits() (droppedOffenders []SrcModEdit) {
 			}
 		}
 	}
-	if mod {
-		*me = all
-	}
+	*me = all
 	return
 }
 

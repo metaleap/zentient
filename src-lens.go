@@ -20,26 +20,21 @@ type SrcPos struct {
 }
 
 func (oneRangeStart *SrcPos) ComesBehind(anotherRangeEnd *SrcPos) bool {
-	return oneRangeStart.Off >= anotherRangeEnd.Off ||
-		oneRangeStart.byteOff >= anotherRangeEnd.byteOff ||
-		oneRangeStart.Ln >= anotherRangeEnd.Ln ||
+	if oneRangeStart.Off > 0 && anotherRangeEnd.Off > 0 {
+		return oneRangeStart.Off >= anotherRangeEnd.Off
+	}
+	return oneRangeStart.Ln > anotherRangeEnd.Ln ||
 		(oneRangeStart.Ln == anotherRangeEnd.Ln && oneRangeStart.Col >= anotherRangeEnd.Col)
 }
 
 func (me *SrcPos) EquivTo(pos *SrcPos) bool {
-	if me.byteoff && pos.byteoff {
-		return me.byteOff == pos.byteOff
-	} else if me.Off > 0 && pos.Off > 0 {
-		return me.Off == pos.Off
-	}
-	return me.Ln == pos.Ln && me.Col == pos.Col
+	return (me.Off > 0 && me.Off == pos.Off) ||
+		(me.Ln == pos.Ln && me.Col == pos.Col)
 }
 
 func (me *SrcPos) IsBetween(sr *SrcRange) bool {
-	if sr.IsEmpty() {
-		return me.EquivTo(&sr.Start)
-	}
-	return me.ComesBehind(&sr.Start) && sr.End.ComesBehind(me)
+	return (sr.IsEmpty() && me.EquivTo(&sr.Start)) ||
+		me.ComesBehind(&sr.Start) && sr.End.ComesBehind(me)
 }
 
 func (me *SrcPos) String() string {
@@ -59,7 +54,14 @@ func (me *SrcRange) IsEmpty() bool {
 }
 
 func (me *SrcRange) OverlapsWith(sr *SrcRange) bool {
-	return (!me.Start.EquivTo(&sr.End) || me.End.EquivTo(&sr.Start)) &&
+	if is0me, is0sr := me.IsEmpty(), sr.IsEmpty(); is0me && is0sr {
+		return me.Start.EquivTo(&sr.Start)
+	} else if is0me {
+		return me.Start.IsBetween(sr)
+	} else if is0sr {
+		return sr.Start.IsBetween(me)
+	}
+	return (!(me.Start.EquivTo(&sr.End) || me.End.EquivTo(&sr.Start))) &&
 		(me.Start.IsBetween(sr) || me.End.IsBetween(sr) || sr.Start.IsBetween(me) || sr.End.IsBetween(me))
 }
 
