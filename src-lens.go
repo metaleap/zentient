@@ -112,6 +112,7 @@ func (me *SrcLens) EnsureSrcFull() {
 func (me *SrcLens) ByteOffsetForPos(pos *SrcPos) int {
 	if !pos.byteoff {
 		pos.byteoff = true
+		me.EnsureSrcFull()
 		if pos.Off == 0 && pos.Col > 0 && pos.Ln > 0 {
 			ln := 1
 			for _, r := range me.Txt {
@@ -125,7 +126,6 @@ func (me *SrcLens) ByteOffsetForPos(pos *SrcPos) int {
 			pos.Off += pos.Col
 		}
 		if pos.Off > 1 {
-			me.EnsureSrcFull()
 			r := 1
 			for i := range me.Txt {
 				if r == pos.Off {

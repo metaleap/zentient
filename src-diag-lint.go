@@ -30,7 +30,7 @@ func init() {
 			val, workspacefiles := cfgLintStickiness.ValUInt(), Lang.Workspace.Files()
 			for _, f := range workspacefiles {
 				for _, d := range f.Diags.Lint.Items {
-					d.StickyAuto = uint64(d.Loc.Flag) <= (val)
+					d.StickyAuto = uint64(d.Loc.Flag) <= val
 				}
 			}
 			go Lang.Diag.send(workspacefiles, false)

@@ -91,7 +91,7 @@ func (me WorkspaceFiles) FilePathsOpened() (all []string) {
 func (me WorkspaceFiles) FilePathsKnown() (all []string) {
 	var i int
 	all = make([]string, len(me))
-	for fp, _ := range me {
+	for fp := range me {
 		all[i], i = fp, i+1
 	}
 	return
