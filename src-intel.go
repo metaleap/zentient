@@ -15,6 +15,7 @@ type ISrcIntel interface {
 
 	ComplDetails(*SrcLens, string) *SrcIntelCompl
 	ComplItems(*SrcLens) SrcIntelCompls
+	ComplItemsShouldSort(*SrcLens) bool
 	DefSym(*SrcLens) SrcLocs
 	DefType(*SrcLens) SrcLocs
 	DefImpl(*SrcLens) SrcLocs
@@ -127,13 +128,7 @@ func (me *SrcIntelBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 func (me *SrcIntelBase) onCmplItems(req *ipcReq, resp *ipcResp) {
 	if lex := me.posLex(req.SrcLens); lex.canIntel() {
 		resp.SrcIntel.Cmpl = me.Impl.ComplItems(req.SrcLens)
-		var shouldsort bool
-		for _, c := range resp.SrcIntel.Cmpl {
-			if shouldsort = c.SortPrio != 0; shouldsort {
-				break
-			}
-		}
-		if shouldsort {
+		if me.Impl.ComplItemsShouldSort(req.SrcLens) {
 			sort.Sort(resp.SrcIntel.Cmpl)
 			for i, c := range resp.SrcIntel.Cmpl {
 				c.SortText = Strf("%03d", i)
@@ -232,6 +227,7 @@ func (me *SrcIntelBase) onSyms(req *ipcReq, resp *ipcResp) {
 
 func (*SrcIntelBase) ComplItems(srcLens *SrcLens) SrcIntelCompls                    { return nil }
 func (*SrcIntelBase) ComplDetails(srcLens *SrcLens, itemText string) *SrcIntelCompl { return nil }
+func (*SrcIntelBase) ComplItemsShouldSort(*SrcLens) bool                            { return false }
 func (*SrcIntelBase) DefImpl(srcLens *SrcLens) SrcLenses                            { return nil }
 func (*SrcIntelBase) DefSym(srcLens *SrcLens) SrcLenses                             { return nil }
 func (*SrcIntelBase) DefType(srcLens *SrcLens) SrcLenses                            { return nil }

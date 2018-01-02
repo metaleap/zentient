@@ -3,6 +3,7 @@ package zgo
 import (
 	"path/filepath"
 	"strings"
+	"text/template"
 
 	"github.com/metaleap/go-util/dev/go"
 	"github.com/metaleap/go-util/str"
@@ -28,6 +29,8 @@ func init() {
 type goSrcIntel struct {
 	z.SrcIntelBase
 }
+
+func (*goSrcIntel) ComplItemsShouldSort(*z.SrcLens) bool { return true }
 
 func (*goSrcIntel) ComplItems(srcLens *z.SrcLens) (all z.SrcIntelCompls) {
 	if !tools.gocode.Installed {
@@ -196,7 +199,8 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 					} else if impdoc != "builtin" {
 						impdoc = z.Strf("`import %q`", impdoc)
 					}
-					impdoc = "[" + impdoc + "](http://godoc.org/" + ggd.DocUrl + ")"
+					docuri := "zentient://" + z.Lang.ID + "/godoc/pkg/" + ggd.DocUrl
+					impdoc = z.Strf("[%s](command:zen.internal.page?\"%s\")", impdoc, template.URLQueryEscaper(docuri))
 				}
 				hovs = append(hovs, z.InfoTip{Value: ustr.Both(impdoc, "\n\n", ggd.Doc)})
 			}
