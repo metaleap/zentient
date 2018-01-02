@@ -66,12 +66,12 @@ func (me *goPages) onGoDoc(uriPath string, identName string) string {
 						if u, e := url.Parse(href); e == nil {
 							for _, gp := range udevgo.AllGoPaths() {
 								if ln, fp := "", filepath.Join(gp, u.Path); ufs.FileExists(fp) {
-									if done = true; strings.HasPrefix(u.Fragment, "L") {
+									if strings.HasPrefix(u.Fragment, "L") {
 										if l := ustr.ParseInt(u.Fragment[1:]); l > 0 {
 											ln = z.Strf(":%d", l+10)
 										}
 									}
-									href = z.Strf("command:zen.internal.openFileAt?\"%s%s\"", fp, ln)
+									done, href = true, z.Strf("command:zen.internal.openFileAt?\"%s%s\"", fp, ln)
 									break
 								}
 							}

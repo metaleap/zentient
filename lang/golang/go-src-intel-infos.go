@@ -199,7 +199,6 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 						impdoc = z.Strf("`import %q`", impdoc)
 					}
 					docuri := "zentient://" + z.Lang.ID + "/godoc/pkg/" + ggd.DocUrl
-					// impdoc = z.Strf("[%s](command:zen.internal.page?\"%s\")", impdoc, template.URLQueryEscaper(docuri))
 					impdoc = z.Strf("[%s](%s)", impdoc, pages.linkifyUri(docuri))
 				}
 				hovs = append(hovs, z.InfoTip{Value: ustr.Both(impdoc, "\n\n", ggd.Doc)})
