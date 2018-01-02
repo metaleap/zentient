@@ -47,13 +47,18 @@ func (*goSrcIntel) ComplItems(srcLens *z.SrcLens) (all z.SrcIntelCompls) {
 					continue
 				case "func":
 					cmpl.Kind = z.CMPL_FUNCTION
+					cmpl.SortPrio = 3
 				case "package", "import":
 					cmpl.Kind = z.CMPL_FOLDER
+					cmpl.SortPrio = 1
 				case "var":
 					cmpl.Kind = z.CMPL_FIELD
+					cmpl.SortPrio = 2
 				case "const":
 					cmpl.Kind = z.CMPL_CONSTANT
+					cmpl.SortPrio = 5
 				case "type":
+					cmpl.SortPrio = 4
 					switch t {
 					case "built-in":
 						switch n {

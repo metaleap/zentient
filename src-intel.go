@@ -49,8 +49,6 @@ type SrcIntelCompl struct {
 	SortPrio int `json:"-"`
 }
 
-type SrcIntelCompls []*SrcIntelCompl
-
 type srcIntelLex struct {
 	Ident   string
 	Int     string
@@ -62,6 +60,8 @@ type srcIntelLex struct {
 }
 
 func (me *srcIntelLex) canIntel() bool { return me == nil || me.Ident != "" || me.Other != "" }
+
+type SrcIntelCompls []*SrcIntelCompl
 
 func (me SrcIntelCompls) Len() int               { return len(me) }
 func (me SrcIntelCompls) Swap(i int, j int)      { me[i], me[j] = me[j], me[i] }
