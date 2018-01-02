@@ -166,9 +166,7 @@ func (me *SrcIntelBase) onHover(req *ipcReq, resp *ipcResp) {
 		if lex.Char != "" {
 			hov.Value = Strf("`%s` — byte length %d", lex.Char, len(lex.Char[:len(lex.Char)-1][1:]))
 		} else if lex.Int != "" || lex.Float != "" {
-			if i, ui, f := ustr.ParseInt(lex.Int), ustr.ParseUint(lex.Int), ustr.ParseFloat(lex.Float); ui == 0 && i == 0 && f == 0 {
-				return
-			} else {
+			if i, ui, f := ustr.ParseInt(lex.Int), ustr.ParseUint(lex.Int), ustr.ParseFloat(lex.Float); ui != 0 || i != 0 || f != 0 {
 				const strf = "`%s` — `%s`\n\n"
 				formats := []string{"%v", "%d", "%x", "%X", "%o", "%b", "%c", "%U", "%q"}
 				if i == 0 && ui == 0 {
@@ -186,9 +184,9 @@ func (me *SrcIntelBase) onHover(req *ipcReq, resp *ipcResp) {
 			}
 		} else if lex.String != "" {
 			var str string
-			if i, e := fmt.Sscanf(lex.String, "%q", &str); e != nil {
+			if n, e := fmt.Sscanf(lex.String, "%q", &str); e != nil {
 				hov.Value = e.Error()
-			} else if i > 0 && str != "" {
+			} else if n > 0 && str != "" {
 				hov.Value = Strf("Byte-length: %d — rune count: %d\n\n---------------------------------------\n\n%s", len(str), utf8.RuneCountInString(str), str)
 			}
 		} else if lex.Comment != "" {
