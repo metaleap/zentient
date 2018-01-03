@@ -51,6 +51,8 @@ func (me *goPages) onGoDoc(uriPath string, identName string) string {
 		}
 		if i = strings.Index(cmdout, "<div id=\"short-nav\">"); i >= 0 {
 			cmdout = cmdout[i:]
+		} else if i = strings.Index(cmdout, "<h1>"); i >= 0 {
+			cmdout = cmdout[i:]
 		}
 		left, right := "", cmdout
 		for right != "" {
@@ -60,8 +62,11 @@ func (me *goPages) onGoDoc(uriPath string, identName string) string {
 				left, right = left+right, ""
 			} else {
 				href := right[i+7:][:j]
-				if strings.HasPrefix(href, "/") {
-					var done bool
+				if (!strings.HasPrefix(href, "/")) && (!strings.HasPrefix(href, "#")) && (!strings.ContainsRune(href, ':')) {
+					href = "/" + uriPath + "/" + href
+				}
+				if strings.HasPrefix(href, "/") && !strings.HasPrefix(href, "//") {
+					var link2srcfilepos bool
 					if strings.HasPrefix(href, "/src/") {
 						if u, e := url.Parse(href); e == nil {
 							for _, gp := range udevgo.AllGoPaths() {
@@ -71,13 +76,13 @@ func (me *goPages) onGoDoc(uriPath string, identName string) string {
 											ln = z.Strf(":%d", l+10)
 										}
 									}
-									done, href = true, z.Strf("command:zen.internal.openFileAt?\"%s%s\"", fp, ln)
+									link2srcfilepos, href = true, z.Strf("command:zen.internal.openFileAt?\"%s%s\"", fp, ln)
 									break
 								}
 							}
 						}
 					}
-					if !done {
+					if !link2srcfilepos {
 						href = "zentient://" + z.Lang.ID + "/godoc" + href
 						href = me.linkifyUri(href)
 					}
@@ -85,17 +90,28 @@ func (me *goPages) onGoDoc(uriPath string, identName string) string {
 				left, right = left+right[:i]+" href='"+href, "'"+right[i+7:][j+1:]
 			}
 		}
-		cmdout = left
-		return _PAGES_GODOC_CSS + cmdout
+		if cmdout = _PAGES_GODOC_CSS + strings.Replace(left, " src=\"/", " src=\"http://golang.org/", -1); identName != "" {
+			cmdout += z.Strf(_PAGES_GODOC_SCRIPT, identName)
+		}
+		return cmdout
 	}
 	return cmderr
 }
 
 const _PAGES_GODOC_CSS = `
 <style type="text/css">
-div.collapsed { display: none !important; }
-a.permalink { color: #5A5651; }
-h2 { padding-top: 3.44em !important; }
-h3 { padding-top: 4.33em !important; }
+div.collapsed { display: none !important }
+a.permalink { color: #5A5651 }
+h2, h3 { margin-top: 4.88em }
 </style>
+`
+
+const _PAGES_GODOC_SCRIPT = `
+<script type="text/javascript">
+var zentientgodocscrolltoelem = document.getElementById("%s");
+if (zentientgodocscrolltoelem) {
+	zentientgodocscrolltoelem.style.backgroundColor = "#785020";
+	zentientgodocscrolltoelem.scrollIntoView(true);
+}
+</script>
 `
