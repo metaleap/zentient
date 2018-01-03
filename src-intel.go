@@ -225,16 +225,6 @@ func (me *SrcIntelBase) onSyms(req *ipcReq, resp *ipcResp) {
 	resp.SrcIntel.Syms = me.Impl.Symbols(req.SrcLens, query, req.IpcID == IPCID_SRCINTEL_SYMS_FILE)
 }
 
-func (*SrcIntelBase) ComplItems(srcLens *SrcLens) SrcIntelCompls                    { return nil }
-func (*SrcIntelBase) ComplDetails(srcLens *SrcLens, itemText string) *SrcIntelCompl { return nil }
-func (*SrcIntelBase) ComplItemsShouldSort(*SrcLens) bool                            { return false }
-func (*SrcIntelBase) DefImpl(srcLens *SrcLens) SrcLenses                            { return nil }
-func (*SrcIntelBase) DefSym(srcLens *SrcLens) SrcLenses                             { return nil }
-func (*SrcIntelBase) DefType(srcLens *SrcLens) SrcLenses                            { return nil }
-func (*SrcIntelBase) Highlights(srcLens *SrcLens, curWord string) SrcLenses         { return nil }
-func (*SrcIntelBase) Hovers(srcLens *SrcLens) []InfoTip                             { return nil }
-func (*SrcIntelBase) posLexErrNoOp(*scanner.Scanner, string)                        {}
-
 func (me *SrcIntelBase) posLex(srcLens *SrcLens) (poslex *srcIntelLex) {
 	if srcLens.EnsureSrcFull(); srcLens.Txt != "" {
 		var scan scanner.Scanner
@@ -275,14 +265,15 @@ func (me *SrcIntelBase) posLex(srcLens *SrcLens) (poslex *srcIntelLex) {
 	return
 }
 
-func (*SrcIntelBase) References(srcLens *SrcLens, includeDeclaration bool) SrcLenses {
-	return nil
-}
-
-func (*SrcIntelBase) Signature(srcLens *SrcLens) *SrcIntelSigHelp {
-	return nil
-}
-
-func (*SrcIntelBase) Symbols(srcLens *SrcLens, query string, curFileOnly bool) SrcLenses {
-	return nil
-}
+func (*SrcIntelBase) posLexErrNoOp(*scanner.Scanner, string)       {}
+func (*SrcIntelBase) ComplItems(*SrcLens) SrcIntelCompls           { return nil }
+func (*SrcIntelBase) ComplDetails(*SrcLens, string) *SrcIntelCompl { return nil }
+func (*SrcIntelBase) ComplItemsShouldSort(*SrcLens) bool           { return false }
+func (*SrcIntelBase) DefImpl(*SrcLens) SrcLenses                   { return nil }
+func (*SrcIntelBase) DefSym(*SrcLens) SrcLenses                    { return nil }
+func (*SrcIntelBase) DefType(*SrcLens) SrcLenses                   { return nil }
+func (*SrcIntelBase) Highlights(*SrcLens, string) SrcLenses        { return nil }
+func (*SrcIntelBase) Hovers(*SrcLens) []InfoTip                    { return nil }
+func (*SrcIntelBase) References(*SrcLens, bool) SrcLenses          { return nil }
+func (*SrcIntelBase) Signature(*SrcLens) *SrcIntelSigHelp          { return nil }
+func (*SrcIntelBase) Symbols(*SrcLens, string, bool) SrcLenses     { return nil }

@@ -32,8 +32,8 @@ type IListMenu interface {
 	IList
 	IMenuItems
 
-	IpcID(*ListFilter) IpcIDs
-	ListItemsSubMenu(string, string, ListFilters) *Menu
+	ipcID(*ListFilter) ipcIDs
+	listItemsSubMenu(string, string, ListFilters) *Menu
 	ListItemToMenuItem(IListItem) *MenuItem
 }
 
@@ -91,7 +91,7 @@ func (me *ListMenuBase) init(impl IListMenu, cat string, fdesc string) {
 
 	for _, lf := range me.listFilters {
 		item := &MenuItem{Title: lf.Title, Desc: me.itemDesc(nil, lf)}
-		item.IpcID, item.IpcArgs = me.impl.IpcID(lf), lf.ID
+		item.IpcID, item.IpcArgs = me.impl.ipcID(lf), lf.ID
 		me.items = append(me.items, item)
 	}
 }
@@ -103,7 +103,7 @@ func (me *ListMenuBase) itemDesc(srcLens *SrcLens, lf *ListFilter) string {
 	return Strf(me.fdesc, Lang.Title, lf.Desc)
 }
 
-func (me *ListMenuBase) ListItemsSubMenu(title string, desc string, filters ListFilters) *Menu {
+func (me *ListMenuBase) listItemsSubMenu(title string, desc string, filters ListFilters) *Menu {
 	listitems := me.impl.List(filters)
 	cat := me.cat
 	if len(listitems) == 1 && strings.HasSuffix(cat, "s") {
@@ -122,7 +122,7 @@ func (me *ListMenuBase) MenuCategory() string {
 	return me.cat
 }
 
-func (me *ListMenuBase) MenuItems(srcLens *SrcLens) MenuItems {
+func (me *ListMenuBase) menuItems(srcLens *SrcLens) MenuItems {
 	const fhint = "(%v at last count)"
 	for _, item := range me.items {
 		fcount, filterid := "amount unknown", item.IpcArgs.(string)

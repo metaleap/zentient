@@ -46,7 +46,7 @@ func Serve() (err error) {
 	defer catch(&err)
 
 	Prog.pipeIO.stdinReadLn, Prog.pipeIO.stdoutWriter, Prog.pipeIO.stdoutEncoder =
-		urun.SetupJsonIpcPipes(1024*1024*16, false, true)
+		urun.SetupJsonIpcPipes(1024*1024*1, false, true)
 
 	// announce each caddy's existence
 	for _, c := range Lang.Caddies {

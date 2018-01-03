@@ -15,6 +15,7 @@ import (
 type IWorkspace interface {
 	iDispatcher
 	IObjSnap
+	json.Marshaler
 	sync.Locker
 
 	Dirs() WorkspaceDirs
@@ -30,8 +31,8 @@ type WorkspaceDirs map[string]*WorkspaceDir
 
 type WorkspaceFiles map[string]*WorkspaceFile
 
-func (me WorkspaceFiles) Ensure(fpath string) (file *WorkspaceFile) {
-	if file, _ = me[fpath]; file == nil {
+func (me WorkspaceFiles) ensure(fpath string) (file *WorkspaceFile) {
+	if file = me[fpath]; file == nil {
 		file = &WorkspaceFile{Path: fpath}
 		me[fpath] = file
 	}
@@ -57,7 +58,7 @@ func (me WorkspaceFiles) diagsSummary() *diagsSummary {
 	return s
 }
 
-func (me WorkspaceFiles) HaveAnyDiags(buildDiags bool, lintDiags bool) bool {
+func (me WorkspaceFiles) haveAnyDiags(buildDiags bool, lintDiags bool) bool {
 	for _, f := range me {
 		if lb, ll := len(f.Diags.Build.Items), len(f.Diags.Lint.Items); (buildDiags && lb > 0) || (lintDiags && ll > 0) {
 			return true
@@ -67,18 +68,17 @@ func (me WorkspaceFiles) HaveAnyDiags(buildDiags bool, lintDiags bool) bool {
 }
 
 func (me WorkspaceFiles) HasBuildDiags(filePath string) (has bool) {
-	if f, _ := me[filePath]; f != nil {
+	if f := me[filePath]; f != nil {
 		has = len(f.Diags.Build.Items) > 0
 	}
 	return
 }
 
 func (me WorkspaceFiles) exists(fpath string) bool {
-	f, _ := me[fpath]
-	return f != nil
+	return me[fpath] != nil
 }
 
-func (me WorkspaceFiles) FilePathsOpened() (all []string) {
+func (me WorkspaceFiles) filePathsOpened() (all []string) {
 	all = make([]string, 0, len(me))
 	for _, f := range me {
 		if f.IsOpen {
@@ -88,7 +88,7 @@ func (me WorkspaceFiles) FilePathsOpened() (all []string) {
 	return
 }
 
-func (me WorkspaceFiles) FilePathsKnown() (all []string) {
+func (me WorkspaceFiles) filePathsKnown() (all []string) {
 	var i int
 	all = make([]string, len(me))
 	for fp := range me {
@@ -97,7 +97,7 @@ func (me WorkspaceFiles) FilePathsKnown() (all []string) {
 	return
 }
 
-func (me WorkspaceFiles) NumDirs(incl func(*WorkspaceFile) bool) int {
+func (me WorkspaceFiles) numDirs(incl func(*WorkspaceFile) bool) int {
 	filedirs := make(map[string]bool, len(me))
 	for _, f := range me {
 		if incl == nil || incl(f) {
@@ -111,9 +111,9 @@ type WorkspaceFile struct {
 	Path   string
 	IsOpen bool `json:",omitempty"`
 	Diags  struct {
+		AutoLintUpToDate bool
 		Build            Diags
 		Lint             Diags
-		AutoLintUpToDate bool
 	}
 }
 
@@ -131,15 +131,15 @@ type WorkspaceChanges struct {
 	WrittenFiles []string
 }
 
-func (me *WorkspaceChanges) HasChanges() bool {
-	return me.HasDirChanges() || me.HasFileChanges()
+func (me *WorkspaceChanges) hasChanges() bool {
+	return me.HasDirChanges() || me.hasFileChanges()
 }
 
 func (me *WorkspaceChanges) HasDirChanges() bool {
 	return len(me.AddedDirs) > 0 || len(me.RemovedDirs) > 0
 }
 
-func (me *WorkspaceChanges) HasFileChanges() bool {
+func (me *WorkspaceChanges) hasFileChanges() bool {
 	return len(me.OpenedFiles) > 0 || len(me.ClosedFiles) > 0 || len(me.WrittenFiles) > 0
 }
 
@@ -207,10 +207,9 @@ func (*WorkspaceBase) analyzeChanges(files WorkspaceFiles, upd *WorkspaceChanges
 }
 
 func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
-	if upd != nil && upd.HasChanges() {
+	if upd != nil && upd.hasChanges() {
 		dirs, files := me.dirs, me.files
 		freshfiles, hasfreshfiles, dirschanged, needsfreshautolints := me.analyzeChanges(files, upd)
-
 		if needsfreshautolints || hasfreshfiles || dirschanged {
 			me.Lock()
 			defer me.Unlock()
@@ -229,7 +228,7 @@ func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 				delete(dirs, gonedirpath)
 			}
 			for _, newdirpath := range upd.AddedDirs {
-				if dir, _ := dirs[newdirpath]; dir == nil {
+				if dir := dirs[newdirpath]; dir == nil {
 					dir = &WorkspaceDir{Path: strings.TrimRight(newdirpath, "/\\")}
 					dirs[newdirpath] = dir
 				}
@@ -244,13 +243,13 @@ func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 		}
 
 		for _, gonefilepath := range upd.ClosedFiles {
-			files.Ensure(gonefilepath).IsOpen = false
+			files.ensure(gonefilepath).IsOpen = false
 		}
 		for _, freshfilepath := range upd.OpenedFiles {
-			files.Ensure(freshfilepath).IsOpen = true
+			files.ensure(freshfilepath).IsOpen = true
 		}
 		for _, modfilepath := range upd.WrittenFiles {
-			files.Ensure(modfilepath).resetDiags()
+			files.ensure(modfilepath).resetDiags()
 		}
 		if Lang.Diag != nil {
 			if len(upd.WrittenFiles) > 0 {
@@ -271,7 +270,7 @@ func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 	}
 }
 
-func (me *WorkspaceBase) ObjSnap(_ string) interface{} { return me.Impl }
+func (me *WorkspaceBase) ObjSnap(string) interface{} { return me.Impl }
 
 func (*WorkspaceBase) ObjSnapPrefix() string { return Lang.ID + ".proj." }
 

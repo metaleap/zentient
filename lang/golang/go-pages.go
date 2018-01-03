@@ -94,5 +94,8 @@ func (me *goPages) onGoDoc(uriPath string, identName string) string {
 const _PAGES_GODOC_CSS = `
 <style type="text/css">
 div.collapsed { display: none !important; }
+a.permalink { color: #5A5651; }
+h2 { padding-top: 3.44em !important; }
+h3 { padding-top: 4.33em !important; }
 </style>
 `

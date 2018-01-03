@@ -47,9 +47,9 @@ var (
 			stdoutWriter  *bufio.Writer
 			stdinReadLn   *bufio.Scanner
 		}
-		recall struct {
-			i64 map[string]int64
-		}
+		// recall struct {
+		// 	i64 map[string]int64
+		// }
 	}
 )
 
@@ -112,7 +112,7 @@ func Init() (err error) {
 	}
 
 	if Prog.Cfg.reload(); Prog.Cfg.err == nil {
-		Prog.Cfg.recall()
+		// Prog.Cfg.recall()
 		wellknowndispatchers := []iDispatcher{
 			Lang.SrcIntel, Lang.Workspace, Lang.Diag, Lang.SrcMod, Lang.Extras, Lang.PkgIntel, Lang.Tooling, Lang.Settings, &mainMenu{}, Lang.Pages,
 		}

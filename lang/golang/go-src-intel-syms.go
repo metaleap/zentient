@@ -248,11 +248,11 @@ func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (al
 				} else if strings.HasPrefix(pmtype, "struct{") {
 					next := func() int { return strings.Index(pmtype, ` "json:\"`) }
 					for ij1 := next(); ij1 > 0; ij1 = next() {
-						if ij2 := strings.Index(pmtype[ij1+9:], `\""`); ij2 >= 0 {
+						if ij2 := strings.Index(pmtype[ij1+9:], `\""`); ij2 < 0 {
+							break
+						} else {
 							pref, suff := pmtype[:ij1], pmtype[ij1+9+3+ij2:]
 							pmtype = pref + suff
-						} else {
-							break
 						}
 					}
 				}

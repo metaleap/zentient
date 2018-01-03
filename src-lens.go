@@ -19,24 +19,24 @@ type SrcPos struct {
 	byteoff bool
 }
 
-func (oneRangeStart *SrcPos) ComesBehind(anotherRangeEnd *SrcPos) bool {
-	if oneRangeStart.Off > 0 && anotherRangeEnd.Off > 0 {
-		return oneRangeStart.Off >= anotherRangeEnd.Off
-	}
-	return oneRangeStart.Ln > anotherRangeEnd.Ln ||
-		(oneRangeStart.Ln == anotherRangeEnd.Ln && oneRangeStart.Col >= anotherRangeEnd.Col)
+func (me *SrcPos) isBetween(sr *SrcRange) bool {
+	return (sr.isEmpty() && me.isEquivTo(&sr.Start)) ||
+		me.isSameOrGreaterThan(&sr.Start) && sr.End.isSameOrGreaterThan(me)
 }
 
-func (me *SrcPos) EquivTo(pos *SrcPos) bool {
+func (me *SrcPos) isEquivTo(pos *SrcPos) bool {
 	if me.Off > 0 && pos.Off > 0 {
 		return me.Off == pos.Off
 	}
 	return me.Ln == pos.Ln && me.Col == pos.Col
 }
 
-func (me *SrcPos) IsBetween(sr *SrcRange) bool {
-	return (sr.IsEmpty() && me.EquivTo(&sr.Start)) ||
-		me.ComesBehind(&sr.Start) && sr.End.ComesBehind(me)
+func (me *SrcPos) isSameOrGreaterThan(pos *SrcPos) bool {
+	if me.Off > 0 && pos.Off > 0 {
+		return me.Off >= pos.Off
+	}
+	return me.Ln > pos.Ln ||
+		(me.Ln == pos.Ln && me.Col >= pos.Col)
 }
 
 func (me *SrcPos) String() string {
@@ -51,20 +51,20 @@ type SrcRange struct {
 	End   SrcPos `json:"e,omitempty"`
 }
 
-func (me *SrcRange) IsEmpty() bool {
-	return me.Start.EquivTo(&me.End) || (me.End.Col == 0 && me.End.Ln == 0 && me.End.Off == 0)
+func (me *SrcRange) isEmpty() bool {
+	return me.Start.isEquivTo(&me.End) || (me.End.Col == 0 && me.End.Ln == 0 && me.End.Off == 0)
 }
 
-func (me *SrcRange) OverlapsWith(sr *SrcRange) bool {
-	if is0me, is0sr := me.IsEmpty(), sr.IsEmpty(); is0me && is0sr {
-		return me.Start.EquivTo(&sr.Start)
+func (me *SrcRange) overlapsWith(sr *SrcRange) bool {
+	if is0me, is0sr := me.isEmpty(), sr.isEmpty(); is0me && is0sr {
+		return me.Start.isEquivTo(&sr.Start)
 	} else if is0me {
-		return me.Start.IsBetween(sr)
+		return me.Start.isBetween(sr)
 	} else if is0sr {
-		return sr.Start.IsBetween(me)
+		return sr.Start.isBetween(me)
 	}
-	return (!(me.Start.EquivTo(&sr.End) || me.End.EquivTo(&sr.Start))) &&
-		(me.Start.IsBetween(sr) || me.End.IsBetween(sr) || sr.Start.IsBetween(me) || sr.End.IsBetween(me))
+	return (!(me.Start.isEquivTo(&sr.End) || me.End.isEquivTo(&sr.Start))) &&
+		(me.Start.isBetween(sr) || me.End.isBetween(sr) || sr.Start.isBetween(me) || sr.End.isBetween(me))
 }
 
 type SrcLocs []*SrcLoc
@@ -156,7 +156,7 @@ func (me *SrcLens) ByteOffsetForFirstLineBeginningWith(prefix string) int {
 }
 
 func (me *SrcLens) Rune1OffsetForByte0Offset(byte0off int) (rune1off int) {
-	for byteoff, _ := range me.Txt {
+	for byteoff := range me.Txt {
 		rune1off++
 		if byteoff >= byte0off {
 			return
@@ -166,11 +166,11 @@ func (me *SrcLens) Rune1OffsetForByte0Offset(byte0off int) (rune1off int) {
 }
 
 func (me *SrcLoc) SetFilePathAndPosOrRangeFrom(srcRef *udev.SrcMsg, fallbackFilePath func() string) {
-	me.SetFilePathFrom(srcRef, fallbackFilePath)
-	me.SetPosOrRangeFrom(srcRef, true)
+	me.setFilePathFrom(srcRef, fallbackFilePath)
+	me.setPosOrRangeFrom(srcRef, true)
 }
 
-func (me *SrcLoc) SetFilePathFrom(srcRef *udev.SrcMsg, fallbackFilePath func() string) {
+func (me *SrcLoc) setFilePathFrom(srcRef *udev.SrcMsg, fallbackFilePath func() string) {
 	if me.FilePath = srcRef.Ref; me.FilePath != "" && !filepath.IsAbs(me.FilePath) {
 		if absfilepath, err := filepath.Abs(me.FilePath); err == nil {
 			me.FilePath = absfilepath
@@ -183,7 +183,7 @@ func (me *SrcLoc) SetFilePathFrom(srcRef *udev.SrcMsg, fallbackFilePath func() s
 	}
 }
 
-func (me *SrcLoc) SetPosOrRangeFrom(srcRef *udev.SrcMsg, preferRange bool) {
+func (me *SrcLoc) setPosOrRangeFrom(srcRef *udev.SrcMsg, preferRange bool) {
 	me.Pos, me.Range = nil, nil
 	if preferRange && srcRef.Pos2Ch > 0 && srcRef.Pos2Ln > 0 && srcRef.Pos1Ch > 0 && srcRef.Pos1Ln > 0 {
 		me.Range = &SrcRange{Start: SrcPos{Ln: srcRef.Pos1Ln, Col: srcRef.Pos1Ch},

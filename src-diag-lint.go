@@ -18,23 +18,21 @@ type IDiagLint interface {
 }
 
 func init() {
-	if cfgLintStickiness == nil {
-		cfgLintStickiness = &Setting{Id: "cfgLintStickiness", Title: "Sticky-Lints Level", ValDef: uint64(0),
-			Desc: "Lints showing for closed files ➜ 0: errors only — 1: and warnings — 2: and infos — 3: and hints."}
-		cfgLintStickiness.OnChanging = func(nv interface{}) {
-			if l, ok := nv.(uint64); (!ok) || l > 3 {
-				panic("Wanted: a level of at-least 0 and at-most 3.")
+	cfgLintStickiness = &Setting{Id: "cfgLintStickiness", Title: "Sticky-Lints Level", ValDef: uint64(0),
+		Desc: "Lints showing for closed files ➜ 0: errors only — 1: and warnings — 2: and infos — 3: and hints."}
+	cfgLintStickiness.OnChanging = func(nv interface{}) {
+		if l, ok := nv.(uint64); (!ok) || l > 3 {
+			panic("Wanted: a level of at-least 0 and at-most 3.")
+		}
+	}
+	cfgLintStickiness.OnChanged = func(_ interface{}) {
+		val, workspacefiles := cfgLintStickiness.ValUInt(), Lang.Workspace.Files()
+		for _, f := range workspacefiles {
+			for _, d := range f.Diags.Lint.Items {
+				d.StickyAuto = uint64(d.Loc.Flag) <= val
 			}
 		}
-		cfgLintStickiness.OnChanged = func(_ interface{}) {
-			val, workspacefiles := cfgLintStickiness.ValUInt(), Lang.Workspace.Files()
-			for _, f := range workspacefiles {
-				for _, d := range f.Diags.Lint.Items {
-					d.StickyAuto = uint64(d.Loc.Flag) <= val
-				}
-			}
-			go Lang.Diag.send(workspacefiles, false)
-		}
+		go Lang.Diag.send(workspacefiles, false)
 	}
 }
 
@@ -56,7 +54,7 @@ func (me *DiagJobLint) Done() {
 
 func (me *DiagBase) knownLinters(auto bool) (diags Tools) {
 	for _, dt := range me.Impl.KnownLinters() {
-		if dt.IsInAutoDiags() == auto {
+		if dt.isInAutoDiags() == auto {
 			diags = append(diags, dt)
 		}
 	}

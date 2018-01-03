@@ -36,10 +36,9 @@ func (me *Caddy) OnStatusChanged() {
 	go send(&ipcResp{CaddyUpdate: me})
 }
 
-func (me *Caddy) PendingOrBusy() bool {
+func (me *Caddy) IsPendingOrBusy() bool {
 	return me.Status.Flag == CADDY_BUSY || me.Status.Flag == CADDY_PENDING
 }
-
-func (me *Caddy) Ready() bool {
+func (me *Caddy) IsReady() bool {
 	return me.ready
 }

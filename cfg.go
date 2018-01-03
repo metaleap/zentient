@@ -18,7 +18,7 @@ type ISettings interface {
 
 type Settings []*Setting
 
-func (me Settings) ById(id string) *Setting {
+func (me Settings) byId(id string) *Setting {
 	for _, s := range me {
 		if s.Id == id {
 			return s
@@ -103,8 +103,8 @@ type Config struct {
 	FormatterProg string                 `json:",omitempty"`
 	AutoDiags     []string               `json:",omitempty"`
 
-	err            error
-	recallFilePath string
+	err error
+	// recallFilePath string
 	filePath       string
 	timeLastLoaded int64
 }
@@ -152,22 +152,21 @@ func (me *Config) reload() {
 			}
 		}
 	}
-	return
 }
 
-func (me *Config) recall() {
-	me.recallFilePath = filepath.Join(Prog.dir.cache, Prog.name+".recall.json")
-	if ufs.FileExists(me.recallFilePath) {
-		umisc.JsonDecodeFromFile(me.recallFilePath, &Prog.recall)
-	}
-	if Prog.recall.i64 == nil {
-		Prog.recall.i64 = map[string]int64{}
-	}
-}
+// func (me *Config) recall() {
+// 	me.recallFilePath = filepath.Join(Prog.dir.cache, Prog.name+".recall.json")
+// 	if ufs.FileExists(me.recallFilePath) {
+// 		umisc.JsonDecodeFromFile(me.recallFilePath, &Prog.recall)
+// 	}
+// 	if Prog.recall.i64 == nil {
+// 		Prog.recall.i64 = map[string]int64{}
+// 	}
+// }
 
-func (me *Config) saveRecall() {
-	umisc.JsonEncodeToFile(&Prog.recall, me.recallFilePath)
-}
+// func (me *Config) saveRecall() {
+// 	umisc.JsonEncodeToFile(&Prog.recall, me.recallFilePath)
+// }
 
 func (me *Config) Save() (err error) {
 	if Lang.Settings != nil {
@@ -232,7 +231,7 @@ func (me *SettingsBase) KnownSettings() Settings {
 }
 
 func (me *SettingsBase) onSet(cfgId string, cfgVal string, menu *MenuResp) {
-	info, setting := "changed", me.Impl.KnownSettings().ById(cfgId)
+	info, setting := "changed", me.Impl.KnownSettings().byId(cfgId)
 	if setting == nil {
 		BadPanic("setting ID", cfgId)
 	}
@@ -301,7 +300,7 @@ func (me *SettingsBase) onResetAll() (num int, err error) {
 	return
 }
 
-func (me *SettingsBase) MenuItems(*SrcLens) (menuItems MenuItems) {
+func (me *SettingsBase) menuItems(*SrcLens) (menuItems MenuItems) {
 	if Lang.Settings != nil {
 		menuItems = MenuItems{me.cmdListAll}
 		if num := Lang.Settings.KnownSettings().numCust(); num > 0 {

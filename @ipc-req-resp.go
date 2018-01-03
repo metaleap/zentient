@@ -17,7 +17,7 @@ type IObjSnap interface {
 
 type ipcReq struct {
 	ReqID   int64       `json:"ri"`
-	IpcID   IpcIDs      `json:"ii"`
+	IpcID   ipcIDs      `json:"ii"`
 	IpcArgs interface{} `json:"ia"`
 
 	ProjUpd *WorkspaceChanges `json:"projUpd"`
@@ -55,10 +55,9 @@ func ipcDecodeReqAndRespond(jsonreq string) *ipcResp {
 }
 
 type ipcResp struct {
-	IpcID  IpcIDs `json:"i,omitempty"`
-	ReqID  int64  `json:"r,omitempty"`
-	ErrMsg string `json:"err,omitempty"`
-
+	IpcID       ipcIDs         `json:"i,omitempty"`
+	ReqID       int64          `json:"r,omitempty"`
+	ErrMsg      string         `json:"err,omitempty"`
 	SrcIntel    *srcIntelResp  `json:"sI,omitempty"`
 	SrcDiags    *DiagResp      `json:"srcDiags,omitempty"`
 	SrcMods     SrcLenses      `json:"srcMods,omitempty"`

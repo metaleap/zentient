@@ -9,7 +9,7 @@ import (
 type IMenuItems interface {
 	iDispatcher
 
-	MenuItems(*SrcLens) MenuItems
+	menuItems(*SrcLens) MenuItems
 	MenuCategory() string
 }
 
@@ -22,7 +22,7 @@ type Menu struct {
 type MenuItems []*MenuItem
 
 type MenuItem struct {
-	IpcID    IpcIDs      `json:"ii,omitempty"`
+	IpcID    ipcIDs      `json:"ii,omitempty"`
 	IpcArgs  interface{} `json:"ia,omitempty"`
 	Category string      `json:"c,omitempty"`
 	Title    string      `json:"t"`
@@ -69,7 +69,7 @@ func (me *mainMenu) onMainMenu(req *ipcReq, resp *ipcResp) {
 		m.Desc = "Category:  "
 	}
 	for _, menu := range Prog.menus {
-		for _, item := range menu.MenuItems(req.SrcLens) {
+		for _, item := range menu.menuItems(req.SrcLens) {
 			if item.Category = menu.MenuCategory(); catfilter == "" || item.Category == catfilter {
 				if !uslice.StrHas(cats, item.Category) {
 					cats = append(cats, item.Category)

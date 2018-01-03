@@ -18,11 +18,11 @@ type ISrcMod interface {
 
 type SrcModEdits []SrcModEdit
 
-func (me *SrcModEdits) DropConflictingEdits() (droppedOffenders []SrcModEdit) {
+func (me *SrcModEdits) dropConflictingEdits() (droppedOffenders []SrcModEdit) {
 	all := *me
 	for i := 0; i < len(all); i++ {
 		for disedit, j := all[i], i+1; j < len(all); j++ {
-			if datedit := all[j]; disedit.At.OverlapsWith(datedit.At) {
+			if datedit := all[j]; disedit.At.overlapsWith(datedit.At) {
 				droppedOffenders = append(droppedOffenders, all[j])
 				pref, suff := all[:j], all[j+1:]
 				j, all = j-1, append(pref, suff...)
@@ -33,9 +33,11 @@ func (me *SrcModEdits) DropConflictingEdits() (droppedOffenders []SrcModEdit) {
 	return
 }
 
-func (me SrcModEdits) Len() int               { return len(me) }
-func (me SrcModEdits) Swap(i int, j int)      { me[i], me[j] = me[j], me[i] }
-func (me SrcModEdits) Less(i int, j int) bool { return me[i].At.Start.ComesBehind(&me[j].At.End) }
+func (me SrcModEdits) Len() int          { return len(me) }
+func (me SrcModEdits) Swap(i int, j int) { me[i], me[j] = me[j], me[i] }
+func (me SrcModEdits) Less(i int, j int) bool {
+	return me[i].At.Start.isSameOrGreaterThan(&me[j].At.End)
+}
 
 func (*SrcModEdits) lensForNewEdit(srcFilePath string) *SrcLens {
 	var lens = SrcLens{SrcLoc: SrcLoc{FilePath: srcFilePath}}
@@ -98,7 +100,7 @@ func (me *SrcModBase) Init() {
 	}
 }
 
-func (me *SrcModBase) MenuItems(srcLens *SrcLens) (cmds MenuItems) {
+func (me *SrcModBase) menuItems(srcLens *SrcLens) (cmds MenuItems) {
 	if srcLens != nil {
 		srcfilepath, hint := srcLens.FilePath, "("+me.cmdFmtSetDef.Desc+" first)"
 		if me.hasFormatter() {
@@ -201,7 +203,7 @@ func (me *SrcModBase) onRunFormatter(req *ipcReq, resp *ipcResp) {
 		resp.Menu = &MenuResp{}
 	}
 
-	formatter := me.Impl.KnownFormatters().ByName(Prog.Cfg.FormatterName)
+	formatter := me.Impl.KnownFormatters().byName(Prog.Cfg.FormatterName)
 	if formatter == nil {
 		if resp.Menu == nil {
 			resp.ErrMsg = "Select a Default Formatter first via the Zentient Main Menu."

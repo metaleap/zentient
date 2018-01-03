@@ -11,6 +11,9 @@ import (
 )
 
 var (
+	xQuerierGodoc = z.ExtrasItem{ID: "godoc", Label: "godoc",
+		Desc: "[package] [member-name]", Detail: "➜ shows the specified item's summary desc",
+		QueryArg: "Query to `go doc`"}
 	xQuerierGoDoc = z.ExtrasItem{ID: "go_doc", Label: "go doc",
 		Desc: "[package] [member-name]", Detail: "➜ shows the specified item's summary desc",
 		QueryArg: "Query to `go doc`"}

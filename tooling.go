@@ -101,7 +101,7 @@ func (me *ToolingBase) MenuCategory() string {
 	return "Tooling"
 }
 
-func (me *ToolingBase) MenuItems(srcLens *SrcLens) (menu MenuItems) {
+func (me *ToolingBase) menuItems(srcLens *SrcLens) (menu MenuItems) {
 	menu = append(menu, me.cmdListAll)
 	return
 }
@@ -119,17 +119,14 @@ func (me *ToolingBase) KnownToolsFor(cats ...ToolCats) (tools Tools) {
 	alltools := me.Impl.KnownTools()
 	if tools = alltools; len(cats) > 0 {
 		tools = Tools{}
-		added := false
 		for _, t := range alltools {
+		__:
 			for _, tc := range t.Cats {
 				for _, c := range cats {
-					if added = (tc == c); added {
+					if tc == c {
 						tools = append(tools, t)
-						break
+						break __
 					}
-				}
-				if added {
-					break
 				}
 			}
 		}
@@ -139,7 +136,7 @@ func (me *ToolingBase) KnownToolsFor(cats ...ToolCats) (tools Tools) {
 
 type Tools []*Tool
 
-func (me Tools) Has(name string) bool {
+func (me Tools) has(name string) bool {
 	for _, t := range me {
 		if t.Name == name {
 			return true
@@ -148,7 +145,7 @@ func (me Tools) Has(name string) bool {
 	return false
 }
 
-func (me Tools) Len(inst bool) (num int) {
+func (me Tools) len(inst bool) (num int) {
 	for _, t := range me {
 		if t.Installed == inst {
 			num++
@@ -173,7 +170,7 @@ func (me Tools) Len(inst bool) (num int) {
 // 	return one.Name < two.Name
 // }
 
-func (me Tools) ByName(name string) *Tool {
+func (me Tools) byName(name string) *Tool {
 	if name != "" {
 		for _, tool := range me {
 			if tool.Name == name {
@@ -203,7 +200,7 @@ func (*Tool) Exec(cmdname string, cmdargs []string, stdin string) (string, strin
 	return stdout, stderr
 }
 
-func (me *Tool) IsInAutoDiags() bool {
+func (me *Tool) isInAutoDiags() bool {
 	return uslice.StrHas(Prog.Cfg.AutoDiags, me.Name)
 }
 
@@ -211,8 +208,8 @@ func (me *Tool) NotInstalledMessage() string {
 	return Strf("Not installed: `%s`, how-to at: %s", me.Name, me.Website)
 }
 
-func (me *Tool) ToggleInAutoDiags() error {
-	if me.IsInAutoDiags() {
+func (me *Tool) toggleInAutoDiags() error {
+	if me.isInAutoDiags() {
 		Prog.Cfg.AutoDiags = uslice.StrWithout(Prog.Cfg.AutoDiags, false, me.Name)
 	} else {
 		Prog.Cfg.AutoDiags = append(Prog.Cfg.AutoDiags, me.Name)

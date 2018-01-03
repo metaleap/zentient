@@ -51,8 +51,8 @@ func (me *goWorkspace) onBeforeChanges(upd *z.WorkspaceChanges, freshFiles []str
 				break
 			}
 		}
-		if hasnewpkgs && caddyRefreshPkgs.Ready() {
-			if caddyRefreshPkgs.PendingOrBusy() {
+		if hasnewpkgs && caddyRefreshPkgs.IsReady() {
+			if caddyRefreshPkgs.IsPendingOrBusy() {
 				caddyRefreshPkgs.ShouldReRunWhenNextDone = true
 			} else {
 				go caddyRunRefreshPkgs()
