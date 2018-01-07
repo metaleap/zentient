@@ -47,42 +47,38 @@ func (*goSrcIntel) ComplItems(srcLens *z.SrcLens) (all z.SrcIntelCompls) {
 				switch c {
 				case "PANIC":
 					continue
-				case "func":
-					cmpl.Kind = z.CMPL_FUNCTION
-					cmpl.SortPrio = 3
 				case "package", "import":
-					cmpl.Kind = z.CMPL_FOLDER
-					cmpl.SortPrio = 1
+					cmpl.SortPrio, cmpl.Kind = 2, z.CMPL_FOLDER
 				case "var":
-					cmpl.Kind = z.CMPL_FIELD
-					cmpl.SortPrio = 2
+					cmpl.SortPrio, cmpl.Kind = 3, z.CMPL_FIELD
+				case "func":
+					cmpl.SortPrio, cmpl.Kind = 4, z.CMPL_FUNCTION
 				case "const":
-					cmpl.Kind = z.CMPL_CONSTANT
-					cmpl.SortPrio = 5
+					cmpl.SortPrio, cmpl.Kind = 20, z.CMPL_CONSTANT
 				case "type":
-					cmpl.SortPrio = 4
+					cmpl.SortPrio = 19
 					switch t {
+					case "interface":
+						cmpl.SortPrio, cmpl.Kind = 10, z.CMPL_INTERFACE
+					case "struct":
+						cmpl.SortPrio, cmpl.Kind = 11, z.CMPL_CLASS
+					case "int", "int8", "int16", "int32", "uint", "uint8", "uint16", "uint32":
+						cmpl.Kind = z.CMPL_ENUMMEMBER
+					case "float32", "float64", "complex64", "complex128", "int64", "uint64":
+						cmpl.Kind = z.CMPL_OPERATOR
+					case "string", "rune", "[]byte":
+						cmpl.Kind = z.CMPL_UNIT
 					case "built-in":
 						switch n {
-						case "byte", "float32", "float64", "float", "complex64", "complex128", "int64", "uint64", "int", "int8", "int16", "int32", "uint", "uint8", "uint16", "uint32":
+						case "byte", "float32", "float64", "complex64", "complex128", "int64", "uint64", "int", "int8", "int16", "int32", "uint", "uint8", "uint16", "uint32":
 							cmpl.Kind = z.CMPL_OPERATOR
 						case "string", "rune", "bool", "uintptr":
 							cmpl.Kind = z.CMPL_UNIT
 						default:
 							cmpl.Kind = z.CMPL_FILE
 						}
-					case "float32", "float64", "float", "complex64", "complex128", "int64", "uint64":
-						cmpl.Kind = z.CMPL_OPERATOR
-					case "int", "int8", "int16", "int32", "uint", "uint8", "uint16", "uint32":
-						cmpl.Kind = z.CMPL_ENUMMEMBER
-					case "string", "rune", "[]byte":
-						cmpl.Kind = z.CMPL_UNIT
-					case "struct":
-						cmpl.Kind = z.CMPL_CLASS
-					case "interface":
-						cmpl.Kind = z.CMPL_INTERFACE
 					default:
-						cmpl.Kind = z.CMPL_TYPEPARAMETER
+						cmpl.SortPrio, cmpl.Kind = 12, z.CMPL_TYPEPARAMETER
 						for pref, ck := range cmplPatterns {
 							if strings.HasPrefix(t, pref) {
 								cmpl.Kind = ck
@@ -91,7 +87,7 @@ func (*goSrcIntel) ComplItems(srcLens *z.SrcLens) (all z.SrcIntelCompls) {
 						}
 					}
 				default:
-					cmpl.Detail = "CMPLCLS:[" + c + "]\n" + cmpl.Detail
+					cmpl.SortPrio, cmpl.Detail = 1, "CMPLCLS:["+c+"]\n"+cmpl.Detail
 				}
 				all = append(all, cmpl)
 			}

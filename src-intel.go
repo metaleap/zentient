@@ -66,7 +66,7 @@ type SrcIntelCompls []*SrcIntelCompl
 
 func (me SrcIntelCompls) Len() int               { return len(me) }
 func (me SrcIntelCompls) Swap(i int, j int)      { me[i], me[j] = me[j], me[i] }
-func (me SrcIntelCompls) Less(i int, j int) bool { return me[i].SortPrio < me[j].SortPrio }
+func (me SrcIntelCompls) Less(i int, j int) bool { return me[i].SortText < me[j].SortText }
 
 type SrcIntelDoc struct {
 	Value     string `json:"value,omitempty"`
@@ -129,10 +129,13 @@ func (me *SrcIntelBase) onCmplItems(req *ipcReq, resp *ipcResp) {
 	if lex := me.posLex(req.SrcLens); lex.canIntel() {
 		resp.SrcIntel.Cmpl = me.Impl.ComplItems(req.SrcLens)
 		if me.Impl.ComplItemsShouldSort(req.SrcLens) {
-			sort.Sort(resp.SrcIntel.Cmpl)
-			for i, c := range resp.SrcIntel.Cmpl {
-				c.SortText = Strf("%03d%s", i, strings.ToLower(c.Label))
+			for _, c := range resp.SrcIntel.Cmpl {
+				if c.SortText == "" {
+					c.SortText = strings.ToLower(c.Label)
+				}
+				c.SortText = Strf("%02d", c.SortPrio) + c.SortText
 			}
+			sort.Sort(resp.SrcIntel.Cmpl)
 		}
 	}
 }
