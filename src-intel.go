@@ -131,7 +131,7 @@ func (me *SrcIntelBase) onCmplItems(req *ipcReq, resp *ipcResp) {
 		if me.Impl.ComplItemsShouldSort(req.SrcLens) {
 			sort.Sort(resp.SrcIntel.Cmpl)
 			for i, c := range resp.SrcIntel.Cmpl {
-				c.SortText = Strf("%03d", i)
+				c.SortText = Strf("%03d%s", i, strings.ToLower(c.Label))
 			}
 		}
 	}
