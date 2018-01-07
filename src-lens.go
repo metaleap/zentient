@@ -3,6 +3,7 @@ package z
 import (
 	"path/filepath"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/metaleap/go-util/dev"
 	"github.com/metaleap/go-util/fs"
@@ -156,13 +157,14 @@ func (me *SrcLens) ByteOffsetForFirstLineBeginningWith(prefix string) int {
 }
 
 func (me *SrcLens) Rune1OffsetForByte0Offset(byte0off int) (rune1off int) {
-	for byteoff := range me.Txt {
-		rune1off++
-		if byteoff >= byte0off {
-			return
-		}
-	}
-	return
+	return 1 + utf8.RuneCountInString(me.Txt[:byte0off])
+	// for byteoff := range me.Txt {
+	// 	rune1off++
+	// 	if byteoff >= byte0off {
+	// 		return
+	// 	}
+	// }
+	// return
 }
 
 func (me *SrcLoc) SetFilePathAndPosOrRangeFrom(srcRef *udev.SrcMsg, fallbackFilePath func() string) {

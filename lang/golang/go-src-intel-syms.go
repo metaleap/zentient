@@ -162,15 +162,17 @@ func (*goSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (all z.SrcLocs
 			sl.FilePath = ""
 		}
 	}
-	if len(all) == 0 && len(gw.Enclosing) > 0 {
-		srcraw := []byte(srcLens.Txt)
-		bpos2rpos := func(bytepos int) int {
-			length := 0
-			for range string(srcraw[:bytepos]) {
-				length++
-			}
-			return length // here's what *won't* work for multi-byte/unicode/etc: just bytepos, or even len(string(srcraw[:bytepos]))
-		}
+	if len(all) > 0 {
+		return
+	}
+	if len(gw.Enclosing) > 0 {
+		// srcraw := []byte(srcLens.Txt)
+		// bpos2rpos := func(bytepos int) (runeidx int) {
+		// 	for range string(srcraw[:bytepos]) {
+		// 		runeidx++
+		// 	}
+		// 	return // here's what *won't* work for multi-byte/unicode/etc: just bytepos, or even len(string(srcraw[:bytepos]))
+		// }
 		var check func(num int, checks ...string) bool
 		check = func(num int, checks ...string) bool {
 			if num <= 0 {
@@ -184,7 +186,7 @@ func (*goSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (all z.SrcLocs
 			if ustr.AnyOf(gw.Enclosing[0].Description, checks[:num]...) {
 				for _, syntaxnode := range gw.Enclosing {
 					if ustr.AnyOf(syntaxnode.Description, checks[num:]...) {
-						all = append(all, &z.SrcLoc{Range: &z.SrcRange{Start: z.SrcPos{Off: 1 + bpos2rpos(syntaxnode.Start)}, End: z.SrcPos{Off: 1 + bpos2rpos(syntaxnode.End)}}})
+						all = append(all, &z.SrcLoc{Range: &z.SrcRange{Start: z.SrcPos{Off: srcLens.Rune1OffsetForByte0Offset(syntaxnode.Start)}, End: z.SrcPos{Off: srcLens.Rune1OffsetForByte0Offset(syntaxnode.End)}}})
 						return true
 					}
 				}

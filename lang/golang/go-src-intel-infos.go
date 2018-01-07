@@ -13,8 +13,8 @@ var (
 	srcIntel     goSrcIntel
 	cmplPatterns = map[string]z.Completion{
 		"*":          z.CMPL_UNIT,
-		"map[":       z.CMPL_VARIABLE,
-		"[]":         z.CMPL_VARIABLE,
+		"map[":       z.CMPL_TYPEPARAMETER,
+		"[]":         z.CMPL_TYPEPARAMETER,
 		"func(":      z.CMPL_EVENT,
 		"interface{": z.CMPL_INTERFACE,
 		"struct{":    z.CMPL_CLASS,
