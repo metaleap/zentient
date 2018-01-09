@@ -6,6 +6,7 @@ import (
 
 	"github.com/metaleap/go-util/dev"
 	"github.com/metaleap/go-util/dev/go"
+	"github.com/metaleap/go-util/slice"
 	"github.com/metaleap/zentient"
 )
 
@@ -16,12 +17,26 @@ func ensureBuildOrder(dis z.IDiagJobTarget, dat z.IDiagJobTarget) bool {
 func (me *goDiag) OnUpdateBuildDiags(writtenFilePaths []string) (jobs z.DiagBuildJobs) {
 	if pkgjobs := me.onUpdateDiagsPrepPkgJobs(writtenFilePaths); len(pkgjobs) > 0 {
 		for _, pj := range pkgjobs {
-			jobs = append(jobs, &z.DiagJobBuild{DiagJob: pj, TargetCmp: ensureBuildOrder})
+			job := &z.DiagJobBuild{DiagJob: pj, TargetCmp: ensureBuildOrder}
 			for _, dependant := range pj.Target.(*udevgo.Pkg).Dependants() {
 				if pkgdep := udevgo.PkgsByImP[dependant]; pkgdep != nil {
 					jobs = append(jobs, &z.DiagJobBuild{DiagJob: z.DiagJob{Target: pkgdep, AffectedFilePaths: pkgdep.GoFilePaths()}, TargetCmp: ensureBuildOrder})
 				}
 			}
+			for _, dep := range pj.Target.(*udevgo.Pkg).Deps {
+				// this sub-optimal loop in practice unneeded in ~90+% of usage but sometimes *is* to prevent ugly diag duplications of existing unaddressed dep diags
+				// ie: you remove an issue from main, there remains one in its imported dep, but we rely on `go install` for that one to rebuild
+				// (there was no build-on-save signal for the dep, just the main) --- we could also do lengthy "duplicate check"s on all diags but
+				// mildly cleaner to mark all go files of all dependencies as "affected" aka "may-produce-diags", meaning we clear those deps too (not just dependants as done above)
+				if pkgdep := udevgo.PkgsByImP[dep]; pkgdep != nil {
+					for _, gfp := range pkgdep.GoFilePaths() {
+						if !uslice.StrHas(job.AffectedFilePaths, gfp) {
+							job.AffectedFilePaths = append(job.AffectedFilePaths, gfp)
+						}
+					}
+				}
+			}
+			jobs = append(jobs, job)
 		}
 	}
 	return
