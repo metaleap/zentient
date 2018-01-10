@@ -96,21 +96,20 @@ func (me *goDiag) FixerUppers() []z.FixerUpper {
 }
 
 func (me *goDiag) tryFixImpMissing(d *z.DiagItem) (fix *z.FixUp) {
-	//undefined: strings
-	pref := "undefined: "
-	if pkgs := udevgo.PkgsByImP; strings.HasPrefix(d.Msg, pref) && pkgs != nil {
-		if pkgname := d.Msg[len(pref):]; len(pkgname) > 0 {
-			pkg := pkgs[pkgname]
-			if pkg == nil || pkg.Name != pkgname {
-				for _, p := range pkgs {
-					if p.Name == pkgname {
-						pkg = p
-						break
-					}
+	if pkgname, pref, pkgs, i := "", "undefined: ", udevgo.PkgsByImP, strings.Index(d.Msg, " is not a package"); pkgs != nil {
+		if strings.HasPrefix(d.Msg, pref) {
+			pkgname = d.Msg[len(pref):]
+		} else if i > 0 {
+			pkgname = d.Msg[:i]
+		}
+		if mpkgs := []string{}; pkgname != "" {
+			for _, p := range pkgs {
+				if p.Name == pkgname {
+					mpkgs = append(mpkgs, p.ImportPath)
 				}
 			}
-			if pkg != nil {
-				fix = &z.FixUp{Name: "Add missing imports", Items: []string{pkgname}}
+			if pkg := udevgo.PkgsByImP[uslice.StrShortest(mpkgs)]; pkg != nil {
+				fix = &z.FixUp{Name: "Add missing imports", Items: []string{pkg.ImportPath}}
 				fix.Edits.AddEdit_Insert(d.Loc.FilePath, func(srclens *z.SrcLens, set *z.SrcPos) (ins string) {
 					if i := strings.Index(srclens.Txt, "\nimport (\n"); i > 0 {
 						idot, j := strings.IndexRune(pkg.ImportPath, '.'), strings.Index(srclens.Txt[i:], "\n)\n")
