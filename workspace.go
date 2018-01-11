@@ -29,11 +29,38 @@ type WorkspaceDir struct {
 
 type WorkspaceDirs map[string]*WorkspaceDir
 
+type WorkspaceFile struct {
+	Path   string
+	IsOpen bool `json:",omitempty"`
+	Diags  struct {
+		AutoLintUpToDate bool
+		Build            diags
+		Lint             diags
+	}
+
+	modTime int64
+}
+
+func (me *WorkspaceFile) updateModTime() (hasChanged bool) {
+	if fileinfo, err := os.Stat(me.Path); err == nil && !fileinfo.IsDir() {
+		modtime := fileinfo.ModTime().UnixNano()
+		me.modTime, hasChanged = modtime, modtime > me.modTime
+	}
+	return
+}
+
+func (me *WorkspaceFile) resetDiags() {
+	me.Diags.Build.forget(nil)
+	me.Diags.Lint.forget(nil)
+	me.Diags.AutoLintUpToDate = false
+}
+
 type WorkspaceFiles map[string]*WorkspaceFile
 
 func (me WorkspaceFiles) ensure(fpath string) (file *WorkspaceFile) {
 	if file = me[fpath]; file == nil {
 		file = &WorkspaceFile{Path: fpath}
+		file.updateModTime()
 		me[fpath] = file
 	}
 	return
@@ -107,22 +134,6 @@ func (me WorkspaceFiles) numDirs(incl func(*WorkspaceFile) bool) int {
 	return len(filedirs)
 }
 
-type WorkspaceFile struct {
-	Path   string
-	IsOpen bool `json:",omitempty"`
-	Diags  struct {
-		AutoLintUpToDate bool
-		Build            diags
-		Lint             diags
-	}
-}
-
-func (me *WorkspaceFile) resetDiags() {
-	me.Diags.Build.forget(nil)
-	me.Diags.Lint.forget(nil)
-	me.Diags.AutoLintUpToDate = false
-}
-
 type WorkspaceChanges struct {
 	AddedDirs    []string
 	RemovedDirs  []string
@@ -137,6 +148,20 @@ func (me *WorkspaceChanges) hasChanges() bool {
 
 func (me *WorkspaceChanges) HasDirChanges() bool {
 	return len(me.AddedDirs) > 0 || len(me.RemovedDirs) > 0
+}
+
+func (me *WorkspaceChanges) hasFileIn(filePath string, slices ...[]string) bool {
+	if len(slices) == 0 {
+		slices = [][]string{me.ClosedFiles, me.OpenedFiles, me.WrittenFiles}
+	}
+	for _, eventfiles := range slices {
+		for _, fpath := range eventfiles {
+			if fpath == filePath {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func (me *WorkspaceChanges) hasFileChanges() bool {
@@ -199,6 +224,11 @@ func (*WorkspaceBase) analyzeChanges(files WorkspaceFiles, upd *WorkspaceChanges
 			if !files.exists(fpath) {
 				freshFiles = append(freshFiles, fpath)
 			}
+		}
+	}
+	for _, file := range files { // we really only check all-known-files for changes seemingly-somewhat-redudantly here to cover changes outside the editor (from code-gens etc)
+		if file.updateModTime() && !upd.hasFileIn(file.Path, upd.WrittenFiles) {
+			upd.WrittenFiles = append(upd.WrittenFiles, file.Path)
 		}
 	}
 	hasFreshFiles, dirsChanged = len(freshFiles) > 0, upd.HasDirChanges()
