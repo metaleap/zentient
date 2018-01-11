@@ -230,7 +230,7 @@ func (me *SettingsBase) KnownSettings() Settings {
 	return Settings{cfgLintStickiness}
 }
 
-func (me *SettingsBase) onSet(cfgId string, cfgVal string, menu *MenuResp) {
+func (me *SettingsBase) onSet(cfgId string, cfgVal string, menu *menuResp) {
 	info, setting := "changed", me.Impl.KnownSettings().byId(cfgId)
 	if setting == nil {
 		BadPanic("setting ID", cfgId)
@@ -273,7 +273,7 @@ func (me *SettingsBase) onSet(cfgId string, cfgVal string, menu *MenuResp) {
 	}
 }
 
-func (me *SettingsBase) onListAll(menu *MenuResp) {
+func (me *SettingsBase) onListAll(menu *menuResp) {
 	menu.SubMenu = &Menu{Desc: Strf("%s — %s:", me.MenuCategory(), me.cmdListAll.Title)}
 	for _, ks := range me.Impl.KnownSettings() {
 		svdef, svcur := "(empty)", "(default)"
@@ -284,7 +284,7 @@ func (me *SettingsBase) onListAll(menu *MenuResp) {
 			svcur = Strf("%v", ks.ValCfg)
 		}
 		ks.menuItem.Hint = Strf("Default: %s — Current: %s", svdef, svcur)
-		ks.menuItem.IpcArgs = map[string]interface{}{"id": ks.Id, "val": MenuItemIpcArgPrompt{Placeholder: ks.Desc,
+		ks.menuItem.IpcArgs = map[string]interface{}{"id": ks.Id, "val": menuItemIpcArgPrompt{Placeholder: ks.Desc,
 			Prompt: "Specify as instructed, or clear to reset.", Value: ks.ValStr()}}
 		menu.SubMenu.Items = append(menu.SubMenu.Items, ks.menuItem)
 	}

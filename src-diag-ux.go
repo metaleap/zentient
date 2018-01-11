@@ -1,137 +1,11 @@
 package z
 
 import (
-	"fmt"
 	"path/filepath"
 	"strings"
 
-	"github.com/metaleap/go-util/dev"
-	"github.com/metaleap/go-util/fs"
 	"github.com/metaleap/go-util/slice"
-	"github.com/metaleap/go-util/str"
 )
-
-type IDiag interface {
-	IDiagBuild
-	IDiagLint
-	IMenuItems
-
-	send(WorkspaceFiles, bool)
-}
-
-type Diags struct {
-	Items DiagItems `json:",omitempty"`
-}
-
-func (me *Diags) forget(onlyFor Tools) {
-	if len(onlyFor) == 0 {
-		me.Items = nil
-	} else {
-		for i := 0; i < len(me.Items); i++ {
-			if onlyFor.has(me.Items[i].Cat) {
-				pre, post := me.Items[:i], me.Items[i+1:]
-				i, me.Items = i-1, append(pre, post...)
-			}
-		}
-	}
-}
-
-type DiagItemsBy map[string]DiagItems
-
-type DiagItem struct {
-	Cat         string `json:",omitempty"`
-	Loc         SrcLoc
-	Msg         string
-	SrcActions  []EditorAction `json:",omitempty"`
-	StickyForce bool           `json:"-"`
-	StickyAuto  bool           `json:"Sticky,omitempty"`
-}
-
-func (me *DiagItem) resetAndInferSrcActions() {
-	me.SrcActions = nil
-	if ilastcolon := strings.LastIndex(me.Msg, ":"); ilastcolon > 0 {
-		if ilastnum := ustr.ToInt(me.Msg[ilastcolon+1:]); ilastnum > 0 {
-			if ifirstsep := strings.IndexRune(me.Msg, filepath.Separator); ifirstsep >= 0 {
-				refpath := me.Msg[ifirstsep:]
-				refpathf := refpath[:strings.IndexRune(refpath, ':')]
-				if !ufs.FileExists(refpathf) {
-					for i := ifirstsep - 1; i > 0; i-- {
-						refpath = me.Msg[i:]
-						if refpathf = refpath[:strings.IndexRune(refpath, ':')]; ufs.FileExists(refpathf) {
-							break
-						}
-					}
-				}
-				if ufs.FileExists(refpathf) && !filepath.IsAbs(refpathf) {
-					refpathf, _ = filepath.Abs(refpathf)
-				}
-				if ufs.FileExists(refpathf) {
-					cmd := EditorAction{Cmd: "zen.internal.openFileAt", Title: refpathf + refpath[strings.IndexRune(refpath, ':'):]}
-					cmd.Arguments = append(cmd.Arguments, cmd.Title)
-					cmd.Title = Strf("Jump to %s", filepath.Base(cmd.Title))
-					me.SrcActions = append(me.SrcActions, cmd)
-				}
-			}
-		}
-	}
-}
-
-type DiagItems []*DiagItem
-
-func (me DiagItems) propagate(lintDiags bool, diagsSticky bool, workspaceFiles WorkspaceFiles) {
-	for _, diag := range me {
-		f := workspaceFiles.ensure(diag.Loc.FilePath)
-		fd := &f.Diags.Lint
-		if !lintDiags {
-			fd = &f.Diags.Build
-		}
-		if diag.StickyForce, fd.Items = diagsSticky, append(fd.Items, diag); diagsSticky {
-			diag.StickyAuto = true
-		} else {
-			diag.StickyAuto = uint64(diag.Loc.Flag) <= cfgLintStickiness.ValUInt()
-		}
-	}
-}
-
-type IDiagJobTarget interface {
-	ISortable
-	fmt.Stringer
-}
-
-type DiagJob struct {
-	AffectedFilePaths []string
-	Target            IDiagJobTarget
-	WorkspaceFiles    WorkspaceFiles
-}
-
-func (me *DiagJob) forgetPrevDiags(diagToolsIfLint Tools, setAutoUpToDateToTrueIfLint bool, workspaceFiles WorkspaceFiles) {
-	forbuild := len(diagToolsIfLint) == 0
-	var f *WorkspaceFile
-	for _, fpath := range me.AffectedFilePaths {
-		if setAutoUpToDateToTrueIfLint {
-			f = workspaceFiles.ensure(fpath)
-		} else {
-			f = workspaceFiles[fpath]
-		}
-		if f != nil {
-			if forbuild {
-				f.Diags.Build.forget(nil)
-				f.Diags.AutoLintUpToDate = false
-			} else if setAutoUpToDateToTrueIfLint {
-				f.Diags.AutoLintUpToDate = true
-			}
-			f.Diags.Lint.forget(diagToolsIfLint)
-		}
-	}
-}
-
-func (me *DiagJob) String() string { return me.Target.String() }
-
-type DiagResp struct {
-	All    DiagItemsBy
-	FixUps []*FixUps
-	LangID string
-}
 
 type DiagBase struct {
 	Impl IDiag
@@ -234,14 +108,6 @@ func (me *DiagBase) menuItemsUpdateHint(diags Tools, item *MenuItem) {
 	}
 }
 
-func (me *DiagBase) NewDiagItemFrom(srcRef *udev.SrcMsg, toolName string, fallbackFilePath func() string) (di *DiagItem) {
-	di = &DiagItem{Msg: ustr.Trim(srcRef.Msg), Cat: toolName}
-	di.Loc.Flag = srcRef.Flag
-	di.Loc.SetFilePathAndPosOrRangeFrom(srcRef, fallbackFilePath)
-	di.resetAndInferSrcActions()
-	return
-}
-
 func (me *DiagBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	switch req.IpcID {
 	case IPCID_SRCDIAG_LIST:
@@ -268,7 +134,7 @@ func (me *DiagBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	return true
 }
 
-func (me *DiagBase) onPeekHidden(approxNum int, resp *MenuResp) {
+func (me *DiagBase) onPeekHidden(approxNum int, resp *menuResp) {
 	workspacefiles := Lang.Workspace.Files()
 	resp.Refs = make(SrcLocs, 0, approxNum)
 	for _, f := range workspacefiles {
@@ -294,7 +160,7 @@ var onRunManuallyInfoNoteAlreadyShownOnceInThisSession, onRunManuallyAlreadyCurr
 
 func (me *DiagBase) onRunManually(filePaths []string, resp *ipcResp) {
 	if onRunManuallyAlreadyCurrentlyRunning {
-		resp.Menu = &MenuResp{NoteWarn: "Declined: previous batch of lintish jobs still running, please wait until those have finished."}
+		resp.Menu = &menuResp{NoteWarn: "Declined: previous batch of lintish jobs still running, please wait until those have finished."}
 	} else {
 		workspacefiles := Lang.Workspace.Files()
 		if filePaths == nil {
@@ -304,16 +170,16 @@ func (me *DiagBase) onRunManually(filePaths []string, resp *ipcResp) {
 		}
 		go me.Impl.UpdateLintDiagsIfAndAsNeeded(workspacefiles, false, filePaths...)
 		if workspacefiles.haveAnyDiags(true, false) {
-			resp.Menu = &MenuResp{NoteWarn: "Any lintish findings will not display as long as the currently shown build problems remain unresolved in the workspace."}
+			resp.Menu = &menuResp{NoteWarn: "Any lintish findings will not display as long as the currently shown build problems remain unresolved in the workspace."}
 		} else if !onRunManuallyInfoNoteAlreadyShownOnceInThisSession {
 			onRunManuallyInfoNoteAlreadyShownOnceInThisSession = true
-			resp.Menu = &MenuResp{NoteInfo: Strf("All lintish findings (if any) will show up shortly and remain visible until invalidated.")}
+			resp.Menu = &menuResp{NoteInfo: Strf("All lintish findings (if any) will show up shortly and remain visible until invalidated.")}
 		}
 	}
 }
 
 func (me *DiagBase) onListAll(resp *ipcResp) {
-	resp.Menu = &MenuResp{SubMenu: &Menu{Desc: me.cmdListDiags.Desc}}
+	resp.Menu = &menuResp{SubMenu: &Menu{Desc: me.cmdListDiags.Desc}}
 	knowndiagsauto, knowndiagsmanual := me.knownLinters(true), me.knownLinters(false)
 	itemdesc := "WILL run automatically on file open/save. ➜ Pick to turn this off."
 	for _, knowndiags := range []Tools{knowndiagsauto, knowndiagsmanual} {
@@ -361,7 +227,7 @@ func (me *DiagBase) onToggleAll(enableAll bool, resp *ipcResp) {
 	if enableAll {
 		s = "all"
 	}
-	resp.Menu = &MenuResp{NoteInfo: Strf("From now on, %s known-and-installed %s lintish tools will run automatically on file open/save.", s, Lang.Title)}
+	resp.Menu = &menuResp{NoteInfo: Strf("From now on, %s known-and-installed %s lintish tools will run automatically on file open/save.", s, Lang.Title)}
 	go me.onToggled()
 }
 
@@ -372,9 +238,9 @@ func (me *DiagBase) onToggle(toolName string, resp *ipcResp) {
 	} else if err := diagtool.toggleInAutoDiags(); err != nil {
 		resp.ErrMsg = err.Error()
 	} else if diagtool.isInAutoDiags() {
-		resp.Menu = &MenuResp{NoteInfo: Strf("The %s lintish tool `%s` will run automatically on file open/save.", Lang.Title, toolName)}
+		resp.Menu = &menuResp{NoteInfo: Strf("The %s lintish tool `%s` will run automatically on file open/save.", Lang.Title, toolName)}
 	} else {
-		resp.Menu = &MenuResp{NoteInfo: Strf("The %s lintish tool `%s` won't run automatically on file open/save.", Lang.Title, toolName)}
+		resp.Menu = &menuResp{NoteInfo: Strf("The %s lintish tool `%s` won't run automatically on file open/save.", Lang.Title, toolName)}
 	}
 	go me.onToggled()
 }
@@ -391,7 +257,7 @@ func (me *DiagBase) onToggled() {
 }
 
 func (me *DiagBase) send(workspaceFiles WorkspaceFiles, onlyBuildDiags bool) {
-	resp := &DiagResp{LangID: Lang.ID, All: make(DiagItemsBy, len(workspaceFiles))}
+	resp := &diagResp{LangID: Lang.ID, All: make(diagItemsBy, len(workspaceFiles))}
 	onlyBuildDiags = onlyBuildDiags || workspaceFiles.haveAnyDiags(true, false)
 	for _, f := range workspaceFiles {
 		fdiagitems := f.Diags.Lint.Items

@@ -6,6 +6,21 @@ import (
 
 type FixerUpper func(*DiagItem) *FixUp
 
+type fixUpsByFile map[string][]*FixUp
+
+type FixUp struct {
+	Name  string
+	Items []string
+	Edits SrcModEdits
+}
+
+type fixUps struct {
+	FilePath string
+	Desc     map[string][]string
+	Edits    SrcModEdits
+	Dropped  []srcModEdit
+}
+
 type IDiagBuild interface {
 	FixerUppers() []FixerUpper
 	OnUpdateBuildDiags([]string) DiagBuildJobs
@@ -37,21 +52,6 @@ type DiagJobBuild struct {
 	diags     DiagItems
 }
 
-type FixUpsByFile map[string][]*FixUp
-
-type FixUp struct {
-	Name  string
-	Items []string
-	Edits SrcModEdits
-}
-
-type FixUps struct {
-	FilePath string
-	Desc     map[string][]string
-	Edits    SrcModEdits
-	Dropped  []SrcModEdit
-}
-
 func (me *DiagJobBuild) Yield(diag *DiagItem) { me.diags = append(me.diags, diag) }
 
 func (me *DiagJobBuild) IsSortedPriorTo(cmp interface{}) bool {
@@ -69,7 +69,7 @@ func (me *DiagBase) fixUps(diags DiagItems) {
 	if len(fixers) == 0 {
 		return
 	}
-	fixupsbyfile := FixUpsByFile{}
+	fixupsbyfile := fixUpsByFile{}
 	for _, d := range diags {
 		for _, f := range fixers {
 			if fixup := f(d); fixup != nil && len(fixup.Edits) > 0 {
@@ -78,15 +78,15 @@ func (me *DiagBase) fixUps(diags DiagItems) {
 		}
 	}
 	if len(fixupsbyfile) > 0 {
-		dr := &DiagResp{LangID: Lang.ID, FixUps: make([]*FixUps, 0, len(fixupsbyfile))}
+		dr := &diagResp{LangID: Lang.ID, FixUps: make([]*fixUps, 0, len(fixupsbyfile))}
 		for filepath, filefixups := range fixupsbyfile {
-			fixups := &FixUps{FilePath: filepath, Desc: map[string][]string{}}
+			fixups := &fixUps{FilePath: filepath, Desc: map[string][]string{}}
 			for _, fixup := range filefixups {
 				fixups.Desc[fixup.Name] = append(fixups.Desc[fixup.Name], fixup.Items...)
 				fixups.Edits = append(fixups.Edits, fixup.Edits...)
 			}
 			if fixups.Dropped = fixups.Edits.dropConflictingEdits(); fixups.Dropped == nil { // be nice to the client-side here..
-				fixups.Dropped = []SrcModEdit{}
+				fixups.Dropped = []srcModEdit{}
 			}
 			sort.Sort(fixups.Edits)
 			dr.FixUps = append(dr.FixUps, fixups)

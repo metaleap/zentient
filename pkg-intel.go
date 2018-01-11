@@ -15,10 +15,9 @@ func (me *PkgIntelBase) Init() {
 	me.ListMenuBase.init(me.Impl, "Packages", "Lists %s packages %s")
 }
 
-func (me *PkgIntelBase) ipcID(_ *ListFilter) ipcIDs {
+func (me *PkgIntelBase) ipcID(_ *ListFilter) IpcIDs {
 	return IPCID_MENUS_PKGS
 }
-
 func (me *PkgIntelBase) ObjSnapPrefix() string {
 	return Lang.ID + ".pkgIntel."
 }
@@ -32,7 +31,7 @@ func (me *PkgIntelBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 		if filterid != "" {
 			filters = ListFilters{filter: true}
 		}
-		resp.Menu = &MenuResp{
+		resp.Menu = &menuResp{
 			SubMenu: me.Impl.listItemsSubMenu(filter.Title, filter.Desc, filters),
 		}
 	default:

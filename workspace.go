@@ -112,8 +112,8 @@ type WorkspaceFile struct {
 	IsOpen bool `json:",omitempty"`
 	Diags  struct {
 		AutoLintUpToDate bool
-		Build            Diags
-		Lint             Diags
+		Build            diags
+		Lint             diags
 	}
 }
 

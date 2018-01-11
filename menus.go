@@ -22,7 +22,7 @@ type Menu struct {
 type MenuItems []*MenuItem
 
 type MenuItem struct {
-	IpcID    ipcIDs      `json:"ii,omitempty"`
+	IpcID    IpcIDs      `json:"ii,omitempty"`
 	IpcArgs  interface{} `json:"ia,omitempty"`
 	Category string      `json:"c,omitempty"`
 	Title    string      `json:"t"`
@@ -33,13 +33,13 @@ type MenuItem struct {
 	tag string
 }
 
-type MenuItemIpcArgPrompt struct {
+type menuItemIpcArgPrompt struct {
 	Prompt      string `json:"prompt,omitempty"`
 	Placeholder string `json:"placeHolder,omitempty"`
 	Value       string `json:"value,omitempty"`
 }
 
-type MenuResp struct {
+type menuResp struct {
 	SubMenu       *Menu   `json:",omitempty"`
 	WebsiteURL    string  `json:",omitempty"`
 	NoteInfo      string  `json:",omitempty"`
@@ -79,7 +79,7 @@ func (me *mainMenu) onMainMenu(req *ipcReq, resp *ipcResp) {
 		}
 	}
 	m.Desc += strings.Join(cats, "  ·  ")
-	resp.Menu = &MenuResp{SubMenu: &m}
+	resp.Menu = &menuResp{SubMenu: &m}
 }
 
 func (me *mainMenu) Init() {

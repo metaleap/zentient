@@ -2,10 +2,10 @@ package z
 
 // REMINDER TO SELF, on the rare update also update corresponding String()ers at the bottom end of the file
 
-type ipcIDs uint8
+type IpcIDs uint8
 
 const (
-	_ ipcIDs = iota
+	_ IpcIDs = iota
 
 	IPCID_MENUS_MAIN
 	IPCID_MENUS_PKGS
@@ -142,7 +142,7 @@ const (
 // Stringers below.
 // Yes go generate exists. Not into it. One day I'll generate stuff like this with gomacro, for now manual werks as changes are rare
 
-func (me ipcIDs) String() string {
+func (me IpcIDs) String() string {
 	switch me {
 	case IPCID_MENUS_MAIN:
 		return "IPCID_MENUS_MAIN"

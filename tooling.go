@@ -72,7 +72,7 @@ func (me *ToolingBase) Init() {
 func (me *ToolingBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	switch req.IpcID {
 	case IPCID_MENUS_TOOLS:
-		resp.Menu = &MenuResp{SubMenu: &Menu{Desc: me.cmdListAll.Desc, Items: me.onListAllTools()}}
+		resp.Menu = &menuResp{SubMenu: &Menu{Desc: me.cmdListAll.Desc, Items: me.onListAllTools()}}
 	default:
 		return false
 	}
@@ -153,22 +153,6 @@ func (me Tools) len(inst bool) (num int) {
 	}
 	return
 }
-
-// func (me Tools) Len() int          { return len(me) }
-// func (me Tools) Swap(i int, j int) { me[i], me[j] = me[j], me[i] }
-// func (me Tools) Less(i1 int, i2 int) bool {
-// 	one, two := me[i1], me[i2]
-// 	if l := len(one.Cats); l != len(two.Cats) {
-// 		return l < len(two.Cats)
-// 	} else {
-// 		for i := 0; i < l; i++ {
-// 			if one.Cats[i] != two.Cats[i] {
-// 				return one.Cats[i] < two.Cats[i]
-// 			}
-// 		}
-// 	}
-// 	return one.Name < two.Name
-// }
 
 func (me Tools) byName(name string) *Tool {
 	if name != "" {

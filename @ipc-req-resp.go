@@ -17,7 +17,7 @@ type IObjSnap interface {
 
 type ipcReq struct {
 	ReqID   int64       `json:"ri"`
-	IpcID   ipcIDs      `json:"ii"`
+	IpcID   IpcIDs      `json:"ii"`
 	IpcArgs interface{} `json:"ia"`
 
 	ProjUpd *WorkspaceChanges `json:"projUpd"`
@@ -55,15 +55,15 @@ func ipcDecodeReqAndRespond(jsonreq string) *ipcResp {
 }
 
 type ipcResp struct {
-	IpcID       ipcIDs         `json:"i,omitempty"`
+	IpcID       IpcIDs         `json:"i,omitempty"`
 	ReqID       int64          `json:"r,omitempty"`
 	ErrMsg      string         `json:"err,omitempty"`
 	SrcIntel    *srcIntelResp  `json:"sI,omitempty"`
-	SrcDiags    *DiagResp      `json:"srcDiags,omitempty"`
+	SrcDiags    *diagResp      `json:"srcDiags,omitempty"`
 	SrcMods     SrcLenses      `json:"srcMods,omitempty"`
 	SrcActions  []EditorAction `json:"srcActions,omitempty"`
 	Extras      *ExtrasResp    `json:"extras,omitempty"`
-	Menu        *MenuResp      `json:"menu,omitempty"`
+	Menu        *menuResp      `json:"menu,omitempty"`
 	CaddyUpdate *Caddy         `json:"caddy,omitempty"`
 	ObjSnapshot interface{}    `json:"obj,omitempty"`
 }
@@ -106,11 +106,10 @@ func (me *ipcResp) withExtras() *ipcResp {
 	return me
 }
 
-func (me *ipcResp) withMenu() *MenuResp {
-	me.Menu = &MenuResp{}
+func (me *ipcResp) withMenu() *menuResp {
+	me.Menu = &menuResp{}
 	return me.Menu
 }
-
 func (me *ipcResp) withSrcIntel() *ipcResp {
 	me.SrcIntel = &srcIntelResp{}
 	return me

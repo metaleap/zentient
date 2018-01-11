@@ -32,7 +32,7 @@ type IListMenu interface {
 	IList
 	IMenuItems
 
-	ipcID(*ListFilter) ipcIDs
+	ipcID(*ListFilter) IpcIDs
 	listItemsSubMenu(string, string, ListFilters) *Menu
 	ListItemToMenuItem(IListItem) *MenuItem
 }

@@ -96,11 +96,11 @@ func (me *goDiag) FixerUppers() []z.FixerUpper {
 }
 
 func (me *goDiag) tryFixImpMissing(d *z.DiagItem) (fix *z.FixUp) {
-	if pkgname, pref, pkgs, i := "", "undefined: ", udevgo.PkgsByImP, strings.Index(d.Msg, " is not a package"); pkgs != nil {
+	if pkgname, pref, pkgs, idx := "", "undefined: ", udevgo.PkgsByImP, strings.Index(d.Msg, " is not a package"); pkgs != nil {
 		if strings.HasPrefix(d.Msg, pref) {
 			pkgname = d.Msg[len(pref):]
-		} else if i > 0 {
-			pkgname = d.Msg[:i]
+		} else if idx > 0 {
+			pkgname = d.Msg[:idx]
 		}
 		if mpkgs := []string{}; pkgname != "" {
 			for _, p := range pkgs {
@@ -110,7 +110,7 @@ func (me *goDiag) tryFixImpMissing(d *z.DiagItem) (fix *z.FixUp) {
 			}
 			if pkg := udevgo.PkgsByImP[uslice.StrShortest(mpkgs)]; pkg != nil {
 				fix = &z.FixUp{Name: "Add missing imports", Items: []string{pkg.ImportPath}}
-				fix.Edits.AddEdit_Insert(d.Loc.FilePath, func(srclens *z.SrcLens, set *z.SrcPos) (ins string) {
+				fix.Edits.AddInsert(d.Loc.FilePath, func(srclens *z.SrcLens, set *z.SrcPos) (ins string) {
 					if i := strings.Index(srclens.Txt, "\nimport (\n"); i > 0 {
 						idot, j := strings.IndexRune(pkg.ImportPath, '.'), strings.Index(srclens.Txt[i:], "\n)\n")
 						if ins = z.Strf("\t%#v\n", pkg.ImportPath); j > 0 && idot >= 0 && idot < strings.IndexRune(pkg.ImportPath, '/') {
@@ -141,7 +141,7 @@ func (me *goDiag) tryFixImpNotFound(d *z.DiagItem) (fix *z.FixUp) {
 	}
 	if badimpname != "" {
 		fix = &z.FixUp{Name: "Removes invalid imports", Items: []string{badimpname}}
-		fix.Edits.AddEdit_DeleteLine(d.Loc.FilePath, d.Loc.Pos)
+		fix.Edits.AddDeleteLine(d.Loc.FilePath, d.Loc.Pos)
 	}
 	return
 }
