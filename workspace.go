@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/metaleap/go-util/dev/go"
+	"github.com/metaleap/go-util/slice"
 	"github.com/metaleap/go-util/sys"
 )
 
@@ -338,13 +339,8 @@ func (me *WorkspaceBase) PrettyPath(fsPath string, otherEnvs ...string) string {
 				candidates = append(candidates, filepath.Join("…", filepath.Base(d.Path), rp))
 			}
 		}
-		if shortest := ""; len(candidates) > 0 {
-			for _, c := range candidates {
-				if shortest == "" || len(c) < len(shortest) {
-					shortest = c
-				}
-			}
-			return shortest
+		if len(candidates) > 0 {
+			return uslice.StrShortest(candidates)
 		}
 
 		for _, gopath := range udevgo.GoPaths {

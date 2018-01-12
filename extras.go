@@ -23,6 +23,7 @@ type ExtrasResp struct {
 	Items []*ExtrasItem
 	Warns []string `json:",omitempty"`
 	Desc  string   `json:",omitempty"`
+	Url   string   `json:",omitempty"`
 }
 
 type ExtrasBase struct {

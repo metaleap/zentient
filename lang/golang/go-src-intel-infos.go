@@ -183,7 +183,6 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 					ggd.Decl = z.Strf("//ℤ/ struct field:\n{ %s }\n//ℤ/ field context (tags etc.) not shown", ggd.Decl[6:])
 				}
 				decl = &z.InfoTip{Language: z.Lang.ID, Value: ggd.Decl}
-				hovs = append(hovs, *decl)
 			}
 			if impdoc := ggd.ImpP; ggd.Doc != "" || impdoc != "" {
 				if ispkglocal {
@@ -204,6 +203,12 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 	if decl == nil && tools.godef.Installed {
 		if defdecl := udevgo.QueryDefDecl_GoDef(srcLens.FilePath, srcLens.Txt, offset); defdecl != "" {
 			decl = &z.InfoTip{Language: z.Lang.ID, Value: me.goFuncDeclLineBreaks(defdecl, 42)}
+		}
+	}
+	if decl != nil {
+		if strings.Count(decl.Value, "\n") > 3 {
+			hovs = append(hovs, *decl)
+		} else {
 			hovs = append([]z.InfoTip{*decl}, hovs...)
 		}
 	}

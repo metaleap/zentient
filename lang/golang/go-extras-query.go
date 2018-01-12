@@ -2,6 +2,7 @@ package zgo
 
 import (
 	"path/filepath"
+	"strings"
 
 	"github.com/metaleap/go-util/dev/go"
 	"github.com/metaleap/go-util/run"
@@ -12,11 +13,11 @@ import (
 
 var (
 	xQuerierGodoc = z.ExtrasItem{ID: "godoc", Label: "godoc",
-		Desc: "[package] [member-name]", Detail: "➜ shows the specified item's summary desc",
-		QueryArg: "Query to `go doc`"}
+		Desc: "package[/path][#Name]", Detail: "➜ opens the godoc page for the specified package",
+		QueryArg: "package[/path][#Name]"}
 	xQuerierGoDoc = z.ExtrasItem{ID: "go_doc", Label: "go doc",
 		Desc: "[package] [member-name]", Detail: "➜ shows the specified item's summary desc",
-		QueryArg: "Query to `go doc`"}
+		QueryArg: "[package] [member-name]"}
 	xQuerierStructlayout = z.ExtrasItem{ID: "structlayout", Label: "structlayout",
 		Desc: "[package] struct-name", Detail: "➜ shows the specified struct's memory layout",
 		QueryArg: "Specify (optionally) a package and (always) a struct type definition's name"}
@@ -48,6 +49,21 @@ func (me *goExtras) runQuery_StructLayout(srcLens *z.SrcLens, arg string, resp *
 			}
 		}
 	}
+}
+
+func (me *goExtras) runQuery_Godoc(srcLens *z.SrcLens, arg string, resp *z.ExtrasResp) {
+	if isdocpath := strings.ContainsRune(arg, '/') || strings.ContainsRune(arg, '#'); !isdocpath {
+		if isup := ustr.BeginsUpper(arg); isup && udevgo.PkgsByDir != nil {
+			if pkg := udevgo.PkgsByDir[filepath.Dir(srcLens.FilePath)]; pkg != nil {
+				arg = pkg.ImportPath + "#" + arg
+			}
+		} else if (!isup) && udevgo.PkgsByImP != nil && nil == udevgo.PkgsByImP[arg] {
+			if pkgimppath := uslice.StrWithFewest(udevgo.PkgsByName(arg), "/", uslice.StrShortest); pkgimppath != "" {
+				arg = pkgimppath
+			}
+		}
+	}
+	resp.Url = "zentient://" + z.Lang.ID + "/godoc/pkg/" + arg
 }
 
 func (me *goExtras) runQuery_GoDoc(srcLens *z.SrcLens, arg string, resp *z.ExtrasResp) {

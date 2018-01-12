@@ -102,13 +102,9 @@ func (me *goDiag) tryFixImpMissing(d *z.DiagItem) (fix *z.FixUp) {
 		} else if idx > 0 {
 			pkgname = d.Msg[:idx]
 		}
-		if mpkgs := []string{}; pkgname != "" {
-			for _, p := range pkgs {
-				if p.Name == pkgname {
-					mpkgs = append(mpkgs, p.ImportPath)
-				}
-			}
-			if pkg := udevgo.PkgsByImP[uslice.StrShortest(mpkgs)]; pkg != nil {
+		if pkgname != "" {
+			mpkgs := udevgo.PkgsByName(pkgname)
+			if pkg := udevgo.PkgsByImP[uslice.StrWithFewest(mpkgs, "/", uslice.StrShortest)]; pkg != nil {
 				fix = &z.FixUp{Name: "Add missing imports", Items: []string{pkg.ImportPath}}
 				fix.Edits.AddInsert(d.Loc.FilePath, func(srclens *z.SrcLens, set *z.SrcPos) (ins string) {
 					if i := strings.Index(srclens.Txt, "\nimport (\n"); i > 0 {
