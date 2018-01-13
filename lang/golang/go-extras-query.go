@@ -3,8 +3,10 @@ package zgo
 import (
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/metaleap/go-util/dev/go"
+	"github.com/metaleap/go-util/fs"
 	"github.com/metaleap/go-util/run"
 	"github.com/metaleap/go-util/slice"
 	"github.com/metaleap/go-util/str"
@@ -12,6 +14,9 @@ import (
 )
 
 var (
+	xQuerierGoRun = z.ExtrasItem{ID: "gorun", Label: "eval via `go run`",
+		Desc: "foo", Detail: "➜ evaluates the specified expression in the context of this file's package",
+		QueryArg: "q-args"}
 	xQuerierGodoc = z.ExtrasItem{ID: "godoc", Label: "godoc",
 		Desc: "package[/path][#Name]", Detail: "➜ opens the godoc page for the specified package",
 		QueryArg: "package[/path][#Name]"}
@@ -90,4 +95,63 @@ func (me *goExtras) runQuery_GoDoc(srcLens *z.SrcLens, arg string, resp *z.Extra
 	resp.Warns = uslice.StrFiltered(uslice.StrMap(ustr.Split(cmderr, "\n"), ustr.Trim),
 		func(s string) bool { return !ustr.Pref(s, "exit status ") })
 	resp.Info = append(resp.Info, z.InfoTip{Value: ustr.Trim(cmdout)})
+}
+
+func (me *goExtras) runQuery_GoRun(srcLens *z.SrcLens, arg string, resp *z.ExtrasResp) {
+	pkgsrcdirpath := filepath.Dir(srcLens.FilePath)
+	pkgtmpdirpath := filepath.Join(z.Prog.Dir.Cache, pkgsrcdirpath)
+	var err error
+	if ufs.DirExists(pkgtmpdirpath) {
+		err = ufs.ClearDirectory(pkgtmpdirpath)
+	} else {
+		err = ufs.EnsureDirExists(pkgtmpdirpath)
+	}
+	if err == nil && udevgo.PkgsByDir == nil {
+		err = udevgo.RefreshPkgs()
+	}
+	if err == nil {
+		if pkg := udevgo.PkgsByDir[pkgsrcdirpath]; pkg == nil {
+			err = z.Errf("Not (yet) a Go package: %s", pkgsrcdirpath)
+		} else {
+			for i, pos, src, gfps := 0, 0, "", pkg.GoFilePaths(); (err == nil) && (i < len(gfps)); i++ {
+				iscursrc := gfps[i] == srcLens.FilePath
+				if iscursrc && len(srcLens.Txt) > 0 {
+					src = srcLens.Txt
+				} else {
+					src = ufs.ReadTextFile(gfps[i], true, "")
+				}
+				if strings.HasPrefix(src, "package ") {
+					pos = 0
+				} else if pos = 1 + strings.Index(src, "\npackage "); pos == 0 {
+					err = z.Errf("Not a Go package source file: %s", gfps[i])
+				}
+				if posln := pos + strings.IndexRune(src[pos:], '\n'); err == nil {
+					if oldpkgln := src[pos:posln]; oldpkgln != "package main" {
+						src = src[:pos] + "package main" + src[posln:]
+					}
+					if pos = 1 + strings.Index(src, "\nfunc main() {"); pos > 0 {
+						src = src[:pos] + z.Strf("func main%d() {", time.Now().UnixNano()) + src[pos+13:]
+					} else if iscursrc {
+						src += z.Strf("\n\nfunc main() { println(%s) }", arg)
+					}
+					err = ufs.WriteTextFile(filepath.Join(pkgtmpdirpath, filepath.Base(gfps[i])), src)
+				}
+			}
+			if err == nil {
+				if cmdout, cmderr, e := urun.CmdExecIn(pkgtmpdirpath, "go", "run", filepath.Base(srcLens.FilePath)); e != nil {
+					err = e
+				} else {
+					resp.Desc = arg
+					for _, ln := range ustr.Split(strings.TrimSpace(cmderr), "\n") {
+						resp.Info = append(resp.Info, z.InfoTip{Value: ln})
+					}
+					resp.Warns = ustr.Split(cmdout, "\n")
+				}
+			}
+		}
+	}
+
+	if err != nil {
+		resp.Warns = []string{err.Error()}
+	}
 }

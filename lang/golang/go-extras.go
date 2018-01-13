@@ -24,7 +24,7 @@ func (me *goExtras) ListIntelExtras() (all []*z.ExtrasItem) {
 }
 
 func (me *goExtras) ListQueryExtras() (all []*z.ExtrasItem) {
-	all = []*z.ExtrasItem{&xQuerierGodoc, &xQuerierGoDoc, &xQuerierStructlayout}
+	all = []*z.ExtrasItem{&xQuerierGoRun, &xQuerierGodoc, &xQuerierGoDoc, &xQuerierStructlayout}
 	return
 }
 
@@ -39,6 +39,8 @@ func (me *goExtras) RunIntelExtra(srcLens *z.SrcLens, id string, arg string, res
 func (me *goExtras) RunQueryExtra(srcLens *z.SrcLens, id string, arg string, resp *z.ExtrasResp) {
 	var runner func(srcLens *z.SrcLens, arg string, resp *z.ExtrasResp)
 	switch id {
+	case xQuerierGoRun.ID:
+		runner = me.runQuery_GoRun
 	case xQuerierGodoc.ID:
 		runner = me.runQuery_Godoc
 	case xQuerierGoDoc.ID:

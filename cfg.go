@@ -114,7 +114,7 @@ func (me *Config) reload() {
 		// 1. re-initialize me
 		var empty Config
 		*me = empty
-		me.filePath = filepath.Join(Prog.dir.config, Prog.name+".config.json")
+		me.filePath = filepath.Join(Prog.Dir.Config, Prog.Name+".config.json")
 
 		// 2. load
 		if ufs.FileExists(me.filePath) { // otherwise, it's a fresh setup
@@ -155,7 +155,7 @@ func (me *Config) reload() {
 }
 
 // func (me *Config) recall() {
-// 	me.recallFilePath = filepath.Join(Prog.dir.cache, Prog.name+".recall.json")
+// 	me.recallFilePath = filepath.Join(Prog.Dir.Cache, Prog.Name+".recall.json")
 // 	if ufs.FileExists(me.recallFilePath) {
 // 		umisc.JsonDecodeFromFile(me.recallFilePath, &Prog.recall)
 // 	}

@@ -14,6 +14,7 @@ import (
 )
 
 var (
+	Errf = fmt.Errorf
 	Strf = fmt.Sprintf
 	Lang struct {
 		Enabled   bool
@@ -33,10 +34,10 @@ var (
 	Prog struct {
 		Cfg Config
 
-		name string
-		dir  struct {
-			cache  string
-			config string
+		Name string
+		Dir  struct {
+			Cache  string
+			Config string
 		}
 		menus       []IMenuItems
 		dispatchers []iDispatcher
@@ -54,7 +55,7 @@ var (
 )
 
 func BadMsg(what string, which string) string {
-	return Strf("%s: invalid %s %s '%s'", Prog.name, Lang.Title, what, which)
+	return Strf("%s: invalid %s %s '%s'", Prog.Name, Lang.Title, what, which)
 }
 
 func BadPanic(what string, which string) {
@@ -102,12 +103,12 @@ func ToolGonePanic(missingToolName string) {
 }
 
 func Init() (err error) {
-	Prog.name = os.Args[0]
-	Prog.dir.config = filepath.Join(usys.UserDataDirPath(false), Prog.name)
-	Prog.dir.cache = filepath.Join(usys.UserDataDirPath(true), Prog.name)
-	if err = ufs.EnsureDirExists(Prog.dir.config); err != nil {
+	Prog.Name = os.Args[0]
+	Prog.Dir.Config = filepath.Join(usys.UserDataDirPath(false), Prog.Name)
+	Prog.Dir.Cache = filepath.Join(usys.UserDataDirPath(true), Prog.Name)
+	if err = ufs.EnsureDirExists(Prog.Dir.Config); err != nil {
 		return
-	} else if err = ufs.EnsureDirExists(Prog.dir.cache); err != nil {
+	} else if err = ufs.EnsureDirExists(Prog.Dir.Cache); err != nil {
 		return
 	}
 

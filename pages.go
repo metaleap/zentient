@@ -38,5 +38,5 @@ func (me *PagesBase) onPageHtml(rawUri string) string {
 }
 
 func (*PagesBase) PageBodyInnerHtml(rawUri string, path []string, query url.Values, fragment string) string {
-	return Strf("<h1>Not Yet Implemented</h1><p>The Zentient %s provider <code>%s</code> has not implemented a custom <code>IPages.PageBodyInnerHtml(string) string</code> handler to serve this request with path: <code>%s</code></p>", Lang.Title, Prog.name, rawUri)
+	return Strf("<h1>Not Yet Implemented</h1><p>The Zentient %s provider <code>%s</code> has not implemented a custom <code>IPages.PageBodyInnerHtml(string) string</code> handler to serve this request with path: <code>%s</code></p>", Lang.Title, Prog.Name, rawUri)
 }
