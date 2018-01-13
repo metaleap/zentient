@@ -110,9 +110,10 @@ func (me *goExtras) runQuery_GoRun(srcLens *z.SrcLens, arg string, resp *z.Extra
 		err = udevgo.RefreshPkgs()
 	}
 	if err == nil {
-		if pkg := udevgo.PkgsByDir[pkgsrcdirpath]; pkg == nil {
+		if cmdargs, pkg := []string{"run"}, udevgo.PkgsByDir[pkgsrcdirpath]; pkg == nil {
 			err = z.Errf("Not (yet) a Go package: %s", pkgsrcdirpath)
 		} else {
+			defer ufs.ClearDirectory(pkgtmpdirpath)
 			for i, pos, src, gfps := 0, 0, "", pkg.GoFilePaths(); (err == nil) && (i < len(gfps)); i++ {
 				iscursrc := gfps[i] == srcLens.FilePath
 				if iscursrc && len(srcLens.Txt) > 0 {
@@ -134,11 +135,12 @@ func (me *goExtras) runQuery_GoRun(srcLens *z.SrcLens, arg string, resp *z.Extra
 					} else if iscursrc {
 						src += z.Strf("\n\nfunc main() { println(%s) }", arg)
 					}
-					err = ufs.WriteTextFile(filepath.Join(pkgtmpdirpath, filepath.Base(gfps[i])), src)
+					cmdargs = append(cmdargs, filepath.Base(gfps[i]))
+					err = ufs.WriteTextFile(filepath.Join(pkgtmpdirpath, cmdargs[len(cmdargs)-1]), src)
 				}
 			}
 			if err == nil {
-				if cmdout, cmderr, e := urun.CmdExecIn(pkgtmpdirpath, "go", "run", filepath.Base(srcLens.FilePath)); e != nil {
+				if cmdout, cmderr, e := urun.CmdExecIn(pkgtmpdirpath, "go", cmdargs...); e != nil {
 					err = e
 				} else {
 					resp.Desc = arg
