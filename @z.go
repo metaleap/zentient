@@ -14,7 +14,6 @@ import (
 )
 
 var (
-	Errf = fmt.Errorf
 	Strf = fmt.Sprintf
 	Lang struct {
 		Enabled   bool
