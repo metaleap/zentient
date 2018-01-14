@@ -11,6 +11,9 @@ import (
 	"github.com/metaleap/zentient"
 )
 
+type Dbg struct {
+}
+
 func goRunEvalOrPanic(srcFilePath string, maybeSrcFull string, goEvalExpr string) (evalOutAndStdErr string, otherStdOut string) {
 	pkgsrcdirpath := filepath.Dir(srcFilePath)
 	pkgtmpdirpath := filepath.Join(z.Prog.Dir.Cache, pkgsrcdirpath)
