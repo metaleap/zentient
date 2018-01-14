@@ -36,15 +36,14 @@ func (me *Dbg) onClientReq_Pause(req *zdbgvscp.PauseRequest, resp *zdbgvscp.Paus
 }
 
 func (me *Dbg) onClientReq_Restart(req *zdbgvscp.RestartRequest, resp *zdbgvscp.RestartResponse) (err error) {
-	if err = me.procKill(); err == nil {
-		err = me.procLaunch()
-	}
+	_ = me.procKill()
+	err = me.procLaunch()
 	return
 }
 
 func (me *Dbg) onClientReq_Disconnect(req *zdbgvscp.DisconnectRequest, resp *zdbgvscp.DisconnectResponse) (err error) {
-	err = me.procKill()
-	if err == nil && req.Arguments.Restart {
+	_ = me.procKill()
+	if req.Arguments.Restart {
 		err = me.procLaunch()
 	}
 	return

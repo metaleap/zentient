@@ -51,7 +51,7 @@ func (me *Dbg) main() {
 	var err error
 	logdirpath := filepath.Join(filepath.Join(usys.UserDataDirPath(true), filepath.Base(os.Args[0])), "log")
 	ufs.EnsureDirExists(logdirpath)
-	logfilepath := filepath.Join(logdirpath, "log"+umisc.Str(time.Now().UnixNano())+".log")
+	logfilepath := filepath.Join(logdirpath, "log"+umisc.Str(time.Now().UnixNano())+".log.json")
 	me.logfile, err = os.Create(logfilepath)
 	if err != nil {
 		panic(err)

@@ -2,28 +2,28 @@ package zdbgvsc
 
 import (
 	"os/exec"
+	"time"
 )
 
 func (me *Dbg) procLaunch() (err error) {
-	me.procKill()
+	_ = me.procKill()
 	me.cmd = exec.Command("go-stdinoutdummy")
 	me.cmd.Stdout = &ProcInOut{dbg: me, outcat: "stdout"}
 	me.cmd.Stderr = &ProcInOut{dbg: me, outcat: "stderr"}
 	me.cmd.Stdin = &ProcInOut{dbg: me}
 	if err = me.cmd.Start(); err != nil {
-		me.procKill()
+		_ = me.procKill()
 	} else {
-		go me.procWait(me.cmd)
+		go me.procWait()
 	}
 	return
 }
 
-func (me *Dbg) procWait(cmd *exec.Cmd) {
-	if cmd != nil {
-		if err := cmd.Wait(); err != nil {
-			me.onServerEvt_Output("stderr", "ERR:"+err.Error())
-		}
-		me.onServerEvt_Terminated()
+func (me *Dbg) procWait() {
+	_, err := me.cmd.Process.Wait() // cmd.Wait() hung forever in this specific scenario
+	me.onServerEvt_Terminated()
+	if err != nil {
+		me.onServerEvt_Output("stderr", "exec.Cmd.Wait: "+err.Error())
 	}
 }
 
@@ -47,13 +47,13 @@ func (me *ProcInOut) Write(p []byte) (n int, err error) {
 }
 
 func (me *ProcInOut) Read(p []byte) (n int, err error) {
-	if cmdexprs := me.dbg.cmdExprs; len(cmdexprs) > 0 {
-		expr := []byte(cmdexprs[0] + "\n")
+	if len(me.dbg.cmdExprs) == 0 {
+		time.Sleep(time.Millisecond * 23) // reduces this program's CPU% from "too high" (~12+% here) to "fine" (under-1% here) --- the delay-time itself is arbitrary, lower means sooner writes to the sub-proc's stdin of course, but too-low (around 1ms/under) negates the CPU% benefit
+	} else {
+		expr := me.dbg.cmdExprs[0]
 		me.dbg.cmdExprs = me.dbg.cmdExprs[1:]
-		if n = len(expr); n > 1 {
-			for i := 0; i < n; i++ {
-				p[i] = expr[i]
-			}
+		if len(expr) > 0 {
+			n = copy(p, expr+"\n")
 		}
 	}
 	return
