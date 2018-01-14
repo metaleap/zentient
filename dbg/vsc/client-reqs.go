@@ -36,6 +36,9 @@ func (me *Dbg) onClientReq_Pause(req *zdbgvscp.PauseRequest, resp *zdbgvscp.Paus
 }
 
 func (me *Dbg) onClientReq_Restart(req *zdbgvscp.RestartRequest, resp *zdbgvscp.RestartResponse) (err error) {
+	if err = me.procKill(); err == nil {
+		err = me.procLaunch()
+	}
 	return
 }
 

@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sync"
 	"time"
 
 	"github.com/metaleap/go-util"
@@ -27,6 +28,7 @@ func Main(impl zdbg.IDbg) {
 
 type Dbg struct {
 	Impl zdbg.IDbg
+	sync.Mutex
 
 	stdin       *bufio.Scanner
 	rawOut      *bufio.Writer
@@ -91,6 +93,8 @@ func (me *Dbg) main() {
 }
 
 func (me *Dbg) send(item interface{}) {
+	me.Lock()
+	defer me.Unlock()
 	me.sendseq++
 	if bresp := zdbgvscp.BaseResponse(item); bresp != nil {
 		bresp.Seq = me.sendseq
