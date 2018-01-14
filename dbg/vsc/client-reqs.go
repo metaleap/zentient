@@ -1,7 +1,7 @@
 package zdbgvsc
 
 import (
-	"strings"
+	"time"
 
 	"github.com/metaleap/zentient/dbg/vsc/protocol"
 )
@@ -19,14 +19,12 @@ func (me *Dbg) onClientReq_Threads(req *zdbgvscp.ThreadsRequest, resp *zdbgvscp.
 }
 
 func (me *Dbg) onClientReq_Launch(req *zdbgvscp.LaunchRequest, resp *zdbgvscp.LaunchResponse) (err error) {
-	err = me.procLaunch()
+	err = me.procStart()
 	return
 }
 
 func (me *Dbg) onClientReq_Evaluate(req *zdbgvscp.EvaluateRequest, resp *zdbgvscp.EvaluateResponse) (err error) {
-	if req.Arguments.Expression = strings.TrimSpace(req.Arguments.Expression); req.Arguments.Expression != "" {
-		me.cmdExprs = append(me.cmdExprs, req.Arguments.Expression)
-	}
+	me.Impl.Enqueue(req.Arguments.Expression)
 	return
 }
 
@@ -36,15 +34,19 @@ func (me *Dbg) onClientReq_Pause(req *zdbgvscp.PauseRequest, resp *zdbgvscp.Paus
 }
 
 func (me *Dbg) onClientReq_Restart(req *zdbgvscp.RestartRequest, resp *zdbgvscp.RestartResponse) (err error) {
+	me.waitIgnoreTermination = true
 	_ = me.procKill()
-	err = me.procLaunch()
+	for me.waitIgnoreTermination {
+		time.Sleep(time.Millisecond)
+	}
+	err = me.procStart()
 	return
 }
 
 func (me *Dbg) onClientReq_Disconnect(req *zdbgvscp.DisconnectRequest, resp *zdbgvscp.DisconnectResponse) (err error) {
 	_ = me.procKill()
 	if req.Arguments.Restart {
-		err = me.procLaunch()
+		err = me.procStart()
 	}
 	return
 }

@@ -9,9 +9,11 @@ import (
 	"github.com/metaleap/go-util/fs"
 	"github.com/metaleap/go-util/run"
 	"github.com/metaleap/zentient"
+	"github.com/metaleap/zentient/dbg"
 )
 
 type Dbg struct {
+	zdbg.Dbg
 }
 
 func goRunEvalOrPanic(srcFilePath string, maybeSrcFull string, goEvalExpr string) (evalOutAndStdErr string, otherStdOut string) {

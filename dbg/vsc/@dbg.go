@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"encoding/json"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"sync"
 	"time"
@@ -30,13 +29,12 @@ type Dbg struct {
 	Impl zdbg.IDbg
 	sync.Mutex
 
-	stdin       *bufio.Scanner
-	rawOut      *bufio.Writer
-	cmd         *exec.Cmd
-	cmdExprs    []string
-	vscLastInit *zdbgvscp.InitializeRequestArguments
-	sendseq     int
-	logfile     *os.File
+	stdin                 *bufio.Scanner
+	rawOut                *bufio.Writer
+	vscLastInit           *zdbgvscp.InitializeRequestArguments
+	sendseq               int
+	logfile               *os.File
+	waitIgnoreTermination bool
 }
 
 func (me *Dbg) main() {
