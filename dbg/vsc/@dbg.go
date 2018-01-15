@@ -16,6 +16,12 @@ import (
 	"github.com/metaleap/zentient/dbg/vsc/protocol"
 )
 
+const (
+	logToFile       = true
+	logJsonIncoming = true
+	logJsonOutgoing = true
+)
+
 var (
 	bclen = []byte("Content-Length: ")
 	bln   = []byte("\r\n\r\n")
@@ -51,20 +57,22 @@ func (me *Dbg) main() {
 	logdirpath := filepath.Join(tmpdirpath, "log")
 	ufs.EnsureDirExists(logdirpath)
 	logfilepath := filepath.Join(logdirpath, "log"+umisc.Str(time.Now().UnixNano())+".log.json")
-	me.logfile, err = os.Create(logfilepath)
+	if logToFile {
+		me.logfile, err = os.Create(logfilepath)
+	}
 	if err != nil {
 		panic(err)
-	} else {
+	} else if me.logfile != nil {
 		defer me.logfile.Close()
 	}
 	me.stdin, me.rawOut, _ = urun.SetupJsonIpcPipes(1024*1024*4, true, false)
-	onerrorexit := func(msg string) {
+	onerror := func(msg string) {
 		me.onServerEvt_Output("stderr", msg)
-		me.onServerEvt_Stopped()
+		me.Impl.Kill()
 		me.onServerEvt_Terminated()
-		me.onServerEvt_Exited()
-		me.logfile.WriteString(msg)
-		// panic(msg)
+		if me.logfile != nil {
+			me.logfile.WriteString(msg)
+		}
 	}
 
 	var req, resp interface{}
@@ -74,19 +82,22 @@ func (me *Dbg) main() {
 		srcfull = os.Args[2]
 	}
 	if err = me.Impl.Init(tmpdirpath, os.Args[1], srcfull); err != nil {
-		onerrorexit("Impl.Init:" + err.Error())
+
+		onerror("Impl.Init:" + err.Error())
 	}
 	for me.stdin.Scan() {
 		if err = me.stdin.Err(); err != nil {
 			break
 		}
 		jsonin := me.stdin.Text()
-		me.logfile.WriteString("\n\n\n\n\n" + jsonin)
+		if logJsonIncoming && me.logfile != nil {
+			me.logfile.WriteString("\n\n\n\n\n" + jsonin)
+		}
 		if req, err = zdbgvscp.TryUnmarshalRequest(jsonin); err != nil {
-			onerrorexit("TryUnmarshalRequest: " + err.Error())
+			onerror("TryUnmarshalRequest: " + err.Error())
 		}
 		if resp, respbase, err = zdbgvscp.HandleRequest(req, me.initNewRespBase); resp == nil {
-			onerrorexit("BUG: resp returned was nil")
+			onerror("BUG: resp returned was nil")
 		} else if err != nil {
 			respbase.Success = false
 			respbase.Message = err.Error()
@@ -127,11 +138,13 @@ func (me *Dbg) send(item interface{}) {
 	me.rawOut.Write(bln)
 	me.rawOut.Write(jsonout)
 	me.rawOut.Flush()
-	me.logfile.Write(bclen)
-	me.logfile.Write([]byte(umisc.Str(len(jsonout))))
-	me.logfile.Write(bln)
-	me.logfile.Write(jsonout)
-	me.logfile.Sync()
+	if logJsonOutgoing && me.logfile != nil {
+		me.logfile.Write(bclen)
+		me.logfile.Write([]byte(umisc.Str(len(jsonout))))
+		me.logfile.Write(bln)
+		me.logfile.Write(jsonout)
+		me.logfile.Sync()
+	}
 }
 
 func (me *Dbg) initNewRespBase(reqbase *zdbgvscp.Request, respbase *zdbgvscp.Response) {

@@ -1,6 +1,7 @@
 package zgo
 
 import (
+	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -20,13 +21,14 @@ type Dbg struct {
 func (me *Dbg) Init(tmpDirPath string, srcFilePath string, maybeSrcFull string) (err error) {
 	var gorunargs []string
 	if gorunargs, me.Cmd.Dir, err = goRunEvalPrepCmd(tmpDirPath, srcFilePath, maybeSrcFull, ""); err == nil {
-		me.Cmd.Name = "zdbg-main-" + filepath.Base(me.Cmd.Dir)
+		me.Cmd.Name = filepath.Base(os.Args[0]) + "-" + filepath.Base(me.Cmd.Dir)
 		gobuildargs := append([]string{"build", "-o", me.Cmd.Name}, gorunargs[1:]...)
 		if _, cmderr, e := urun.CmdExecStdin("", me.Cmd.Dir, "go", gobuildargs...); e != nil {
 			err = e
 		} else if cmderr != "" {
 			err = umisc.E(cmderr)
 		}
+		me.Cmd.Name = filepath.Join(me.Cmd.Dir, me.Cmd.Name)
 	}
 	return
 }
