@@ -96,8 +96,10 @@ func (me *goExtras) runQuery_GoDoc(srcLens *z.SrcLens, arg string, resp *z.Extra
 }
 
 func (me *goExtras) runQuery_GoRun(srcLens *z.SrcLens, arg string, resp *z.ExtrasResp) {
-	evaloutandstderr, otherstdout := goRunEvalOrPanic(srcLens.FilePath, srcLens.Txt, arg)
-	resp.Desc = arg
+	evaloutandstderr, otherstdout, err := goRunEval(srcLens.FilePath, srcLens.Txt, arg)
+	if resp.Desc = arg; err != nil {
+		panic(err)
+	}
 	for _, ln := range ustr.Split(strings.TrimSpace(evaloutandstderr), "\n") {
 		resp.Info = append(resp.Info, z.InfoTip{Value: ln})
 	}

@@ -9,14 +9,18 @@ import (
 type IDbg interface {
 	Dequeue() string
 	Enqueue(string)
+	Init(string, string, string) error
 	Kill() error
 	Start(io.Writer, io.Reader, io.Writer) error
 	Wait() error
 }
 
 type Dbg struct {
-	CmdName string
-	CmdArgs []string
+	Cmd struct {
+		Dir  string
+		Name string
+		Args []string
+	}
 
 	sync.Mutex
 
@@ -50,11 +54,8 @@ func (me *Dbg) Kill() (err error) {
 
 func (me *Dbg) Start(stdout io.Writer, stdin io.Reader, stderr io.Writer) (err error) {
 	_ = me.Kill()
-	if me.CmdName == "" { // temporary
-		me.CmdName = "go-stdinoutdummy"
-	}
-	me.cmd = exec.Command(me.CmdName, me.CmdArgs...)
-	me.cmd.Stdout, me.cmd.Stdin, me.cmd.Stderr = stdout, stdin, stderr
+	me.cmd = exec.Command(me.Cmd.Name, me.Cmd.Args...)
+	me.cmd.Dir, me.cmd.Stdout, me.cmd.Stdin, me.cmd.Stderr = me.Cmd.Dir, stdout, stdin, stderr
 	if err = me.cmd.Start(); err != nil {
 		_ = me.Kill()
 	}

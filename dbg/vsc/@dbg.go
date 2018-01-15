@@ -47,7 +47,8 @@ func (me *Dbg) main() {
 	zdbgvscp.OnEvaluateRequest = me.onClientReq_Evaluate
 
 	var err error
-	logdirpath := filepath.Join(filepath.Join(usys.UserDataDirPath(true), filepath.Base(os.Args[0])), "log")
+	tmpdirpath := filepath.Join(usys.UserDataDirPath(true), filepath.Base(os.Args[0]))
+	logdirpath := filepath.Join(tmpdirpath, "log")
 	ufs.EnsureDirExists(logdirpath)
 	logfilepath := filepath.Join(logdirpath, "log"+umisc.Str(time.Now().UnixNano())+".log.json")
 	me.logfile, err = os.Create(logfilepath)
@@ -56,11 +57,18 @@ func (me *Dbg) main() {
 	} else {
 		defer me.logfile.Close()
 	}
-	logpanic := func(msg string) { me.logfile.WriteString(msg); panic(msg) }
-
 	me.stdin, me.rawOut, _ = urun.SetupJsonIpcPipes(1024*1024*4, true, false)
+	logpanic := func(msg string) { me.onServerEvt_Output("stderr", msg); me.logfile.WriteString(msg); panic(msg) }
+
 	var req, resp interface{}
 	var respbase *zdbgvscp.Response
+	var srcfull string
+	if len(os.Args) > 2 {
+		srcfull = os.Args[2]
+	}
+	if err = me.Impl.Init(tmpdirpath, os.Args[1], srcfull); err != nil {
+		logpanic("Impl.Init:" + err.Error())
+	}
 	for me.stdin.Scan() {
 		if err = me.stdin.Err(); err != nil {
 			break

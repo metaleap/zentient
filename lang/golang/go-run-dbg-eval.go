@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/metaleap/go-util"
 	"github.com/metaleap/go-util/dev/go"
 	"github.com/metaleap/go-util/fs"
 	"github.com/metaleap/go-util/run"
@@ -16,52 +17,70 @@ type Dbg struct {
 	zdbg.Dbg
 }
 
-func goRunEvalOrPanic(srcFilePath string, maybeSrcFull string, goEvalExpr string) (evalOutAndStdErr string, otherStdOut string) {
+func (me *Dbg) Init(tmpDirPath string, srcFilePath string, maybeSrcFull string) (err error) {
+	if me.Cmd.Args, me.Cmd.Dir, err = goRunEvalPrepCmd(tmpDirPath, srcFilePath, maybeSrcFull, ""); err == nil {
+		me.Cmd.Name = "go"
+	}
+	return
+}
+
+func goRunEvalPrepCmd(tmpDirPath string, srcFilePath string, maybeSrcFull string, goEvalExpr string) (goRunArgs []string, goRunDir string, err error) {
 	pkgsrcdirpath := filepath.Dir(srcFilePath)
-	pkgtmpdirpath := filepath.Join(z.Prog.Dir.Cache, pkgsrcdirpath)
-	var err error
-	if ufs.DirExists(pkgtmpdirpath) {
-		err = ufs.ClearDirectory(pkgtmpdirpath)
+	goRunDir = filepath.Join(tmpDirPath, pkgsrcdirpath)
+	if ufs.DirExists(goRunDir) {
+		err = ufs.ClearDirectory(goRunDir)
 	} else {
-		err = ufs.EnsureDirExists(pkgtmpdirpath)
+		err = ufs.EnsureDirExists(goRunDir)
 	}
 	if err == nil && udevgo.PkgsByDir == nil {
 		err = udevgo.RefreshPkgs()
 	}
-	if err == nil {
-		if cmdargs, pkg := []string{"run"}, udevgo.PkgsByDir[pkgsrcdirpath]; pkg == nil {
-			z.BadPanic("Go package", pkgsrcdirpath)
+	if goRunArgs = []string{"run"}; err == nil {
+		if pkg := udevgo.PkgsByDir[pkgsrcdirpath]; pkg == nil {
+			err = umisc.E(z.BadMsg("Go package", pkgsrcdirpath))
 		} else {
-			defer ufs.ClearDirectory(pkgtmpdirpath)
 			for i, pos, src, gfps := 0, 0, "", pkg.GoFilePaths(); (err == nil) && (i < len(gfps)); i++ {
 				iscursrc := gfps[i] == srcFilePath
 				if iscursrc && len(maybeSrcFull) > 0 {
 					src = maybeSrcFull
-				} else {
-					src = ufs.ReadTextFile(gfps[i], true, "")
+				} else if err = ufs.ReadFileIntoStr(gfps[i], &src); err != nil {
+					break
 				}
 				if strings.HasPrefix(src, "package ") {
 					pos = 0
 				} else if pos = 1 + strings.Index(src, "\npackage "); pos == 0 {
-					z.BadPanic("Go package source file", gfps[i])
+					err = umisc.E(z.BadMsg("Go package source file", gfps[i]))
 				}
 				if posln := pos + strings.IndexRune(src[pos:], '\n'); err == nil {
 					if oldpkgln := src[pos:posln]; oldpkgln != "package main" {
 						src = src[:pos] + "package main" + src[posln:]
 					}
-					if pos = 1 + strings.Index(src, "\nfunc main() {"); pos > 0 {
-						src = src[:pos] + z.Strf("func main%d() {", time.Now().UnixNano()) + src[pos+13:]
-					} else if iscursrc {
-						src += z.Strf("\n\nfunc main() { println(%s) }", goEvalExpr)
+					if goEvalExpr != "" {
+						if pos = 1 + strings.Index(src, "\nfunc main() {"); pos > 0 {
+							src = src[:pos] + z.Strf("func main%d() {", time.Now().UnixNano()) + src[pos+13:]
+						}
+						if iscursrc {
+							if strings.HasPrefix(goEvalExpr, ":") {
+								src += z.Strf("\n\nfunc main() { %s }", goEvalExpr[1:])
+							} else {
+								src += z.Strf("\n\nfunc main() { println(%s) }", goEvalExpr)
+							}
+						}
 					}
-					cmdargs = append(cmdargs, filepath.Base(gfps[i]))
-					err = ufs.WriteTextFile(filepath.Join(pkgtmpdirpath, cmdargs[len(cmdargs)-1]), src)
+					goRunArgs = append(goRunArgs, filepath.Base(gfps[i]))
+					err = ufs.WriteTextFile(filepath.Join(goRunDir, goRunArgs[len(goRunArgs)-1]), src)
 				}
 			}
-			if err == nil {
-				otherStdOut, evalOutAndStdErr, err = urun.CmdExecIn(pkgtmpdirpath, "go", cmdargs...)
-			}
 		}
+	}
+	return
+}
+
+func goRunEval(srcFilePath string, maybeSrcFull string, goEvalExpr string) (evalOutAndStdErr string, otherStdOut string, err error) {
+	gorunargs, gorundir, e := goRunEvalPrepCmd(z.Prog.Dir.Cache, srcFilePath, maybeSrcFull, goEvalExpr)
+	defer ufs.ClearDirectory(gorundir)
+	if err = e; err == nil {
+		otherStdOut, evalOutAndStdErr, err = urun.CmdExecIn(gorundir, "go", gorunargs...)
 	}
 	if err != nil {
 		panic(err)
