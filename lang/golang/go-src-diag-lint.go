@@ -14,7 +14,7 @@ func (me *goDiag) OnUpdateLintDiags(workspaceFiles z.WorkspaceFiles, diagTools z
 	if pkgjobs := me.onUpdateDiagsPrepPkgJobs(filePaths); len(pkgjobs) > 0 {
 		for _, pj := range pkgjobs {
 			skippkg := false
-			for _, fpath := range pj.Target.(*udevgo.Pkg).GoFilePaths() {
+			for _, fpath := range pj.Target.(*udevgo.Pkg).GoFilePaths(true) {
 				if skippkg = workspaceFiles.HasBuildDiags(fpath); skippkg {
 					break
 				}

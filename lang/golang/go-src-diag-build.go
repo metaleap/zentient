@@ -20,7 +20,7 @@ func (me *goDiag) OnUpdateBuildDiags(writtenFilePaths []string) (jobs z.DiagBuil
 			job := &z.DiagJobBuild{DiagJob: pj, TargetCmp: ensureBuildOrder}
 			for _, dependant := range pj.Target.(*udevgo.Pkg).Dependants() {
 				if pkgdep := udevgo.PkgsByImP[dependant]; pkgdep != nil {
-					jobs = append(jobs, &z.DiagJobBuild{DiagJob: z.DiagJob{Target: pkgdep, AffectedFilePaths: pkgdep.GoFilePaths()}, TargetCmp: ensureBuildOrder})
+					jobs = append(jobs, &z.DiagJobBuild{DiagJob: z.DiagJob{Target: pkgdep, AffectedFilePaths: pkgdep.GoFilePaths(true)}, TargetCmp: ensureBuildOrder})
 				}
 			}
 			for _, dep := range pj.Target.(*udevgo.Pkg).Deps {
@@ -29,7 +29,7 @@ func (me *goDiag) OnUpdateBuildDiags(writtenFilePaths []string) (jobs z.DiagBuil
 				// (there was no build-on-save signal for the dep, just the main) --- we could also do lengthy "duplicate check"s on all diags but
 				// mildly cleaner to mark all go files of all dependencies as "affected" aka "may-produce-diags", meaning we clear those deps too (not just dependants as done above)
 				if pkgdep := udevgo.PkgsByImP[dep]; pkgdep != nil {
-					for _, gfp := range pkgdep.GoFilePaths() {
+					for _, gfp := range pkgdep.GoFilePaths(true) {
 						if !uslice.StrHas(job.AffectedFilePaths, gfp) {
 							job.AffectedFilePaths = append(job.AffectedFilePaths, gfp)
 						}

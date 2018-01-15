@@ -58,7 +58,14 @@ func (me *Dbg) main() {
 		defer me.logfile.Close()
 	}
 	me.stdin, me.rawOut, _ = urun.SetupJsonIpcPipes(1024*1024*4, true, false)
-	logpanic := func(msg string) { me.onServerEvt_Output("stderr", msg); me.logfile.WriteString(msg); panic(msg) }
+	onerrorexit := func(msg string) {
+		me.onServerEvt_Output("stderr", msg)
+		me.onServerEvt_Stopped()
+		me.onServerEvt_Terminated()
+		me.onServerEvt_Exited()
+		me.logfile.WriteString(msg)
+		// panic(msg)
+	}
 
 	var req, resp interface{}
 	var respbase *zdbgvscp.Response
@@ -67,7 +74,7 @@ func (me *Dbg) main() {
 		srcfull = os.Args[2]
 	}
 	if err = me.Impl.Init(tmpdirpath, os.Args[1], srcfull); err != nil {
-		logpanic("Impl.Init:" + err.Error())
+		onerrorexit("Impl.Init:" + err.Error())
 	}
 	for me.stdin.Scan() {
 		if err = me.stdin.Err(); err != nil {
@@ -76,10 +83,10 @@ func (me *Dbg) main() {
 		jsonin := me.stdin.Text()
 		me.logfile.WriteString("\n\n\n\n\n" + jsonin)
 		if req, err = zdbgvscp.TryUnmarshalRequest(jsonin); err != nil {
-			logpanic("TryUnmarshalRequest: " + err.Error())
+			onerrorexit("TryUnmarshalRequest: " + err.Error())
 		}
 		if resp, respbase, err = zdbgvscp.HandleRequest(req, me.initNewRespBase); resp == nil {
-			logpanic("BUG: resp returned was nil")
+			onerrorexit("BUG: resp returned was nil")
 		} else if err != nil {
 			respbase.Success = false
 			respbase.Message = err.Error()
@@ -87,6 +94,8 @@ func (me *Dbg) main() {
 		switch respbase.Command {
 		case "initialize":
 			me.onServerEvt_Initialized()
+		case "disconnect":
+			me.Impl.Kill()
 		}
 		me.send(resp)
 		switch respbase.Command {

@@ -15,6 +15,16 @@ func (me *Dbg) onServerEvt_Output(cat string, msg string) {
 	me.send(evtOutput)
 }
 
+func (me *Dbg) onServerEvt_Stopped() {
+	evtStopped := zdbgvscp.NewStoppedEvent()
+	me.send(evtStopped)
+}
+
+func (me *Dbg) onServerEvt_Exited() {
+	evtExited := zdbgvscp.NewExitedEvent()
+	me.send(evtExited)
+}
+
 func (me *Dbg) onServerEvt_Terminated() {
 	evtTerminated := zdbgvscp.NewTerminatedEvent()
 	me.send(evtTerminated)

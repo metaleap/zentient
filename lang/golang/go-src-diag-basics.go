@@ -28,7 +28,7 @@ func (me *goDiag) onUpdateDiagsPrepPkgJobs(filePaths []string) (jobs []z.DiagJob
 		}
 		for _, pkg := range pkgs {
 			if !(pkg.Standard || pkg.BinaryOnly) {
-				if pkggofilepaths := pkg.GoFilePaths(); len(pkggofilepaths) > 0 {
+				if pkggofilepaths := pkg.GoFilePaths(true); len(pkggofilepaths) > 0 {
 					jobs = append(jobs, z.DiagJob{AffectedFilePaths: pkggofilepaths, Target: pkg})
 				}
 			}
@@ -38,7 +38,7 @@ func (me *goDiag) onUpdateDiagsPrepPkgJobs(filePaths []string) (jobs []z.DiagJob
 }
 
 func (*goDiag) fallbackFilePath(pkg *udevgo.Pkg, workspaceFiles z.WorkspaceFiles) (filePath string) {
-	for _, fp := range pkg.GoFilePaths() {
+	for _, fp := range pkg.GoFilePaths(false) {
 		if filePath == "" {
 			filePath = fp
 		}

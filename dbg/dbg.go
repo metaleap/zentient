@@ -4,6 +4,8 @@ import (
 	"io"
 	"os/exec"
 	"sync"
+	"syscall"
+	"time"
 )
 
 type IDbg interface {
@@ -46,6 +48,8 @@ func (me *Dbg) Enqueue(cmdEvalExpr string) {
 
 func (me *Dbg) Kill() (err error) {
 	if me.cmd != nil && me.cmd.Process != nil {
+		me.cmd.Process.Signal(syscall.SIGQUIT)
+		time.Sleep(time.Second)
 		err = me.cmd.Process.Kill()
 	}
 	me.cmd = nil

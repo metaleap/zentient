@@ -18,8 +18,15 @@ type Dbg struct {
 }
 
 func (me *Dbg) Init(tmpDirPath string, srcFilePath string, maybeSrcFull string) (err error) {
-	if me.Cmd.Args, me.Cmd.Dir, err = goRunEvalPrepCmd(tmpDirPath, srcFilePath, maybeSrcFull, ""); err == nil {
-		me.Cmd.Name = "go"
+	var gorunargs []string
+	if gorunargs, me.Cmd.Dir, err = goRunEvalPrepCmd(tmpDirPath, srcFilePath, maybeSrcFull, ""); err == nil {
+		me.Cmd.Name = "zdbg-main-" + filepath.Base(tmpDirPath)
+		gobuildargs := append([]string{"build", "-o", me.Cmd.Name}, gorunargs[1:]...)
+		if _, cmderr, e := urun.CmdExecStdin("", me.Cmd.Dir, "go", gobuildargs...); e != nil {
+			err = e
+		} else if cmderr != "" {
+			err = umisc.E(cmderr)
+		}
 	}
 	return
 }
@@ -39,7 +46,7 @@ func goRunEvalPrepCmd(tmpDirPath string, srcFilePath string, maybeSrcFull string
 		if pkg := udevgo.PkgsByDir[pkgsrcdirpath]; pkg == nil {
 			err = umisc.E(z.BadMsg("Go package", pkgsrcdirpath))
 		} else {
-			for i, pos, src, gfps := 0, 0, "", pkg.GoFilePaths(); (err == nil) && (i < len(gfps)); i++ {
+			for i, pos, src, gfps := 0, 0, "", pkg.GoFilePaths(false); (err == nil) && (i < len(gfps)); i++ {
 				iscursrc := gfps[i] == srcFilePath
 				if iscursrc && len(maybeSrcFull) > 0 {
 					src = maybeSrcFull
