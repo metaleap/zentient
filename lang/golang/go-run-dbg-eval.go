@@ -20,7 +20,7 @@ type Dbg struct {
 func (me *Dbg) Init(tmpDirPath string, srcFilePath string, maybeSrcFull string) (err error) {
 	var gorunargs []string
 	if gorunargs, me.Cmd.Dir, err = goRunEvalPrepCmd(tmpDirPath, srcFilePath, maybeSrcFull, ""); err == nil {
-		me.Cmd.Name = "zdbg-main-" + filepath.Base(tmpDirPath)
+		me.Cmd.Name = "zdbg-main-" + filepath.Base(me.Cmd.Dir)
 		gobuildargs := append([]string{"build", "-o", me.Cmd.Name}, gorunargs[1:]...)
 		if _, cmderr, e := urun.CmdExecStdin("", me.Cmd.Dir, "go", gobuildargs...); e != nil {
 			err = e
