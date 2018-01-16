@@ -3,6 +3,7 @@ package zdbgvsc
 import (
 	"time"
 
+	"github.com/metaleap/go-util"
 	"github.com/metaleap/zentient/dbg/vsc/protocol"
 )
 
@@ -29,7 +30,7 @@ func (me *Dbg) onClientReq_Evaluate(req *zdbgvscp.EvaluateRequest, resp *zdbgvsc
 }
 
 func (me *Dbg) onClientReq_Pause(req *zdbgvscp.PauseRequest, resp *zdbgvscp.PauseResponse) (err error) {
-	//	req.Arguments.ThreadId
+	err = umisc.E("Not currently supported: Pause")
 	return
 }
 

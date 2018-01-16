@@ -75,14 +75,16 @@ func (me *Dbg) main() {
 		}
 	}
 
-	var req, resp interface{}
-	var respbase *zdbgvscp.Response
-	var srcfull string
+	var (
+		req, resp interface{}
+		respbase  *zdbgvscp.Response
+		srcfull   string
+		handled   bool
+	)
 	if len(os.Args) > 2 {
 		srcfull = os.Args[2]
 	}
 	if err = me.Impl.Init(tmpdirpath, os.Args[1], srcfull); err != nil {
-
 		onerror("Impl.Init:" + err.Error())
 	}
 	for me.stdin.Scan() {
@@ -96,11 +98,13 @@ func (me *Dbg) main() {
 		if req, err = zdbgvscp.TryUnmarshalRequest(jsonin); err != nil {
 			onerror("TryUnmarshalRequest: " + err.Error())
 		}
-		if resp, respbase, err = zdbgvscp.HandleRequest(req, me.initNewRespBase); resp == nil {
+		if resp, respbase, handled, err = zdbgvscp.HandleRequest(req, me.initNewRespBase); resp == nil {
 			onerror("BUG: resp returned was nil")
 		} else if err != nil {
-			respbase.Success = false
-			respbase.Message = err.Error()
+			respbase.Success, respbase.Message = false, err.Error()
+			me.onServerEvt_Output("stderr", respbase.Message)
+		} else if !handled {
+			me.onServerEvt_Output("stderr", "zdbgNoHandlerYet:"+respbase.Command)
 		}
 		switch respbase.Command {
 		case "initialize":
