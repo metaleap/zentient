@@ -39,11 +39,13 @@ type WorkspaceFile struct {
 		Lint             diags
 	}
 
-	modTime int64
+	existsAtLastCheck bool
+	modTime           int64
 }
 
 func (me *WorkspaceFile) updateModTime() (hasChanged bool) {
-	if fileinfo, err := os.Stat(me.Path); err == nil && !fileinfo.IsDir() {
+	fileinfo, err := os.Stat(me.Path)
+	if me.existsAtLastCheck = (err == nil) && fileinfo.Mode().IsRegular(); me.existsAtLastCheck {
 		modtime := fileinfo.ModTime().UnixNano()
 		me.modTime, hasChanged = modtime, modtime > me.modTime
 	}
@@ -61,8 +63,9 @@ type WorkspaceFiles map[string]*WorkspaceFile
 func (me WorkspaceFiles) ensure(fpath string) (file *WorkspaceFile) {
 	if file = me[fpath]; file == nil {
 		file = &WorkspaceFile{Path: fpath}
-		file.updateModTime()
-		me[fpath] = file
+		if file.updateModTime(); file.existsAtLastCheck {
+			me[fpath] = file
+		}
 	}
 	return
 }
@@ -219,7 +222,7 @@ func (me *WorkspaceBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	return true
 }
 
-func (*WorkspaceBase) analyzeChanges(files WorkspaceFiles, upd *WorkspaceChanges) (freshFiles []string, hasFreshFiles bool, dirsChanged bool, needsFreshAutoLints bool) {
+func (*WorkspaceBase) analyzeChanges(files WorkspaceFiles, upd *WorkspaceChanges) (freshFiles []string, hasFreshFiles bool, hasDiedFiles bool, dirsChanged bool, needsFreshAutoLints bool) {
 	for _, eventfiles := range [][]string{upd.OpenedFiles, upd.ClosedFiles, upd.WrittenFiles} {
 		for _, fpath := range eventfiles {
 			if !files.exists(fpath) {
@@ -228,7 +231,9 @@ func (*WorkspaceBase) analyzeChanges(files WorkspaceFiles, upd *WorkspaceChanges
 		}
 	}
 	for _, file := range files { // we really only check all-known-files for changes seemingly-somewhat-redudantly here to cover changes outside the editor (from code-gens etc)
-		if file.updateModTime() && !upd.hasFileIn(file.Path, upd.WrittenFiles) {
+		if haschanged := file.updateModTime(); !file.existsAtLastCheck {
+			hasDiedFiles = true
+		} else if haschanged && !upd.hasFileIn(file.Path, upd.WrittenFiles) {
 			upd.WrittenFiles = append(upd.WrittenFiles, file.Path)
 		}
 	}
@@ -240,8 +245,8 @@ func (*WorkspaceBase) analyzeChanges(files WorkspaceFiles, upd *WorkspaceChanges
 func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 	if upd != nil && upd.hasChanges() {
 		dirs, files := me.dirs, me.files
-		freshfiles, hasfreshfiles, dirschanged, needsfreshautolints := me.analyzeChanges(files, upd)
-		if needsfreshautolints || hasfreshfiles || dirschanged {
+		freshfiles, hasfreshfiles, hasdiedfiles, dirschanged, needsfreshautolints := me.analyzeChanges(files, upd)
+		if needsfreshautolints || hasfreshfiles || hasdiedfiles || dirschanged {
 			me.Lock()
 			defer me.Unlock()
 		}
@@ -266,10 +271,12 @@ func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 			}
 		}
 
-		if hasfreshfiles {
+		if hasfreshfiles || hasdiedfiles {
 			files = make(WorkspaceFiles, len(me.files))
 			for k, v := range me.files {
-				files[k] = v
+				if v.existsAtLastCheck {
+					files[k] = v
+				}
 			}
 		}
 
