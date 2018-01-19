@@ -1,7 +1,9 @@
 package zgo
 
 import (
+	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
@@ -16,24 +18,108 @@ import (
 
 type Dbg struct {
 	zdbg.Dbg
+	printLn func(bool, string)
+	replish struct {
+		is           bool
+		killed       bool
+		stdout       io.Writer
+		stderr       io.Writer
+		stdin        io.Reader
+		tmpDirPath   string
+		srcFilePath  string
+		maybeSrcFull string
+	}
 }
 
-func (me *Dbg) Init(tmpDirPath string, srcFilePath string, maybeSrcFull string) (err error) {
+func (me *Dbg) Init(tmpDirPath string, srcFilePath string, maybeSrcFull string, printLn func(bool, string)) (err error) {
+	me.printLn = printLn
 	var gorunargs []string
-	if gorunargs, me.Cmd.Dir, err = goRunEvalPrepCmd(tmpDirPath, srcFilePath, maybeSrcFull, ""); err == nil {
-		me.Cmd.Name = filepath.Base(os.Args[0]) + "-" + filepath.Base(me.Cmd.Dir)
-		gobuildargs := append([]string{"build", "-o", me.Cmd.Name}, gorunargs[1:]...)
-		if _, cmderr, e := urun.CmdExecStdin("", me.Cmd.Dir, "go", gobuildargs...); e != nil {
-			err = e
-		} else if cmderr != "" {
-			err = umisc.E(cmderr)
+	var hadmain bool
+	if gorunargs, me.Cmd.Dir, hadmain, err = goRunEvalPrepCmd(tmpDirPath, srcFilePath, maybeSrcFull, ""); err == nil {
+		if me.replish.is = !hadmain; me.replish.is {
+			me.replish.tmpDirPath, me.replish.srcFilePath, me.replish.maybeSrcFull = tmpDirPath, srcFilePath, maybeSrcFull
+		} else {
+			me.Cmd.Name = filepath.Base(os.Args[0]) + "-" + filepath.Base(me.Cmd.Dir)
+			gobuildargs := append([]string{"build", "-o", me.Cmd.Name}, gorunargs[1:]...)
+			if _, cmderr, e := urun.CmdExecStdin("", me.Cmd.Dir, "go", gobuildargs...); e != nil {
+				err = e
+			} else if cmderr != "" {
+				err = umisc.E(cmderr)
+			}
+			me.Cmd.Name = filepath.Join(me.Cmd.Dir, me.Cmd.Name)
 		}
-		me.Cmd.Name = filepath.Join(me.Cmd.Dir, me.Cmd.Name)
 	}
 	return
 }
 
-func goRunEvalPrepCmd(tmpDirPath string, srcFilePath string, maybeSrcFull string, goEvalExpr string) (goRunArgs []string, goRunDir string, err error) {
+func (me *Dbg) Dequeue() string {
+	if me.replish.is {
+		return "Unexpected, but OK here's some faux stdin!\n"
+	}
+	return me.Dbg.Dequeue()
+}
+
+func (me *Dbg) Enqueue(goEvalExpr string) {
+	if !me.replish.is {
+		me.Dbg.Enqueue(goEvalExpr)
+		return
+	}
+	gorunargs, gorundir, _, err := goRunEvalPrepCmd(me.replish.tmpDirPath, me.replish.srcFilePath, me.replish.maybeSrcFull, goEvalExpr)
+	if me.Cmd.Dir = gorundir; err == nil {
+		cmdout, cmderr, cmdname := "", "", filepath.Base(os.Args[0])+"-"+filepath.Base(gorundir)
+		gobuildargs := append([]string{"build", "-o", cmdname}, gorunargs[1:]...)
+		if cmdout, cmderr, err = urun.CmdExecStdin("", gorundir, "go", gobuildargs...); err == nil {
+			if cmderr != "" {
+				err = umisc.E(cmderr)
+			} else if cmdout != "" {
+				err = umisc.E(cmdout)
+			}
+		}
+		if err == nil {
+			cmdname = filepath.Join(gorundir, cmdname)
+			cmd := exec.Command(cmdname)
+			cmd.Dir, cmd.Stdout, cmd.Stdin, cmd.Stderr = gorundir, me.replish.stdout, me.replish.stdin, me.replish.stderr
+			if err = cmd.Start(); err == nil {
+				err = cmd.Wait()
+			}
+		}
+	}
+	if err != nil {
+		me.printLn(true, err.Error())
+	}
+}
+
+func (me *Dbg) Kill() error {
+	if me.replish.is {
+		me.replish.killed, me.replish.stdout, me.replish.stdin, me.replish.stderr = true, nil, nil, nil
+		return nil
+	}
+	return me.Dbg.Kill()
+}
+
+func (me *Dbg) PrintLn(isErr bool, ln string) {
+	me.printLn(isErr, ln)
+}
+
+func (me *Dbg) Start(stdout io.Writer, stdin io.Reader, stderr io.Writer) error {
+	if me.replish.is {
+		me.replish.stdout, me.replish.stdin, me.replish.stderr = stdout, stdin, stderr
+		return nil
+	}
+	return me.Dbg.Start(stdout, stdin, stderr)
+}
+
+func (me *Dbg) Wait() error {
+	if me.replish.is {
+		for !me.replish.killed {
+			time.Sleep(time.Millisecond * 123)
+		}
+		return nil
+	}
+	return me.Dbg.Wait()
+}
+
+func goRunEvalPrepCmd(tmpDirPath string, srcFilePath string, maybeSrcFull string, goEvalExpr string) (goRunArgs []string, goRunDir string, hadMain bool, err error) {
 	pkgsrcdirpath := filepath.Dir(srcFilePath)
 	goRunDir = filepath.Join(tmpDirPath, pkgsrcdirpath)
 	if ufs.DirExists(goRunDir) {
@@ -64,10 +150,12 @@ func goRunEvalPrepCmd(tmpDirPath string, srcFilePath string, maybeSrcFull string
 					if oldpkgln := src[pos:posln]; oldpkgln != "package main" {
 						src = src[:pos] + "package main" + src[posln:]
 					}
-					if goEvalExpr != "" {
-						if pos = 1 + strings.Index(src, "\nfunc main() {"); pos > 0 {
+					if pos = 1 + strings.Index(src, "\nfunc main() {"); pos > 0 {
+						if hadMain = true; goEvalExpr != "" {
 							src = src[:pos] + z.Strf("func main%d() {", time.Now().UnixNano()) + src[pos+13:]
 						}
+					}
+					if goEvalExpr != "" {
 						if iscursrc {
 							if strings.HasPrefix(goEvalExpr, ":") {
 								src += z.Strf("\n\nfunc main() { %s }", goEvalExpr[1:])
@@ -86,7 +174,7 @@ func goRunEvalPrepCmd(tmpDirPath string, srcFilePath string, maybeSrcFull string
 }
 
 func goRunEval(srcFilePath string, maybeSrcFull string, goEvalExpr string) (evalOutAndStdErr string, otherStdOut string, err error) {
-	gorunargs, gorundir, e := goRunEvalPrepCmd(z.Prog.Dir.Cache, srcFilePath, maybeSrcFull, goEvalExpr)
+	gorunargs, gorundir, _, e := goRunEvalPrepCmd(z.Prog.Dir.Cache, srcFilePath, maybeSrcFull, goEvalExpr)
 	defer ufs.ClearDirectory(gorundir)
 	if err = e; err == nil {
 		otherStdOut, evalOutAndStdErr, err = urun.CmdExecIn(gorundir, "go", gorunargs...)

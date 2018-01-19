@@ -4,13 +4,17 @@ import (
 	"io"
 	"os/exec"
 	"sync"
+
+	"github.com/metaleap/go-util/fs"
 )
 
 type IDbg interface {
+	Dispose()
 	Dequeue() string
 	Enqueue(string)
-	Init(string, string, string) error
+	Init(string, string, string, func(bool, string)) error
 	Kill() error
+	PrintLn(bool, string)
 	Start(io.Writer, io.Reader, io.Writer) error
 	Wait() error
 }
@@ -26,6 +30,12 @@ type Dbg struct {
 
 	cmd      *exec.Cmd
 	cmdExprs []string
+}
+
+func (me *Dbg) Dispose() {
+	if me.Cmd.Dir != "" {
+		_ = ufs.ClearDirectory(me.Cmd.Dir)
+	}
 }
 
 func (me *Dbg) Dequeue() (cmdEvalExpr string) {
@@ -55,7 +65,7 @@ func (me *Dbg) Kill() (err error) {
 func (me *Dbg) Start(stdout io.Writer, stdin io.Reader, stderr io.Writer) (err error) {
 	_ = me.Kill()
 	me.cmd = exec.Command(me.Cmd.Name, me.Cmd.Args...)
-	me.cmd.Dir, me.cmd.Stdout, me.cmd.Stdin, me.cmd.Stderr = me.Cmd.Dir, stdout, stdin, stderr
+	me.cmd.Stdout, me.cmd.Stdin, me.cmd.Stderr = stdout, stdin, stderr
 	if err = me.cmd.Start(); err != nil {
 		_ = me.Kill()
 	}
