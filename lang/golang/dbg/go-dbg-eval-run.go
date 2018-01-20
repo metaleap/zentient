@@ -1,6 +1,7 @@
 package zgodbg
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"os/exec"
@@ -12,9 +13,10 @@ import (
 	"github.com/metaleap/go-util/dev/go"
 	"github.com/metaleap/go-util/fs"
 	"github.com/metaleap/go-util/run"
-	"github.com/metaleap/zentient"
 	"github.com/metaleap/zentient/dbg"
 )
+
+var strf = fmt.Sprintf
 
 type Dbg struct {
 	zdbg.Dbg
@@ -155,7 +157,7 @@ func GoRunEvalPrepCmd(tmpDirPath string, srcFilePath string, maybeSrcFull string
 	}
 	if goRunArgs = []string{"run"}; err == nil {
 		if pkg := udevgo.PkgsByDir[pkgsrcdirpath]; pkg == nil {
-			err = umisc.E(z.BadMsg("Go package", pkgsrcdirpath))
+			err = umisc.E("Bad Go package: " + pkgsrcdirpath)
 		} else {
 			for i, pos, src, gfps := 0, 0, "", pkg.GoFilePaths(false); (err == nil) && (i < len(gfps)); i++ {
 				iscursrc := gfps[i] == srcFilePath
@@ -167,7 +169,7 @@ func GoRunEvalPrepCmd(tmpDirPath string, srcFilePath string, maybeSrcFull string
 				if strings.HasPrefix(src, "package ") {
 					pos = 0
 				} else if pos = 1 + strings.Index(src, "\npackage "); pos == 0 {
-					err = umisc.E(z.BadMsg("Go package source file", gfps[i]))
+					err = umisc.E("Bad Go package source file: " + gfps[i])
 				}
 				if posln := pos + strings.IndexRune(src[pos:], '\n'); err == nil {
 					if oldpkgln := src[pos:posln]; oldpkgln != "package main" {
@@ -175,15 +177,15 @@ func GoRunEvalPrepCmd(tmpDirPath string, srcFilePath string, maybeSrcFull string
 					}
 					if pos = 1 + strings.Index(src, "\nfunc main() {"); pos > 0 {
 						if hadMain = true; goEvalExpr != "" {
-							src = src[:pos] + z.Strf("func main%d() {", time.Now().UnixNano()) + src[pos+13:]
+							src = src[:pos] + strf("func main%d() {", time.Now().UnixNano()) + src[pos+13:]
 						}
 					}
 					if goEvalExpr != "" {
 						if iscursrc {
 							if strings.HasPrefix(goEvalExpr, ":") {
-								src += z.Strf("\n\nfunc main() { %s }", goEvalExpr[1:])
+								src += strf("\n\nfunc main() { %s }", goEvalExpr[1:])
 							} else {
-								src += z.Strf("\n\nfunc main() { println(%s) }", goEvalExpr)
+								src += strf("\n\nfunc main() { println(%s) }", goEvalExpr)
 							}
 						}
 					}
