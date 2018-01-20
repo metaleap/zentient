@@ -168,13 +168,13 @@ func (me *DiagBase) onRunManually(filePaths []string, resp *ipcResp) {
 		} else if len(filePaths) == 0 {
 			filePaths = workspacefiles.filePathsKnown()
 		}
-		go me.Impl.UpdateLintDiagsIfAndAsNeeded(workspacefiles, false, filePaths...)
 		if workspacefiles.haveAnyDiags(true, false) {
 			resp.Menu = &menuResp{NoteWarn: "Any lintish findings will not display as long as the currently shown build problems remain unresolved in the workspace."}
 		} else if !onRunManuallyInfoNoteAlreadyShownOnceInThisSession {
 			onRunManuallyInfoNoteAlreadyShownOnceInThisSession = true
 			resp.Menu = &menuResp{NoteInfo: Strf("All lintish findings (if any) will show up shortly and remain visible until invalidated.")}
 		}
+		go me.Impl.UpdateLintDiagsIfAndAsNeeded(workspacefiles, false, filePaths...)
 	}
 }
 
