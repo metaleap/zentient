@@ -20,13 +20,13 @@ type IDbg interface {
 }
 
 type Dbg struct {
+	sync.Mutex
+
 	Cmd struct {
 		Dir  string
 		Name string
 		Args []string
 	}
-
-	sync.Mutex
 
 	cmd      *exec.Cmd
 	cmdExprs []string

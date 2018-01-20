@@ -5,10 +5,12 @@ import (
 	"strings"
 
 	"github.com/metaleap/go-util/dev/go"
+	"github.com/metaleap/go-util/fs"
 	"github.com/metaleap/go-util/run"
 	"github.com/metaleap/go-util/slice"
 	"github.com/metaleap/go-util/str"
 	"github.com/metaleap/zentient"
+	"github.com/metaleap/zentient/lang/golang/dbg"
 )
 
 var (
@@ -104,4 +106,13 @@ func (me *goExtras) runQuery_GoRun(srcLens *z.SrcLens, arg string, resp *z.Extra
 		resp.Info = append(resp.Info, z.InfoTip{Value: ln})
 	}
 	resp.Warns = ustr.Split(otherstdout, "\n")
+}
+
+func goRunEval(srcFilePath string, maybeSrcFull string, goEvalExpr string) (evalOutAndStdErr string, otherStdOut string, err error) {
+	gorunargs, gorundir, _, e := zgodbg.GoRunEvalPrepCmd(z.Prog.Dir.Cache, srcFilePath, maybeSrcFull, goEvalExpr)
+	defer ufs.ClearDirectory(gorundir)
+	if err = e; err == nil {
+		otherStdOut, evalOutAndStdErr, err = urun.CmdExecIn(gorundir, "go", gorunargs...)
+	}
+	return
 }

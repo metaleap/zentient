@@ -16,21 +16,6 @@ import (
 	"github.com/metaleap/zentient/dbg/vsc/protocol"
 )
 
-const (
-	logToFile       = true
-	logJsonIncoming = true
-	logJsonOutgoing = true
-)
-
-var (
-	bclen = []byte("Content-Length: ")
-	bln   = []byte("\r\n\r\n")
-)
-
-func Main(impl zdbg.IDbg) {
-	(&Dbg{Impl: impl}).main()
-}
-
 type Dbg struct {
 	Impl zdbg.IDbg
 	sync.Mutex
@@ -43,6 +28,21 @@ type Dbg struct {
 	waitIgnoreTermination bool
 }
 
+const (
+	logToFile       = false
+	logJsonIncoming = false
+	logJsonOutgoing = false
+)
+
+var (
+	bclen = []byte("Content-Length: ")
+	bln   = []byte("\r\n\r\n")
+)
+
+func Main(impl zdbg.IDbg) {
+	(&Dbg{Impl: impl}).main()
+}
+
 func (me *Dbg) main() {
 	zdbgvscp.OnDisconnectRequest = me.onClientReq_Disconnect
 	zdbgvscp.OnInitializeRequest = me.onClientReq_Initialize
@@ -52,12 +52,11 @@ func (me *Dbg) main() {
 	zdbgvscp.OnRestartRequest = me.onClientReq_Restart
 	zdbgvscp.OnEvaluateRequest = me.onClientReq_Evaluate
 
-	var err error
 	tmpdirpath := filepath.Join(usys.UserDataDirPath(true), filepath.Base(os.Args[0]))
 	logdirpath := filepath.Join(tmpdirpath, "log")
-	ufs.EnsureDirExists(logdirpath)
+	err := ufs.EnsureDirExists(logdirpath)
 	logfilepath := filepath.Join(logdirpath, "log"+umisc.Str(time.Now().UnixNano())+".log.json")
-	if logToFile {
+	if logToFile && err == nil {
 		me.logfile, err = os.Create(logfilepath)
 	}
 	if err != nil {
@@ -86,11 +85,11 @@ func (me *Dbg) main() {
 	defer me.Impl.Dispose()
 	for me.stdin.Scan() {
 		if err = me.stdin.Err(); err != nil {
-			break
+			return
 		}
 		jsonin := me.stdin.Text()
 		if logJsonIncoming && me.logfile != nil {
-			me.logfile.WriteString("\n\n\n\n\n" + jsonin)
+			_, _ = me.logfile.WriteString("\n\n\n\n\n" + jsonin)
 		}
 		var (
 			req, resp interface{}
@@ -99,9 +98,11 @@ func (me *Dbg) main() {
 		)
 		if req, err = zdbgvscp.TryUnmarshalRequest(jsonin); err != nil {
 			onerror("TryUnmarshalRequest: " + err.Error())
+			continue
 		}
 		if resp, respbase, handled, err = zdbgvscp.HandleRequest(req, me.initNewRespBase); resp == nil {
 			onerror("BUG: resp returned was nil")
+			continue
 		} else if err != nil {
 			respbase.Success, respbase.Message = false, err.Error()
 			me.Impl.PrintLn(true, respbase.Message)
@@ -132,6 +133,11 @@ func (me *Dbg) printLn(isErr bool, msgLn string) {
 }
 
 func (me *Dbg) send(item interface{}) {
+	jsonout, err := json.Marshal(item)
+	if err != nil {
+		me.printLn(true, err.Error())
+		return
+	}
 	me.Lock()
 	defer me.Unlock()
 	me.sendseq++
@@ -141,10 +147,6 @@ func (me *Dbg) send(item interface{}) {
 		bevt.Seq = me.sendseq
 	} else if breq := zdbgvscp.BaseRequest(item); breq != nil {
 		breq.Seq = me.sendseq
-	}
-	jsonout, err := json.Marshal(item)
-	if err != nil {
-		panic("json.Marshal: " + err.Error())
 	}
 	me.rawOut.Write(bclen)
 	me.rawOut.Write([]byte(umisc.Str(len(jsonout))))

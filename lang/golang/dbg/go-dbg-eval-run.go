@@ -1,4 +1,4 @@
-package zgo
+package zgodbg
 
 import (
 	"io"
@@ -40,7 +40,7 @@ start:
 	if jumpFilePath != "" {
 		srcFilePath = jumpFilePath
 	}
-	if gorunargs, me.Cmd.Dir, hadmain, err = goRunEvalPrepCmd(tmpDirPath, srcFilePath, maybeSrcFull, ""); err == nil {
+	if gorunargs, me.Cmd.Dir, hadmain, err = GoRunEvalPrepCmd(tmpDirPath, srcFilePath, maybeSrcFull, ""); err == nil {
 		if (!hadmain) && jumpFilePath == "" {
 			for pkgdir := filepath.Dir(filepath.Dir(srcFilePath)); len(pkgdir) > 3; pkgdir = filepath.Dir(pkgdir) {
 				ufs.WalkFilesIn(pkgdir, func(fullPath string) (keepWalking bool) {
@@ -87,7 +87,7 @@ func (me *Dbg) Enqueue(goEvalExpr string) {
 		me.Dbg.Enqueue(goEvalExpr)
 		return
 	}
-	gorunargs, gorundir, _, err := goRunEvalPrepCmd(me.replish.tmpDirPath, me.replish.srcFilePath, me.replish.maybeSrcFull, goEvalExpr)
+	gorunargs, gorundir, _, err := GoRunEvalPrepCmd(me.replish.tmpDirPath, me.replish.srcFilePath, me.replish.maybeSrcFull, goEvalExpr)
 	if me.Cmd.Dir = gorundir; err == nil {
 		cmdout, cmderr, cmdname := "", "", filepath.Base(os.Args[0])+"-"+filepath.Base(gorundir)
 		gobuildargs := append([]string{"build", "-o", cmdname}, gorunargs[1:]...)
@@ -142,7 +142,7 @@ func (me *Dbg) Wait() error {
 	return me.Dbg.Wait()
 }
 
-func goRunEvalPrepCmd(tmpDirPath string, srcFilePath string, maybeSrcFull string, goEvalExpr string) (goRunArgs []string, goRunDir string, hadMain bool, err error) {
+func GoRunEvalPrepCmd(tmpDirPath string, srcFilePath string, maybeSrcFull string, goEvalExpr string) (goRunArgs []string, goRunDir string, hadMain bool, err error) {
 	pkgsrcdirpath := filepath.Dir(srcFilePath)
 	goRunDir = filepath.Join(tmpDirPath, pkgsrcdirpath)
 	if ufs.DirExists(goRunDir) {
@@ -192,18 +192,6 @@ func goRunEvalPrepCmd(tmpDirPath string, srcFilePath string, maybeSrcFull string
 				}
 			}
 		}
-	}
-	return
-}
-
-func goRunEval(srcFilePath string, maybeSrcFull string, goEvalExpr string) (evalOutAndStdErr string, otherStdOut string, err error) {
-	gorunargs, gorundir, _, e := goRunEvalPrepCmd(z.Prog.Dir.Cache, srcFilePath, maybeSrcFull, goEvalExpr)
-	defer ufs.ClearDirectory(gorundir)
-	if err = e; err == nil {
-		otherStdOut, evalOutAndStdErr, err = urun.CmdExecIn(gorundir, "go", gorunargs...)
-	}
-	if err != nil {
-		panic(err)
 	}
 	return
 }
