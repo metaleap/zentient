@@ -35,7 +35,30 @@ func (me *Dbg) Init(tmpDirPath string, srcFilePath string, maybeSrcFull string, 
 	me.printLn = printLn
 	var gorunargs []string
 	var hadmain bool
+	var jumpFilePath string
+start:
+	if jumpFilePath != "" {
+		srcFilePath = jumpFilePath
+	}
 	if gorunargs, me.Cmd.Dir, hadmain, err = goRunEvalPrepCmd(tmpDirPath, srcFilePath, maybeSrcFull, ""); err == nil {
+		if (!hadmain) && jumpFilePath == "" {
+			for pkgdir := filepath.Dir(filepath.Dir(srcFilePath)); len(pkgdir) > 3; pkgdir = filepath.Dir(pkgdir) {
+				ufs.WalkFilesIn(pkgdir, func(fullPath string) (keepWalking bool) {
+					if keepWalking = true; strings.HasSuffix(fullPath, ".go") {
+						if src := ufs.ReadTextFile(fullPath, false, ""); strings.HasPrefix(src, "package main\n") || strings.Index(src, "\npackage main\n") >= 2 {
+							jumpFilePath, keepWalking = fullPath, false
+						}
+					}
+					return
+				})
+				if jumpFilePath != "" {
+					break
+				}
+			}
+			if jumpFilePath != "" {
+				goto start
+			}
+		}
 		if me.replish.is = !hadmain; me.replish.is {
 			me.replish.tmpDirPath, me.replish.srcFilePath, me.replish.maybeSrcFull = tmpDirPath, srcFilePath, maybeSrcFull
 		} else {
