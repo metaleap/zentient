@@ -5,8 +5,8 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/go-leap/str"
 	"github.com/metaleap/go-util/dev/go"
-	"github.com/metaleap/go-util/slice"
 	"github.com/metaleap/zentient"
 )
 
@@ -93,19 +93,19 @@ func (me *goPkgIntel) onSrcLens(lf *z.ListFilter, srcLens *z.SrcLens) {
 			curpkgdesc = curpkg.ImportPath
 			if isdepd {
 				lf.Pred = func(p z.IListItem) bool {
-					return uslice.StrHas(curpkg.Imports, p.(*udevgo.Pkg).ImportPath)
+					return ustr.In(p.(*udevgo.Pkg).ImportPath, curpkg.Imports...)
 				}
 			} else if isdepi {
 				lf.Pred = func(p z.IListItem) bool {
-					return uslice.StrHas(curpkg.Deps, p.(*udevgo.Pkg).ImportPath)
+					return ustr.In(p.(*udevgo.Pkg).ImportPath, curpkg.Deps...)
 				}
 			} else if isimpd { // d meaning 'direct' (vs. 'indirect') --- not 'dependant' (vs 'importer')
 				lf.Pred = func(p z.IListItem) bool {
-					return uslice.StrHas(curpkg.Importers(), p.(*udevgo.Pkg).ImportPath)
+					return ustr.In(p.(*udevgo.Pkg).ImportPath, curpkg.Importers()...)
 				}
 			} else if isimpi { // i meaning 'indirect' (vs. 'direct') --- not 'importer' (vs 'dependant')
 				lf.Pred = func(p z.IListItem) bool {
-					return uslice.StrHas(curpkg.Dependants(), p.(*udevgo.Pkg).ImportPath)
+					return ustr.In(p.(*udevgo.Pkg).ImportPath, curpkg.Dependants()...)
 				}
 			} else if isself {
 				lf.Pred = func(p z.IListItem) (iscurpkg bool) {

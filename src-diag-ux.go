@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/metaleap/go-util/slice"
+	"github.com/go-leap/str"
 )
 
 type DiagBase struct {
@@ -55,7 +55,7 @@ func (me *DiagBase) menuItems(srcLens *SrcLens) (menu MenuItems) {
 			if l := len(wfps); l > 0 && (l > 1 || wfps[0] != srcfilepath) {
 				menuitem.Desc = Strf("➜ on: %d currently-%s %s source file(s) in %d folder(s)",
 					l, menuitem.tag, Lang.Title, workspacefiles.numDirs(func(f *WorkspaceFile) bool { return f.IsOpen || menuitem != me.cmdRunDiagsOnOpenFiles }))
-				menuitem.Hint = strings.Join(uslice.StrMap(wfps, filepath.Base), " · ")
+				menuitem.Hint = strings.Join(ustr.Map(wfps, filepath.Base), " · ")
 				menu = append(menu, menuitem)
 			}
 		}

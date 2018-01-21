@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/go-leap/str"
 	"github.com/metaleap/go-util/dev/go"
-	"github.com/metaleap/go-util/slice"
 	"github.com/metaleap/go-util/sys"
 )
 
@@ -347,7 +347,7 @@ func (me *WorkspaceBase) PrettyPath(fsPath string, otherEnvs ...string) string {
 			}
 		}
 		if len(candidates) > 0 {
-			return uslice.StrShortest(candidates)
+			return ustr.Shortest(candidates)
 		}
 
 		for _, gopath := range udevgo.GoPaths {

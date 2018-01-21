@@ -3,7 +3,7 @@ package z
 import (
 	"strings"
 
-	"github.com/metaleap/go-util/slice"
+	"github.com/go-leap/str"
 )
 
 type IMenuItems interface {
@@ -71,7 +71,7 @@ func (me *mainMenu) onMainMenu(req *ipcReq, resp *ipcResp) {
 	for _, menu := range Prog.menus {
 		for _, item := range menu.menuItems(req.SrcLens) {
 			if item.Category = menu.MenuCategory(); catfilter == "" || item.Category == catfilter {
-				if !uslice.StrHas(cats, item.Category) {
+				if !ustr.In(item.Category, cats...) {
 					cats = append(cats, item.Category)
 				}
 				m.Items = append(m.Items, item)

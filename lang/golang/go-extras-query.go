@@ -8,7 +8,6 @@ import (
 	"github.com/metaleap/go-util/dev/go"
 	"github.com/metaleap/go-util/fs"
 	"github.com/metaleap/go-util/run"
-	"github.com/metaleap/go-util/slice"
 	"github.com/metaleap/zentient"
 	"github.com/metaleap/zentient/lang/golang/dbg"
 )
@@ -63,7 +62,7 @@ func (me *goExtras) runQuery_Godoc(srcLens *z.SrcLens, arg string, resp *z.Extra
 				arg = pkg.ImportPath + "#" + arg
 			}
 		} else if (!isup) && udevgo.PkgsByImP != nil && nil == udevgo.PkgsByImP[arg] {
-			if pkgimppath := uslice.StrWithFewest(udevgo.PkgsByName(arg), "/", uslice.StrShortest); pkgimppath != "" {
+			if pkgimppath := ustr.Fewest(udevgo.PkgsByName(arg), "/", ustr.Shortest); pkgimppath != "" {
 				arg = pkgimppath
 			}
 		}
@@ -92,7 +91,7 @@ func (me *goExtras) runQuery_GoDoc(srcLens *z.SrcLens, arg string, resp *z.Extra
 		panic(err)
 	}
 	resp.Desc = z.Strf("Results of `go doc %s`:", ustr.Join(cmd, " "))
-	resp.Warns = uslice.StrFiltered(uslice.StrMap(ustr.Split(cmderr, "\n"), ustr.Trim),
+	resp.Warns = ustr.Filtered(ustr.Map(ustr.Split(cmderr, "\n"), ustr.Trim),
 		func(s string) bool { return !ustr.Pref(s, "exit status ") })
 	resp.Info = append(resp.Info, z.InfoTip{Value: ustr.Trim(cmdout)})
 }

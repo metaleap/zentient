@@ -4,9 +4,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-leap/str"
 	"github.com/metaleap/go-util/dev"
 	"github.com/metaleap/go-util/dev/go"
-	"github.com/metaleap/go-util/slice"
 	"github.com/metaleap/zentient"
 )
 
@@ -30,7 +30,7 @@ func (me *goDiag) OnUpdateBuildDiags(writtenFilePaths []string) (jobs z.DiagBuil
 				// mildly cleaner to mark all go files of all dependencies as "affected" aka "may-produce-diags", meaning we clear those deps too (not just dependants as done above)
 				if pkgdep := udevgo.PkgsByImP[dep]; pkgdep != nil {
 					for _, gfp := range pkgdep.GoFilePaths(true) {
-						if !uslice.StrHas(job.AffectedFilePaths, gfp) {
+						if !ustr.In(gfp, job.AffectedFilePaths...) {
 							job.AffectedFilePaths = append(job.AffectedFilePaths, gfp)
 						}
 					}
@@ -111,7 +111,7 @@ func (me *goDiag) tryFixImpMissing(d *z.DiagItem) (fix *z.FixUp) {
 		}
 		if pkgname != "" {
 			mpkgs := udevgo.PkgsByName(pkgname)
-			if pkg := udevgo.PkgsByImP[uslice.StrWithFewest(mpkgs, "/", uslice.StrShortest)]; pkg != nil {
+			if pkg := udevgo.PkgsByImP[ustr.Fewest(mpkgs, "/", ustr.Shortest)]; pkg != nil {
 				fix = &z.FixUp{Name: "Add missing imports", Items: []string{pkg.ImportPath}}
 				fix.Edits.AddInsert(d.Loc.FilePath, func(srclens *z.SrcLens, set *z.SrcPos) (ins string) {
 					if i := strings.Index(srclens.Txt, "\nimport (\n"); i > 0 {

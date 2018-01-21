@@ -3,8 +3,8 @@ package z
 import (
 	"strings"
 
+	"github.com/go-leap/str"
 	"github.com/metaleap/go-util/run"
-	"github.com/metaleap/go-util/slice"
 )
 
 type ToolCats uint8
@@ -188,7 +188,7 @@ func (*Tool) Exec(panicOnErr bool, stdin string, cmdName string, cmdArgs []strin
 }
 
 func (me *Tool) isInAutoDiags() bool {
-	return uslice.StrHas(Prog.Cfg.AutoDiags, me.Name)
+	return ustr.In(me.Name, Prog.Cfg.AutoDiags...)
 }
 
 func (me *Tool) NotInstalledMessage() string {
@@ -197,7 +197,7 @@ func (me *Tool) NotInstalledMessage() string {
 
 func (me *Tool) toggleInAutoDiags() error {
 	if me.isInAutoDiags() {
-		Prog.Cfg.AutoDiags = uslice.StrWithout(Prog.Cfg.AutoDiags, false, me.Name)
+		Prog.Cfg.AutoDiags = ustr.Without(Prog.Cfg.AutoDiags, me.Name)
 	} else {
 		Prog.Cfg.AutoDiags = append(Prog.Cfg.AutoDiags, me.Name)
 	}

@@ -3,7 +3,7 @@ package z
 import (
 	"time"
 
-	"github.com/metaleap/go-util/slice"
+	"github.com/go-leap/str"
 )
 
 var (
@@ -68,7 +68,7 @@ func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(workspaceFiles WorkspaceFiles, 
 			if autos && len(f.Diags.Build.Items) > 0 {
 				return
 			} else if f.IsOpen && (nonautos || !f.Diags.AutoLintUpToDate) {
-				if len(onlyFilePaths) == 0 || uslice.StrHas(onlyFilePaths, f.Path) {
+				if len(onlyFilePaths) == 0 || ustr.In(f.Path, onlyFilePaths...) {
 					filepaths = append(filepaths, f.Path)
 				}
 			}
