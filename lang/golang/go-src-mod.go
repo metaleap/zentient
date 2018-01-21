@@ -71,5 +71,5 @@ func (me *goSrcMod) RunFormatter(formatter *z.Tool, cmdName string, _ *z.SrcForm
 		cmdargs = append(cmdargs, srcFilePath)
 	}
 
-	return formatter.Exec(cmdName, cmdargs, src)
+	return formatter.Exec(true, src, cmdName, cmdargs)
 }

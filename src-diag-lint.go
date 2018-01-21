@@ -13,7 +13,7 @@ var (
 type IDiagLint interface {
 	KnownLinters() Tools
 	OnUpdateLintDiags(WorkspaceFiles, Tools, []string) DiagLintJobs
-	RunLintJob(*DiagJobLint)
+	RunLintJob(*DiagJobLint, WorkspaceFiles)
 	UpdateLintDiagsIfAndAsNeeded(WorkspaceFiles, bool, ...string)
 }
 
@@ -85,7 +85,6 @@ func (me *DiagBase) updateLintDiags(workspaceFiles WorkspaceFiles, diagTools Too
 	if numjobs, nonautos := len(jobs), !autos; numjobs > 0 {
 		numdone, await, descs := 0, make(chan *DiagItem), make([]string, numjobs)
 		for _, job := range jobs { // separate loop from the go-routines below to prevent concurrent-map-read+write as forgetPrevDiags() calls workspaceFiles.ensure()
-			job.WorkspaceFiles = workspaceFiles
 			job.forgetPrevDiags(diagTools, autos, workspaceFiles)
 		}
 		go me.send(workspaceFiles, false)
@@ -94,7 +93,7 @@ func (me *DiagBase) updateLintDiags(workspaceFiles WorkspaceFiles, diagTools Too
 		}
 		for i, job := range jobs {
 			job.lintChan, job.timeStarted = await, time.Now()
-			go me.Impl.RunLintJob(job)
+			go me.Impl.RunLintJob(job, workspaceFiles)
 			descs[i] = job.Tool.Name + " ➜ " + job.String()
 		}
 		send(&ipcResp{IpcID: IPCID_SRCDIAG_STARTED, ObjSnapshot: descs})

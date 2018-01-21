@@ -24,7 +24,7 @@ type fixUps struct {
 type IDiagBuild interface {
 	FixerUppers() []FixerUpper
 	OnUpdateBuildDiags([]string) DiagBuildJobs
-	RunBuildJobs(DiagBuildJobs) DiagItems
+	RunBuildJobs(DiagBuildJobs, WorkspaceFiles) DiagItems
 	UpdateBuildDiagsAsNeeded(WorkspaceFiles, []string)
 }
 
@@ -99,11 +99,10 @@ func (me *DiagBase) UpdateBuildDiagsAsNeeded(workspaceFiles WorkspaceFiles, writ
 	if jobs := me.Impl.OnUpdateBuildDiags(writtenFiles).withoutDuplicates(); len(jobs) > 0 {
 		sort.Sort(jobs)
 		for _, job := range jobs {
-			job.WorkspaceFiles = workspaceFiles
 			job.forgetPrevDiags(nil, false, workspaceFiles)
 		}
 		go me.send(workspaceFiles, true)
-		diagitems := me.Impl.RunBuildJobs(jobs)
+		diagitems := me.Impl.RunBuildJobs(jobs, workspaceFiles)
 		diagitems.propagate(false, true, workspaceFiles)
 		if len(diagitems) > 0 {
 			go me.fixUps(diagitems)

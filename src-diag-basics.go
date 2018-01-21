@@ -99,7 +99,6 @@ type IDiagJobTarget interface {
 type DiagJob struct {
 	AffectedFilePaths []string
 	Target            IDiagJobTarget
-	WorkspaceFiles    WorkspaceFiles
 }
 
 func (me *DiagJob) forgetPrevDiags(diagToolsIfLint Tools, setAutoUpToDateToTrueIfLint bool, workspaceFiles WorkspaceFiles) {

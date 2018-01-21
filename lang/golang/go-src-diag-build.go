@@ -55,7 +55,7 @@ func (me *goDiag) runBuildPkg(pkg *udevgo.Pkg, workspaceFiles z.WorkspaceFiles) 
 	return
 }
 
-func (me *goDiag) RunBuildJobs(jobs z.DiagBuildJobs) (diags z.DiagItems) {
+func (me *goDiag) RunBuildJobs(jobs z.DiagBuildJobs, workspaceFiles z.WorkspaceFiles) (diags z.DiagItems) {
 	numjobs, starttime, numbuilt := len(jobs), time.Now(), 0
 	failed, skipped := make(map[string]bool, numjobs), make(map[string]bool, numjobs)
 	pkgnames := make([]string, 0, numjobs)
@@ -76,7 +76,7 @@ func (me *goDiag) RunBuildJobs(jobs z.DiagBuildJobs) (diags z.DiagItems) {
 			}
 		}
 		if !skip {
-			pkgdiags := me.runBuildPkg(pkg, pkgjob.WorkspaceFiles)
+			pkgdiags := me.runBuildPkg(pkg, workspaceFiles)
 			if pkgjob.Succeeded, diags = len(pkgdiags) == 0, append(diags, pkgdiags...); pkgjob.Succeeded {
 				numbuilt++
 			} else {
@@ -87,6 +87,13 @@ func (me *goDiag) RunBuildJobs(jobs z.DiagBuildJobs) (diags z.DiagItems) {
 	caddyBuildOnDone(failed, skipped, pkgnames, time.Since(starttime))
 	if numbuilt > 0 {
 		go caddyRunRefreshPkgs()
+		if tools.godocdown.Installed {
+			for _, pkgjob := range jobs {
+				if pkgjob.Succeeded {
+					go tools.execGodocdown(pkgjob.Target.(*udevgo.Pkg))
+				}
+			}
+		}
 	}
 	return
 }

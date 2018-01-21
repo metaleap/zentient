@@ -20,6 +20,7 @@ const (
 	TOOLS_CAT_INTEL_NAV
 	TOOLS_CAT_EXTRAS_QUERY
 	TOOLS_CAT_DIAGS
+	TOOLS_CAT_RUNONSAVE
 )
 
 func (me ToolCats) String() string {
@@ -42,6 +43,8 @@ func (me ToolCats) String() string {
 		return "Linting / Diagnostics"
 	case TOOLS_CAT_EXTRAS_QUERY:
 		return "CodeQuery"
+	case TOOLS_CAT_RUNONSAVE:
+		return "Run-on-Save"
 	}
 	return Strf("%d", me)
 }
@@ -173,13 +176,13 @@ type Tool struct {
 	DiagSev   DiagSeverity
 }
 
-func (*Tool) Exec(cmdname string, cmdargs []string, stdin string) (string, string) {
-	stdout, stderr, err := urun.CmdExecStdin(stdin, "", cmdname, cmdargs...)
-	if err != nil {
+func (*Tool) Exec(panicOnErr bool, stdin string, cmdName string, cmdArgs []string) (string, string) {
+	stdout, stderr, err := urun.CmdExecStdin(stdin, "", cmdName, cmdArgs...)
+	if err != nil && panicOnErr {
 		panic(err)
 	}
 	if stderr != "" {
-		stderr = Strf("%s: %s", cmdname, stderr)
+		stderr = Strf("%s: %s", cmdName, stderr)
 	}
 	return stdout, stderr
 }

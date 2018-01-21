@@ -29,7 +29,7 @@ func (me *goDiag) OnUpdateLintDiags(workspaceFiles z.WorkspaceFiles, diagTools z
 	return
 }
 
-func (me *goDiag) RunLintJob(job *z.DiagJobLint) {
+func (me *goDiag) RunLintJob(job *z.DiagJobLint, workspaceFiles z.WorkspaceFiles) {
 	defer job.Done()
 	if !job.Tool.Installed {
 		return
@@ -74,7 +74,7 @@ func (me *goDiag) RunLintJob(job *z.DiagJobLint) {
 		msgs = append(msgs, &udev.SrcMsg{Msg: z.BadMsg("lint tool", job.Tool.Name)})
 	}
 	if len(msgs) > 0 {
-		fallbackfilepath := func() string { return me.fallbackFilePath(pkg, job.WorkspaceFiles) }
+		fallbackfilepath := func() string { return me.fallbackFilePath(pkg, workspaceFiles) }
 		for _, srcref := range msgs {
 			srcref.Flag = int(job.Tool.DiagSev)
 			job.Yield(me.NewDiagItemFrom(srcref, job.Tool.Name, fallbackfilepath))

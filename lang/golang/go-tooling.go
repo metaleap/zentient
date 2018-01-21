@@ -1,7 +1,10 @@
 package zgo
 
 import (
+	"path/filepath"
+
 	"github.com/metaleap/go-util/dev/go"
+	"github.com/metaleap/go-util/fs"
 	"github.com/metaleap/zentient"
 )
 
@@ -26,7 +29,8 @@ type goTooling struct {
 	guru     *z.Tool
 	gocode   *z.Tool
 
-	gorename *z.Tool
+	gorename  *z.Tool
+	godocdown *z.Tool
 
 	govet       *z.Tool
 	golint      *z.Tool
@@ -60,6 +64,7 @@ func (me *goTooling) onPreInit() {
 	me.gocode = &z.Tool{Name: "gocode", Website: "http://github.com/nsf/gocode#readme", Installed: udevgo.Has_gocode, Cats: []z.ToolCats{z.TOOLS_CAT_INTEL_CMPL}}
 
 	me.gorename = &z.Tool{Name: "gorename", Website: "http://golang.org/x/tools/cmd/gorename", Installed: udevgo.Has_gorename, Cats: []z.ToolCats{z.TOOLS_CAT_MOD_REN}}
+	me.godocdown = &z.Tool{Name: "godocdown", Website: "http://github.com/robertkrimen/godocdown", Installed: udevgo.Has_godocdown, Cats: []z.ToolCats{z.TOOLS_CAT_RUNONSAVE}}
 
 	me.govet = &z.Tool{Name: "go vet", Website: "http://golang.org/cmd/vet/", Installed: true, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_WARN}
 	me.ineffassign = &z.Tool{Name: "ineffassign", Website: "http://github.com/gordonklaus/ineffassign#readme", Installed: udevgo.Has_ineffassign, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_WARN}
@@ -120,4 +125,10 @@ func (me *goTooling) NumInst() int {
 
 func (me *goTooling) NumTotal() int {
 	return len(me.all)
+}
+
+func (me *goTooling) execGodocdown(pkg *udevgo.Pkg) {
+	if readmefilepath := filepath.Join(pkg.Dir, "readme.md"); ufs.FileExists(readmefilepath) {
+		go tools.godocdown.Exec(false, "", "godocdown", []string{"-output", readmefilepath, pkg.ImportPath})
+	}
 }
