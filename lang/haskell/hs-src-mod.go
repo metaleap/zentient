@@ -1,7 +1,7 @@
 package zhs
 
 import (
-	"github.com/metaleap/go-util/str"
+	"github.com/go-leap/str"
 	"github.com/metaleap/zentient"
 )
 
@@ -38,7 +38,7 @@ func (me *hsSrcMod) RunFormatter(formatter *z.Tool, cmdName string, clientPrefs 
 
 	tabsize := "4"
 	if clientPrefs != nil && clientPrefs.TabSize != nil {
-		tabsize = ustr.FromInt(*clientPrefs.TabSize)
+		tabsize = ustr.Int(*clientPrefs.TabSize)
 	}
 	var cmdargs []string
 	if formatter == tools.hindent {

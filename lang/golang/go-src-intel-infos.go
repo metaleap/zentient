@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/go-leap/str"
 	"github.com/metaleap/go-util/dev/go"
-	"github.com/metaleap/go-util/str"
 	"github.com/metaleap/zentient"
 )
 
@@ -107,7 +107,7 @@ func (me *goSrcIntel) ComplDetails(srcLens *z.SrcLens, itemText string) (itemDoc
 	itemDoc = &z.SrcIntelCompl{
 		Documentation: &z.SrcIntelDoc{IsTrusted: true},
 	}
-	decl, spos := "", ustr.FromInt(pos)
+	decl, spos := "", ustr.Int(pos)
 	if tools.gogetdoc.Installed {
 		ggd := udevgo.Query_Gogetdoc(srcLens.FilePath, srcLens.Txt, spos, true, true)
 		if decl = ggd.Decl; decl != "" {
@@ -196,7 +196,7 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 					docuri := "zentient://" + z.Lang.ID + "/godoc/pkg/" + ggd.DocUrl
 					impdoc = z.Strf("[%s](%s)", impdoc, pages.linkifyUri(docuri))
 				}
-				hovs = append(hovs, z.InfoTip{Value: ustr.Both(impdoc, "\n\n", ggd.Doc)})
+				hovs = append(hovs, z.InfoTip{Value: ustr.Combine(impdoc, "\n\n", ggd.Doc)})
 			}
 		}
 	}
@@ -223,7 +223,7 @@ func (me *goSrcIntel) Signature(srcLens *z.SrcLens) (sig *z.SrcIntelSigHelp) {
 		return
 	}
 	pos := srcLens.ByteOffsetForPos(srcLens.Pos)
-	gw, err := udevgo.QueryWhat_Guru(srcLens.FilePath, srcLens.Txt, ustr.FromInt(pos))
+	gw, err := udevgo.QueryWhat_Guru(srcLens.FilePath, srcLens.Txt, ustr.Int(pos))
 	if err != nil {
 		sig0.Label, sig0.Documentation.Value = "Error running guru", err.Error()
 		return
@@ -250,7 +250,7 @@ func (me *goSrcIntel) Signature(srcLens *z.SrcLens) (sig *z.SrcIntelSigHelp) {
 		if len(poss) == 0 {
 			sig = nil
 		} else {
-			decl, spos := "", ustr.FromInt(poss[len(poss)-1])
+			decl, spos := "", ustr.Int(poss[len(poss)-1])
 			if tools.gogetdoc.Installed {
 				ggd := udevgo.Query_Gogetdoc(srcLens.FilePath, srcLens.Txt, spos, true, true)
 				if decl = ggd.Decl; decl != "" {

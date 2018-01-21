@@ -6,10 +6,10 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/go-leap/str"
 	"github.com/metaleap/go-util/dev/go"
 	"github.com/metaleap/go-util/fs"
 	"github.com/metaleap/go-util/run"
-	"github.com/metaleap/go-util/str"
 	"github.com/metaleap/zentient"
 )
 
@@ -72,7 +72,7 @@ func (me *goPages) onGoDoc(uriPath string, identName string) string {
 							for _, gp := range udevgo.AllGoPaths() {
 								if ln, fp := "", filepath.Join(gp, u.Path); ufs.FileExists(fp) {
 									if strings.HasPrefix(u.Fragment, "L") {
-										if l := ustr.ParseInt(u.Fragment[1:]); l > 0 {
+										if l := ustr.ToInt(u.Fragment[1:], 0); l > 0 {
 											ln = z.Strf(":%d", l+10)
 										}
 									}

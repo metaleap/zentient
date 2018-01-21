@@ -4,11 +4,11 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/go-leap/str"
 	"github.com/metaleap/go-util/dev/go"
 	"github.com/metaleap/go-util/fs"
 	"github.com/metaleap/go-util/run"
 	"github.com/metaleap/go-util/slice"
-	"github.com/metaleap/go-util/str"
 	"github.com/metaleap/zentient"
 	"github.com/metaleap/zentient/lang/golang/dbg"
 )
@@ -48,8 +48,8 @@ func (me *goExtras) runQuery_StructLayout(srcLens *z.SrcLens, arg string, resp *
 		} else if cmdout != "" {
 			for _, ln := range ustr.Split(cmdout, "\n") {
 				if sfield, ssize := ustr.BreakOnLast(ln, ":"); sfield != "" {
-					sfname, sftype := ustr.BreakOn(sfield, " ")
-					resp.Items = append(resp.Items, &z.ExtrasItem{Label: ustr.FirstNonEmpty(sfname, "—"), Desc: sftype, Detail: ssize})
+					sfname, sftype := ustr.BreakOnFirst(sfield, " ")
+					resp.Items = append(resp.Items, &z.ExtrasItem{Label: ustr.FirstOf(sfname, "—"), Desc: sftype, Detail: ssize})
 				}
 			}
 		}
@@ -75,7 +75,7 @@ func (me *goExtras) runQuery_GoDoc(srcLens *z.SrcLens, arg string, resp *z.Extra
 	if arg = ustr.Trim(arg); arg == "" {
 		return
 	}
-	if i1, i2 := ustr.Idx(arg, "."), ustr.Idx(arg, " "); i1 > 0 && (i2 < 0 || i2 > i1) {
+	if i1, i2 := ustr.Pos(arg, "."), ustr.Pos(arg, " "); i1 > 0 && (i2 < 0 || i2 > i1) {
 		arg = arg[:i1] + " " + arg[i1+1:]
 	}
 	var cmd = ustr.Split(arg, " ")

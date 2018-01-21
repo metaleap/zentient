@@ -8,9 +8,9 @@ import (
 
 	gurujson "golang.org/x/tools/cmd/guru/serial"
 
+	"github.com/go-leap/str"
 	"github.com/metaleap/go-util/dev"
 	"github.com/metaleap/go-util/dev/go"
-	"github.com/metaleap/go-util/str"
 	"github.com/metaleap/zentient"
 )
 
@@ -30,7 +30,7 @@ func (*goSrcIntel) References(srcLens *z.SrcLens, includeDeclaration bool) (refs
 		return
 	}
 	bytepos := srcLens.ByteOffsetForPos(srcLens.Pos)
-	if gr := udevgo.QueryRefs_Guru(srcLens.FilePath, srcLens.Txt, ustr.FromInt(bytepos)); len(gr) > 0 {
+	if gr := udevgo.QueryRefs_Guru(srcLens.FilePath, srcLens.Txt, ustr.Int(bytepos)); len(gr) > 0 {
 		refs = make(z.SrcLocs, 0, len(gr))
 		for _, gref := range gr {
 			refs.AddFrom(udev.SrcMsgFromLn(gref.Pos), nil)
@@ -42,7 +42,7 @@ func (*goSrcIntel) References(srcLens *z.SrcLens, includeDeclaration bool) (refs
 func (*goSrcIntel) DefSym(srcLens *z.SrcLens) (defs z.SrcLocs) {
 	var refloc *udev.SrcMsg
 	bytepos := srcLens.ByteOffsetForPos(srcLens.Pos)
-	spos := ustr.FromInt(bytepos)
+	spos := ustr.Int(bytepos)
 
 	if refloc == nil && tools.godef.Installed {
 		refloc = udevgo.QueryDefLoc_Godef(srcLens.FilePath, srcLens.Txt, spos)
@@ -74,7 +74,7 @@ func (me *goSrcIntel) DefType(srcLens *z.SrcLens) (defs z.SrcLocs) {
 	}
 	var refloc *udev.SrcMsg
 	bytepos := srcLens.ByteOffsetForPos(srcLens.Pos)
-	spos := ustr.FromInt(bytepos)
+	spos := ustr.Int(bytepos)
 
 	if gd, _ := udevgo.QueryDesc_Guru(srcLens.FilePath, srcLens.Txt, spos); gd != nil {
 		if gd.Type != nil && len(gd.Type.NamePos) > 0 {
@@ -96,7 +96,7 @@ func (me *goSrcIntel) DefType(srcLens *z.SrcLens) (defs z.SrcLocs) {
 				}
 			}
 			pkgimppath, typename := ustr.BreakOnLast(gd.Value.Type, ".")
-			pkgname := ustr.AfterLast(pkgimppath, "/", false)
+			pkgname := ustr.AfterLast(pkgimppath, "/", pkgimppath)
 			if udevgo.PkgsByImP != nil {
 				if pkg := udevgo.PkgsByImP[pkgimppath]; pkg != nil && len(pkg.Name) > 0 {
 					pkgname = pkg.Name
@@ -121,7 +121,7 @@ func (*goSrcIntel) DefImpl(srcLens *z.SrcLens) (defs z.SrcLocs) {
 		return
 	}
 	bytepos := srcLens.ByteOffsetForPos(srcLens.Pos)
-	if gi := udevgo.QueryImpl_Guru(srcLens.FilePath, srcLens.Txt, ustr.FromInt(bytepos)); gi != nil {
+	if gi := udevgo.QueryImpl_Guru(srcLens.FilePath, srcLens.Txt, ustr.Int(bytepos)); gi != nil {
 		if defs = make(z.SrcLocs, 0, len(gi.AssignableFrom)+len(gi.AssignableTo)+len(gi.AssignableFromPtr)+len(gi.AssignableFromMethod)+len(gi.AssignableFromPtrMethod)+len(gi.AssignableToMethod)); cap(defs) > 0 {
 			addtypes := func(impltypes []gurujson.ImplementsType) {
 				for _, it := range impltypes {
@@ -152,7 +152,7 @@ func (*goSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (all z.SrcLocs
 		return
 	}
 	byteoff := srcLens.ByteOffsetForPos(srcLens.Pos)
-	gw, err := udevgo.QueryWhat_Guru(srcLens.FilePath, srcLens.Txt, ustr.FromInt(byteoff))
+	gw, err := udevgo.QueryWhat_Guru(srcLens.FilePath, srcLens.Txt, ustr.Int(byteoff))
 	if err != nil {
 		panic(err)
 	}
@@ -183,9 +183,9 @@ func (*goSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (all z.SrcLocs
 				}
 				return false
 			}
-			if ustr.AnyOf(gw.Enclosing[0].Description, checks[:num]...) {
+			if ustr.In(gw.Enclosing[0].Description, checks[:num]...) {
 				for _, syntaxnode := range gw.Enclosing {
-					if ustr.AnyOf(syntaxnode.Description, checks[num:]...) {
+					if ustr.In(syntaxnode.Description, checks[num:]...) {
 						all = append(all, &z.SrcLoc{Range: &z.SrcRange{Start: z.SrcPos{Off: srcLens.Rune1OffsetForByte0Offset(syntaxnode.Start)}, End: z.SrcPos{Off: srcLens.Rune1OffsetForByte0Offset(syntaxnode.End)}}})
 						return true
 					}
@@ -225,7 +225,7 @@ func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (al
 	sL.EnsureSrcFull()
 	srclns := strings.Split(sL.Txt, "\n")
 	bytepos := 8 + sL.ByteOffsetForFirstLineBeginningWith("package ")
-	gd, err := udevgo.QueryDesc_Guru(sL.FilePath, sL.Txt, ustr.FromInt(bytepos))
+	gd, err := udevgo.QueryDesc_Guru(sL.FilePath, sL.Txt, ustr.Int(bytepos))
 	if err != nil {
 		return onerr("Error running guru:", err.Error())
 	} else if gd.Package == nil {

@@ -3,9 +3,9 @@ package zgo
 import (
 	"path/filepath"
 
+	"github.com/go-leap/str"
 	"github.com/metaleap/go-util/dev"
 	"github.com/metaleap/go-util/dev/go"
-	"github.com/metaleap/go-util/str"
 	"github.com/metaleap/zentient"
 )
 
@@ -33,11 +33,11 @@ func (me *goExtras) runIntel_Guru(guruCmd string, srcLens *z.SrcLens, arg string
 		z.ToolGonePanic("guru")
 	}
 	bpos := srcLens.ByteOffsetForPos(srcLens.Pos)
-	bp1, bp2 := ustr.FromInt(bpos), ""
+	bp1, bp2 := ustr.Int(bpos), ""
 	if srcLens.Range != nil {
 		bpos1, bpos2 := srcLens.ByteOffsetForPos(&srcLens.Range.Start), srcLens.ByteOffsetForPos(&srcLens.Range.End)
-		if bp1 = ustr.FromInt(bpos1); bpos2 != bpos1 {
-			bp2 = ustr.FromInt(bpos2)
+		if bp1 = ustr.Int(bpos1); bpos2 != bpos1 {
+			bp2 = ustr.Int(bpos2)
 		}
 	}
 	guruscope := ""
@@ -88,7 +88,7 @@ func (me *goExtras) runIntel_Guru(guruCmd string, srcLens *z.SrcLens, arg string
 		} else {
 			resp.Items = make([]*z.ExtrasItem, 0, len(gfvs))
 			for _, gfv := range gfvs {
-				resp.Items = append([]*z.ExtrasItem{&z.ExtrasItem{Desc: udevgo.PkgImpPathsToNamesInLn(gfv.Type, curpkgdir), Label: gfv.Ref,
+				resp.Items = append([]*z.ExtrasItem{{Desc: udevgo.PkgImpPathsToNamesInLn(gfv.Type, curpkgdir), Label: gfv.Ref,
 					Detail: z.Lang.Workspace.PrettyPath(gfv.Pos), FilePos: gfv.Pos}}, resp.Items...)
 			}
 		}
@@ -100,7 +100,7 @@ func (me *goExtras) runIntel_Guru(guruCmd string, srcLens *z.SrcLens, arg string
 			resp.Desc = udevgo.PkgImpPathsToNamesInLn(gcs.Target, curpkgdir) + " ➜ " + xIntelGuruCallstack.Label
 			resp.Items = make([]*z.ExtrasItem, 0, len(gcs.Callers))
 			for _, gc := range gcs.Callers {
-				resp.Items = append([]*z.ExtrasItem{&z.ExtrasItem{Desc: gc.Desc, Label: udevgo.PkgImpPathsToNamesInLn(gc.Caller, curpkgdir),
+				resp.Items = append([]*z.ExtrasItem{{Desc: gc.Desc, Label: udevgo.PkgImpPathsToNamesInLn(gc.Caller, curpkgdir),
 					Detail: z.Lang.Workspace.PrettyPath(gc.Pos), FilePos: gc.Pos}}, resp.Items...)
 			}
 		}
@@ -156,11 +156,12 @@ func (me *goExtras) runIntel_Guru(guruCmd string, srcLens *z.SrcLens, arg string
 	}
 	if err != nil {
 		errmsg, chkmsg := err.Error(), "guru: couldn't load packages due to errors: "
-		if cml, i := len(chkmsg), ustr.Idx(errmsg, chkmsg); i >= 0 {
+		if cml, i := len(chkmsg), ustr.Pos(errmsg, chkmsg); i >= 0 {
 			err = nil
 			oldnumscopeexcl, errpkgimppaths := len(udevgo.GuruScopeExclPkgs), ustr.Split(errmsg[i+cml:], ", ")
 			if len(errpkgimppaths) > 0 {
-				errpkgimppaths[len(errpkgimppaths)-1] = ustr.Before(errpkgimppaths[len(errpkgimppaths)-1], " ", false)
+				errpkgimppathlast := errpkgimppaths[len(errpkgimppaths)-1]
+				errpkgimppaths[len(errpkgimppaths)-1] = ustr.BeforeFirst(errpkgimppathlast, " ", errpkgimppathlast)
 				for _, epkg := range errpkgimppaths {
 					udevgo.GuruScopeExclPkgs[epkg] = true
 				}
