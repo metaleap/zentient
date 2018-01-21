@@ -197,7 +197,7 @@ func (me *Tool) NotInstalledMessage() string {
 
 func (me *Tool) toggleInAutoDiags() error {
 	if me.isInAutoDiags() {
-		Prog.Cfg.AutoDiags = ustr.Without(Prog.Cfg.AutoDiags, me.Name)
+		Prog.Cfg.AutoDiags = ustr.Sans(Prog.Cfg.AutoDiags, me.Name)
 	} else {
 		Prog.Cfg.AutoDiags = append(Prog.Cfg.AutoDiags, me.Name)
 	}
