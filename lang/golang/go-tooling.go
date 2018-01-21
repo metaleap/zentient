@@ -2,6 +2,7 @@ package zgo
 
 import (
 	"path/filepath"
+	"strings"
 
 	"github.com/metaleap/go-util/dev/go"
 	"github.com/metaleap/go-util/fs"
@@ -128,7 +129,13 @@ func (me *goTooling) NumTotal() int {
 }
 
 func (me *goTooling) execGodocdown(pkg *udevgo.Pkg) {
-	if readmefilepath := filepath.Join(pkg.Dir, "readme.md"); ufs.FileExists(readmefilepath) {
+	var proceed bool
+	for _, imppathprefix := range settings.cfgGddGopaths.ValStrs() {
+		if proceed = pkg.ImportPath == imppathprefix || strings.HasPrefix(pkg.ImportPath, imppathprefix+"/"); proceed {
+			break
+		}
+	}
+	if readmefilepath := filepath.Join(pkg.Dir, settings.cfgGddFileName.ValStr()); proceed && ufs.FileExists(readmefilepath) {
 		go tools.godocdown.Exec(false, "", "godocdown", []string{"-output", readmefilepath, pkg.ImportPath})
 	}
 }
