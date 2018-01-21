@@ -5,7 +5,7 @@ import (
 	"os/exec"
 	"sync"
 
-	"github.com/metaleap/go-util/fs"
+	"github.com/go-leap/fs"
 )
 
 type IDbg interface {
@@ -34,7 +34,7 @@ type Dbg struct {
 
 func (me *Dbg) Dispose() {
 	if me.Cmd.Dir != "" {
-		_ = ufs.ClearDirectory(me.Cmd.Dir)
+		_ = ufs.Del(me.Cmd.Dir)
 	}
 }
 

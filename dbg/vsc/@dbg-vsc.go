@@ -8,10 +8,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/metaleap/go-util"
-	"github.com/metaleap/go-util/fs"
-	"github.com/metaleap/go-util/run"
-	"github.com/metaleap/go-util/sys"
+	"github.com/go-leap/fs"
+	"github.com/go-leap/run"
+	"github.com/go-leap/str"
+	"github.com/go-leap/sys"
 	"github.com/metaleap/zentient/dbg"
 	"github.com/metaleap/zentient/dbg/vsc/protocol"
 )
@@ -54,8 +54,8 @@ func (me *Dbg) main() {
 
 	tmpdirpath := filepath.Join(usys.UserDataDirPath(true), filepath.Base(os.Args[0]))
 	logdirpath := filepath.Join(tmpdirpath, "log")
-	err := ufs.EnsureDirExists(logdirpath)
-	logfilepath := filepath.Join(logdirpath, "log"+umisc.Str(time.Now().UnixNano())+".log.json")
+	err := ufs.EnsureDir(logdirpath)
+	logfilepath := filepath.Join(logdirpath, "log"+ustr.Int64(time.Now().UnixNano())+".log.json")
 	if logToFile && err == nil {
 		me.logfile, err = os.Create(logfilepath)
 	}
@@ -64,7 +64,7 @@ func (me *Dbg) main() {
 	} else if me.logfile != nil {
 		defer me.logfile.Close()
 	}
-	me.stdin, me.rawOut, _ = urun.SetupJsonIpcPipes(1024*1024*4, true, false)
+	me.stdin, me.rawOut, _ = urun.SetupIpcPipes(1024*1024*4, zdbgvscp.IpcSplit_ContentLengthCrLfPlusJson, false)
 	onerror := func(msg string) {
 		me.Impl.PrintLn(true, msg)
 		me.Impl.Kill()
@@ -149,13 +149,13 @@ func (me *Dbg) send(item interface{}) {
 		breq.Seq = me.sendseq
 	}
 	me.rawOut.Write(bclen)
-	me.rawOut.Write([]byte(umisc.Str(len(jsonout))))
+	me.rawOut.Write([]byte(ustr.Int(len(jsonout))))
 	me.rawOut.Write(bln)
 	me.rawOut.Write(jsonout)
 	me.rawOut.Flush()
 	if logJsonOutgoing && me.logfile != nil {
 		me.logfile.Write(bclen)
-		me.logfile.Write([]byte(umisc.Str(len(jsonout))))
+		me.logfile.Write([]byte(ustr.Int(len(jsonout))))
 		me.logfile.Write(bln)
 		me.logfile.Write(jsonout)
 		me.logfile.Sync()

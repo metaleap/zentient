@@ -1,9 +1,9 @@
 package zdbgvsc
 
 import (
+	"errors"
 	"time"
 
-	"github.com/metaleap/go-util"
 	"github.com/metaleap/zentient/dbg/vsc/protocol"
 )
 
@@ -15,7 +15,7 @@ func (me *Dbg) onClientReq_Initialize(req *zdbgvscp.InitializeRequest, resp *zdb
 }
 
 func (me *Dbg) onClientReq_Threads(req *zdbgvscp.ThreadsRequest, resp *zdbgvscp.ThreadsResponse) (err error) {
-	resp.Body.Threads = []zdbgvscp.Thread{zdbgvscp.Thread{Id: 1, Name: "DummyThread"}}
+	resp.Body.Threads = []zdbgvscp.Thread{{Id: 1, Name: "DummyThread"}}
 	return
 }
 
@@ -30,7 +30,7 @@ func (me *Dbg) onClientReq_Evaluate(req *zdbgvscp.EvaluateRequest, resp *zdbgvsc
 }
 
 func (me *Dbg) onClientReq_Pause(req *zdbgvscp.PauseRequest, resp *zdbgvscp.PauseResponse) (err error) {
-	err = umisc.E("Not currently supported: Pause")
+	err = errors.New("Not currently supported: Pause")
 	return
 }
 
