@@ -2,7 +2,6 @@ package z
 
 import (
 	"path/filepath"
-	"strings"
 
 	"github.com/go-leap/str"
 )
@@ -55,7 +54,7 @@ func (me *DiagBase) menuItems(srcLens *SrcLens) (menu MenuItems) {
 			if l := len(wfps); l > 0 && (l > 1 || wfps[0] != srcfilepath) {
 				menuitem.Desc = Strf("➜ on: %d currently-%s %s source file(s) in %d folder(s)",
 					l, menuitem.tag, Lang.Title, workspacefiles.numDirs(func(f *WorkspaceFile) bool { return f.IsOpen || menuitem != me.cmdRunDiagsOnOpenFiles }))
-				menuitem.Hint = strings.Join(ustr.Map(wfps, filepath.Base), " · ")
+				menuitem.Hint = ustr.Join(ustr.Map(wfps, filepath.Base), " · ")
 				menu = append(menu, menuitem)
 			}
 		}
@@ -103,7 +102,7 @@ func (me *DiagBase) menuItemsUpdateHint(diags Tools, item *MenuItem) {
 		if len(toolnames) == 0 {
 			item.Hint = "(none)"
 		} else {
-			item.Hint = Strf("(%d/%d)  · %s", len(diags), len(me.Impl.KnownLinters()), strings.Join(toolnames, " · "))
+			item.Hint = Strf("(%d/%d)  · %s", len(diags), len(me.Impl.KnownLinters()), ustr.Join(toolnames, " · "))
 		}
 	}
 }

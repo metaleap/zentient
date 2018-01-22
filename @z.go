@@ -9,8 +9,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/metaleap/go-util/fs"
-	"github.com/metaleap/go-util/sys"
+	"github.com/go-leap/fs"
+	"github.com/go-leap/sys"
 )
 
 var (
@@ -105,9 +105,9 @@ func Init() (err error) {
 	Prog.Name = os.Args[0]
 	Prog.Dir.Config = filepath.Join(usys.UserDataDirPath(false), Prog.Name)
 	Prog.Dir.Cache = filepath.Join(usys.UserDataDirPath(true), Prog.Name)
-	if err = ufs.EnsureDirExists(Prog.Dir.Config); err != nil {
+	if err = ufs.EnsureDir(Prog.Dir.Config); err != nil {
 		return
-	} else if err = ufs.EnsureDirExists(Prog.Dir.Cache); err != nil {
+	} else if err = ufs.EnsureDir(Prog.Dir.Cache); err != nil {
 		return
 	}
 

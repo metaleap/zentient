@@ -3,7 +3,7 @@ package z
 import (
 	"fmt"
 
-	"github.com/metaleap/go-util/run"
+	"github.com/go-leap/run"
 )
 
 func canSend() bool {
@@ -46,7 +46,7 @@ func Serve() (err error) {
 	defer catch(&err)
 
 	Prog.pipeIO.stdinReadLn, Prog.pipeIO.stdoutWriter, Prog.pipeIO.stdoutEncoder =
-		urun.SetupJsonIpcPipes(1024*1024*1, false, true)
+		urun.SetupIpcPipes(1024*1024*1, nil, true)
 
 	// announce each caddy's existence
 	for _, c := range Lang.Caddies {

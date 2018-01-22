@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/go-leap/fs"
 	"github.com/metaleap/go-util/dev/go"
-	"github.com/metaleap/go-util/fs"
 	"github.com/metaleap/zentient"
 )
 
@@ -135,7 +135,7 @@ func (me *goTooling) execGodocdown(pkg *udevgo.Pkg) {
 			break
 		}
 	}
-	if readmefilepath := filepath.Join(pkg.Dir, settings.cfgGddFileName.ValStr()); proceed && ufs.FileExists(readmefilepath) {
+	if readmefilepath := filepath.Join(pkg.Dir, settings.cfgGddFileName.ValStr()); proceed && ufs.IsFile(readmefilepath) {
 		go tools.godocdown.Exec(false, "", "godocdown", []string{"-output", readmefilepath, pkg.ImportPath})
 	}
 }

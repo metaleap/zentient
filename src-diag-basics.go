@@ -3,11 +3,10 @@ package z
 import (
 	"fmt"
 	"path/filepath"
-	"strings"
 
+	"github.com/go-leap/fs"
 	"github.com/go-leap/str"
 	"github.com/metaleap/go-util/dev"
-	"github.com/metaleap/go-util/fs"
 )
 
 type IDiag interface {
@@ -47,24 +46,24 @@ type DiagItem struct {
 
 func (me *DiagItem) resetAndInferSrcActions() {
 	me.SrcActions = nil
-	if ilastcolon := strings.LastIndex(me.Msg, ":"); ilastcolon > 0 {
+	if ilastcolon := ustr.Last(me.Msg, ":"); ilastcolon > 0 {
 		if ilastnum := ustr.ToInt(me.Msg[ilastcolon+1:], 0); ilastnum > 0 {
-			if ifirstsep := strings.IndexRune(me.Msg, filepath.Separator); ifirstsep >= 0 {
+			if ifirstsep := ustr.Idx(me.Msg, filepath.Separator); ifirstsep >= 0 {
 				refpath := me.Msg[ifirstsep:]
-				refpathf := refpath[:strings.IndexRune(refpath, ':')]
-				if !ufs.FileExists(refpathf) {
+				refpathf := refpath[:ustr.Idx(refpath, ':')]
+				if !ufs.IsFile(refpathf) {
 					for i := ifirstsep - 1; i > 0; i-- {
 						refpath = me.Msg[i:]
-						if refpathf = refpath[:strings.IndexRune(refpath, ':')]; ufs.FileExists(refpathf) {
+						if refpathf = refpath[:ustr.Idx(refpath, ':')]; ufs.IsFile(refpathf) {
 							break
 						}
 					}
 				}
-				if ufs.FileExists(refpathf) && !filepath.IsAbs(refpathf) {
+				if ufs.IsFile(refpathf) && !filepath.IsAbs(refpathf) {
 					refpathf, _ = filepath.Abs(refpathf)
 				}
-				if ufs.FileExists(refpathf) {
-					cmd := EditorAction{Cmd: "zen.internal.openFileAt", Title: refpathf + refpath[strings.IndexRune(refpath, ':'):]}
+				if ufs.IsFile(refpathf) {
+					cmd := EditorAction{Cmd: "zen.internal.openFileAt", Title: refpathf + refpath[ustr.Idx(refpath, ':'):]}
 					cmd.Arguments = append(cmd.Arguments, cmd.Title)
 					cmd.Title = Strf("Jump to %s", filepath.Base(cmd.Title))
 					me.SrcActions = append(me.SrcActions, cmd)

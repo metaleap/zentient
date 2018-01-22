@@ -3,7 +3,7 @@ package z
 import (
 	"strings"
 
-	"github.com/metaleap/go-util/fs"
+	"github.com/go-leap/fs"
 )
 
 type ISrcMod interface {
@@ -217,14 +217,14 @@ func (me *SrcModBase) onRunFormatter(req *ipcReq, resp *ipcResp) {
 
 	srcfilepath := req.SrcLens.FilePath
 	withfilepathcmdarg := me.Impl.DoesStdoutWithFilePathArg(formatter)
-	if !(ufs.FileExists(srcfilepath) && withfilepathcmdarg) {
+	if !(ufs.IsFile(srcfilepath) && withfilepathcmdarg) {
 		srcfilepath = ""
 	}
 	src := &req.SrcLens.Str
 	if *src == "" {
 		src = &req.SrcLens.Txt
 	}
-	if (*src == "") && req.SrcLens.FilePath != "" && ufs.FileExists(req.SrcLens.FilePath) && !withfilepathcmdarg {
+	if (*src == "") && req.SrcLens.FilePath != "" && ufs.IsFile(req.SrcLens.FilePath) && !withfilepathcmdarg {
 		req.SrcLens.EnsureSrcFull()
 		src = &req.SrcLens.Txt
 	}

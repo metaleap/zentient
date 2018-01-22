@@ -3,7 +3,6 @@ package z
 import (
 	"fmt"
 	"sort"
-	"strings"
 	"text/scanner"
 	"unicode/utf8"
 
@@ -131,7 +130,7 @@ func (me *SrcIntelBase) onCmplItems(req *ipcReq, resp *ipcResp) {
 		if me.Impl.ComplItemsShouldSort(req.SrcLens) {
 			for _, c := range resp.SrcIntel.Cmpl {
 				if c.SortText == "" {
-					c.SortText = strings.ToLower(c.Label)
+					c.SortText = ustr.Lo(c.Label)
 				}
 				c.SortText = Strf("%02d", c.SortPrio) + c.SortText
 			}
@@ -188,10 +187,10 @@ func (me *SrcIntelBase) onHover(req *ipcReq, resp *ipcResp) {
 				hov.Value = Strf("Byte-length: %d — rune count: %d\n\n---------------------------------------\n\n%s", len(str), utf8.RuneCountInString(str), str)
 			}
 		} else if lex.Comment != "" {
-			if strings.HasPrefix(lex.Comment, "//") {
-				hov.Value = strings.TrimLeft(strings.TrimPrefix(lex.Comment, "//"), " \t")
+			if ustr.Pref(lex.Comment, "//") {
+				hov.Value = ustr.Trim(ustr.TrimPref(lex.Comment, "//"))
 			} else {
-				hov.Value = strings.TrimSuffix(strings.TrimPrefix(lex.Comment, "/*"), "*/")
+				hov.Value = ustr.TrimSuff(ustr.TrimPref(lex.Comment, "/*"), "*/")
 			}
 		}
 		if hov.Value != "" {
@@ -231,7 +230,7 @@ func (me *SrcIntelBase) onSyms(req *ipcReq, resp *ipcResp) {
 func (me *SrcIntelBase) posLex(srcLens *SrcLens) (poslex *srcIntelLex) {
 	if srcLens.EnsureSrcFull(); srcLens.Txt != "" {
 		var scan scanner.Scanner
-		scan.Init(strings.NewReader(srcLens.Txt)).Filename = srcLens.FilePath
+		scan.Init(ustr.Reader(srcLens.Txt)).Filename = srcLens.FilePath
 		scan.Mode = scanner.ScanIdents | scanner.ScanFloats | scanner.ScanChars | scanner.ScanStrings | scanner.ScanRawStrings | scanner.ScanComments
 		scan.Error = me.posLexErrNoOp
 		var lr rune

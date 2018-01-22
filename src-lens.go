@@ -2,11 +2,10 @@ package z
 
 import (
 	"path/filepath"
-	"strings"
-	"unicode/utf8"
 
+	"github.com/go-leap/fs"
+	"github.com/go-leap/str"
 	"github.com/metaleap/go-util/dev"
-	"github.com/metaleap/go-util/fs"
 )
 
 // All public fields are 1-based (so 0 means 'missing') and rune-not-byte-based
@@ -106,7 +105,7 @@ type SrcLens struct {
 
 func (me *SrcLens) EnsureSrcFull() {
 	if me.Txt == "" {
-		me.Txt = ufs.ReadTextFile(me.FilePath, true, "")
+		me.Txt = ufs.ReadTextFileOr(me.FilePath, "")
 	}
 }
 
@@ -148,16 +147,16 @@ func (me *SrcLens) ByteOffsetForPos(pos *SrcPos) int {
 }
 
 func (me *SrcLens) ByteOffsetForFirstLineBeginningWith(prefix string) int {
-	if strings.HasPrefix(me.Txt, prefix) {
+	if ustr.Pref(me.Txt, prefix) {
 		return 0
-	} else if idx := strings.Index(me.Txt, "\n"+prefix); idx >= 0 {
+	} else if idx := ustr.Pos(me.Txt, "\n"+prefix); idx >= 0 {
 		return len([]byte(me.Txt[:idx+1])) // want byte-pos not rune-pos
 	}
 	return -1
 }
 
 func (me *SrcLens) Rune1OffsetForByte0Offset(byte0off int) (rune1off int) {
-	return 1 + utf8.RuneCountInString(me.Txt[:byte0off])
+	return 1 + ustr.NumRunes(me.Txt[:byte0off])
 	// for byteoff := range me.Txt {
 	// 	rune1off++
 	// 	if byteoff >= byte0off {
@@ -180,7 +179,7 @@ func (me *SrcLoc) setFilePathFrom(srcRef *udev.SrcMsg, fallbackFilePath func() s
 			me.FilePath = fallbackFilePath()
 		}
 	}
-	if (fallbackFilePath != nil) && (me.FilePath == "" || !ufs.FileExists(me.FilePath)) {
+	if (fallbackFilePath != nil) && (me.FilePath == "" || !ufs.IsFile(me.FilePath)) {
 		me.FilePath = fallbackFilePath()
 	}
 }

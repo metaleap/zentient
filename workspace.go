@@ -4,13 +4,12 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
-	"strings"
 	"sync"
 	"time"
 
 	"github.com/go-leap/str"
+	"github.com/go-leap/sys"
 	"github.com/metaleap/go-util/dev/go"
-	"github.com/metaleap/go-util/sys"
 )
 
 type IWorkspace interface {
@@ -265,7 +264,7 @@ func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 			}
 			for _, newdirpath := range upd.AddedDirs {
 				if dir := dirs[newdirpath]; dir == nil {
-					dir = &WorkspaceDir{Path: strings.TrimRight(newdirpath, "/\\")}
+					dir = &WorkspaceDir{Path: ustr.TrimR(newdirpath, "/\\")}
 					dirs[newdirpath] = dir
 				}
 			}
@@ -329,7 +328,7 @@ func (me *WorkspaceBase) pollFileEventsForever() {
 
 func (*WorkspaceBase) prettyPathRel(path string, fsPath string) string {
 	if path != "" {
-		if rp, err := filepath.Rel(path, fsPath); err == nil && rp != "" && !strings.HasPrefix(rp, ".") {
+		if rp, err := filepath.Rel(path, fsPath); err == nil && rp != "" && !ustr.Pref(rp, ".") {
 			return rp
 		}
 	}

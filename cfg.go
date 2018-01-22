@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/metaleap/go-util"
-	"github.com/metaleap/go-util/fs"
+	"github.com/go-leap/fs"
+	"github.com/go-leap/std"
 )
 
 type ISettings interface {
@@ -117,8 +117,8 @@ func (me *Config) reload() {
 		me.filePath = filepath.Join(Prog.Dir.Config, Prog.Name+".config.json")
 
 		// 2. load
-		if ufs.FileExists(me.filePath) { // otherwise, it's a fresh setup
-			if me.err = umisc.JsonDecodeFromFile(me.filePath, me); me.err == nil {
+		if ufs.IsFile(me.filePath) { // otherwise, it's a fresh setup
+			if me.err = ustd.JsonDecodeFromFile(me.filePath, me); me.err == nil {
 				me.timeLastLoaded = time.Now().UnixNano()
 				if Lang.Settings != nil && me.Internal != nil {
 					for _, ks := range Lang.Settings.KnownSettings() {
@@ -156,8 +156,8 @@ func (me *Config) reload() {
 
 // func (me *Config) recall() {
 // 	me.recallFilePath = filepath.Join(Prog.Dir.Cache, Prog.Name+".recall.json")
-// 	if ufs.FileExists(me.recallFilePath) {
-// 		umisc.JsonDecodeFromFile(me.recallFilePath, &Prog.recall)
+// 	if ufs.IsFile(me.recallFilePath) {
+// 		ustd.JsonDecodeFromFile(me.recallFilePath, &Prog.recall)
 // 	}
 // 	if Prog.recall.i64 == nil {
 // 		Prog.recall.i64 = map[string]int64{}
@@ -165,7 +165,7 @@ func (me *Config) reload() {
 // }
 
 // func (me *Config) saveRecall() {
-// 	umisc.JsonEncodeToFile(&Prog.recall, me.recallFilePath)
+// 	ustd.JsonEncodeToFile(&Prog.recall, me.recallFilePath)
 // }
 
 func (me *Config) Save() (err error) {
@@ -180,7 +180,7 @@ func (me *Config) Save() (err error) {
 			me.Internal = nil
 		}
 	}
-	err = umisc.JsonEncodeToFile(me, me.filePath)
+	err = ustd.JsonEncodeToFile(me, me.filePath)
 	me.Internal = nil
 	return
 }

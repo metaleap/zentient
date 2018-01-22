@@ -4,10 +4,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/go-leap/run"
 	"github.com/go-leap/str"
 	"github.com/metaleap/go-util/dev/go"
-	"github.com/metaleap/go-util/fs"
-	"github.com/metaleap/go-util/run"
 	"github.com/metaleap/zentient"
 	"github.com/metaleap/zentient/lang/golang/dbg"
 )
@@ -97,7 +96,7 @@ func (me *goExtras) runQuery_GoDoc(srcLens *z.SrcLens, arg string, resp *z.Extra
 }
 
 func (me *goExtras) runQuery_GoRun(srcLens *z.SrcLens, arg string, resp *z.ExtrasResp) {
-	evaloutandstderr, otherstdout, err := goRunEval(srcLens.FilePath, srcLens.Txt, arg)
+	evaloutandstderr, otherstdout, err := zgodbg.GoRunEval(z.Prog.Dir.Cache, srcLens.FilePath, srcLens.Txt, arg)
 	if resp.Desc = arg; err != nil {
 		panic(err)
 	}
@@ -105,13 +104,4 @@ func (me *goExtras) runQuery_GoRun(srcLens *z.SrcLens, arg string, resp *z.Extra
 		resp.Info = append(resp.Info, z.InfoTip{Value: ln})
 	}
 	resp.Warns = ustr.Split(otherstdout, "\n")
-}
-
-func goRunEval(srcFilePath string, maybeSrcFull string, goEvalExpr string) (evalOutAndStdErr string, otherStdOut string, err error) {
-	gorunargs, gorundir, _, e := zgodbg.GoRunEvalPrepCmd(z.Prog.Dir.Cache, srcFilePath, maybeSrcFull, goEvalExpr)
-	defer ufs.ClearDirectory(gorundir)
-	if err = e; err == nil {
-		otherStdOut, evalOutAndStdErr, err = urun.CmdExecIn(gorundir, "go", gorunargs...)
-	}
-	return
 }

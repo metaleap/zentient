@@ -1,10 +1,8 @@
 package z
 
 import (
-	"strings"
-
+	"github.com/go-leap/run"
 	"github.com/go-leap/str"
-	"github.com/metaleap/go-util/run"
 )
 
 type ToolCats uint8
@@ -93,7 +91,7 @@ func (me *ToolingBase) onListAllTools() (menu MenuItems) {
 			for _, c := range t.Cats {
 				cats = append(cats, c.String())
 			}
-			item.Hint += "  ·  Used for: " + strings.Join(cats, ", ")
+			item.Hint += "  ·  Used for: " + ustr.Join(cats, ", ")
 		}
 		menu = append(menu, &item)
 	}

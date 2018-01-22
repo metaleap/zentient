@@ -1,8 +1,6 @@
 package z
 
 import (
-	"strings"
-
 	"github.com/go-leap/str"
 )
 
@@ -78,7 +76,7 @@ func (me *mainMenu) onMainMenu(req *ipcReq, resp *ipcResp) {
 			}
 		}
 	}
-	m.Desc += strings.Join(cats, "  ·  ")
+	m.Desc += ustr.Join(cats, "  ·  ")
 	resp.Menu = &menuResp{SubMenu: &m}
 }
 

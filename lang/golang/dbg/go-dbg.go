@@ -1,7 +1,7 @@
 package zgodbg
 
 import (
-	"fmt"
+	"errors"
 	"io"
 	"os"
 	"os/exec"
@@ -9,14 +9,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/metaleap/go-util"
-	"github.com/metaleap/go-util/dev/go"
-	"github.com/metaleap/go-util/fs"
-	"github.com/metaleap/go-util/run"
+	"github.com/go-leap/fs"
+	"github.com/go-leap/run"
 	"github.com/metaleap/zentient/dbg"
 )
-
-var strf = fmt.Sprintf
 
 type Dbg struct {
 	zdbg.Dbg
@@ -47,7 +43,7 @@ start:
 			for pkgdir := filepath.Dir(filepath.Dir(srcFilePath)); len(pkgdir) > 3; pkgdir = filepath.Dir(pkgdir) {
 				ufs.WalkFilesIn(pkgdir, func(fullPath string) (keepWalking bool) {
 					if keepWalking = true; strings.HasSuffix(fullPath, ".go") {
-						if src := ufs.ReadTextFile(fullPath, false, ""); strings.HasPrefix(src, "package main\n") || strings.Index(src, "\npackage main\n") >= 2 {
+						if src := ufs.ReadTextFileOr(fullPath, ""); strings.HasPrefix(src, "package main\n") || strings.Index(src, "\npackage main\n") >= 2 {
 							jumpFilePath, keepWalking = fullPath, false
 						}
 					}
@@ -69,7 +65,7 @@ start:
 			if _, cmderr, e := urun.CmdExecStdin("", me.Cmd.Dir, "go", gobuildargs...); e != nil {
 				err = e
 			} else if cmderr != "" {
-				err = umisc.E(cmderr)
+				err = errors.New(cmderr)
 			}
 			me.Cmd.Name = filepath.Join(me.Cmd.Dir, me.Cmd.Name)
 		}
@@ -95,9 +91,9 @@ func (me *Dbg) Enqueue(goEvalExpr string) {
 		gobuildargs := append([]string{"build", "-o", cmdname}, gorunargs[1:]...)
 		if cmdout, cmderr, err = urun.CmdExecStdin("", gorundir, "go", gobuildargs...); err == nil {
 			if cmderr != "" {
-				err = umisc.E(cmderr)
+				err = errors.New(cmderr)
 			} else if cmdout != "" {
-				err = umisc.E(cmdout)
+				err = errors.New(cmdout)
 			}
 		}
 		if err == nil {
@@ -142,58 +138,4 @@ func (me *Dbg) Wait() error {
 		return nil
 	}
 	return me.Dbg.Wait()
-}
-
-func GoRunEvalPrepCmd(tmpDirPath string, srcFilePath string, maybeSrcFull string, goEvalExpr string) (goRunArgs []string, goRunDir string, hadMain bool, err error) {
-	pkgsrcdirpath := filepath.Dir(srcFilePath)
-	goRunDir = filepath.Join(tmpDirPath, pkgsrcdirpath)
-	if ufs.DirExists(goRunDir) {
-		err = ufs.ClearDirectory(goRunDir)
-	} else {
-		err = ufs.EnsureDirExists(goRunDir)
-	}
-	if err == nil && udevgo.PkgsByDir == nil {
-		err = udevgo.RefreshPkgs()
-	}
-	if goRunArgs = []string{"run"}; err == nil {
-		if pkg := udevgo.PkgsByDir[pkgsrcdirpath]; pkg == nil {
-			err = umisc.E("Bad Go package: " + pkgsrcdirpath)
-		} else {
-			for i, pos, src, gfps := 0, 0, "", pkg.GoFilePaths(false); (err == nil) && (i < len(gfps)); i++ {
-				iscursrc := gfps[i] == srcFilePath
-				if iscursrc && len(maybeSrcFull) > 0 {
-					src = maybeSrcFull
-				} else if err = ufs.ReadFileIntoStr(gfps[i], &src); err != nil {
-					break
-				}
-				if strings.HasPrefix(src, "package ") {
-					pos = 0
-				} else if pos = 1 + strings.Index(src, "\npackage "); pos == 0 {
-					err = umisc.E("Bad Go package source file: " + gfps[i])
-				}
-				if posln := pos + strings.IndexRune(src[pos:], '\n'); err == nil {
-					if oldpkgln := src[pos:posln]; oldpkgln != "package main" {
-						src = src[:pos] + "package main" + src[posln:]
-					}
-					if pos = 1 + strings.Index(src, "\nfunc main() {"); pos > 0 {
-						if hadMain = true; goEvalExpr != "" {
-							src = src[:pos] + strf("func main%d() {", time.Now().UnixNano()) + src[pos+13:]
-						}
-					}
-					if goEvalExpr != "" {
-						if iscursrc {
-							if strings.HasPrefix(goEvalExpr, ":") {
-								src += strf("\n\nfunc main() { %s }", goEvalExpr[1:])
-							} else {
-								src += strf("\n\nfunc main() { println(%s) }", goEvalExpr)
-							}
-						}
-					}
-					goRunArgs = append(goRunArgs, filepath.Base(gfps[i]))
-					err = ufs.WriteTextFile(filepath.Join(goRunDir, goRunArgs[len(goRunArgs)-1]), src)
-				}
-			}
-		}
-	}
-	return
 }
