@@ -90,7 +90,7 @@ func (me *goExtras) runQuery_GoDoc(srcLens *z.SrcLens, arg string, resp *z.Extra
 		panic(err)
 	}
 	resp.Desc = z.Strf("Results of `go doc %s`:", ustr.Join(cmd, " "))
-	resp.Warns = ustr.Filt(ustr.Map(ustr.Split(cmderr, "\n"), ustr.Trim),
+	resp.Warns = ustr.Filter(ustr.Map(ustr.Split(cmderr, "\n"), ustr.Trim),
 		func(s string) bool { return !ustr.Pref(s, "exit status ") })
 	resp.Info = append(resp.Info, z.InfoTip{Value: ustr.Trim(cmdout)})
 }
