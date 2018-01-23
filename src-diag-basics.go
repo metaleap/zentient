@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"github.com/go-leap/dev"
 	"github.com/go-leap/fs"
 	"github.com/go-leap/str"
-	"github.com/metaleap/go-util/dev"
 )
 
 type IDiag interface {
@@ -47,7 +47,7 @@ type DiagItem struct {
 func (me *DiagItem) resetAndInferSrcActions() {
 	me.SrcActions = nil
 	if ilastcolon := ustr.Last(me.Msg, ":"); ilastcolon > 0 {
-		if ilastnum := ustr.ToInt(me.Msg[ilastcolon+1:], 0); ilastnum > 0 {
+		if ustr.ToInt(me.Msg[ilastcolon+1:], 0) > 0 {
 			if ifirstsep := ustr.Idx(me.Msg, filepath.Separator); ifirstsep >= 0 {
 				refpath := me.Msg[ifirstsep:]
 				refpathf := refpath[:ustr.Idx(refpath, ':')]

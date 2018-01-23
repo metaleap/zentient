@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-leap/dev/go"
 	"github.com/go-leap/fs"
 	"github.com/go-leap/run"
-	"github.com/metaleap/go-util/dev/go"
 )
 
 func GoRunEval(userAppCacheDirPath string, srcFilePath string, maybeSrcFull string, goEvalExpr string) (evalOutAndStdErr string, otherStdOut string, err error) {

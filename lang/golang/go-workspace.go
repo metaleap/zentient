@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/go-leap/dev/go"
 	"github.com/go-leap/fs"
-	"github.com/metaleap/go-util/dev/go"
 	"github.com/metaleap/zentient"
 )
 
@@ -27,7 +27,7 @@ func (me *goWorkspace) onAfterChanges(upd *z.WorkspaceChanges) {
 		goPathScopes, udevgo.GuruScopes = nil, ""
 		for _, dp := range me.Dirs() {
 			dp_ := dp.Path + sep
-			for _, gp := range udevgo.AllGoPaths() {
+			for _, gp := range udevgo.Gopaths() {
 				if gpsrc := filepath.Join(gp, "src"); strings.HasPrefix(gp, dp_) && ufs.IsDir(gpsrc) {
 					ufs.WalkDirsIn(gpsrc, func(gopathsubdir string) bool {
 						goPathScopes = append(goPathScopes, gopathsubdir[len(gpsrc)+1:]+"/...")

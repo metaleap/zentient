@@ -1,7 +1,7 @@
 package zhs
 
 import (
-	"github.com/metaleap/go-util/dev/hs"
+	"github.com/go-leap/dev/hs"
 	"github.com/metaleap/zentient"
 )
 

@@ -7,9 +7,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/go-leap/dev/go"
 	"github.com/go-leap/str"
 	"github.com/go-leap/sys"
-	"github.com/metaleap/go-util/dev/go"
 )
 
 type IWorkspace interface {
@@ -349,7 +349,7 @@ func (me *WorkspaceBase) PrettyPath(fsPath string, otherEnvs ...string) string {
 			return ustr.Shortest(candidates)
 		}
 
-		for _, gopath := range udevgo.GoPaths {
+		for _, gopath := range udevgo.Gopaths() {
 			if rp := rel(gopath); rp != "" {
 				return filepath.Join("$GOPATH", rp)
 			}

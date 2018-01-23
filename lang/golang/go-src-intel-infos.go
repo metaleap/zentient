@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/go-leap/dev/go"
 	"github.com/go-leap/str"
-	"github.com/metaleap/go-util/dev/go"
 	"github.com/metaleap/zentient"
 )
 

@@ -1,8 +1,8 @@
 package zgo
 
 import (
-	"github.com/metaleap/go-util/dev"
-	"github.com/metaleap/go-util/dev/go"
+	"github.com/go-leap/dev"
+	"github.com/go-leap/dev/go"
 	"github.com/metaleap/zentient"
 )
 

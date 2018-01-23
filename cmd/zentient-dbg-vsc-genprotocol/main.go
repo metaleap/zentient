@@ -3,9 +3,9 @@ package main
 import (
 	"path/filepath"
 
+	"github.com/go-leap/dev/go"
 	"github.com/go-leap/fs"
 	"github.com/metaleap/go-fromjsonschema"
-	"github.com/metaleap/go-util/dev/go"
 )
 
 const (
@@ -14,7 +14,7 @@ const (
 )
 
 func main() {
-	gopathsrc := filepath.Join(udevgo.AllGoPaths()[0], "src")
+	gopathsrc := filepath.Join(udevgo.Gopaths()[0], "src")
 	jsonschemaraw := ufs.ReadTextFileOrPanic(filepath.Join(gopathsrc, srcpath))
 
 	fromjsd.GoPkgDesc = "Package codegen'd from " + srcpath + " with github.com/metaleap/zentient/cmd/zentient-dbg-vsc-genprotocol"

@@ -6,10 +6,10 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/go-leap/dev/go"
 	"github.com/go-leap/fs"
+	"github.com/go-leap/run"
 	"github.com/go-leap/str"
-	"github.com/metaleap/go-util/dev/go"
-	"github.com/metaleap/go-util/run"
 	"github.com/metaleap/zentient"
 )
 
@@ -69,7 +69,7 @@ func (me *goPages) onGoDoc(uriPath string, identName string) string {
 					var link2srcfilepos bool
 					if strings.HasPrefix(href, "/src/") {
 						if u, e := url.Parse(href); e == nil {
-							for _, gp := range udevgo.AllGoPaths() {
+							for _, gp := range udevgo.Gopaths() {
 								if ln, fp := "", filepath.Join(gp, u.Path); ufs.IsFile(fp) {
 									if strings.HasPrefix(u.Fragment, "L") {
 										if l := ustr.ToInt(u.Fragment[1:], 0); l > 0 {

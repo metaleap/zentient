@@ -3,9 +3,9 @@ package z
 import (
 	"path/filepath"
 
+	"github.com/go-leap/dev"
 	"github.com/go-leap/fs"
 	"github.com/go-leap/str"
-	"github.com/metaleap/go-util/dev"
 )
 
 // All public fields are 1-based (so 0 means 'missing') and rune-not-byte-based
