@@ -137,24 +137,6 @@ func (me *ToolingBase) KnownToolsFor(cats ...ToolCats) (tools Tools) {
 
 type Tools []*Tool
 
-func (me Tools) has(name string) bool {
-	for _, t := range me {
-		if t.Name == name {
-			return true
-		}
-	}
-	return false
-}
-
-func (me Tools) len(inst bool) (num int) {
-	for _, t := range me {
-		if t.Installed == inst {
-			num++
-		}
-	}
-	return
-}
-
 func (me Tools) byName(name string) *Tool {
 	if name != "" {
 		for _, tool := range me {
@@ -164,6 +146,34 @@ func (me Tools) byName(name string) *Tool {
 		}
 	}
 	return nil
+}
+
+func (me Tools) has(name string) bool {
+	for _, t := range me {
+		if t.Name == name {
+			return true
+		}
+	}
+	return false
+}
+
+func (me Tools) instOnly() (inst Tools) {
+	inst = make(Tools, 0, len(me))
+	for _, t := range me {
+		if t.Installed {
+			inst = append(inst, t)
+		}
+	}
+	return
+}
+
+func (me Tools) len(inst bool) (num int) {
+	for _, t := range me {
+		if t.Installed == inst {
+			num++
+		}
+	}
+	return
 }
 
 type Tool struct {

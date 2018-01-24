@@ -47,7 +47,7 @@ type DiagJobLint struct {
 }
 
 func (me *DiagJobLint) Yield(diag *DiagItem) { me.lintChan <- diag }
-func (me *DiagJobLint) Done() {
+func (me *DiagJobLint) done() {
 	me.timeTaken = time.Since(me.timeStarted)
 	me.lintChan <- nil
 }
@@ -62,15 +62,12 @@ func (me *DiagBase) knownLinters(auto bool) (diags Tools) {
 }
 
 func (me *DiagBase) runLintJob(job *DiagJobLint, workspaceFiles WorkspaceFiles) {
-	defer job.Done()
-	if !job.Tool.Installed {
-		return
-	}
+	defer job.done()
 	me.Impl.RunLintJob(job, workspaceFiles)
 }
 
 func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(workspaceFiles WorkspaceFiles, autos bool, onlyFilePaths ...string) {
-	if nonautos, diagtools := !autos, me.knownLinters(autos); len(diagtools) > 0 {
+	if nonautos, diagtools := !autos, me.knownLinters(autos).instOnly(); len(diagtools) > 0 {
 		var filepaths []string
 		for _, f := range workspaceFiles {
 			if autos && len(f.Diags.Build.Items) > 0 {
