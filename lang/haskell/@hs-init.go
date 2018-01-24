@@ -10,6 +10,7 @@ func OnPreInit() {
 	l.ID, l.Title = "haskell", "Haskell"
 	if l.Enabled = udevhs.HasHsDevEnv(); l.Enabled {
 		tools.onPreInit()
+		diag.onPreInit()
 		srcMod.onPreInit()
 	}
 }

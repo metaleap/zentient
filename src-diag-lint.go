@@ -61,6 +61,14 @@ func (me *DiagBase) knownLinters(auto bool) (diags Tools) {
 	return
 }
 
+func (me *DiagBase) runLintJob(job *DiagJobLint, workspaceFiles WorkspaceFiles) {
+	defer job.Done()
+	if !job.Tool.Installed {
+		return
+	}
+	me.Impl.RunLintJob(job, workspaceFiles)
+}
+
 func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(workspaceFiles WorkspaceFiles, autos bool, onlyFilePaths ...string) {
 	if nonautos, diagtools := !autos, me.knownLinters(autos); len(diagtools) > 0 {
 		var filepaths []string
@@ -93,7 +101,7 @@ func (me *DiagBase) updateLintDiags(workspaceFiles WorkspaceFiles, diagTools Too
 		}
 		for i, job := range jobs {
 			job.lintChan, job.timeStarted = await, time.Now()
-			go me.Impl.RunLintJob(job, workspaceFiles)
+			go me.runLintJob(job, workspaceFiles)
 			descs[i] = job.Tool.Name + " ➜ " + job.String()
 		}
 		send(&ipcResp{IpcID: IPCID_SRCDIAG_STARTED, ObjSnapshot: descs})

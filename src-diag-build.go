@@ -59,7 +59,10 @@ func (me *DiagJobBuild) IsSortedPriorTo(cmp interface{}) bool {
 	if me.TargetCmp != nil {
 		return me.TargetCmp(me.Target, c.Target)
 	}
-	return me.Target.IsSortedPriorTo(c.Target)
+	if sortish, _ := me.Target.(ISortable); sortish != nil {
+		return sortish.IsSortedPriorTo(c.Target)
+	}
+	return false
 }
 
 func (*DiagBase) FixerUppers() []FixerUpper { return nil }

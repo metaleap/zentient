@@ -30,10 +30,6 @@ func (me *goDiag) OnUpdateLintDiags(workspaceFiles z.WorkspaceFiles, diagTools z
 }
 
 func (me *goDiag) RunLintJob(job *z.DiagJobLint, workspaceFiles z.WorkspaceFiles) {
-	defer job.Done()
-	if !job.Tool.Installed {
-		return
-	}
 	jt, pkg := job.Tool, job.Target.(*udevgo.Pkg)
 	var msgs udev.SrcMsgs
 	if jt == tools.gosimple {

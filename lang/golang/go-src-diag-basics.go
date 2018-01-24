@@ -22,10 +22,11 @@ func (me *goDiag) onPreInit() {
 }
 
 func (me *goDiag) onUpdateDiagsPrepPkgJobs(filePaths []string) (jobs []z.DiagJob) {
-	if pkgs, shouldrefresh := udevgo.PkgsForFiles(filePaths...); len(pkgs) > 0 {
-		if shouldrefresh {
-			go caddyRunRefreshPkgs()
-		}
+	pkgs, shouldrefresh := udevgo.PkgsForFiles(filePaths...)
+	if shouldrefresh {
+		go caddyRunRefreshPkgs()
+	}
+	if len(pkgs) > 0 {
 		for _, pkg := range pkgs {
 			if !(pkg.Standard || pkg.BinaryOnly) {
 				if pkggofilepaths := pkg.GoFilePaths(true); len(pkggofilepaths) > 0 {

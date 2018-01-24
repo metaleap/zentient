@@ -91,8 +91,8 @@ func (me DiagItems) propagate(lintDiags bool, diagsSticky bool, workspaceFiles W
 }
 
 type IDiagJobTarget interface {
-	ISortable
-	fmt.Stringer
+	// ISortable
+	// fmt.Stringer
 }
 
 type DiagJob struct {
@@ -121,7 +121,12 @@ func (me *DiagJob) forgetPrevDiags(diagToolsIfLint Tools, setAutoUpToDateToTrueI
 	}
 }
 
-func (me *DiagJob) String() string { return me.Target.String() }
+func (me *DiagJob) String() string {
+	if str, _ := me.Target.(fmt.Stringer); str != nil {
+		return str.String()
+	}
+	return Strf("%v", me.Target)
+}
 
 type diagResp struct {
 	All    diagItemsBy
