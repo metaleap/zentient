@@ -23,11 +23,11 @@ func (me *goDiag) OnUpdateBuildDiags(writtenFilePaths []string) (jobs z.DiagBuil
 					jobs = append(jobs, &z.DiagJobBuild{DiagJob: z.DiagJob{Target: pkgdep, AffectedFilePaths: pkgdep.GoFilePaths(true)}, TargetCmp: ensureBuildOrder})
 				}
 			}
-			for _, dep := range pj.Target.(*udevgo.Pkg).Deps {
-				// this sub-optimal loop in practice unneeded in ~90+% of usage but sometimes *is* to prevent ugly diag duplications of existing unaddressed dep diags
-				// ie: you remove an issue from main, there remains one in its imported dep, but we rely on `go install` for that one to rebuild
-				// (there was no build-on-save signal for the dep, just the main) --- we could also do lengthy "duplicate check"s on all diags but
-				// mildly cleaner to mark all go files of all dependencies as "affected" aka "may-produce-diags", meaning we clear those deps too (not just dependants as done above)
+			jobs = append(jobs, job)
+		}
+		for _, job := range jobs {
+			// somewhat inelegant-seeming loop prevents accumulation of duplicate build-diags
+			for _, dep := range job.Target.(*udevgo.Pkg).Deps {
 				if pkgdep := udevgo.PkgsByImP[dep]; pkgdep != nil {
 					for _, gfp := range pkgdep.GoFilePaths(true) {
 						if !ustr.In(gfp, job.AffectedFilePaths...) {
@@ -36,7 +36,7 @@ func (me *goDiag) OnUpdateBuildDiags(writtenFilePaths []string) (jobs z.DiagBuil
 					}
 				}
 			}
-			jobs = append(jobs, job)
+
 		}
 	}
 	return
