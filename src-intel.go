@@ -271,11 +271,11 @@ func (*SrcIntelBase) posLexErrNoOp(*scanner.Scanner, string)       {}
 func (*SrcIntelBase) ComplItems(*SrcLens) SrcIntelCompls           { return nil }
 func (*SrcIntelBase) ComplDetails(*SrcLens, string) *SrcIntelCompl { return nil }
 func (*SrcIntelBase) ComplItemsShouldSort(*SrcLens) bool           { return false }
-func (*SrcIntelBase) DefImpl(*SrcLens) SrcLenses                   { return nil }
-func (*SrcIntelBase) DefSym(*SrcLens) SrcLenses                    { return nil }
-func (*SrcIntelBase) DefType(*SrcLens) SrcLenses                   { return nil }
-func (*SrcIntelBase) Highlights(*SrcLens, string) SrcLenses        { return nil }
+func (*SrcIntelBase) DefImpl(*SrcLens) SrcLocs                     { return nil }
+func (*SrcIntelBase) DefSym(*SrcLens) SrcLocs                      { return nil }
+func (*SrcIntelBase) DefType(*SrcLens) SrcLocs                     { return nil }
+func (*SrcIntelBase) Highlights(*SrcLens, string) SrcLocs          { return nil }
 func (*SrcIntelBase) Hovers(*SrcLens) []InfoTip                    { return nil }
-func (*SrcIntelBase) References(*SrcLens, bool) SrcLenses          { return nil }
+func (*SrcIntelBase) References(*SrcLens, bool) SrcLocs            { return nil }
 func (*SrcIntelBase) Signature(*SrcLens) *SrcIntelSigHelp          { return nil }
 func (*SrcIntelBase) Symbols(*SrcLens, string, bool) SrcLenses     { return nil }
