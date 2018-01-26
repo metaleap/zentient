@@ -44,7 +44,7 @@ type DiagItem struct {
 	StickyAuto  bool           `json:"Sticky,omitempty"`
 }
 
-func (me *DiagItem) resetAndInferSrcActions() {
+func (me *DiagItem) resetAndInferSrcActions(maybeOrigSrcRef *udev.SrcMsg) {
 	me.SrcActions = nil
 	if ilastcolon := ustr.Last(me.Msg, ":"); ilastcolon > 0 {
 		if ustr.ToInt(me.Msg[ilastcolon+1:], 0) > 0 {
@@ -63,12 +63,30 @@ func (me *DiagItem) resetAndInferSrcActions() {
 					refpathf, _ = filepath.Abs(refpathf)
 				}
 				if ufs.IsFile(refpathf) {
-					cmd := EditorAction{Cmd: "zen.internal.openFileAt", Title: refpathf + refpath[ustr.Idx(refpath, ':'):]}
-					cmd.Arguments = append(cmd.Arguments, cmd.Title)
-					cmd.Title = Strf("Jump to %s", filepath.Base(cmd.Title))
-					me.SrcActions = append(me.SrcActions, cmd)
+					fpathref := refpathf + refpath[ustr.Idx(refpath, ':'):]
+					me.SrcActions = append(me.SrcActions, EditorAction{
+						Cmd:       "zen.internal.openFileAt",
+						Title:     Strf("Jump to %s", filepath.Base(fpathref)),
+						Arguments: []interface{}{fpathref},
+					})
 				}
 			}
+		}
+	}
+	if maybeOrigSrcRef != nil && maybeOrigSrcRef.Data != nil {
+		if xfrom, xto, xnotes := maybeOrigSrcRef.Data["From"], maybeOrigSrcRef.Data["To"], maybeOrigSrcRef.Data["Note"]; xfrom != nil && xto != nil {
+			from, _ := xfrom.(string)
+			to, _ := xto.(string)
+			notes, _ := xnotes.([]string)
+			if from != "" && to != "" {
+				me.SrcActions = append(me.SrcActions, EditorAction{
+					Cmd:       "zen.internal.replaceText",
+					Title:     "Apply Suggestion",
+					Hint:      ustr.Join(notes, "\n"),
+					Arguments: []interface{}{from, to},
+				})
+			}
+			me.Msg += " —\n" + ustr.Join(append([]string{"Instead of:\n\t" + from, "Consider:\n\t" + to}, notes...), "\n")
 		}
 	}
 }
@@ -138,6 +156,6 @@ func (me *DiagBase) NewDiagItemFrom(srcRef *udev.SrcMsg, toolName string, fallba
 	di = &DiagItem{Msg: ustr.Trim(srcRef.Msg), Cat: toolName}
 	di.Loc.Flag = srcRef.Flag
 	di.Loc.SetFilePathAndPosOrRangeFrom(srcRef, fallbackFilePath)
-	di.resetAndInferSrcActions()
+	di.resetAndInferSrcActions(srcRef)
 	return
 }
