@@ -2,6 +2,8 @@ package z
 
 import (
 	"sort"
+	"strings"
+	"time"
 )
 
 type FixerUpper func(*DiagItem) *FixUp
@@ -60,6 +62,34 @@ func (me *DiagJobBuild) IsSortedPriorTo(cmp interface{}) bool {
 		return sortish.IsSortedPriorTo(c.Target)
 	}
 	return false
+}
+
+type BuildProgress struct {
+	NumJobs   int
+	StartTime time.Time
+	Failed    map[string]bool
+	Skipped   map[string]bool
+	PkgNames  []string
+}
+
+func NewBuildProgress(numJobs int) *BuildProgress {
+	return &BuildProgress{NumJobs: numJobs, StartTime: time.Now(), PkgNames: make([]string, 0, numJobs), Failed: make(map[string]bool, numJobs), Skipped: make(map[string]bool, numJobs)}
+}
+
+func (me *BuildProgress) AddPkgName(pkgName string) {
+	me.PkgNames = append(me.PkgNames, pkgName)
+}
+
+func (me *BuildProgress) OnDone() {
+	CaddyBuildOnDone(me.Failed, me.Failed, me.PkgNames, time.Since(me.StartTime))
+}
+
+func (me *BuildProgress) OnJob(i int) {
+	CaddyBuildOnRunning(me.NumJobs, i, me.String())
+}
+
+func (me *BuildProgress) String() string {
+	return strings.Join(me.PkgNames, "\n")
 }
 
 func (*DiagBase) FixerUppers() []FixerUpper { return nil }

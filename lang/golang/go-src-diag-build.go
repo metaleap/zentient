@@ -2,7 +2,6 @@ package zgo
 
 import (
 	"strings"
-	"time"
 
 	"github.com/go-leap/dev"
 	"github.com/go-leap/dev/go"
@@ -56,21 +55,18 @@ func (me *goDiag) runBuildPkg(pkg *udevgo.Pkg, workspaceFiles z.WorkspaceFiles) 
 }
 
 func (me *goDiag) RunBuildJobs(jobs z.DiagBuildJobs, workspaceFiles z.WorkspaceFiles) (diags z.DiagItems) {
-	numjobs, starttime, numbuilt := len(jobs), time.Now(), 0
-	failed, skipped := make(map[string]bool, numjobs), make(map[string]bool, numjobs)
-	pkgnames := make([]string, 0, numjobs)
-	for i := 0; i < numjobs; i++ {
-		pkgnames = append(pkgnames, jobs[i].Target.(*udevgo.Pkg).ImportPath)
+	numbuilt, progress := 0, z.NewBuildProgress(len(jobs))
+	for i := 0; i < progress.NumJobs; i++ {
+		progress.AddPkgName(jobs[i].Target.(*udevgo.Pkg).ImportPath)
 	}
-	allpkgnames := strings.Join(pkgnames, "\n")
 
 	for i, pkgjob := range jobs {
-		z.CaddyBuildOnRunning(numjobs, i, allpkgnames)
+		progress.OnJob(i)
 		skip, pkg := false, pkgjob.Target.(*udevgo.Pkg)
-		if len(failed) > 0 {
+		if len(progress.Failed) > 0 {
 			for _, pdep := range pkg.Deps {
-				if skip, _ = failed[pdep]; skip {
-					skipped[pkg.ImportPath] = true
+				if skip, _ = progress.Failed[pdep]; skip {
+					progress.Skipped[pkg.ImportPath] = true
 					break
 				}
 			}
@@ -80,11 +76,11 @@ func (me *goDiag) RunBuildJobs(jobs z.DiagBuildJobs, workspaceFiles z.WorkspaceF
 			if pkgjob.Succeeded, diags = len(pkgdiags) == 0, append(diags, pkgdiags...); pkgjob.Succeeded {
 				numbuilt++
 			} else {
-				failed[pkg.ImportPath] = true
+				progress.Failed[pkg.ImportPath] = true
 			}
 		}
 	}
-	z.CaddyBuildOnDone(failed, skipped, pkgnames, time.Since(starttime))
+	progress.OnDone()
 	if numbuilt > 0 {
 		go caddyRunRefreshPkgs()
 		if tools.godocdown.Installed {

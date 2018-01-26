@@ -28,10 +28,16 @@ func (me *hsDiag) OnUpdateBuildDiags(writtenFilePaths []string) (jobs z.DiagBuil
 }
 
 func (me *hsDiag) RunBuildJobs(jobs z.DiagBuildJobs, workspaceFiles z.WorkspaceFiles) (diags z.DiagItems) {
-	for _, job := range jobs {
+	progress := z.NewBuildProgress(len(jobs))
+	for i := 0; i < progress.NumJobs; i++ {
+		progress.AddPkgName(jobs[i].Target.(string))
+	}
+
+	for i, job := range jobs {
+		progress.OnJob(i)
 		stackyamldirpath := job.Target.(string)
 		stackyamlfilepath := filepath.Join(stackyamldirpath, "stack.yaml")
-		cmdargs := append(append([]string{"build"}, udevhs.StackArgs...), udevhs.StackArgsBuild...)
+		haderrs, cmdargs := false, append(append([]string{"build"}, udevhs.StackArgs...), udevhs.StackArgsBuild...)
 		stdout, stderr, err := urun.CmdExecIn(stackyamldirpath, "stack", cmdargs...)
 		if err != nil {
 			stderr = err.Error()
@@ -72,7 +78,7 @@ func (me *hsDiag) RunBuildJobs(jobs z.DiagBuildJobs, workspaceFiles z.WorkspaceF
 
 			if _p := "Could not parse '"; ustr.Pref(lns[0], _p) {
 				fpath := ustr.TrimR(lns[0][len(_p):], "':")
-				diags = append(diags, &z.DiagItem{
+				haderrs, diags = true, append(diags, &z.DiagItem{
 					Cat: "stack", Msg: ustr.Join(lns[1:], "\n"), Loc: z.SrcLoc{
 						FilePath: fpath, Flag: int(z.DIAG_SEV_ERR), Pos: &z.SrcPos{Col: 1, Ln: 1},
 					},
@@ -81,7 +87,7 @@ func (me *hsDiag) RunBuildJobs(jobs z.DiagBuildJobs, workspaceFiles z.WorkspaceF
 			}
 
 			if _e := "Error: "; ustr.Pref(lns[0], _e) {
-				diags = append(diags, &z.DiagItem{
+				haderrs, diags = true, append(diags, &z.DiagItem{
 					Cat: "stack", Msg: ustr.Join(lns, "\n")[len(_e):], Loc: z.SrcLoc{
 						FilePath: stackyamlfilepath, Flag: int(z.DIAG_SEV_ERR), Pos: &z.SrcPos{Col: 1, Ln: 1},
 					},
@@ -102,7 +108,9 @@ func (me *hsDiag) RunBuildJobs(jobs z.DiagBuildJobs, workspaceFiles z.WorkspaceF
 						cur.Msg = ustr.Trim(cur.Msg[i+1:])
 					}
 					diag := me.DiagBase.NewDiagItemFrom(cur, toolname, func() string { return stackyamlfilepath })
-					diags = append(diags, diag)
+					if diags = append(diags, diag); diag.Loc.Flag == int(z.DIAG_SEV_ERR) {
+						haderrs = true
+					}
 					cur = nil
 				}
 			}
@@ -127,6 +135,10 @@ func (me *hsDiag) RunBuildJobs(jobs z.DiagBuildJobs, workspaceFiles z.WorkspaceF
 			}
 			addlastcur()
 		}
+		if haderrs {
+			progress.Failed[stackyamldirpath] = true
+		}
 	}
+	progress.OnDone()
 	return
 }
