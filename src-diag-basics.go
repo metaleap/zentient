@@ -97,7 +97,7 @@ func (me DiagItems) propagate(lintDiags bool, diagsSticky bool, workspaceFiles W
 	for _, diag := range me {
 		f := workspaceFiles.ensure(diag.Loc.FilePath)
 		fd := &f.Diags.Lint
-		if !lintDiags {
+		if (!lintDiags) && diag.Loc.Flag == int(DIAG_SEV_ERR) {
 			fd = &f.Diags.Build
 		}
 		if diag.StickyForce, fd.Items = diagsSticky, append(fd.Items, diag); diagsSticky {

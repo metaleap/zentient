@@ -75,10 +75,12 @@ func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(workspaceFiles WorkspaceFiles, 
 			} else if f.IsOpen && (nonautos || !f.Diags.AutoLintUpToDate) {
 				if len(onlyFilePaths) == 0 || ustr.In(f.Path, onlyFilePaths...) {
 					filepaths = append(filepaths, f.Path)
+				} else {
 				}
 			}
 		}
 		if len(filepaths) > 0 {
+			// println(ustr.Fmt("%#v", filepaths))
 			me.updateLintDiags(workspaceFiles, diagtools, autos, filepaths).propagate(true, nonautos, workspaceFiles)
 		}
 	}

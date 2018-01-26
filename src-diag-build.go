@@ -49,10 +49,7 @@ type DiagJobBuild struct {
 	DiagJob
 	TargetCmp func(IDiagJobTarget, IDiagJobTarget) bool
 	Succeeded bool
-	diags     DiagItems
 }
-
-func (me *DiagJobBuild) Yield(diag *DiagItem) { me.diags = append(me.diags, diag) }
 
 func (me *DiagJobBuild) IsSortedPriorTo(cmp interface{}) bool {
 	c := cmp.(*DiagJobBuild)
