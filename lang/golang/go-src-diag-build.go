@@ -65,7 +65,7 @@ func (me *goDiag) RunBuildJobs(jobs z.DiagBuildJobs, workspaceFiles z.WorkspaceF
 	allpkgnames := strings.Join(pkgnames, "\n")
 
 	for i, pkgjob := range jobs {
-		caddyBuildOnRunning(numjobs, i, allpkgnames)
+		z.CaddyBuildOnRunning(numjobs, i, allpkgnames)
 		skip, pkg := false, pkgjob.Target.(*udevgo.Pkg)
 		if len(failed) > 0 {
 			for _, pdep := range pkg.Deps {
@@ -84,7 +84,7 @@ func (me *goDiag) RunBuildJobs(jobs z.DiagBuildJobs, workspaceFiles z.WorkspaceF
 			}
 		}
 	}
-	caddyBuildOnDone(failed, skipped, pkgnames, time.Since(starttime))
+	z.CaddyBuildOnDone(failed, skipped, pkgnames, time.Since(starttime))
 	if numbuilt > 0 {
 		go caddyRunRefreshPkgs()
 		if tools.godocdown.Installed {
