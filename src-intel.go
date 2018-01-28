@@ -163,7 +163,7 @@ func (me *SrcIntelBase) onHover(req *ipcReq, resp *ipcResp) {
 		if lex.Char != "" {
 			hov.Value = Strf("`%s` — byte length %d", lex.Char, len(lex.Char[:len(lex.Char)-1][1:]))
 		} else if lex.Int != "" || lex.Float != "" {
-			if i, ui, f := ustr.ToInt(lex.Int, 0), ustr.ToUi64(lex.Int, 0), ustr.ToF64(lex.Float, 0); ui != 0 || i != 0 || f != 0 {
+			if i, ui, f := ustr.ToI64(lex.Int, 0, 0), ustr.ToUi64(lex.Int, 0, 0), ustr.ToF64(lex.Float, 0); ui != 0 || i != 0 || f != 0 {
 				const strf = "`%s` — `%s`\n\n"
 				formats := []string{"%v", "%d", "%x", "%X", "%o", "%b", "%c", "%U", "%q"}
 				if i == 0 && ui == 0 {
