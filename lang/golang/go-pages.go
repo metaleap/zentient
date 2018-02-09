@@ -101,8 +101,9 @@ func (me *goPages) onGoDoc(uriPath string, identName string) string {
 const _PAGES_GODOC_CSS = `
 <style type="text/css">
 div.collapsed { display: none !important }
-a.permalink { color: #5A5651 }
+a.permalink { display: none }
 h2, h3 { margin-top: 4.88em }
+p.toggleButton span.text { font-weight: bold }
 </style>
 `
 
@@ -110,7 +111,7 @@ const _PAGES_GODOC_SCRIPT = `
 <script type="text/javascript">
 var zentientgodocscrolltoelem = document.getElementById("%s");
 if (zentientgodocscrolltoelem) {
-	zentientgodocscrolltoelem.style.backgroundColor = "#785020";
+	zentientgodocscrolltoelem.className = "zentientPageHighlight";
 	zentientgodocscrolltoelem.scrollIntoView(true);
 }
 </script>
