@@ -20,6 +20,7 @@ type goTooling struct {
 	all     z.Tools
 	numInst int
 
+	goformat  *z.Tool
 	gofmt     *z.Tool
 	goimports *z.Tool
 	goreturns *z.Tool
@@ -53,6 +54,7 @@ type goTooling struct {
 }
 
 func (me *goTooling) onPreInit() {
+	me.goformat = &z.Tool{Name: "go/format", Website: "http://golang.org/pkg/go/format", Installed: true, Cats: []z.ToolCats{z.TOOLS_CAT_MOD_FMT}}
 	me.gofmt = &z.Tool{Name: "gofmt", Website: "http://golang.org/cmd/gofmt", Installed: udevgo.Has_gofmt, Cats: []z.ToolCats{z.TOOLS_CAT_MOD_FMT}}
 	me.goimports = &z.Tool{Name: "goimports", Website: "http://golang.org/x/tools/cmd/goimports", Installed: udevgo.Has_goimports, Cats: []z.ToolCats{z.TOOLS_CAT_MOD_FMT}}
 	me.goreturns = &z.Tool{Name: "goreturns", Website: "http://github.com/sqs/goreturns#readme", Installed: udevgo.Has_goreturns, Cats: []z.ToolCats{z.TOOLS_CAT_MOD_FMT}}
@@ -86,6 +88,7 @@ func (me *goTooling) onPreInit() {
 	me.deadcode = &z.Tool{Name: "deadcode", Website: "http://github.com/remyoudompheng/go-misc/tree/master/deadcode#readme", Installed: udevgo.Has_deadcode, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_INFO}
 
 	me.all = z.Tools{
+		me.goformat,
 		me.gofmt,
 		me.goimports,
 		me.goreturns,

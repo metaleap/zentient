@@ -1,6 +1,8 @@
 package zgo
 
 import (
+	"go/format"
+
 	"github.com/go-leap/dev/go"
 	"github.com/metaleap/zentient"
 )
@@ -19,7 +21,7 @@ type goSrcMod struct {
 
 func (me *goSrcMod) onPreInit() {
 	me.knownFormatters = z.Tools{
-		tools.gofmt, tools.goimports, tools.goreturns,
+		tools.goformat, tools.gofmt, tools.goimports, tools.goreturns,
 	}
 }
 
@@ -59,6 +61,14 @@ func (me *goSrcMod) RunRenamer(srcLens *z.SrcLens, newName string) (srcMods z.Sr
 }
 
 func (me *goSrcMod) RunFormatter(formatter *z.Tool, cmdName string, _ *z.SrcFormattingClientPrefs, srcFilePath string, src string) (string, string) {
+	if formatter == tools.goformat {
+		fmtsrc, err := format.Source([]byte(src))
+		if err != nil {
+			panic(err)
+		}
+		return string(fmtsrc), ""
+	}
+
 	if formatter != tools.gofmt && formatter != tools.goimports && formatter != tools.goreturns {
 		z.BadPanic("formatting tool", formatter.Name)
 	}
