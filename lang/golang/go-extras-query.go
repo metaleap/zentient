@@ -46,7 +46,7 @@ func (me *goExtras) runQuery_StructLayout(srcLens *z.SrcLens, arg string, resp *
 		} else if cmdout != "" {
 			for _, ln := range ustr.Split(cmdout, "\n") {
 				if sfield, ssize := ustr.BreakOnLast(ln, ":"); sfield != "" {
-					sfname, sftype := ustr.BreakOnFirst(sfield, " ")
+					sfname, sftype := ustr.BreakOnFirstOrSuff(sfield, " ")
 					resp.Items = append(resp.Items, &z.ExtrasItem{Label: ustr.FirstOf(sfname, "—"), Desc: sftype, Detail: ssize})
 				}
 			}
