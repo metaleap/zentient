@@ -48,13 +48,13 @@ func (me *DiagItem) resetAndInferSrcActions(maybeOrigSrcRef *udev.SrcMsg) {
 	me.SrcActions = nil
 	if ilastcolon := ustr.Last(me.Msg, ":"); ilastcolon > 0 {
 		if ustr.ToInt(me.Msg[ilastcolon+1:], 0) > 0 {
-			if ifirstsep := ustr.Idx(me.Msg, filepath.Separator); ifirstsep >= 0 {
+			if ifirstsep := ustr.IdxR(me.Msg, filepath.Separator); ifirstsep >= 0 {
 				refpath := me.Msg[ifirstsep:]
-				refpathf := refpath[:ustr.Idx(refpath, ':')]
+				refpathf := refpath[:ustr.IdxR(refpath, ':')]
 				if !ufs.IsFile(refpathf) {
 					for i := ifirstsep - 1; i > 0; i-- {
 						refpath = me.Msg[i:]
-						if refpathf = refpath[:ustr.Idx(refpath, ':')]; ufs.IsFile(refpathf) {
+						if refpathf = refpath[:ustr.IdxR(refpath, ':')]; ufs.IsFile(refpathf) {
 							break
 						}
 					}
@@ -63,7 +63,7 @@ func (me *DiagItem) resetAndInferSrcActions(maybeOrigSrcRef *udev.SrcMsg) {
 					refpathf, _ = filepath.Abs(refpathf)
 				}
 				if ufs.IsFile(refpathf) {
-					fpathref := refpathf + refpath[ustr.Idx(refpath, ':'):]
+					fpathref := refpathf + refpath[ustr.IdxR(refpath, ':'):]
 					me.SrcActions = append(me.SrcActions, EditorAction{
 						Cmd:       "zen.internal.openFileAt",
 						Title:     Strf("Jump to %s", filepath.Base(fpathref)),
