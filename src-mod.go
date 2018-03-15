@@ -143,7 +143,7 @@ func (*SrcModBase) CodeActions(srcLens *SrcLens) (all []EditorAction) {
 }
 
 func (*SrcModBase) RunRenamer(srcLens *SrcLens, newName string) (all SrcLenses) {
-	panic(Strf("Rename not yet implemented for __%s__.", Lang.Title))
+	panic(Strf("Rename not yet implemented for %s.", Lang.Title))
 }
 
 func (*SrcModBase) hasFormatter() bool {

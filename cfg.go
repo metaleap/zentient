@@ -263,7 +263,7 @@ func (me *SettingsBase) onSet(cfgId string, cfgVal string, menu *menuResp) {
 	if oldval := setting.ValCfg; err == nil {
 		setting.ValCfg = newval
 		if err = Prog.Cfg.Save(); err == nil {
-			if menu.NoteInfo = Strf("Setting __%s__ was successfully **%s**.", setting.Title, info); setting.OnChanged != nil {
+			if menu.NoteInfo = Strf("Setting `%s` was successfully %s.", setting.Title, info); setting.OnChanged != nil {
 				go setting.OnChanged(oldval)
 			}
 		}
