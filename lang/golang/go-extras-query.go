@@ -34,9 +34,9 @@ func (me *goExtras) runQuery_StructLayout(srcLens *z.SrcLens, arg string, resp *
 		}
 	}
 	if len(args) != 2 {
-		z.BadPanic("structlayout args (need 1 or 2)", arg)
+		z.BadPanic(tools.structlayout.Name+" args (need 1 or 2)", arg)
 	}
-	if cmdout, cmderr, err := urun.CmdExec("structlayout", args[0], args[1]); err != nil {
+	if cmdout, cmderr, err := urun.CmdExec(tools.structlayout.Name, args[0], args[1]); err != nil {
 		panic(err)
 	} else if cmdout = ustr.Trim(cmdout); cmdout != "" || cmderr != "" {
 		scmddesc := z.Strf("structlayout %s %s", args[0], args[1])

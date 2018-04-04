@@ -35,23 +35,24 @@ type goTooling struct {
 	gorename  *z.Tool
 	godocdown *z.Tool
 
-	govet       *z.Tool
-	golint      *z.Tool
-	checkvar    *z.Tool
-	checkalign  *z.Tool
-	checkstruct *z.Tool
-	errcheck    *z.Tool
-	ineffassign *z.Tool
-	interfacer  *z.Tool
-	unparam     *z.Tool
-	unindent    *z.Tool
-	unconvert   *z.Tool
-	maligned    *z.Tool
-	goconst     *z.Tool
-	gosimple    *z.Tool
-	unused      *z.Tool
-	staticcheck *z.Tool
-	deadcode    *z.Tool
+	govet        *z.Tool
+	golint       *z.Tool
+	checkvar     *z.Tool
+	checkalign   *z.Tool
+	checkstruct  *z.Tool
+	errcheck     *z.Tool
+	ineffassign  *z.Tool
+	interfacer   *z.Tool
+	unparam      *z.Tool
+	unindent     *z.Tool
+	unconvert    *z.Tool
+	maligned     *z.Tool
+	goconst      *z.Tool
+	gosimple     *z.Tool
+	unused       *z.Tool
+	staticcheck  *z.Tool
+	structlayout *z.Tool
+	deadcode     *z.Tool
 }
 
 func (me *goTooling) onPreInit() {
@@ -86,6 +87,7 @@ func (me *goTooling) onPreInit() {
 	me.gosimple = &z.Tool{Name: "gosimple", Website: "http://github.com/dominikh/go-tools#readme", Installed: udevgo.Has_gosimple, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_INFO}
 	me.unused = &z.Tool{Name: "unused", Website: "http://github.com/dominikh/go-tools#readme", Installed: udevgo.Has_unused, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_INFO}
 	me.staticcheck = &z.Tool{Name: "staticcheck", Website: "http://github.com/dominikh/go-tools#readme", Installed: udevgo.Has_staticcheck, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_INFO}
+	me.structlayout = &z.Tool{Name: "structlayout", Website: "http://github.com/dominikh/go-tools#readme", Installed: udevgo.Has_structlayout, Cats: []z.ToolCats{z.TOOLS_CAT_EXTRAS_QUERY}}
 	me.deadcode = &z.Tool{Name: "deadcode", Website: "http://github.com/remyoudompheng/go-misc/tree/master/deadcode#readme", Installed: udevgo.Has_deadcode, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_INFO}
 
 	me.all = z.Tools{
@@ -115,6 +117,7 @@ func (me *goTooling) onPreInit() {
 		me.gosimple,
 		me.unused,
 		me.staticcheck,
+		me.structlayout,
 		me.deadcode,
 	}
 	me.numInst = me.CountNumInst(me.all)
