@@ -29,6 +29,7 @@ var (
 		Tooling   ITooling
 		Workspace IWorkspace
 		Pages     IPages
+		sideViews sideViews
 	}
 	Prog struct {
 		Cfg Config
@@ -114,7 +115,7 @@ func Init() (err error) {
 	if Prog.Cfg.reload(); Prog.Cfg.err == nil {
 		// Prog.Cfg.recall()
 		wellknowndispatchers := []iDispatcher{
-			Lang.SrcIntel, Lang.Workspace, Lang.Diag, Lang.SrcMod, Lang.Extras, Lang.PkgIntel, Lang.Tooling, Lang.Settings, &mainMenu{}, Lang.Pages,
+			Lang.SrcIntel, Lang.Workspace, Lang.Diag, Lang.SrcMod, Lang.Extras, Lang.PkgIntel, Lang.Tooling, Lang.Settings, &mainMenu{}, Lang.Pages, &Lang.sideViews,
 		}
 		for _, disp := range wellknowndispatchers {
 			if disp != nil {
