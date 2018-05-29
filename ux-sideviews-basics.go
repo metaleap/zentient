@@ -28,7 +28,7 @@ func (me *sideViews) Init() {
 }
 
 func (me *sideViews) dispatch(req *ipcReq, resp *ipcResp) bool {
-	if req.IpcID == IPCID_TREEVIEW_GETITEM || req.IpcID == IPCID_TREEVIEW_CHILDREN {
+	if reqtreeitem, reqchildren := req.IpcID == IPCID_TREEVIEW_GETITEM, req.IpcID == IPCID_TREEVIEW_CHILDREN; reqtreeitem || reqchildren {
 		var dataprovider iTreeDataProvider
 		treepath, _ := req.IpcArgs.(string)
 		treepathparts := strings.Split(treepath, ":")
@@ -45,10 +45,10 @@ func (me *sideViews) dispatch(req *ipcReq, resp *ipcResp) bool {
 				BadPanic("tree-data provider ID", treepathparts[0])
 			}
 		}
-		switch req.IpcID {
-		case IPCID_TREEVIEW_GETITEM:
+		switch {
+		case reqtreeitem:
 			resp.Val = dataprovider.getTreeItem(treepathparts)
-		case IPCID_TREEVIEW_CHILDREN:
+		case reqchildren:
 			resp.Val = dataprovider.getChildren(treepathparts)
 		}
 		return true
