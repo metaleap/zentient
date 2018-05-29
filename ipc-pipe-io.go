@@ -70,6 +70,7 @@ func Serve() (err error) {
 }
 
 func serveIncomingReq(jsonreq string) {
+	// println(jsonreq)
 	resp := ipcDecodeReqAndRespond(jsonreq)
 
 	// err only covers: either resp couldn't be json-encoded, or stdout write/flush problem:
