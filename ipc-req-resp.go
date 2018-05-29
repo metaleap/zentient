@@ -38,7 +38,7 @@ func ipcDecodeReqAndRespond(jsonreq string) *ipcResp {
 		found := false
 		for _, objsnp := range Prog.objSnappers {
 			if pref := objsnp.ObjSnapPrefix(); strings.HasPrefix(objpath, pref) {
-				found, resp.ObjSnapshot = true, objsnp.ObjSnap(objpath[len(pref):])
+				found, resp.Val = true, objsnp.ObjSnap(objpath[len(pref):])
 				break
 			}
 		}
@@ -65,7 +65,7 @@ type ipcResp struct {
 	Extras      *ExtrasResp    `json:"extras,omitempty"`
 	Menu        *menuResp      `json:"menu,omitempty"`
 	CaddyUpdate *Caddy         `json:"caddy,omitempty"`
-	ObjSnapshot interface{}    `json:"obj,omitempty"`
+	Val         interface{}    `json:"val,omitempty"`
 }
 
 func (me *ipcResp) postProcess() {

@@ -14,8 +14,9 @@ type TreeItem struct {
 }
 
 type iTreeDataProvider interface {
-	GetTreeItem(string) *TreeItem
-	GetChildren(string) []string
+	getTreeItem([]string) *TreeItem
+	getChildren([]string) []string
+	id() string
 }
 
 type sideViews struct {
@@ -30,14 +31,25 @@ func (me *sideViews) dispatch(req *ipcReq, resp *ipcResp) bool {
 	if req.IpcID == IPCID_TREEVIEW_GETITEM || req.IpcID == IPCID_TREEVIEW_CHILDREN {
 		var dataprovider iTreeDataProvider
 		treepath, _ := req.IpcArgs.(string)
-		if treepathparts := strings.Split(treepath, ":"); len(treepathparts) == 0 {
+		treepathparts := strings.Split(treepath, ":")
+		if len(treepathparts) == 0 {
 			BadPanic(IPCID_TREEVIEW_GETITEM.String()+" arg", "")
-		} else if dataprovider := me.treeDataProviders[treepathparts[0]]; dataprovider == nil {
-			BadPanic("tree-data provider ID", treepathparts[0])
+		} else {
+			for _, dp := range me.treeDataProviders {
+				if dp.id() == treepathparts[0] {
+					dataprovider = dp
+					break
+				}
+			}
+			if dataprovider == nil {
+				BadPanic("tree-data provider ID", treepathparts[0])
+			}
 		}
 		switch req.IpcID {
 		case IPCID_TREEVIEW_GETITEM:
+			resp.Val = dataprovider.getTreeItem(treepathparts)
 		case IPCID_TREEVIEW_CHILDREN:
+			resp.Val = dataprovider.getChildren(treepathparts)
 		}
 		return true
 	}

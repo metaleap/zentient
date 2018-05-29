@@ -86,7 +86,7 @@ func SendNotificationMessageToClient(level DiagSeverity, message string) (err er
 	} else if level == DIAG_SEV_WARN {
 		ipcid = IPCID_NOTIFY_WARN
 	}
-	err = send(&ipcResp{IpcID: ipcid, ObjSnapshot: message})
+	err = send(&ipcResp{IpcID: ipcid, Val: message})
 	return
 }
 

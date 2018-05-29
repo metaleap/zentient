@@ -21,7 +21,7 @@ func (me *PagesBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	switch req.IpcID {
 	case IPCID_PAGE_HTML:
 		resp.IpcID = req.IpcID
-		resp.ObjSnapshot = me.onPageHtml(req.IpcArgs.(string))
+		resp.Val = me.onPageHtml(req.IpcArgs.(string))
 	default:
 		return false
 	}
