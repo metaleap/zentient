@@ -87,12 +87,14 @@ type treeDataProviderPkgIntel struct {
 func (me *treeDataProviderPkgIntel) id() string { return me.treeViewId }
 
 func (me *treeDataProviderPkgIntel) getTreeViewItem(item sideViewTreeItem) *TreeViewItem {
-	println(len(item))
-	foo := item.String()
 	if len(item) == 1 && item[0] == "?" {
-		foo = "(" + Prog.Name + " does not support the PkgIntel interface)"
+		return &TreeViewItem{ID: "?", Label: "(" + Prog.Name + " does not support the PkgIntel interface)"}
 	}
-	return &TreeViewItem{ID: ustr.Lo(foo), Label: foo, Tooltip: ustr.Up(foo)}
+	pkg := Lang.PkgIntel.Pkgs().ById(item[0])
+	if len(item) == 1 {
+		return &TreeViewItem{ID: item[0], Label: pkg.ShortName, Tooltip: pkg.LongName, CollapsibleState: 1}
+	}
+	return &TreeViewItem{ID: "??", Label: "UnExPecTed"}
 }
 
 func (me *treeDataProviderPkgIntel) getChildren(item sideViewTreeItem) []sideViewTreeItem {
@@ -102,11 +104,12 @@ func (me *treeDataProviderPkgIntel) getChildren(item sideViewTreeItem) []sideVie
 				sideViewTreeItem{"?"},
 			}
 		} else {
-			return []sideViewTreeItem{
-				sideViewTreeItem{Lang.ID + "-Dep 1"},
-				sideViewTreeItem{Lang.ID + "-Dep 2"},
-				sideViewTreeItem{Lang.ID + "-Dep 3"},
+			pkgs := Lang.PkgIntel.Pkgs()
+			pkgitems := make([]sideViewTreeItem, 0, len(pkgs))
+			for _, pkg := range pkgs {
+				pkgitems = append(pkgitems, sideViewTreeItem{pkg.Id})
 			}
+			return pkgitems
 		}
 	}
 	return nil
