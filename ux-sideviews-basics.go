@@ -47,9 +47,9 @@ func (me *sideViews) dispatch(req *ipcReq, resp *ipcResp) bool {
 		}
 		switch {
 		case reqtreeitem:
-			resp.Val = dataprovider.getTreeItem(treepathparts)
+			resp.Val = dataprovider.getTreeItem(treepathparts[1:])
 		case reqchildren:
-			resp.Val = dataprovider.getChildren(treepathparts)
+			resp.Val = dataprovider.getChildren(treepathparts[1:])
 		}
 		return true
 	}
