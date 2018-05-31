@@ -9,12 +9,13 @@ const (
 )
 
 type TreeItem struct {
-	ID           string        `json:"id,omitempty"`
-	Label        string        `json:"label,omitempty"`
-	IconPath     string        `json:"iconPath,omitempty"`
-	Tooltip      string        `json:"tooltip,omitempty"`
-	Command      *EditorAction `json:"command,omitempty"`
-	ContextValue string        `json:"contextValue,omitempty"`
+	ID               string        `json:"id,omitempty"`
+	Label            string        `json:"label,omitempty"`
+	IconPath         string        `json:"iconPath,omitempty"`
+	Tooltip          string        `json:"tooltip,omitempty"`
+	Command          *EditorAction `json:"command,omitempty"`
+	ContextValue     string        `json:"contextValue,omitempty"`
+	CollapsibleState int           `json:"collapsibleState"`
 }
 
 type iTreeDataProvider interface {
@@ -25,8 +26,8 @@ type iTreeDataProvider interface {
 
 type sideViews struct {
 	treeDataProviders       []iTreeDataProvider
-	treeDataProviderPkgDeps TreeDataProviderPkgDeps
-	treeDataProviderPkgSyms TreeDataProviderPkgSyms
+	treeDataProviderPkgDeps treeDataProviderPkgDeps
+	treeDataProviderPkgSyms treeDataProviderPkgSyms
 }
 
 func (me *sideViews) Init() {
