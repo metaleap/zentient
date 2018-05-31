@@ -1,7 +1,11 @@
 package z
 
 import (
-	"strings"
+	"github.com/go-leap/str"
+)
+
+const (
+	sideViewsTreeItemSep = "/"
 )
 
 type TreeItem struct {
@@ -15,43 +19,55 @@ type TreeItem struct {
 
 type iTreeDataProvider interface {
 	getTreeItem([]string) *TreeItem
-	getChildren([]string) []string
+	getChildren([]string) [][]string
 	id() string
 }
 
 type sideViews struct {
-	treeDataProviders []iTreeDataProvider
+	treeDataProviders       []iTreeDataProvider
+	treeDataProviderPkgDeps TreeDataProviderPkgDeps
+	treeDataProviderPkgSyms TreeDataProviderPkgSyms
 }
 
 func (me *sideViews) Init() {
-	me.treeDataProviders = []iTreeDataProvider{&TreeDataProviderPkgSyms{}, &TreeDataProviderPkgDeps{}}
+	me.treeDataProviderPkgDeps.onChanged = me.sendOnChanged
+	me.treeDataProviderPkgSyms.onChanged = me.sendOnChanged
+	me.treeDataProviders = []iTreeDataProvider{&me.treeDataProviderPkgDeps, &me.treeDataProviderPkgSyms}
 }
 
 func (me *sideViews) dispatch(req *ipcReq, resp *ipcResp) bool {
 	if reqtreeitem, reqchildren := req.IpcID == IPCID_TREEVIEW_GETITEM, req.IpcID == IPCID_TREEVIEW_CHILDREN; reqtreeitem || reqchildren {
 		var dataprovider iTreeDataProvider
-		treepath, _ := req.IpcArgs.(string)
-		treepathparts := strings.Split(treepath, ":")
-		if len(treepathparts) == 0 {
-			BadPanic(IPCID_TREEVIEW_GETITEM.String()+" arg", "")
-		} else {
-			for _, dp := range me.treeDataProviders {
-				if dp.id() == treepathparts[0] {
-					dataprovider = dp
-					break
-				}
-			}
-			if dataprovider == nil {
-				BadPanic("tree-data provider ID", treepathparts[0])
+		ipcargs := req.IpcArgs.([]interface{})
+		treeviewid := ipcargs[0].(string)
+		treeitem, _ := ipcargs[1].(string)
+		for _, dp := range me.treeDataProviders {
+			if dp.id() == treeviewid {
+				dataprovider = dp
+				break
 			}
 		}
+		if dataprovider == nil {
+			BadPanic("tree-data provider ID", treeviewid)
+		}
+		treepathparts := ustr.Split(treeitem, sideViewsTreeItemSep)
 		switch {
 		case reqtreeitem:
-			resp.Val = dataprovider.getTreeItem(treepathparts[1:])
+			resp.Val = dataprovider.getTreeItem(treepathparts)
 		case reqchildren:
-			resp.Val = dataprovider.getChildren(treepathparts[1:])
+			childitems := dataprovider.getChildren(treepathparts)
+			items := make([]string, len(childitems))
+			for i, item := range childitems {
+				items[i] = ustr.Join(item, sideViewsTreeItemSep)
+			}
+			resp.Val = items
 		}
+		resp.IpcID = req.IpcID
 		return true
 	}
 	return false
+}
+
+func (me *sideViews) sendOnChanged(treeViewId string, item []string) error {
+	return send(&ipcResp{IpcID: IPCID_TREEVIEW_CHANGED, Val: []string{treeViewId, ustr.Join(item, sideViewsTreeItemSep)}})
 }
