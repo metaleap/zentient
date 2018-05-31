@@ -8,7 +8,13 @@ const (
 	sideViewsTreeItemSep = "/"
 )
 
-type TreeItem struct {
+type sideViewTreeItem []string
+
+func (me sideViewTreeItem) String() string {
+	return ustr.Join(me, sideViewsTreeItemSep)
+}
+
+type TreeViewItem struct {
 	ID               string        `json:"id,omitempty"`
 	Label            string        `json:"label,omitempty"`
 	IconPath         string        `json:"iconPath,omitempty"`
@@ -19,20 +25,20 @@ type TreeItem struct {
 }
 
 type iTreeDataProvider interface {
-	getTreeItem([]string) *TreeItem
-	getChildren([]string) [][]string
+	getTreeViewItem(sideViewTreeItem) *TreeViewItem
+	getChildren(sideViewTreeItem) []sideViewTreeItem
 	id() string
 }
 
 type sideViews struct {
 	treeDataProviders       []iTreeDataProvider
-	treeDataProviderPkgDeps treeDataProviderPkgDeps
-	treeDataProviderPkgSyms treeDataProviderPkgSyms
+	treeDataProviderPkgDeps treeDataProviderPkgIntel
+	treeDataProviderPkgSyms treeDataProviderPkgIntel
 }
 
 func (me *sideViews) Init() {
-	me.treeDataProviderPkgDeps.onChanged = me.sendOnChanged
-	me.treeDataProviderPkgSyms.onChanged = me.sendOnChanged
+	me.treeDataProviderPkgDeps.onChanged, me.treeDataProviderPkgSyms.onChanged = me.sendOnChanged, me.sendOnChanged
+	me.treeDataProviderPkgDeps.treeViewId, me.treeDataProviderPkgSyms.treeViewId = "pkgDeps", "pkgSyms"
 	me.treeDataProviders = []iTreeDataProvider{&me.treeDataProviderPkgDeps, &me.treeDataProviderPkgSyms}
 }
 
@@ -54,12 +60,12 @@ func (me *sideViews) dispatch(req *ipcReq, resp *ipcResp) bool {
 		treepathparts := ustr.Split(treeitem, sideViewsTreeItemSep)
 		switch {
 		case reqtreeitem:
-			resp.Val = dataprovider.getTreeItem(treepathparts)
+			resp.Val = dataprovider.getTreeViewItem(treepathparts)
 		case reqchildren:
 			childitems := dataprovider.getChildren(treepathparts)
 			items := make([]string, len(childitems))
 			for i, item := range childitems {
-				items[i] = ustr.Join(item, sideViewsTreeItemSep)
+				items[i] = item.String()
 			}
 			resp.Val = items
 		}
@@ -69,6 +75,39 @@ func (me *sideViews) dispatch(req *ipcReq, resp *ipcResp) bool {
 	return false
 }
 
-func (me *sideViews) sendOnChanged(treeViewId string, item []string) error {
-	return send(&ipcResp{IpcID: IPCID_TREEVIEW_CHANGED, Val: []string{treeViewId, ustr.Join(item, sideViewsTreeItemSep)}})
+func (me *sideViews) sendOnChanged(treeViewId string, item sideViewTreeItem) error {
+	return send(&ipcResp{IpcID: IPCID_TREEVIEW_CHANGED, Val: []string{treeViewId, item.String()}})
+}
+
+type treeDataProviderPkgIntel struct {
+	treeViewId string
+	onChanged  func(string, sideViewTreeItem) error
+}
+
+func (me *treeDataProviderPkgIntel) id() string { return me.treeViewId }
+
+func (me *treeDataProviderPkgIntel) getTreeViewItem(item sideViewTreeItem) *TreeViewItem {
+	println(len(item))
+	foo := item.String()
+	if len(item) == 1 && item[0] == "?" {
+		foo = "(" + Prog.Name + " does not support the PkgIntel interface)"
+	}
+	return &TreeViewItem{ID: ustr.Lo(foo), Label: foo, Tooltip: ustr.Up(foo)}
+}
+
+func (me *treeDataProviderPkgIntel) getChildren(item sideViewTreeItem) []sideViewTreeItem {
+	if len(item) == 0 {
+		if Lang.PkgIntel == nil {
+			return []sideViewTreeItem{
+				sideViewTreeItem{"?"},
+			}
+		} else {
+			return []sideViewTreeItem{
+				sideViewTreeItem{Lang.ID + "-Dep 1"},
+				sideViewTreeItem{Lang.ID + "-Dep 2"},
+				sideViewTreeItem{Lang.ID + "-Dep 3"},
+			}
+		}
+	}
+	return nil
 }
