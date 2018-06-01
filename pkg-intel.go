@@ -25,19 +25,16 @@ type PkgInfo struct {
 	Id        string
 	ShortName string
 	LongName  string
-	Deps      PkgInfos
-	Mems      []*PkgMemInfo
+	Deps      func() PkgInfos
+	Mems      func() []*PkgMemInfo
+	Forget    func()
 }
 
 type PkgMemInfo struct {
 	Kind Symbol
 	Name string
 	Desc string
-	Subs []*PkgMemInfo
-}
-
-func (me *PkgInfo) Forget() {
-	me.Deps, me.Mems = nil, nil
+	Subs func() []*PkgMemInfo
 }
 
 type PkgIntelBase struct {

@@ -12,7 +12,10 @@ import (
 
 const _PKG_NOT_READY_MSG = "Package Tracker not yet ready — try again in a few seconds."
 
-var pkgIntel goPkgIntel
+var (
+	pkgIntel          goPkgIntel
+	strReplDitchSlash = strings.NewReplacer("/", "~")
+)
 
 func init() {
 	pkgIntel.Impl, z.Lang.PkgIntel = &pkgIntel, &pkgIntel
@@ -88,8 +91,8 @@ func (me *goPkgIntel) onSrcLens(lf *z.ListFilter, srcLens *z.SrcLens) {
 	curpkgdesc, isdepd, isdepi, isimpd, isimpi, isself := "?", lf == me.listFilterDepD, lf == me.listFilterDepI, lf == me.listFilterImpD, lf == me.listFilterImpI, lf == me.listFilterSelf
 	lf.Pred, lf.Desc = me.isPkgNope, "?"
 
-	if srcLens != nil && srcLens.FilePath != "" {
-		if curpkg := udevgo.PkgsByDir[filepath.Dir(srcLens.FilePath)]; curpkg != nil {
+	if pkgsbydir := udevgo.PkgsByDir; srcLens != nil && srcLens.FilePath != "" && pkgsbydir != nil {
+		if curpkg := pkgsbydir[filepath.Dir(srcLens.FilePath)]; curpkg != nil {
 			curpkgdesc = curpkg.ImportPath
 			if isdepd {
 				lf.Pred = func(p z.IListItem) bool {
@@ -141,11 +144,11 @@ func (me *goPkgIntel) Count(filters z.ListFilters) (count int) {
 }
 
 func (me *goPkgIntel) list(filters z.ListFilters, count *int) (results z.ListItems) {
-	if udevgo.PkgsByDir != nil {
+	if pkgsbydir := udevgo.PkgsByDir; pkgsbydir != nil {
 		if count != nil {
 			*count = 0
 		}
-		for _, pkg := range udevgo.PkgsByDir {
+		for _, pkg := range pkgsbydir {
 			if pkg != nil {
 				allpredicatesmatch := true
 				if filters != nil {
@@ -263,11 +266,31 @@ func (me *goPkgIntel) Filters() []*z.ListFilter {
 }
 
 func (me *goPkgIntel) ObjSnap(pkgDir string) interface{} {
-	if udevgo.PkgsByDir != nil {
-		if pkg := udevgo.PkgsByDir[pkgDir]; pkg != nil {
+	if pkgsbydir := udevgo.PkgsByDir; pkgsbydir != nil {
+		if pkg := pkgsbydir[pkgDir]; pkg != nil {
 			pkg.CountLoC()
 			return pkg
 		}
 	}
 	return nil
+}
+
+func (me *goPkgIntel) ensurePkgInfo(pkgsByDir map[string]*udevgo.Pkg, pkgDirPath string) {
+	id := strReplDitchSlash.Replace(pkgDirPath)
+	if pkg := pkgsByDir[pkgDirPath]; pkg != nil {
+		if pkginfo := pkgIntel.Pkgs().ById(id); pkginfo == nil {
+			pkginfo = &z.PkgInfo{Id: id, ShortName: pkg.ImportPath, LongName: pkgDirPath}
+			var deps z.PkgInfos = nil
+			pkginfo.Forget = func() {
+				deps = nil
+			}
+			pkginfo.Deps = func() z.PkgInfos {
+				if pkgsbyimp := udevgo.PkgsByImP; pkgsbyimp != nil && deps == nil {
+					deps = make(z.PkgInfos, 0)
+				}
+				return deps
+			}
+			pkgIntel.PkgsAdd(pkginfo)
+		}
+	}
 }

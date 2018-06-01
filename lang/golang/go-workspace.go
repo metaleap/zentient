@@ -10,9 +10,8 @@ import (
 )
 
 var (
-	workspace         goWorkspace
-	goPathScopes      []string
-	strReplDitchSlash = strings.NewReplacer("/", "~")
+	workspace    goWorkspace
+	goPathScopes []string
 )
 
 func init() {
@@ -43,23 +42,17 @@ func (me *goWorkspace) onAfterChanges(upd *z.WorkspaceChanges) {
 			udevgo.GuruScopes = strings.Join(goPathScopes, ",")
 		}
 	}
-	if udevgo.PkgsByDir != nil {
+	if pkgsbydir := udevgo.PkgsByDir; pkgsbydir != nil {
 		for _, fp := range upd.OpenedFiles {
-			dp := filepath.Dir(fp)
-			id := strReplDitchSlash.Replace(dp)
-			if pkg := udevgo.PkgsByDir[dp]; pkg != nil {
-				if pkginfo := pkgIntel.Pkgs().ById(id); pkginfo == nil {
-					pkgIntel.PkgsAdd(&z.PkgInfo{Id: id, ShortName: pkg.ImportPath, LongName: dp})
-				}
-			}
+			pkgIntel.ensurePkgInfo(pkgsbydir, filepath.Dir(fp))
 		}
 	}
 }
 
 func (me *goWorkspace) onBeforeChanges(_ *z.WorkspaceChanges, freshFiles []string, willAutoLint bool) {
-	if hasnewpkgs := false; udevgo.PkgsByDir != nil && len(freshFiles) > 0 {
+	if hasnewpkgs, pkgsbydir := false, udevgo.PkgsByDir; pkgsbydir != nil && len(freshFiles) > 0 {
 		for _, ffp := range freshFiles {
-			if hasnewpkgs = strings.ToLower(filepath.Ext(ffp)) == ".go" && (nil == udevgo.PkgsByDir[filepath.Dir(ffp)]); hasnewpkgs {
+			if hasnewpkgs = strings.ToLower(filepath.Ext(ffp)) == ".go" && (nil == pkgsbydir[filepath.Dir(ffp)]); hasnewpkgs {
 				break
 			}
 		}

@@ -97,8 +97,8 @@ func (me *goSrcIntel) DefType(srcLens *z.SrcLens) (defs z.SrcLocs) {
 			}
 			pkgimppath, typename := ustr.BreakOnLast(gd.Value.Type, ".")
 			pkgname := ustr.AfterLast(pkgimppath, "/", pkgimppath)
-			if udevgo.PkgsByImP != nil {
-				if pkg := udevgo.PkgsByImP[pkgimppath]; pkg != nil && len(pkg.Name) > 0 {
+			if pkgsbyimp := udevgo.PkgsByImP; pkgsbyimp != nil {
+				if pkg := pkgsbyimp[pkgimppath]; pkg != nil && len(pkg.Name) > 0 {
 					pkgname = pkg.Name
 				}
 			}

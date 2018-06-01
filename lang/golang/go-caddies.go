@@ -21,17 +21,19 @@ func caddyRunRefreshPkgs() {
 	caddyRefreshPkgs.Status.Flag, caddyRefreshPkgs.Status.Desc, caddyRefreshPkgs.Details, caddyRefreshPkgs.UxActionID =
 		z.CADDY_BUSY, "refreshing", "", "zen.menus.main."+z.Lang.PkgIntel.MenuCategory()
 	caddyRefreshPkgs.OnStatusChanged()
-	firstrun := (udevgo.PkgsByDir == nil)
+	pkgsbydir := udevgo.PkgsByDir
+	firstrun := (pkgsbydir == nil)
 
 	if err := udevgo.RefreshPkgs(); err != nil {
 		caddyRefreshPkgs.Status.Flag, caddyRefreshPkgs.Status.Desc =
 			z.CADDY_ERROR, "error: "+err.Error()
 	} else {
+		pkgsbydir = udevgo.PkgsByDir
 		caddyRefreshPkgs.Status.Flag, caddyRefreshPkgs.Status.Desc =
-			z.CADDY_GOOD, z.Strf("%d packages (at least %d broken)", len(udevgo.PkgsByDir), len(udevgo.PkgsErrs))
+			z.CADDY_GOOD, z.Strf("%d packages (at least %d broken)", len(pkgsbydir), len(udevgo.PkgsErrs))
 	}
 	caddyRefreshPkgs.OnStatusChanged()
-	if firstrun && (udevgo.PkgsByDir != nil) && (z.Lang.Diag != nil) {
+	if firstrun && (pkgsbydir != nil) && (z.Lang.Diag != nil) {
 		time.Sleep(time.Millisecond * 123)
 		z.Lang.Workspace.Lock()
 		defer z.Lang.Workspace.Unlock()

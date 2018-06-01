@@ -14,11 +14,11 @@ func ensureBuildOrder(dis z.IDiagJobTarget, dat z.IDiagJobTarget) bool {
 }
 
 func (me *goDiag) OnUpdateBuildDiags(writtenFilePaths []string) (jobs z.DiagBuildJobs) {
-	if pkgjobs := me.onUpdateDiagsPrepPkgJobs(writtenFilePaths); len(pkgjobs) > 0 {
+	if pkgjobs, pkgsbyimp := me.onUpdateDiagsPrepPkgJobs(writtenFilePaths), udevgo.PkgsByImP; len(pkgjobs) > 0 && pkgsbyimp != nil {
 		for _, pj := range pkgjobs {
 			job := &z.DiagJobBuild{DiagJob: pj, TargetCmp: ensureBuildOrder}
 			for _, dependant := range pj.Target.(*udevgo.Pkg).Dependants() {
-				if pkgdep := udevgo.PkgsByImP[dependant]; pkgdep != nil {
+				if pkgdep := pkgsbyimp[dependant]; pkgdep != nil {
 					jobs = append(jobs, &z.DiagJobBuild{DiagJob: z.DiagJob{Target: pkgdep, AffectedFilePaths: pkgdep.GoFilePaths(true)}, TargetCmp: ensureBuildOrder})
 				}
 			}
@@ -27,7 +27,7 @@ func (me *goDiag) OnUpdateBuildDiags(writtenFilePaths []string) (jobs z.DiagBuil
 		for _, job := range jobs {
 			// somewhat inelegant-seeming loop prevents accumulation of duplicate build-diags
 			for _, dep := range job.Target.(*udevgo.Pkg).Deps {
-				if pkgdep := udevgo.PkgsByImP[dep]; pkgdep != nil {
+				if pkgdep := pkgsbyimp[dep]; pkgdep != nil {
 					for _, gfp := range pkgdep.GoFilePaths(true) {
 						if !ustr.In(gfp, job.AffectedFilePaths...) {
 							job.AffectedFilePaths = append(job.AffectedFilePaths, gfp)
@@ -107,7 +107,7 @@ func (me *goDiag) tryFixImpMissing(d *z.DiagItem) (fix *z.FixUp) {
 		}
 		if pkgname != "" {
 			mpkgs := udevgo.PkgsByName(pkgname)
-			if pkg := udevgo.PkgsByImP[ustr.Fewest(mpkgs, "/", ustr.Shortest)]; pkg != nil {
+			if pkg := pkgs[ustr.Fewest(mpkgs, "/", ustr.Shortest)]; pkg != nil {
 				fix = &z.FixUp{Name: "Add missing imports", Items: []string{pkg.ImportPath}}
 				fix.Edits.AddInsert(d.Loc.FilePath, func(srclens *z.SrcLens, set *z.SrcPos) (ins string) {
 					if i := strings.Index(srclens.Txt, "\nimport (\n"); i > 0 {

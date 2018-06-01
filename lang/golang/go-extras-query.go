@@ -28,8 +28,8 @@ var (
 
 func (me *goExtras) runQuery_StructLayout(srcLens *z.SrcLens, arg string, resp *z.ExtrasResp) {
 	args := ustr.Split(arg, " ")
-	if len(args) == 1 && udevgo.PkgsByDir != nil && srcLens.FilePath != "" {
-		if pkg := udevgo.PkgsByDir[filepath.Dir(srcLens.FilePath)]; pkg != nil {
+	if pkgsbydir := udevgo.PkgsByDir; len(args) == 1 && pkgsbydir != nil && srcLens.FilePath != "" {
+		if pkg := pkgsbydir[filepath.Dir(srcLens.FilePath)]; pkg != nil {
 			args = append([]string{pkg.ImportPath}, args[0])
 		}
 	}
@@ -56,11 +56,11 @@ func (me *goExtras) runQuery_StructLayout(srcLens *z.SrcLens, arg string, resp *
 
 func (me *goExtras) runQuery_Godoc(srcLens *z.SrcLens, arg string, resp *z.ExtrasResp) {
 	if isdocpath := strings.ContainsRune(arg, '/') || strings.ContainsRune(arg, '#'); !isdocpath {
-		if isup := ustr.BeginsUpper(arg); isup && udevgo.PkgsByDir != nil {
-			if pkg := udevgo.PkgsByDir[filepath.Dir(srcLens.FilePath)]; pkg != nil {
+		if isup, pkgsbydir := ustr.BeginsUpper(arg), udevgo.PkgsByDir; isup && pkgsbydir != nil {
+			if pkg := pkgsbydir[filepath.Dir(srcLens.FilePath)]; pkg != nil {
 				arg = pkg.ImportPath + "#" + arg
 			}
-		} else if (!isup) && udevgo.PkgsByImP != nil && nil == udevgo.PkgsByImP[arg] {
+		} else if pkgsbyimp := udevgo.PkgsByImP; (!isup) && pkgsbyimp != nil && nil == pkgsbyimp[arg] {
 			if pkgimppath := ustr.Fewest(udevgo.PkgsByName(arg), "/", ustr.Shortest); pkgimppath != "" {
 				arg = pkgimppath
 			}
@@ -77,8 +77,8 @@ func (me *goExtras) runQuery_GoDoc(srcLens *z.SrcLens, arg string, resp *z.Extra
 		arg = arg[:i1] + " " + arg[i1+1:]
 	}
 	var cmd = ustr.Split(arg, " ")
-	if udevgo.PkgsByImP != nil && ustr.IsLower(cmd[0][:1]) && udevgo.PkgsByImP[cmd[0]] == nil {
-		for _, pkg := range udevgo.PkgsByImP {
+	if pkgsbyimp := udevgo.PkgsByImP; pkgsbyimp != nil && ustr.IsLower(cmd[0][:1]) && pkgsbyimp[cmd[0]] == nil {
+		for _, pkg := range pkgsbyimp {
 			if pkg.Name == cmd[0] {
 				cmd[0] = pkg.ImportPath
 				break

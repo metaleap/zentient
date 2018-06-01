@@ -46,17 +46,17 @@ github.com/golamb/... github.com/capnproto/... github.com/robertkrimen/... githu
 */
 
 func (*goSettings) onChangingGuruScopeExcl(newVal interface{}) {
-	if patterns := newVal.([]string); udevgo.PkgsByImP == nil {
+	if patterns, pkgsbyimp := newVal.([]string), udevgo.PkgsByImP; pkgsbyimp == nil {
 		panic(_PKG_NOT_READY_MSG)
 	} else {
 		for _, pat := range patterns {
-			if pkg := udevgo.PkgsByImP[pat]; pkg == nil {
+			if pkg := pkgsbyimp[pat]; pkg == nil {
 				if !strings.HasSuffix(pat, "/...") {
 					z.BadPanic("guru `-scope` exclusion pattern (no `/...` pattern and no such import-path exists) — ", pat)
 				}
 				var found bool
 				pref, self := pat[:len(pat)-3], pat[:len(pat)-4]
-				for _, pkg = range udevgo.PkgsByImP {
+				for _, pkg = range pkgsbyimp {
 					if found = strings.HasPrefix(pkg.ImportPath, pref) || pkg.ImportPath == self; found {
 						break
 					}

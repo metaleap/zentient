@@ -90,6 +90,7 @@ func (me *treeDataProviderPkgIntel) getTreeViewItem(item sideViewTreeItem) *Tree
 	if len(item) == 1 && item[0] == "?" {
 		return &TreeViewItem{ID: "?", Label: "(" + Prog.Name + " does not support the PkgIntel interface)"}
 	}
+
 	pkg := Lang.PkgIntel.Pkgs().ById(item[0])
 	if len(item) == 1 {
 		return &TreeViewItem{ID: item[0], Label: pkg.ShortName, Tooltip: pkg.LongName, CollapsibleState: 1}
