@@ -77,6 +77,7 @@ func (me *PkgIntelBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 
 func (me *PkgIntelBase) PkgsAdd(pkg *PkgInfo) {
 	me.pkgs.Add(pkg)
+	Lang.sideViews.sendOnChanged("", sideViewTreeItem{pkg.Id})
 }
 
 func (me *PkgIntelBase) Pkgs() PkgInfos {

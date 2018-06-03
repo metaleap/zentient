@@ -279,18 +279,23 @@ func (me *goPkgIntel) ensurePkgInfo(pkgsByDir map[string]*udevgo.Pkg, pkgDirPath
 	id := strReplDitchSlash.Replace(pkgDirPath)
 	if pkg := pkgsByDir[pkgDirPath]; pkg != nil {
 		if pkginfo := pkgIntel.Pkgs().ById(id); pkginfo == nil {
-			pkginfo = &z.PkgInfo{Id: id, ShortName: pkg.ImportPath, LongName: pkgDirPath}
-			var deps z.PkgInfos = nil
-			pkginfo.Forget = func() {
-				deps = nil
-			}
-			pkginfo.Deps = func() z.PkgInfos {
-				if pkgsbyimp := udevgo.PkgsByImP; pkgsbyimp != nil && deps == nil {
-					deps = make(z.PkgInfos, 0)
-				}
-				return deps
-			}
+			pkginfo = me.newPkgInfo(id, pkgDirPath, pkg)
 			pkgIntel.PkgsAdd(pkginfo)
 		}
 	}
+}
+
+func (*goPkgIntel) newPkgInfo(id string, pkgDirPath string, pkg *udevgo.Pkg) *z.PkgInfo {
+	pkginfo := &z.PkgInfo{Id: id, ShortName: pkg.ImportPath, LongName: pkgDirPath}
+	var deps z.PkgInfos = nil
+	pkginfo.Forget = func() {
+		deps = nil
+	}
+	pkginfo.Deps = func() z.PkgInfos {
+		if pkgsbyimp := udevgo.PkgsByImP; pkgsbyimp != nil && deps == nil {
+			deps = make(z.PkgInfos, 0)
+		}
+		return deps
+	}
+	return pkginfo
 }

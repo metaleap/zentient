@@ -75,13 +75,18 @@ func (me *sideViews) dispatch(req *ipcReq, resp *ipcResp) bool {
 	return false
 }
 
-func (me *sideViews) sendOnChanged(treeViewId string, item sideViewTreeItem) error {
-	return send(&ipcResp{IpcID: IPCID_TREEVIEW_CHANGED, Val: []string{treeViewId, item.String()}})
+func (me *sideViews) sendOnChanged(treeViewId string, item sideViewTreeItem) {
+	if treeViewId != "" {
+		_ = send(&ipcResp{IpcID: IPCID_TREEVIEW_CHANGED, Val: []string{treeViewId, item.String()}})
+	} else {
+		_ = send(&ipcResp{IpcID: IPCID_TREEVIEW_CHANGED, Val: []string{me.treeDataProviderPkgDeps.treeViewId, item.String()}})
+		_ = send(&ipcResp{IpcID: IPCID_TREEVIEW_CHANGED, Val: []string{me.treeDataProviderPkgSyms.treeViewId, item.String()}})
+	}
 }
 
 type treeDataProviderPkgIntel struct {
 	treeViewId string
-	onChanged  func(string, sideViewTreeItem) error
+	onChanged  func(string, sideViewTreeItem)
 }
 
 func (me *treeDataProviderPkgIntel) id() string { return me.treeViewId }
