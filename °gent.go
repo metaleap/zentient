@@ -564,6 +564,12 @@ func (this Symbol) String() (ret string) {
 	return
 }
 
+// Valid returns whether the value of this `Completion` is between `CMPL_TEXT` (inclusive) and `CMPL_TYPEPARAMETER` (inclusive).
+func (this Completion) Valid() (ret bool) {
+	ret = ((this >= CMPL_TEXT) && (this <= CMPL_TYPEPARAMETER))
+	return
+}
+
 // IsCMPL_TEXT returns whether the value of this `Completion` equals `CMPL_TEXT`.
 func (this Completion) IsCMPL_TEXT() (ret bool) { ret = (this == CMPL_TEXT); return }
 
@@ -694,12 +700,6 @@ func (this Completion) String() (ret string) {
 	default:
 		ret = strconv.FormatUint(uint64(this), 10)
 	}
-	return
-}
-
-// Valid returns whether the value of this `Completion` is between `CMPL_TEXT` (inclusive) and `CMPL_TYPEPARAMETER` (inclusive).
-func (this Completion) Valid() (ret bool) {
-	ret = ((this >= CMPL_TEXT) && (this <= CMPL_TYPEPARAMETER))
 	return
 }
 
