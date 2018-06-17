@@ -62,8 +62,6 @@ const (
 	IPCID_EXTRAS_INTEL_RUN
 	IPCID_EXTRAS_QUERY_LIST
 	IPCID_EXTRAS_QUERY_RUN
-
-	IPCID_MIN_INVALID // new entries go above this one
 )
 
 type DiagSeverity int
@@ -73,8 +71,6 @@ const (
 	DIAG_SEV_WARN
 	DIAG_SEV_INFO
 	DIAG_SEV_HINT
-
-	DIAG_MIN_INVALID // new entries go above this one
 )
 
 type Symbol uint8
@@ -106,8 +102,6 @@ const (
 	SYM_EVENT
 	SYM_OPERATOR
 	SYM_TYPEPARAMETER
-
-	SYM_MIN_INVALID // new entries go above this one
 )
 
 type Completion uint8
@@ -138,8 +132,6 @@ const (
 	CMPL_EVENT
 	CMPL_OPERATOR
 	CMPL_TYPEPARAMETER
-
-	CMPL_MIN_INVALID // new entries go above this one
 )
 
 // Stringers below.
