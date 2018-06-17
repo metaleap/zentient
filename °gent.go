@@ -2,6 +2,10 @@ package z
 
 // DO NOT EDIT: code generated with zentient-dbg-vsc-go-demo-go-gent using github.com/metaleap/go-gent
 
+import (
+	strconv "strconv"
+)
+
 // Valid returns whether the value of this `CaddyStatus` is between `CADDY_PENDING` (inclusive) and `CADDY_GOOD` (inclusive).
 func (this CaddyStatus) Valid() (ret bool) {
 	ret = ((this >= CADDY_PENDING) && (this <= CADDY_GOOD))
@@ -20,7 +24,21 @@ func (this CaddyStatus) IsCADDY_BUSY() (ret bool) { ret = (this == CADDY_BUSY); 
 // IsCADDY_GOOD returns whether the value of this `CaddyStatus` equals `CADDY_GOOD`.
 func (this CaddyStatus) IsCADDY_GOOD() (ret bool) { ret = (this == CADDY_GOOD); return }
 
-func (this CaddyStatus) Str() (ret string) { ret = "ret"; return }
+func (this CaddyStatus) String() (ret string) {
+	switch this {
+	case CADDY_PENDING:
+		ret = "CADDY_PENDING"
+	case CADDY_ERROR:
+		ret = "CADDY_ERROR"
+	case CADDY_BUSY:
+		ret = "CADDY_BUSY"
+	case CADDY_GOOD:
+		ret = "CADDY_GOOD"
+	default:
+		ret = strconv.FormatUint(uint64(this), 10)
+	}
+	return
+}
 
 // Valid returns whether the value of this `IpcIDs` is between `IPCID_MENUS_MAIN` (inclusive) and `IPCID_EXTRAS_QUERY_RUN` (inclusive).
 func (this IpcIDs) Valid() (ret bool) {
@@ -262,7 +280,111 @@ func (this IpcIDs) IsIPCID_EXTRAS_QUERY_RUN() (ret bool) {
 	return
 }
 
-func (this IpcIDs) Str() (ret string) { ret = "ret"; return }
+func (this IpcIDs) String() (ret string) {
+	switch this {
+	case IPCID_MENUS_MAIN:
+		ret = "IPCID_MENUS_MAIN"
+	case IPCID_MENUS_PKGS:
+		ret = "IPCID_MENUS_PKGS"
+	case IPCID_MENUS_TOOLS:
+		ret = "IPCID_MENUS_TOOLS"
+	case IPCID_OBJ_SNAPSHOT:
+		ret = "IPCID_OBJ_SNAPSHOT"
+	case IPCID_PAGE_HTML:
+		ret = "IPCID_PAGE_HTML"
+	case IPCID_TREEVIEW_GETITEM:
+		ret = "IPCID_TREEVIEW_GETITEM"
+	case IPCID_TREEVIEW_CHILDREN:
+		ret = "IPCID_TREEVIEW_CHILDREN"
+	case IPCID_TREEVIEW_CHANGED:
+		ret = "IPCID_TREEVIEW_CHANGED"
+	case IPCID_CFG_RESETALL:
+		ret = "IPCID_CFG_RESETALL"
+	case IPCID_CFG_LIST:
+		ret = "IPCID_CFG_LIST"
+	case IPCID_CFG_SET:
+		ret = "IPCID_CFG_SET"
+	case IPCID_NOTIFY_INFO:
+		ret = "IPCID_NOTIFY_INFO"
+	case IPCID_NOTIFY_WARN:
+		ret = "IPCID_NOTIFY_WARN"
+	case IPCID_NOTIFY_ERR:
+		ret = "IPCID_NOTIFY_ERR"
+	case IPCID_PROJ_CHANGED:
+		ret = "IPCID_PROJ_CHANGED"
+	case IPCID_PROJ_POLLEVTS:
+		ret = "IPCID_PROJ_POLLEVTS"
+	case IPCID_SRCDIAG_LIST:
+		ret = "IPCID_SRCDIAG_LIST"
+	case IPCID_SRCDIAG_RUN_CURFILE:
+		ret = "IPCID_SRCDIAG_RUN_CURFILE"
+	case IPCID_SRCDIAG_RUN_OPENFILES:
+		ret = "IPCID_SRCDIAG_RUN_OPENFILES"
+	case IPCID_SRCDIAG_RUN_ALLFILES:
+		ret = "IPCID_SRCDIAG_RUN_ALLFILES"
+	case IPCID_SRCDIAG_FORGETALL:
+		ret = "IPCID_SRCDIAG_FORGETALL"
+	case IPCID_SRCDIAG_PEEKHIDDEN:
+		ret = "IPCID_SRCDIAG_PEEKHIDDEN"
+	case IPCID_SRCDIAG_PUB:
+		ret = "IPCID_SRCDIAG_PUB"
+	case IPCID_SRCDIAG_AUTO_TOGGLE:
+		ret = "IPCID_SRCDIAG_AUTO_TOGGLE"
+	case IPCID_SRCDIAG_AUTO_ALL:
+		ret = "IPCID_SRCDIAG_AUTO_ALL"
+	case IPCID_SRCDIAG_AUTO_NONE:
+		ret = "IPCID_SRCDIAG_AUTO_NONE"
+	case IPCID_SRCDIAG_STARTED:
+		ret = "IPCID_SRCDIAG_STARTED"
+	case IPCID_SRCDIAG_FINISHED:
+		ret = "IPCID_SRCDIAG_FINISHED"
+	case IPCID_SRCMOD_FMT_SETDEFMENU:
+		ret = "IPCID_SRCMOD_FMT_SETDEFMENU"
+	case IPCID_SRCMOD_FMT_SETDEFPICK:
+		ret = "IPCID_SRCMOD_FMT_SETDEFPICK"
+	case IPCID_SRCMOD_FMT_RUNONFILE:
+		ret = "IPCID_SRCMOD_FMT_RUNONFILE"
+	case IPCID_SRCMOD_FMT_RUNONSEL:
+		ret = "IPCID_SRCMOD_FMT_RUNONSEL"
+	case IPCID_SRCMOD_RENAME:
+		ret = "IPCID_SRCMOD_RENAME"
+	case IPCID_SRCMOD_ACTIONS:
+		ret = "IPCID_SRCMOD_ACTIONS"
+	case IPCID_SRCINTEL_HOVER:
+		ret = "IPCID_SRCINTEL_HOVER"
+	case IPCID_SRCINTEL_SYMS_FILE:
+		ret = "IPCID_SRCINTEL_SYMS_FILE"
+	case IPCID_SRCINTEL_SYMS_PROJ:
+		ret = "IPCID_SRCINTEL_SYMS_PROJ"
+	case IPCID_SRCINTEL_CMPL_ITEMS:
+		ret = "IPCID_SRCINTEL_CMPL_ITEMS"
+	case IPCID_SRCINTEL_CMPL_DETAILS:
+		ret = "IPCID_SRCINTEL_CMPL_DETAILS"
+	case IPCID_SRCINTEL_HIGHLIGHTS:
+		ret = "IPCID_SRCINTEL_HIGHLIGHTS"
+	case IPCID_SRCINTEL_SIGNATURE:
+		ret = "IPCID_SRCINTEL_SIGNATURE"
+	case IPCID_SRCINTEL_REFERENCES:
+		ret = "IPCID_SRCINTEL_REFERENCES"
+	case IPCID_SRCINTEL_DEFSYM:
+		ret = "IPCID_SRCINTEL_DEFSYM"
+	case IPCID_SRCINTEL_DEFTYPE:
+		ret = "IPCID_SRCINTEL_DEFTYPE"
+	case IPCID_SRCINTEL_DEFIMPL:
+		ret = "IPCID_SRCINTEL_DEFIMPL"
+	case IPCID_EXTRAS_INTEL_LIST:
+		ret = "IPCID_EXTRAS_INTEL_LIST"
+	case IPCID_EXTRAS_INTEL_RUN:
+		ret = "IPCID_EXTRAS_INTEL_RUN"
+	case IPCID_EXTRAS_QUERY_LIST:
+		ret = "IPCID_EXTRAS_QUERY_LIST"
+	case IPCID_EXTRAS_QUERY_RUN:
+		ret = "IPCID_EXTRAS_QUERY_RUN"
+	default:
+		ret = strconv.FormatUint(uint64(this), 10)
+	}
+	return
+}
 
 // Valid returns whether the value of this `DiagSeverity` is between `DIAG_SEV_ERR` (inclusive) and `DIAG_SEV_HINT` (inclusive).
 func (this DiagSeverity) Valid() (ret bool) {
@@ -282,7 +404,21 @@ func (this DiagSeverity) IsDIAG_SEV_INFO() (ret bool) { ret = (this == DIAG_SEV_
 // IsDIAG_SEV_HINT returns whether the value of this `DiagSeverity` equals `DIAG_SEV_HINT`.
 func (this DiagSeverity) IsDIAG_SEV_HINT() (ret bool) { ret = (this == DIAG_SEV_HINT); return }
 
-func (this DiagSeverity) Str() (ret string) { ret = "ret"; return }
+func (this DiagSeverity) String() (ret string) {
+	switch this {
+	case DIAG_SEV_ERR:
+		ret = "DIAG_SEV_ERR"
+	case DIAG_SEV_WARN:
+		ret = "DIAG_SEV_WARN"
+	case DIAG_SEV_INFO:
+		ret = "DIAG_SEV_INFO"
+	case DIAG_SEV_HINT:
+		ret = "DIAG_SEV_HINT"
+	default:
+		ret = strconv.Itoa(int(this))
+	}
+	return
+}
 
 // Valid returns whether the value of this `Symbol` is between `SYM_FILE` (inclusive) and `SYM_TYPEPARAMETER` (inclusive).
 func (this Symbol) Valid() (ret bool) {
@@ -368,11 +504,63 @@ func (this Symbol) IsSYM_OPERATOR() (ret bool) { ret = (this == SYM_OPERATOR); r
 // IsSYM_TYPEPARAMETER returns whether the value of this `Symbol` equals `SYM_TYPEPARAMETER`.
 func (this Symbol) IsSYM_TYPEPARAMETER() (ret bool) { ret = (this == SYM_TYPEPARAMETER); return }
 
-func (this Symbol) Str() (ret string) { ret = "ret"; return }
-
-// Valid returns whether the value of this `Completion` is between `CMPL_TEXT` (inclusive) and `CMPL_TYPEPARAMETER` (inclusive).
-func (this Completion) Valid() (ret bool) {
-	ret = ((this >= CMPL_TEXT) && (this <= CMPL_TYPEPARAMETER))
+func (this Symbol) String() (ret string) {
+	switch this {
+	case SYM_FILE:
+		ret = "SYM_FILE"
+	case SYM_MODULE:
+		ret = "SYM_MODULE"
+	case SYM_NAMESPACE:
+		ret = "SYM_NAMESPACE"
+	case SYM_PACKAGE:
+		ret = "SYM_PACKAGE"
+	case SYM_CLASS:
+		ret = "SYM_CLASS"
+	case SYM_METHOD:
+		ret = "SYM_METHOD"
+	case SYM_PROPERTY:
+		ret = "SYM_PROPERTY"
+	case SYM_FIELD:
+		ret = "SYM_FIELD"
+	case SYM_CONSTRUCTOR:
+		ret = "SYM_CONSTRUCTOR"
+	case SYM_ENUM:
+		ret = "SYM_ENUM"
+	case SYM_INTERFACE:
+		ret = "SYM_INTERFACE"
+	case SYM_FUNCTION:
+		ret = "SYM_FUNCTION"
+	case SYM_VARIABLE:
+		ret = "SYM_VARIABLE"
+	case SYM_CONSTANT:
+		ret = "SYM_CONSTANT"
+	case SYM_STRING:
+		ret = "SYM_STRING"
+	case SYM_NUMBER:
+		ret = "SYM_NUMBER"
+	case SYM_BOOLEAN:
+		ret = "SYM_BOOLEAN"
+	case SYM_ARRAY:
+		ret = "SYM_ARRAY"
+	case SYM_OBJECT:
+		ret = "SYM_OBJECT"
+	case SYM_KEY:
+		ret = "SYM_KEY"
+	case SYM_NULL:
+		ret = "SYM_NULL"
+	case SYM_ENUMMEMBER:
+		ret = "SYM_ENUMMEMBER"
+	case SYM_STRUCT:
+		ret = "SYM_STRUCT"
+	case SYM_EVENT:
+		ret = "SYM_EVENT"
+	case SYM_OPERATOR:
+		ret = "SYM_OPERATOR"
+	case SYM_TYPEPARAMETER:
+		ret = "SYM_TYPEPARAMETER"
+	default:
+		ret = strconv.FormatUint(uint64(this), 10)
+	}
 	return
 }
 
@@ -451,7 +639,69 @@ func (this Completion) IsCMPL_OPERATOR() (ret bool) { ret = (this == CMPL_OPERAT
 // IsCMPL_TYPEPARAMETER returns whether the value of this `Completion` equals `CMPL_TYPEPARAMETER`.
 func (this Completion) IsCMPL_TYPEPARAMETER() (ret bool) { ret = (this == CMPL_TYPEPARAMETER); return }
 
-func (this Completion) Str() (ret string) { ret = "ret"; return }
+func (this Completion) String() (ret string) {
+	switch this {
+	case CMPL_TEXT:
+		ret = "CMPL_TEXT"
+	case CMPL_METHOD:
+		ret = "CMPL_METHOD"
+	case CMPL_FUNCTION:
+		ret = "CMPL_FUNCTION"
+	case CMPL_CONSTRUCTOR:
+		ret = "CMPL_CONSTRUCTOR"
+	case CMPL_FIELD:
+		ret = "CMPL_FIELD"
+	case CMPL_VARIABLE:
+		ret = "CMPL_VARIABLE"
+	case CMPL_CLASS:
+		ret = "CMPL_CLASS"
+	case CMPL_INTERFACE:
+		ret = "CMPL_INTERFACE"
+	case CMPL_MODULE:
+		ret = "CMPL_MODULE"
+	case CMPL_PROPERTY:
+		ret = "CMPL_PROPERTY"
+	case CMPL_UNIT:
+		ret = "CMPL_UNIT"
+	case CMPL_VALUE:
+		ret = "CMPL_VALUE"
+	case CMPL_ENUM:
+		ret = "CMPL_ENUM"
+	case CMPL_KEYWORD:
+		ret = "CMPL_KEYWORD"
+	case CMPL_SNIPPET:
+		ret = "CMPL_SNIPPET"
+	case CMPL_COLOR:
+		ret = "CMPL_COLOR"
+	case CMPL_FILE:
+		ret = "CMPL_FILE"
+	case CMPL_REFERENCE:
+		ret = "CMPL_REFERENCE"
+	case CMPL_FOLDER:
+		ret = "CMPL_FOLDER"
+	case CMPL_ENUMMEMBER:
+		ret = "CMPL_ENUMMEMBER"
+	case CMPL_CONSTANT:
+		ret = "CMPL_CONSTANT"
+	case CMPL_STRUCT:
+		ret = "CMPL_STRUCT"
+	case CMPL_EVENT:
+		ret = "CMPL_EVENT"
+	case CMPL_OPERATOR:
+		ret = "CMPL_OPERATOR"
+	case CMPL_TYPEPARAMETER:
+		ret = "CMPL_TYPEPARAMETER"
+	default:
+		ret = strconv.FormatUint(uint64(this), 10)
+	}
+	return
+}
+
+// Valid returns whether the value of this `Completion` is between `CMPL_TEXT` (inclusive) and `CMPL_TYPEPARAMETER` (inclusive).
+func (this Completion) Valid() (ret bool) {
+	ret = ((this >= CMPL_TEXT) && (this <= CMPL_TYPEPARAMETER))
+	return
+}
 
 // Valid returns whether the value of this `ToolCats` is between `TOOLS_CAT_MOD_REN` (inclusive) and `TOOLS_CAT_RUNONSAVE` (inclusive).
 func (this ToolCats) Valid() (ret bool) {
@@ -491,5 +741,3 @@ func (this ToolCats) IsTOOLS_CAT_DIAGS() (ret bool) { ret = (this == TOOLS_CAT_D
 
 // IsTOOLS_CAT_RUNONSAVE returns whether the value of this `ToolCats` equals `TOOLS_CAT_RUNONSAVE`.
 func (this ToolCats) IsTOOLS_CAT_RUNONSAVE() (ret bool) { ret = (this == TOOLS_CAT_RUNONSAVE); return }
-
-func (this ToolCats) Str() (ret string) { ret = "ret"; return }
