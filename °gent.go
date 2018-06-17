@@ -20,6 +20,8 @@ func (this CaddyStatus) IsCADDY_BUSY() (ret bool) { ret = (this == CADDY_BUSY); 
 // IsCADDY_GOOD returns whether the value of this `CaddyStatus` equals `CADDY_GOOD`.
 func (this CaddyStatus) IsCADDY_GOOD() (ret bool) { ret = (this == CADDY_GOOD); return }
 
+func (this CaddyStatus) Str() (ret string) { ret = "ret"; return }
+
 // Valid returns whether the value of this `IpcIDs` is between `IPCID_MENUS_MAIN` (inclusive) and `IPCID_EXTRAS_QUERY_RUN` (inclusive).
 func (this IpcIDs) Valid() (ret bool) {
 	ret = ((this >= IPCID_MENUS_MAIN) && (this <= IPCID_EXTRAS_QUERY_RUN))
@@ -260,6 +262,8 @@ func (this IpcIDs) IsIPCID_EXTRAS_QUERY_RUN() (ret bool) {
 	return
 }
 
+func (this IpcIDs) Str() (ret string) { ret = "ret"; return }
+
 // Valid returns whether the value of this `DiagSeverity` is between `DIAG_SEV_ERR` (inclusive) and `DIAG_SEV_HINT` (inclusive).
 func (this DiagSeverity) Valid() (ret bool) {
 	ret = ((this >= DIAG_SEV_ERR) && (this <= DIAG_SEV_HINT))
@@ -277,6 +281,8 @@ func (this DiagSeverity) IsDIAG_SEV_INFO() (ret bool) { ret = (this == DIAG_SEV_
 
 // IsDIAG_SEV_HINT returns whether the value of this `DiagSeverity` equals `DIAG_SEV_HINT`.
 func (this DiagSeverity) IsDIAG_SEV_HINT() (ret bool) { ret = (this == DIAG_SEV_HINT); return }
+
+func (this DiagSeverity) Str() (ret string) { ret = "ret"; return }
 
 // Valid returns whether the value of this `Symbol` is between `SYM_FILE` (inclusive) and `SYM_TYPEPARAMETER` (inclusive).
 func (this Symbol) Valid() (ret bool) {
@@ -362,6 +368,8 @@ func (this Symbol) IsSYM_OPERATOR() (ret bool) { ret = (this == SYM_OPERATOR); r
 // IsSYM_TYPEPARAMETER returns whether the value of this `Symbol` equals `SYM_TYPEPARAMETER`.
 func (this Symbol) IsSYM_TYPEPARAMETER() (ret bool) { ret = (this == SYM_TYPEPARAMETER); return }
 
+func (this Symbol) Str() (ret string) { ret = "ret"; return }
+
 // Valid returns whether the value of this `Completion` is between `CMPL_TEXT` (inclusive) and `CMPL_TYPEPARAMETER` (inclusive).
 func (this Completion) Valid() (ret bool) {
 	ret = ((this >= CMPL_TEXT) && (this <= CMPL_TYPEPARAMETER))
@@ -443,6 +451,8 @@ func (this Completion) IsCMPL_OPERATOR() (ret bool) { ret = (this == CMPL_OPERAT
 // IsCMPL_TYPEPARAMETER returns whether the value of this `Completion` equals `CMPL_TYPEPARAMETER`.
 func (this Completion) IsCMPL_TYPEPARAMETER() (ret bool) { ret = (this == CMPL_TYPEPARAMETER); return }
 
+func (this Completion) Str() (ret string) { ret = "ret"; return }
+
 // Valid returns whether the value of this `ToolCats` is between `TOOLS_CAT_MOD_REN` (inclusive) and `TOOLS_CAT_RUNONSAVE` (inclusive).
 func (this ToolCats) Valid() (ret bool) {
 	ret = ((this >= TOOLS_CAT_MOD_REN) && (this <= TOOLS_CAT_RUNONSAVE))
@@ -481,3 +491,5 @@ func (this ToolCats) IsTOOLS_CAT_DIAGS() (ret bool) { ret = (this == TOOLS_CAT_D
 
 // IsTOOLS_CAT_RUNONSAVE returns whether the value of this `ToolCats` equals `TOOLS_CAT_RUNONSAVE`.
 func (this ToolCats) IsTOOLS_CAT_RUNONSAVE() (ret bool) { ret = (this == TOOLS_CAT_RUNONSAVE); return }
+
+func (this ToolCats) Str() (ret string) { ret = "ret"; return }
