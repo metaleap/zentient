@@ -5,11 +5,11 @@ import (
 	"github.com/metaleap/zentient"
 )
 
-func (me *hsDiag) KnownLinters() z.Tools {
-	return me.knownTools
+func (this *hsDiag) KnownLinters() z.Tools {
+	return this.knownTools
 }
 
-func (me *hsDiag) OnUpdateLintDiags(workspaceFiles z.WorkspaceFiles, diagTools z.Tools, filePaths []string) (jobs z.DiagLintJobs) {
+func (this *hsDiag) OnUpdateLintDiags(workspaceFiles z.WorkspaceFiles, diagTools z.Tools, filePaths []string) (jobs z.DiagLintJobs) {
 	for _, dt := range diagTools {
 		jobs = append(jobs, &z.DiagJobLint{
 			DiagJob: z.DiagJob{AffectedFilePaths: filePaths, Target: filePaths},
@@ -19,12 +19,12 @@ func (me *hsDiag) OnUpdateLintDiags(workspaceFiles z.WorkspaceFiles, diagTools z
 	return
 }
 
-func (me *hsDiag) RunLintJob(job *z.DiagJobLint, workspaceFiles z.WorkspaceFiles) {
+func (this *hsDiag) RunLintJob(job *z.DiagJobLint, workspaceFiles z.WorkspaceFiles) {
 	if job.Tool == tools.hlint {
 		fpaths := job.Target.([]string)
 		for _, srcref := range udevhs.LintHlint(fpaths) {
 			srcref.Flag = int(job.Tool.DiagSev)
-			job.Yield(me.DiagBase.NewDiagItemFrom(srcref, job.Tool.Name, func() string { return fpaths[0] }))
+			job.Yield(this.DiagBase.NewDiagItemFrom(srcref, job.Tool.Name, func() string { return fpaths[0] }))
 		}
 	}
 }

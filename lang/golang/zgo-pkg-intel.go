@@ -83,13 +83,13 @@ func (*goPkgIntel) isPkgOpened(pkg z.IListItem) bool {
 	return false
 }
 
-func (me *goPkgIntel) UnfilteredDesc() string {
+func (*goPkgIntel) UnfilteredDesc() string {
 	return "in your GOPATH"
 }
 
-func (me *goPkgIntel) onSrcLens(lf *z.ListFilter, srcLens *z.SrcLens) {
-	curpkgdesc, isdepd, isdepi, isimpd, isimpi, isself := "?", lf == me.listFilterDepD, lf == me.listFilterDepI, lf == me.listFilterImpD, lf == me.listFilterImpI, lf == me.listFilterSelf
-	lf.Pred, lf.Desc = me.isPkgNope, "?"
+func (this *goPkgIntel) onSrcLens(lf *z.ListFilter, srcLens *z.SrcLens) {
+	curpkgdesc, isdepd, isdepi, isimpd, isimpi, isself := "?", lf == this.listFilterDepD, lf == this.listFilterDepI, lf == this.listFilterImpD, lf == this.listFilterImpI, lf == this.listFilterSelf
+	lf.Pred, lf.Desc = this.isPkgNope, "?"
 
 	if pkgsbydir := udevgo.PkgsByDir; srcLens != nil && srcLens.FilePath != "" && pkgsbydir != nil {
 		if curpkg := pkgsbydir[filepath.Dir(srcLens.FilePath)]; curpkg != nil {
@@ -137,13 +137,13 @@ func (me *goPkgIntel) onSrcLens(lf *z.ListFilter, srcLens *z.SrcLens) {
 	lf.Desc += curpkgdesc + "`"
 }
 
-func (me *goPkgIntel) Count(filters z.ListFilters) (count int) {
+func (this *goPkgIntel) Count(filters z.ListFilters) (count int) {
 	count = -1
-	me.list(filters, &count)
+	this.list(filters, &count)
 	return
 }
 
-func (me *goPkgIntel) list(filters z.ListFilters, count *int) (results z.ListItems) {
+func (*goPkgIntel) list(filters z.ListFilters, count *int) (results z.ListItems) {
 	if pkgsbydir := udevgo.PkgsByDir; pkgsbydir != nil {
 		if count != nil {
 			*count = 0
@@ -173,11 +173,11 @@ func (me *goPkgIntel) list(filters z.ListFilters, count *int) (results z.ListIte
 	return
 }
 
-func (me *goPkgIntel) List(filters z.ListFilters) (results z.ListItems) {
-	return me.list(filters, nil)
+func (this *goPkgIntel) List(filters z.ListFilters) (results z.ListItems) {
+	return this.list(filters, nil)
 }
 
-func (me *goPkgIntel) ListItemToMenuItem(p z.IListItem) (item *z.MenuItem) {
+func (this *goPkgIntel) ListItemToMenuItem(p z.IListItem) (item *z.MenuItem) {
 	descsmighthavepaths := false
 	if pkg, _ := p.(*udevgo.Pkg); pkg != nil {
 		delim, hints := " · ", []string{}
@@ -208,7 +208,7 @@ func (me *goPkgIntel) ListItemToMenuItem(p z.IListItem) (item *z.MenuItem) {
 		} else if pref := "Package " + pkg.Name + " "; strings.HasPrefix(item.Desc, pref) {
 			item.Desc, descsmighthavepaths = item.Desc[len(pref):], true
 		}
-		if pkgtarget := z.Lang.Workspace.PrettyPath(pkg.Target); me.isPkgCommand(pkg) && pkgtarget != "" {
+		if pkgtarget := z.Lang.Workspace.PrettyPath(pkg.Target); this.isPkgCommand(pkg) && pkgtarget != "" {
 			if hint := "Target: " + pkgtarget; item.Desc == "" {
 				item.Desc = hint
 			} else {
@@ -216,7 +216,7 @@ func (me *goPkgIntel) ListItemToMenuItem(p z.IListItem) (item *z.MenuItem) {
 			}
 		}
 
-		if suffix := ": " + pkg.StaleReason; me.isPkgStale(pkg) {
+		if suffix := ": " + pkg.StaleReason; this.isPkgStale(pkg) {
 			if item.Desc == pkg.StaleReason {
 				suffix, descsmighthavepaths = "", true
 			}
@@ -224,18 +224,18 @@ func (me *goPkgIntel) ListItemToMenuItem(p z.IListItem) (item *z.MenuItem) {
 		}
 		ª := func(f z.ListItemPredicate) *z.ListItemPredicate { return &f }
 		for f, s := range map[*z.ListItemPredicate]string{
-			ª(me.isPkgBinary):     "Binary",
-			ª(me.isPkgCommand):    "Command",
-			ª(me.isPkgIncomplete): "Incomplete",
-			ª(me.isPkgStandard):   "Standard",
-			ª(me.isPkgGoRoot):     "In GOROOT",
-			ª(me.isPkgOpened):     "In Workspace",
+			ª(this.isPkgBinary):     "Binary",
+			ª(this.isPkgCommand):    "Command",
+			ª(this.isPkgIncomplete): "Incomplete",
+			ª(this.isPkgStandard):   "Standard",
+			ª(this.isPkgGoRoot):     "In GOROOT",
+			ª(this.isPkgOpened):     "In Workspace",
 		} {
 			if (*f)(pkg) {
 				hints = append(hints, s)
 			}
 		}
-		if me.isPkgError(pkg) {
+		if this.isPkgError(pkg) {
 			if len(pkg.Errs) == 0 {
 				hints = append(hints, "Error")
 			} else {
@@ -253,7 +253,7 @@ func (me *goPkgIntel) ListItemToMenuItem(p z.IListItem) (item *z.MenuItem) {
 		}
 		item.Hint = strings.Join(hints, delim)
 		item.IpcID = z.IPCID_OBJ_SNAPSHOT
-		item.IpcArgs = me.ObjSnapPrefix() + pkg.Dir
+		item.IpcArgs = this.ObjSnapPrefix() + pkg.Dir
 	}
 	if descsmighthavepaths {
 		item.Desc = z.PrettifyPathsIn(item.Desc)
@@ -261,11 +261,11 @@ func (me *goPkgIntel) ListItemToMenuItem(p z.IListItem) (item *z.MenuItem) {
 	return
 }
 
-func (me *goPkgIntel) Filters() []*z.ListFilter {
+func (*goPkgIntel) Filters() []*z.ListFilter {
 	return pkgIntel.listFilters
 }
 
-func (me *goPkgIntel) ObjSnap(pkgDir string) interface{} {
+func (*goPkgIntel) ObjSnap(pkgDir string) interface{} {
 	if pkgsbydir := udevgo.PkgsByDir; pkgsbydir != nil {
 		if pkg := pkgsbydir[pkgDir]; pkg != nil {
 			pkg.CountLoC()
@@ -275,11 +275,11 @@ func (me *goPkgIntel) ObjSnap(pkgDir string) interface{} {
 	return nil
 }
 
-func (me *goPkgIntel) ensurePkgInfo(pkgsByDir map[string]*udevgo.Pkg, pkgDirPath string) {
+func (this *goPkgIntel) ensurePkgInfo(pkgsByDir map[string]*udevgo.Pkg, pkgDirPath string) {
 	id := strReplDitchSlash.Replace(pkgDirPath)
 	if pkg := pkgsByDir[pkgDirPath]; pkg != nil {
 		if pkginfo := pkgIntel.Pkgs().ById(id); pkginfo == nil {
-			pkginfo = me.newPkgInfo(id, pkgDirPath, pkg)
+			pkginfo = this.newPkgInfo(id, pkgDirPath, pkg)
 			pkgIntel.PkgsAdd(pkginfo)
 		}
 	}
@@ -287,7 +287,7 @@ func (me *goPkgIntel) ensurePkgInfo(pkgsByDir map[string]*udevgo.Pkg, pkgDirPath
 
 func (*goPkgIntel) newPkgInfo(id string, pkgDirPath string, pkg *udevgo.Pkg) *z.PkgInfo {
 	pkginfo := &z.PkgInfo{Id: id, ShortName: pkg.ImportPath, LongName: pkgDirPath}
-	var deps z.PkgInfos = nil
+	var deps z.PkgInfos
 	pkginfo.Forget = func() {
 		deps = nil
 	}

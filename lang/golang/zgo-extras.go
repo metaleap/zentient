@@ -18,35 +18,35 @@ type goExtras struct {
 	z.ExtrasBase
 }
 
-func (me *goExtras) ListIntelExtras() (all []*z.ExtrasItem) {
+func (*goExtras) ListIntelExtras() (all []*z.ExtrasItem) {
 	all = []*z.ExtrasItem{&xIntelGuruCallers, &xIntelGuruCallees, &xIntelGuruCallstack, &xIntelGuruFreevars, &xIntelGuruErrtypes, &xIntelGuruPointeeTypes, &xIntelGuruPointeeVals, &xIntelGuruChanpeers}
 	return
 }
 
-func (me *goExtras) ListQueryExtras() (all []*z.ExtrasItem) {
+func (*goExtras) ListQueryExtras() (all []*z.ExtrasItem) {
 	all = []*z.ExtrasItem{&xQuerierGoRun, &xQuerierGodoc, &xQuerierGoDoc, &xQuerierStructlayout}
 	return
 }
 
-func (me *goExtras) RunIntelExtra(srcLens *z.SrcLens, id string, arg string, resp *z.ExtrasResp) {
+func (this *goExtras) RunIntelExtra(srcLens *z.SrcLens, id string, arg string, resp *z.ExtrasResp) {
 	if strings.HasPrefix(id, "guru.") {
-		me.runIntel_Guru(id[5:], srcLens, strings.TrimSpace(arg), resp)
+		this.runIntel_Guru(id[5:], srcLens, strings.TrimSpace(arg), resp)
 	} else {
 		z.BadPanic("CodeIntel ID", id)
 	}
 }
 
-func (me *goExtras) RunQueryExtra(srcLens *z.SrcLens, id string, arg string, resp *z.ExtrasResp) {
+func (this *goExtras) RunQueryExtra(srcLens *z.SrcLens, id string, arg string, resp *z.ExtrasResp) {
 	var runner func(srcLens *z.SrcLens, arg string, resp *z.ExtrasResp)
 	switch id {
 	case xQuerierGoRun.ID:
-		runner = me.runQuery_GoRun
+		runner = this.runQuery_GoRun
 	case xQuerierGodoc.ID:
-		runner = me.runQuery_Godoc
+		runner = this.runQuery_Godoc
 	case xQuerierGoDoc.ID:
-		runner = me.runQuery_GoDoc
+		runner = this.runQuery_GoDoc
 	case xQuerierStructlayout.ID:
-		runner = me.runQuery_StructLayout
+		runner = this.runQuery_StructLayout
 	default:
 		z.BadPanic("CodeQuery ID", id)
 	}

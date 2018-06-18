@@ -19,31 +19,31 @@ type SrcPos struct {
 	byteoff bool
 }
 
-func (me *SrcPos) isBetween(sr *SrcRange) bool {
-	return (sr.isEmpty() && me.isEquivTo(&sr.Start)) ||
-		me.isSameOrGreaterThan(&sr.Start) && sr.End.isSameOrGreaterThan(me)
+func (this *SrcPos) isBetween(sr *SrcRange) bool {
+	return (sr.isEmpty() && this.isEquivTo(&sr.Start)) ||
+		this.isSameOrGreaterThan(&sr.Start) && sr.End.isSameOrGreaterThan(this)
 }
 
-func (me *SrcPos) isEquivTo(pos *SrcPos) bool {
-	if me.Off > 0 && pos.Off > 0 {
-		return me.Off == pos.Off
+func (this *SrcPos) isEquivTo(pos *SrcPos) bool {
+	if this.Off > 0 && pos.Off > 0 {
+		return this.Off == pos.Off
 	}
-	return me.Ln == pos.Ln && me.Col == pos.Col
+	return this.Ln == pos.Ln && this.Col == pos.Col
 }
 
-func (me *SrcPos) isSameOrGreaterThan(pos *SrcPos) bool {
-	if me.Off > 0 && pos.Off > 0 {
-		return me.Off >= pos.Off
+func (this *SrcPos) isSameOrGreaterThan(pos *SrcPos) bool {
+	if this.Off > 0 && pos.Off > 0 {
+		return this.Off >= pos.Off
 	}
-	return me.Ln > pos.Ln ||
-		(me.Ln == pos.Ln && me.Col >= pos.Col)
+	return this.Ln > pos.Ln ||
+		(this.Ln == pos.Ln && this.Col >= pos.Col)
 }
 
-func (me *SrcPos) String() string {
-	if me.Ln > 0 && me.Col > 0 {
-		return Strf("%d,%d", me.Ln, me.Col)
+func (this *SrcPos) String() string {
+	if this.Ln > 0 && this.Col > 0 {
+		return Strf("%d,%d", this.Ln, this.Col)
 	}
-	return Strf("#%d", me.Off-1)
+	return Strf("#%d", this.Off-1)
 }
 
 type SrcRange struct {
@@ -51,29 +51,29 @@ type SrcRange struct {
 	End   SrcPos `json:"e,omitempty"`
 }
 
-func (me *SrcRange) isEmpty() bool {
-	return me.Start.isEquivTo(&me.End) || (me.End.Col == 0 && me.End.Ln == 0 && me.End.Off == 0)
+func (this *SrcRange) isEmpty() bool {
+	return this.Start.isEquivTo(&this.End) || (this.End.Col == 0 && this.End.Ln == 0 && this.End.Off == 0)
 }
 
-func (me *SrcRange) overlapsWith(sr *SrcRange) bool {
-	if is0me, is0sr := me.isEmpty(), sr.isEmpty(); is0me && is0sr {
-		return me.Start.isEquivTo(&sr.Start)
+func (this *SrcRange) overlapsWith(sr *SrcRange) bool {
+	if is0me, is0sr := this.isEmpty(), sr.isEmpty(); is0me && is0sr {
+		return this.Start.isEquivTo(&sr.Start)
 	} else if is0me {
-		return me.Start.isBetween(sr)
+		return this.Start.isBetween(sr)
 	} else if is0sr {
-		return sr.Start.isBetween(me)
+		return sr.Start.isBetween(this)
 	}
-	return (!(me.Start.isEquivTo(&sr.End) || me.End.isEquivTo(&sr.Start))) &&
-		(me.Start.isBetween(sr) || me.End.isBetween(sr) || sr.Start.isBetween(me) || sr.End.isBetween(me))
+	return (!(this.Start.isEquivTo(&sr.End) || this.End.isEquivTo(&sr.Start))) &&
+		(this.Start.isBetween(sr) || this.End.isBetween(sr) || sr.Start.isBetween(this) || sr.End.isBetween(this))
 }
 
 type SrcLocs []*SrcLoc
 
-func (me *SrcLocs) AddFrom(srcRefLoc *udev.SrcMsg, fallbackFilePath func() string) (loc *SrcLoc) {
+func (this *SrcLocs) AddFrom(srcRefLoc *udev.SrcMsg, fallbackFilePath func() string) (loc *SrcLoc) {
 	if srcRefLoc != nil {
 		loc = &SrcLoc{}
 		loc.SetFilePathAndPosOrRangeFrom(srcRefLoc, fallbackFilePath)
-		(*me) = append(*me, loc)
+		*this = append(*this, loc)
 	}
 	return
 }
@@ -87,11 +87,11 @@ type SrcLoc struct {
 
 type SrcLenses []*SrcLens
 
-func (me *SrcLenses) AddFrom(srcRefLoc *udev.SrcMsg, fallbackFilePath func() string) (lens *SrcLens) {
+func (this *SrcLenses) AddFrom(srcRefLoc *udev.SrcMsg, fallbackFilePath func() string) (lens *SrcLens) {
 	if srcRefLoc != nil {
 		lens = &SrcLens{}
 		lens.SetFilePathAndPosOrRangeFrom(srcRefLoc, fallbackFilePath)
-		(*me) = append(*me, lens)
+		*this = append(*this, lens)
 	}
 	return
 }
@@ -103,24 +103,24 @@ type SrcLens struct {
 	CrLf bool   `json:"l,omitempty"`
 }
 
-func (me *SrcLens) EnsureSrcFull() {
-	if me.Txt == "" {
-		me.Txt = ufs.ReadTextFileOr(me.FilePath, "")
+func (this *SrcLens) EnsureSrcFull() {
+	if this.Txt == "" {
+		this.Txt = ufs.ReadTextFileOr(this.FilePath, "")
 	}
 }
 
-func (me *SrcLens) ByteOffsetForPos(pos *SrcPos) int {
+func (this *SrcLens) ByteOffsetForPos(pos *SrcPos) int {
 	if (!pos.byteoff) && (pos.Off > 0 || (pos.Ln > 0 && pos.Col > 0)) {
 		pos.byteoff = true
 		if pos.Off > 1 || pos.Col > 1 || pos.Ln > 1 {
-			me.EnsureSrcFull()
+			this.EnsureSrcFull()
 		}
 		if pos.Off == 0 {
 			if pos.Col == 1 && pos.Ln == 1 {
 				pos.Off = 1
 			} else {
 				ln := 1
-				for _, r := range me.Txt {
+				for _, r := range this.Txt {
 					if ln == pos.Ln {
 						break
 					} else if r == '\n' {
@@ -133,31 +133,31 @@ func (me *SrcLens) ByteOffsetForPos(pos *SrcPos) int {
 		}
 		if pos.Off > 1 {
 			r := 1
-			for i := range me.Txt {
+			for i := range this.Txt {
 				if r == pos.Off {
 					pos.byteOff = i
 					return pos.byteOff
 				}
 				r++
 			}
-			pos.byteOff = len([]byte(me.Txt))
+			pos.byteOff = len([]byte(this.Txt))
 		}
 	}
 	return pos.byteOff
 }
 
-func (me *SrcLens) ByteOffsetForFirstLineBeginningWith(prefix string) int {
-	if ustr.Pref(me.Txt, prefix) {
+func (this *SrcLens) ByteOffsetForFirstLineBeginningWith(prefix string) int {
+	if ustr.Pref(this.Txt, prefix) {
 		return 0
-	} else if idx := ustr.Pos(me.Txt, "\n"+prefix); idx >= 0 {
-		return len([]byte(me.Txt[:idx+1])) // want byte-pos not rune-pos
+	} else if idx := ustr.Pos(this.Txt, "\n"+prefix); idx >= 0 {
+		return len([]byte(this.Txt[:idx+1])) // want byte-pos not rune-pos
 	}
 	return -1
 }
 
-func (me *SrcLens) Rune1OffsetForByte0Offset(byte0off int) (rune1off int) {
-	return 1 + ustr.NumRunes(me.Txt[:byte0off])
-	// for byteoff := range me.Txt {
+func (this *SrcLens) Rune1OffsetForByte0Offset(byte0off int) (rune1off int) {
+	return 1 + ustr.NumRunes(this.Txt[:byte0off])
+	// for byteoff := range this.Txt {
 	// 	rune1off++
 	// 	if byteoff >= byte0off {
 	// 		return
@@ -166,30 +166,30 @@ func (me *SrcLens) Rune1OffsetForByte0Offset(byte0off int) (rune1off int) {
 	// return
 }
 
-func (me *SrcLoc) SetFilePathAndPosOrRangeFrom(srcRef *udev.SrcMsg, fallbackFilePath func() string) {
-	me.setFilePathFrom(srcRef, fallbackFilePath)
-	me.setPosOrRangeFrom(srcRef, true)
+func (this *SrcLoc) SetFilePathAndPosOrRangeFrom(srcRef *udev.SrcMsg, fallbackFilePath func() string) {
+	this.setFilePathFrom(srcRef, fallbackFilePath)
+	this.setPosOrRangeFrom(srcRef, true)
 }
 
-func (me *SrcLoc) setFilePathFrom(srcRef *udev.SrcMsg, fallbackFilePath func() string) {
-	if me.FilePath = srcRef.Ref; me.FilePath != "" && !filepath.IsAbs(me.FilePath) {
-		if absfilepath, err := filepath.Abs(me.FilePath); err == nil {
-			me.FilePath = absfilepath
+func (this *SrcLoc) setFilePathFrom(srcRef *udev.SrcMsg, fallbackFilePath func() string) {
+	if this.FilePath = srcRef.Ref; this.FilePath != "" && !filepath.IsAbs(this.FilePath) {
+		if absfilepath, err := filepath.Abs(this.FilePath); err == nil {
+			this.FilePath = absfilepath
 		} else if fallbackFilePath != nil {
-			me.FilePath = fallbackFilePath()
+			this.FilePath = fallbackFilePath()
 		}
 	}
-	if (fallbackFilePath != nil) && (me.FilePath == "" || !ufs.IsFile(me.FilePath)) {
-		me.FilePath = fallbackFilePath()
+	if (fallbackFilePath != nil) && (this.FilePath == "" || !ufs.IsFile(this.FilePath)) {
+		this.FilePath = fallbackFilePath()
 	}
 }
 
-func (me *SrcLoc) setPosOrRangeFrom(srcRef *udev.SrcMsg, preferRange bool) {
-	me.Pos, me.Range = nil, nil
+func (this *SrcLoc) setPosOrRangeFrom(srcRef *udev.SrcMsg, preferRange bool) {
+	this.Pos, this.Range = nil, nil
 	if preferRange && srcRef.Pos2Ch > 0 && srcRef.Pos2Ln > 0 && srcRef.Pos1Ch > 0 && srcRef.Pos1Ln > 0 {
-		me.Range = &SrcRange{Start: SrcPos{Ln: srcRef.Pos1Ln, Col: srcRef.Pos1Ch},
+		this.Range = &SrcRange{Start: SrcPos{Ln: srcRef.Pos1Ln, Col: srcRef.Pos1Ch},
 			End: SrcPos{Ln: srcRef.Pos2Ln, Col: srcRef.Pos2Ch}}
 	} else {
-		me.Pos = &SrcPos{Ln: srcRef.Pos1Ln, Col: srcRef.Pos1Ch}
+		this.Pos = &SrcPos{Ln: srcRef.Pos1Ln, Col: srcRef.Pos1Ch}
 	}
 }

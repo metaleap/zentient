@@ -21,8 +21,8 @@ const (
 	TOOLS_CAT_RUNONSAVE
 )
 
-func (me ToolCats) String() string {
-	switch me {
+func (this ToolCats) String() string {
+	switch this {
 	case TOOLS_CAT_MOD_FMT:
 		return "Formatting"
 	case TOOLS_CAT_MOD_REN:
@@ -44,7 +44,7 @@ func (me ToolCats) String() string {
 	case TOOLS_CAT_RUNONSAVE:
 		return "Run-on-Save"
 	}
-	return Strf("%d", me)
+	return Strf("%d", this)
 }
 
 type ITooling interface {
@@ -61,27 +61,27 @@ type ToolingBase struct {
 	cmdListAll *MenuItem
 }
 
-func (me *ToolingBase) Init() {
-	me.cmdListAll = &MenuItem{
+func (this *ToolingBase) Init() {
+	this.cmdListAll = &MenuItem{
 		IpcID: IPCID_MENUS_TOOLS,
 		Title: Strf("Known %s Tools", Lang.Title),
 		Desc:  Strf("All currently supported %s tools and their installation info", Lang.Title),
-		Hint:  Strf("(%d of %d installed)", me.Impl.NumInst(), me.Impl.NumTotal()),
+		Hint:  Strf("(%d of %d installed)", this.Impl.NumInst(), this.Impl.NumTotal()),
 	}
 }
 
-func (me *ToolingBase) dispatch(req *ipcReq, resp *ipcResp) bool {
+func (this *ToolingBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	switch req.IpcID {
 	case IPCID_MENUS_TOOLS:
-		resp.Menu = &menuResp{SubMenu: &Menu{Desc: me.cmdListAll.Desc, Items: me.onListAllTools()}}
+		resp.Menu = &menuResp{SubMenu: &Menu{Desc: this.cmdListAll.Desc, Items: this.onListAllTools()}}
 	default:
 		return false
 	}
 	return true
 }
 
-func (me *ToolingBase) onListAllTools() (menu MenuItems) {
-	all := me.Impl.KnownTools()
+func (this *ToolingBase) onListAllTools() (menu MenuItems) {
+	all := this.Impl.KnownTools()
 	for _, t := range all {
 		item := MenuItem{Title: t.Name, Desc: "➜ " + t.Website, Hint: "Installed", IpcArgs: t.Website}
 		if !t.Installed {
@@ -98,16 +98,16 @@ func (me *ToolingBase) onListAllTools() (menu MenuItems) {
 	return
 }
 
-func (me *ToolingBase) MenuCategory() string {
+func (this *ToolingBase) MenuCategory() string {
 	return "Tooling"
 }
 
-func (me *ToolingBase) menuItems(srcLens *SrcLens) (menu MenuItems) {
-	menu = append(menu, me.cmdListAll)
+func (this *ToolingBase) menuItems(srcLens *SrcLens) (menu MenuItems) {
+	menu = append(menu, this.cmdListAll)
 	return
 }
 
-func (me *ToolingBase) CountNumInst(all Tools) (numInst int) {
+func (this *ToolingBase) CountNumInst(all Tools) (numInst int) {
 	for _, t := range all {
 		if t.Installed {
 			numInst++
@@ -116,8 +116,8 @@ func (me *ToolingBase) CountNumInst(all Tools) (numInst int) {
 	return
 }
 
-func (me *ToolingBase) KnownToolsFor(cats ...ToolCats) (tools Tools) {
-	alltools := me.Impl.KnownTools()
+func (this *ToolingBase) KnownToolsFor(cats ...ToolCats) (tools Tools) {
+	alltools := this.Impl.KnownTools()
 	if tools = alltools; len(cats) > 0 {
 		tools = Tools{}
 		for _, t := range alltools {
@@ -137,9 +137,9 @@ func (me *ToolingBase) KnownToolsFor(cats ...ToolCats) (tools Tools) {
 
 type Tools []*Tool
 
-func (me Tools) byName(name string) *Tool {
+func (this Tools) byName(name string) *Tool {
 	if name != "" {
-		for _, tool := range me {
+		for _, tool := range this {
 			if tool.Name == name {
 				return tool
 			}
@@ -148,8 +148,8 @@ func (me Tools) byName(name string) *Tool {
 	return nil
 }
 
-func (me Tools) has(name string) bool {
-	for _, t := range me {
+func (this Tools) has(name string) bool {
+	for _, t := range this {
 		if t.Name == name {
 			return true
 		}
@@ -157,9 +157,9 @@ func (me Tools) has(name string) bool {
 	return false
 }
 
-func (me Tools) instOnly() (inst Tools) {
-	inst = make(Tools, 0, len(me))
-	for _, t := range me {
+func (this Tools) instOnly() (inst Tools) {
+	inst = make(Tools, 0, len(this))
+	for _, t := range this {
 		if t.Installed {
 			inst = append(inst, t)
 		}
@@ -167,8 +167,8 @@ func (me Tools) instOnly() (inst Tools) {
 	return
 }
 
-func (me Tools) len(inst bool) (num int) {
-	for _, t := range me {
+func (this Tools) len(inst bool) (num int) {
+	for _, t := range this {
 		if t.Installed == inst {
 			num++
 		}
@@ -195,19 +195,19 @@ func (*Tool) Exec(panicOnErr bool, stdin string, cmdName string, cmdArgs []strin
 	return stdout, stderr
 }
 
-func (me *Tool) isInAutoDiags() bool {
-	return ustr.In(me.Name, Prog.Cfg.AutoDiags...)
+func (this *Tool) isInAutoDiags() bool {
+	return ustr.In(this.Name, Prog.Cfg.AutoDiags...)
 }
 
-func (me *Tool) NotInstalledMessage() string {
-	return Strf("Not installed: `%s`, how-to at: %s", me.Name, me.Website)
+func (this *Tool) NotInstalledMessage() string {
+	return Strf("Not installed: `%s`, how-to at: %s", this.Name, this.Website)
 }
 
-func (me *Tool) toggleInAutoDiags() error {
-	if me.isInAutoDiags() {
-		Prog.Cfg.AutoDiags = ustr.Sans(Prog.Cfg.AutoDiags, me.Name)
+func (this *Tool) toggleInAutoDiags() error {
+	if this.isInAutoDiags() {
+		Prog.Cfg.AutoDiags = ustr.Sans(Prog.Cfg.AutoDiags, this.Name)
 	} else {
-		Prog.Cfg.AutoDiags = append(Prog.Cfg.AutoDiags, me.Name)
+		Prog.Cfg.AutoDiags = append(Prog.Cfg.AutoDiags, this.Name)
 	}
 	return Prog.Cfg.Save()
 }

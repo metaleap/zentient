@@ -6,12 +6,12 @@ import (
 	"github.com/metaleap/zentient"
 )
 
-func (me *goDiag) KnownLinters() z.Tools {
-	return me.knownTools
+func (this *goDiag) KnownLinters() z.Tools {
+	return this.knownTools
 }
 
-func (me *goDiag) OnUpdateLintDiags(workspaceFiles z.WorkspaceFiles, diagTools z.Tools, filePaths []string) (jobs z.DiagLintJobs) {
-	if pkgjobs := me.onUpdateDiagsPrepPkgJobs(filePaths); len(pkgjobs) > 0 {
+func (this *goDiag) OnUpdateLintDiags(workspaceFiles z.WorkspaceFiles, diagTools z.Tools, filePaths []string) (jobs z.DiagLintJobs) {
+	if pkgjobs := this.onUpdateDiagsPrepPkgJobs(filePaths); len(pkgjobs) > 0 {
 		for _, pj := range pkgjobs {
 			skippkg := false
 			for _, fpath := range pj.Target.(*udevgo.Pkg).GoFilePaths(true) {
@@ -29,7 +29,7 @@ func (me *goDiag) OnUpdateLintDiags(workspaceFiles z.WorkspaceFiles, diagTools z
 	return
 }
 
-func (me *goDiag) RunLintJob(job *z.DiagJobLint, workspaceFiles z.WorkspaceFiles) {
+func (this *goDiag) RunLintJob(job *z.DiagJobLint, workspaceFiles z.WorkspaceFiles) {
 	jt, pkg := job.Tool, job.Target.(*udevgo.Pkg)
 	var msgs udev.SrcMsgs
 	if jt == tools.gosimple {
@@ -70,10 +70,10 @@ func (me *goDiag) RunLintJob(job *z.DiagJobLint, workspaceFiles z.WorkspaceFiles
 		msgs = append(msgs, &udev.SrcMsg{Msg: z.BadMsg("lint tool", job.Tool.Name)})
 	}
 	if len(msgs) > 0 {
-		fallbackfilepath := func() string { return me.fallbackFilePath(pkg, workspaceFiles) }
+		fallbackfilepath := func() string { return this.fallbackFilePath(pkg, workspaceFiles) }
 		for _, srcref := range msgs {
 			srcref.Flag = int(job.Tool.DiagSev)
-			job.Yield(me.NewDiagItemFrom(srcref, job.Tool.Name, fallbackfilepath))
+			job.Yield(this.NewDiagItemFrom(srcref, job.Tool.Name, fallbackfilepath))
 		}
 	}
 }

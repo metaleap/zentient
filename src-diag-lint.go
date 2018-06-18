@@ -46,14 +46,14 @@ type DiagJobLint struct {
 	timeTaken   time.Duration
 }
 
-func (me *DiagJobLint) Yield(diag *DiagItem) { me.lintChan <- diag }
-func (me *DiagJobLint) done() {
-	me.timeTaken = time.Since(me.timeStarted)
-	me.lintChan <- nil
+func (this *DiagJobLint) Yield(diag *DiagItem) { this.lintChan <- diag }
+func (this *DiagJobLint) done() {
+	this.timeTaken = time.Since(this.timeStarted)
+	this.lintChan <- nil
 }
 
-func (me *DiagBase) knownLinters(auto bool) (diags Tools) {
-	for _, dt := range me.Impl.KnownLinters() {
+func (this *DiagBase) knownLinters(auto bool) (diags Tools) {
+	for _, dt := range this.Impl.KnownLinters() {
 		if dt.isInAutoDiags() == auto {
 			diags = append(diags, dt)
 		}
@@ -61,13 +61,13 @@ func (me *DiagBase) knownLinters(auto bool) (diags Tools) {
 	return
 }
 
-func (me *DiagBase) runLintJob(job *DiagJobLint, workspaceFiles WorkspaceFiles) {
+func (this *DiagBase) runLintJob(job *DiagJobLint, workspaceFiles WorkspaceFiles) {
 	defer job.done()
-	me.Impl.RunLintJob(job, workspaceFiles)
+	this.Impl.RunLintJob(job, workspaceFiles)
 }
 
-func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(workspaceFiles WorkspaceFiles, autos bool, onlyFilePaths ...string) {
-	if nonautos, diagtools := !autos, me.knownLinters(autos).instOnly(); len(diagtools) > 0 {
+func (this *DiagBase) UpdateLintDiagsIfAndAsNeeded(workspaceFiles WorkspaceFiles, autos bool, onlyFilePaths ...string) {
+	if nonautos, diagtools := !autos, this.knownLinters(autos).instOnly(); len(diagtools) > 0 {
 		var filepaths []string
 		for _, f := range workspaceFiles {
 			if autos && len(f.Diags.Build.Items) > 0 {
@@ -79,26 +79,26 @@ func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(workspaceFiles WorkspaceFiles, 
 			}
 		}
 		if len(filepaths) > 0 {
-			me.updateLintDiags(workspaceFiles, diagtools, autos, filepaths).propagate(true, nonautos, workspaceFiles)
+			this.updateLintDiags(workspaceFiles, diagtools, autos, filepaths).propagate(true, nonautos, workspaceFiles)
 		}
 	}
-	go me.send(workspaceFiles, false)
+	go this.send(workspaceFiles, false)
 }
 
-func (me *DiagBase) updateLintDiags(workspaceFiles WorkspaceFiles, diagTools Tools, autos bool, filePaths []string) (diagitems DiagItems) {
-	jobs := me.Impl.OnUpdateLintDiags(workspaceFiles, diagTools, filePaths)
+func (this *DiagBase) updateLintDiags(workspaceFiles WorkspaceFiles, diagTools Tools, autos bool, filePaths []string) (diagitems DiagItems) {
+	jobs := this.Impl.OnUpdateLintDiags(workspaceFiles, diagTools, filePaths)
 	if numjobs, nonautos := len(jobs), !autos; numjobs > 0 {
 		numdone, await, descs := 0, make(chan *DiagItem), make([]string, numjobs)
 		for _, job := range jobs { // separate loop from the go-routines below to prevent concurrent-map-read+write as forgetPrevDiags() calls workspaceFiles.ensure()
 			job.forgetPrevDiags(diagTools, autos, workspaceFiles)
 		}
-		go me.send(workspaceFiles, false)
+		go this.send(workspaceFiles, false)
 		if nonautos {
 			onRunManuallyAlreadyCurrentlyRunning = true
 		}
 		for i, job := range jobs {
 			job.lintChan, job.timeStarted = await, time.Now()
-			go me.runLintJob(job, workspaceFiles)
+			go this.runLintJob(job, workspaceFiles)
 			descs[i] = job.Tool.Name + " ➜ " + job.String()
 		}
 		send(&ipcResp{IpcID: IPCID_SRCDIAG_STARTED, Val: descs})

@@ -17,11 +17,11 @@ type goDiag struct {
 	knownTools z.Tools
 }
 
-func (me *goDiag) onPreInit() {
-	me.knownTools = tools.KnownToolsFor(z.TOOLS_CAT_DIAGS)
+func (this *goDiag) onPreInit() {
+	this.knownTools = tools.KnownToolsFor(z.TOOLS_CAT_DIAGS)
 }
 
-func (me *goDiag) onUpdateDiagsPrepPkgJobs(filePaths []string) (jobs []z.DiagJob) {
+func (*goDiag) onUpdateDiagsPrepPkgJobs(filePaths []string) (jobs []z.DiagJob) {
 	pkgs, shouldrefresh := udevgo.PkgsForFiles(filePaths...)
 	if shouldrefresh {
 		go caddyRunRefreshPkgs()

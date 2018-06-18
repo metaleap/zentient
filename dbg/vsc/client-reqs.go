@@ -7,47 +7,47 @@ import (
 	"github.com/metaleap/zentient/dbg/vsc/protocol"
 )
 
-func (me *Dbg) onClientReq_Initialize(req *zdbgvscp.InitializeRequest, resp *zdbgvscp.InitializeResponse) (err error) {
+func (this *Dbg) onClientReq_Initialize(req *zdbgvscp.InitializeRequest, resp *zdbgvscp.InitializeResponse) (err error) {
 	resp.Body.SupportsRestartRequest = true
 	resp.Body.SupportsConfigurationDoneRequest = true
-	me.vscLastInit = &req.Arguments
+	this.vscLastInit = &req.Arguments
 	return
 }
 
-func (me *Dbg) onClientReq_Threads(req *zdbgvscp.ThreadsRequest, resp *zdbgvscp.ThreadsResponse) (err error) {
+func (this *Dbg) onClientReq_Threads(req *zdbgvscp.ThreadsRequest, resp *zdbgvscp.ThreadsResponse) (err error) {
 	resp.Body.Threads = []zdbgvscp.Thread{{Id: 1, Name: "DummyThread"}}
 	return
 }
 
-func (me *Dbg) onClientReq_Launch(req *zdbgvscp.LaunchRequest, resp *zdbgvscp.LaunchResponse) (err error) {
-	err = me.procStart()
+func (this *Dbg) onClientReq_Launch(req *zdbgvscp.LaunchRequest, resp *zdbgvscp.LaunchResponse) (err error) {
+	err = this.procStart()
 	return
 }
 
-func (me *Dbg) onClientReq_Evaluate(req *zdbgvscp.EvaluateRequest, resp *zdbgvscp.EvaluateResponse) (err error) {
-	me.Impl.Enqueue(req.Arguments.Expression)
+func (this *Dbg) onClientReq_Evaluate(req *zdbgvscp.EvaluateRequest, resp *zdbgvscp.EvaluateResponse) (err error) {
+	this.Impl.Enqueue(req.Arguments.Expression)
 	return
 }
 
-func (me *Dbg) onClientReq_Pause(req *zdbgvscp.PauseRequest, resp *zdbgvscp.PauseResponse) (err error) {
+func (this *Dbg) onClientReq_Pause(req *zdbgvscp.PauseRequest, resp *zdbgvscp.PauseResponse) (err error) {
 	err = errors.New("Not currently supported: Pause")
 	return
 }
 
-func (me *Dbg) onClientReq_Restart(req *zdbgvscp.RestartRequest, resp *zdbgvscp.RestartResponse) (err error) {
-	me.waitIgnoreTermination = true
-	_ = me.procKill()
-	for me.waitIgnoreTermination {
+func (this *Dbg) onClientReq_Restart(req *zdbgvscp.RestartRequest, resp *zdbgvscp.RestartResponse) (err error) {
+	this.waitIgnoreTermination = true
+	_ = this.procKill()
+	for this.waitIgnoreTermination {
 		time.Sleep(time.Millisecond)
 	}
-	err = me.procStart()
+	err = this.procStart()
 	return
 }
 
-func (me *Dbg) onClientReq_Disconnect(req *zdbgvscp.DisconnectRequest, resp *zdbgvscp.DisconnectResponse) (err error) {
-	_ = me.procKill()
+func (this *Dbg) onClientReq_Disconnect(req *zdbgvscp.DisconnectRequest, resp *zdbgvscp.DisconnectResponse) (err error) {
+	_ = this.procKill()
 	if req.Arguments.Restart {
-		err = me.procStart()
+		err = this.procStart()
 	}
 	return
 }

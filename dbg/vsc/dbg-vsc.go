@@ -43,34 +43,34 @@ func Main(impl zdbg.IDbg) {
 	(&Dbg{Impl: impl}).main()
 }
 
-func (me *Dbg) main() {
-	zdbgvscp.OnDisconnectRequest = me.onClientReq_Disconnect
-	zdbgvscp.OnInitializeRequest = me.onClientReq_Initialize
-	zdbgvscp.OnLaunchRequest = me.onClientReq_Launch
-	zdbgvscp.OnThreadsRequest = me.onClientReq_Threads
-	zdbgvscp.OnPauseRequest = me.onClientReq_Pause
-	zdbgvscp.OnRestartRequest = me.onClientReq_Restart
-	zdbgvscp.OnEvaluateRequest = me.onClientReq_Evaluate
+func (this *Dbg) main() {
+	zdbgvscp.OnDisconnectRequest = this.onClientReq_Disconnect
+	zdbgvscp.OnInitializeRequest = this.onClientReq_Initialize
+	zdbgvscp.OnLaunchRequest = this.onClientReq_Launch
+	zdbgvscp.OnThreadsRequest = this.onClientReq_Threads
+	zdbgvscp.OnPauseRequest = this.onClientReq_Pause
+	zdbgvscp.OnRestartRequest = this.onClientReq_Restart
+	zdbgvscp.OnEvaluateRequest = this.onClientReq_Evaluate
 
 	tmpdirpath := filepath.Join(usys.UserDataDirPath(true), filepath.Base(os.Args[0]))
 	logdirpath := filepath.Join(tmpdirpath, "log")
 	err := ufs.EnsureDir(logdirpath)
 	logfilepath := filepath.Join(logdirpath, "log"+ustr.Int64(time.Now().UnixNano())+".log.json")
 	if logToFile && err == nil {
-		me.logfile, err = os.Create(logfilepath)
+		this.logfile, err = os.Create(logfilepath)
 	}
 	if err != nil {
 		panic(err)
-	} else if me.logfile != nil {
-		defer me.logfile.Close()
+	} else if this.logfile != nil {
+		defer this.logfile.Close()
 	}
-	me.stdin, me.rawOut, _ = urun.SetupIpcPipes(1024*1024*4, zdbgvscp.IpcSplit_ContentLengthCrLfPlusJson, false)
+	this.stdin, this.rawOut, _ = urun.SetupIpcPipes(1024*1024*4, zdbgvscp.IpcSplit_ContentLengthCrLfPlusJson, false)
 	onerror := func(msg string) {
-		me.Impl.PrintLn(true, msg)
-		me.Impl.Kill()
-		me.onServerEvt_Terminated()
-		if me.logfile != nil {
-			me.logfile.WriteString(msg)
+		this.Impl.PrintLn(true, msg)
+		this.Impl.Kill()
+		this.onServerEvt_Terminated()
+		if this.logfile != nil {
+			this.logfile.WriteString(msg)
 		}
 	}
 
@@ -78,18 +78,18 @@ func (me *Dbg) main() {
 	if len(os.Args) > 2 {
 		srcfull = os.Args[2]
 	}
-	if err = me.Impl.Init(tmpdirpath, os.Args[1], srcfull, me.printLn); err != nil {
+	if err = this.Impl.Init(tmpdirpath, os.Args[1], srcfull, this.printLn); err != nil {
 		onerror("Impl.Init:" + err.Error())
 		return
 	}
-	defer me.Impl.Dispose()
-	for me.stdin.Scan() {
-		if err = me.stdin.Err(); err != nil {
+	defer this.Impl.Dispose()
+	for this.stdin.Scan() {
+		if err = this.stdin.Err(); err != nil {
 			return
 		}
-		jsonin := me.stdin.Text()
-		if logJsonIncoming && me.logfile != nil {
-			_, _ = me.logfile.WriteString("\n\n\n\n\n" + jsonin)
+		jsonin := this.stdin.Text()
+		if logJsonIncoming && this.logfile != nil {
+			_, _ = this.logfile.WriteString("\n\n\n\n\n" + jsonin)
 		}
 		var (
 			req, resp interface{}
@@ -100,69 +100,69 @@ func (me *Dbg) main() {
 			onerror("TryUnmarshalRequest: " + err.Error())
 			continue
 		}
-		if resp, respbase, handled, err = zdbgvscp.HandleRequest(req, me.initNewRespBase); resp == nil {
+		if resp, respbase, handled, err = zdbgvscp.HandleRequest(req, this.initNewRespBase); resp == nil {
 			onerror("BUG: resp returned was nil")
 			continue
 		} else if err != nil {
 			respbase.Success, respbase.Message = false, err.Error()
-			me.Impl.PrintLn(true, respbase.Message)
+			this.Impl.PrintLn(true, respbase.Message)
 		} else if !handled {
-			me.Impl.PrintLn(true, "zdbgNoHandlerYet:"+respbase.Command)
+			this.Impl.PrintLn(true, "zdbgNoHandlerYet:"+respbase.Command)
 		}
 		switch respbase.Command {
 		case "initialize":
-			me.onServerEvt_Initialized()
+			this.onServerEvt_Initialized()
 		case "disconnect":
-			me.Impl.Kill()
+			this.Impl.Kill()
 		}
-		me.send(resp)
+		this.send(resp)
 		switch respbase.Command {
 		case "disconnect":
-			me.onServerEvt_Terminated()
+			this.onServerEvt_Terminated()
 			return
 		}
 	}
 }
 
-func (me *Dbg) printLn(isErr bool, msgLn string) {
+func (this *Dbg) printLn(isErr bool, msgLn string) {
 	outcat := "stdout"
 	if isErr {
 		outcat = "stderr"
 	}
-	me.onServerEvt_Output(outcat, msgLn)
+	this.onServerEvt_Output(outcat, msgLn)
 }
 
-func (me *Dbg) send(item interface{}) {
+func (this *Dbg) send(item interface{}) {
 	jsonout, err := json.Marshal(item)
 	if err != nil {
-		me.printLn(true, err.Error())
+		this.printLn(true, err.Error())
 		return
 	}
-	me.Lock()
-	defer me.Unlock()
-	me.sendseq++
+	this.Lock()
+	defer this.Unlock()
+	this.sendseq++
 	if bresp := zdbgvscp.BaseResponse(item); bresp != nil {
-		bresp.Seq = me.sendseq
+		bresp.Seq = this.sendseq
 	} else if bevt := zdbgvscp.BaseEvent(item); bevt != nil {
-		bevt.Seq = me.sendseq
+		bevt.Seq = this.sendseq
 	} else if breq := zdbgvscp.BaseRequest(item); breq != nil {
-		breq.Seq = me.sendseq
+		breq.Seq = this.sendseq
 	}
-	me.rawOut.Write(bclen)
-	me.rawOut.Write([]byte(ustr.Int(len(jsonout))))
-	me.rawOut.Write(bln)
-	me.rawOut.Write(jsonout)
-	me.rawOut.Flush()
-	if logJsonOutgoing && me.logfile != nil {
-		me.logfile.Write(bclen)
-		me.logfile.Write([]byte(ustr.Int(len(jsonout))))
-		me.logfile.Write(bln)
-		me.logfile.Write(jsonout)
-		me.logfile.Sync()
+	this.rawOut.Write(bclen)
+	this.rawOut.Write([]byte(ustr.Int(len(jsonout))))
+	this.rawOut.Write(bln)
+	this.rawOut.Write(jsonout)
+	this.rawOut.Flush()
+	if logJsonOutgoing && this.logfile != nil {
+		this.logfile.Write(bclen)
+		this.logfile.Write([]byte(ustr.Int(len(jsonout))))
+		this.logfile.Write(bln)
+		this.logfile.Write(jsonout)
+		this.logfile.Sync()
 	}
 }
 
-func (me *Dbg) initNewRespBase(reqbase *zdbgvscp.Request, respbase *zdbgvscp.Response) {
+func (this *Dbg) initNewRespBase(reqbase *zdbgvscp.Request, respbase *zdbgvscp.Response) {
 	respbase.Request_seq = reqbase.Seq
 	respbase.Success = true
 }

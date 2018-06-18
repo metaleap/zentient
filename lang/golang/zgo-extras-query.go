@@ -26,7 +26,7 @@ var (
 		QueryArg: "Specify (optionally) a package and (always) a struct type definition's name"}
 )
 
-func (me *goExtras) runQuery_StructLayout(srcLens *z.SrcLens, arg string, resp *z.ExtrasResp) {
+func (*goExtras) runQuery_StructLayout(srcLens *z.SrcLens, arg string, resp *z.ExtrasResp) {
 	args := ustr.Split(arg, " ")
 	if pkgsbydir := udevgo.PkgsByDir; len(args) == 1 && pkgsbydir != nil && srcLens.FilePath != "" {
 		if pkg := pkgsbydir[filepath.Dir(srcLens.FilePath)]; pkg != nil {
@@ -54,7 +54,7 @@ func (me *goExtras) runQuery_StructLayout(srcLens *z.SrcLens, arg string, resp *
 	}
 }
 
-func (me *goExtras) runQuery_Godoc(srcLens *z.SrcLens, arg string, resp *z.ExtrasResp) {
+func (*goExtras) runQuery_Godoc(srcLens *z.SrcLens, arg string, resp *z.ExtrasResp) {
 	if isdocpath := strings.ContainsRune(arg, '/') || strings.ContainsRune(arg, '#'); !isdocpath {
 		if isup, pkgsbydir := ustr.BeginsUpper(arg), udevgo.PkgsByDir; isup && pkgsbydir != nil {
 			if pkg := pkgsbydir[filepath.Dir(srcLens.FilePath)]; pkg != nil {
@@ -69,7 +69,7 @@ func (me *goExtras) runQuery_Godoc(srcLens *z.SrcLens, arg string, resp *z.Extra
 	resp.Url = "zentient://" + z.Lang.ID + "/godoc/pkg/" + arg
 }
 
-func (me *goExtras) runQuery_GoDoc(srcLens *z.SrcLens, arg string, resp *z.ExtrasResp) {
+func (*goExtras) runQuery_GoDoc(srcLens *z.SrcLens, arg string, resp *z.ExtrasResp) {
 	if arg = ustr.Trim(arg); arg == "" {
 		return
 	}
@@ -95,7 +95,7 @@ func (me *goExtras) runQuery_GoDoc(srcLens *z.SrcLens, arg string, resp *z.Extra
 	resp.Info = append(resp.Info, z.InfoTip{Value: ustr.Trim(cmdout)})
 }
 
-func (me *goExtras) runQuery_GoRun(srcLens *z.SrcLens, arg string, resp *z.ExtrasResp) {
+func (*goExtras) runQuery_GoRun(srcLens *z.SrcLens, arg string, resp *z.ExtrasResp) {
 	evaloutandstderr, otherstdout, err := zgodbg.GoRunEval(z.Prog.Dir.Cache, srcLens.FilePath, srcLens.Txt, arg)
 	if resp.Desc = arg; err != nil {
 		panic(err)

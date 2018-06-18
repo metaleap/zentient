@@ -49,17 +49,17 @@ type menuResp struct {
 type mainMenu struct {
 }
 
-func (me *mainMenu) dispatch(req *ipcReq, resp *ipcResp) bool {
+func (this *mainMenu) dispatch(req *ipcReq, resp *ipcResp) bool {
 	switch req.IpcID {
 	case IPCID_MENUS_MAIN:
-		me.onMainMenu(req, resp)
+		this.onMainMenu(req, resp)
 	default:
 		return false
 	}
 	return true
 }
 
-func (me *mainMenu) onMainMenu(req *ipcReq, resp *ipcResp) {
+func (*mainMenu) onMainMenu(req *ipcReq, resp *ipcResp) {
 	var cats []string
 	catfilter, _ := req.IpcArgs.(string)
 	m := Menu{Desc: "Categories:  ", TopLevel: true}
@@ -80,5 +80,5 @@ func (me *mainMenu) onMainMenu(req *ipcReq, resp *ipcResp) {
 	resp.Menu = &menuResp{SubMenu: &m}
 }
 
-func (me *mainMenu) Init() {
+func (*mainMenu) Init() {
 }

@@ -17,7 +17,7 @@ type hsSrcMod struct {
 	knownFormatters z.Tools
 }
 
-func (me *hsSrcMod) onPreInit() {
+func (this *hsSrcMod) onPreInit() {
 	srcMod.knownFormatters = z.Tools{
 		tools.hindent, tools.stylishhaskell, tools.brittany,
 	}
@@ -27,11 +27,11 @@ func (*hsSrcMod) DoesStdoutWithFilePathArg(tool *z.Tool) bool {
 	return tool != tools.hindent
 }
 
-func (me *hsSrcMod) KnownFormatters() z.Tools {
-	return me.knownFormatters
+func (this *hsSrcMod) KnownFormatters() z.Tools {
+	return this.knownFormatters
 }
 
-func (me *hsSrcMod) RunFormatter(formatter *z.Tool, cmdName string, clientPrefs *z.SrcFormattingClientPrefs, srcFilePath string, src string) (string, string) {
+func (this *hsSrcMod) RunFormatter(formatter *z.Tool, cmdName string, clientPrefs *z.SrcFormattingClientPrefs, srcFilePath string, src string) (string, string) {
 	if formatter != tools.brittany && formatter != tools.hindent && formatter != tools.stylishhaskell {
 		z.BadPanic("formatting tool", formatter.Name)
 	}

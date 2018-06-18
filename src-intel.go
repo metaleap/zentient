@@ -59,13 +59,13 @@ type srcIntelLex struct {
 	Other   string
 }
 
-func (me *srcIntelLex) canIntel() bool { return me == nil || me.Ident != "" || me.Other != "" }
+func (this *srcIntelLex) canIntel() bool { return this == nil || this.Ident != "" || this.Other != "" }
 
 type SrcIntelCompls []*SrcIntelCompl
 
-func (me SrcIntelCompls) Len() int               { return len(me) }
-func (me SrcIntelCompls) Swap(i int, j int)      { me[i], me[j] = me[j], me[i] }
-func (me SrcIntelCompls) Less(i int, j int) bool { return me[i].SortText < me[j].SortText }
+func (this SrcIntelCompls) Len() int               { return len(this) }
+func (this SrcIntelCompls) Swap(i int, j int)      { this[i], this[j] = this[j], this[i] }
+func (this SrcIntelCompls) Less(i int, j int) bool { return this[i].SortText < this[j].SortText }
 
 type SrcIntelDoc struct {
 	Value     string `json:"value,omitempty"`
@@ -96,38 +96,38 @@ type SrcIntelBase struct {
 func (*SrcIntelBase) Init() {
 }
 
-func (me *SrcIntelBase) dispatch(req *ipcReq, resp *ipcResp) bool {
+func (this *SrcIntelBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	switch req.IpcID {
 	case IPCID_SRCINTEL_HOVER:
-		me.onHover(req, resp.withSrcIntel())
+		this.onHover(req, resp.withSrcIntel())
 	case IPCID_SRCINTEL_SYMS_FILE, IPCID_SRCINTEL_SYMS_PROJ:
-		me.onSyms(req, resp.withSrcIntel())
+		this.onSyms(req, resp.withSrcIntel())
 	case IPCID_SRCINTEL_CMPL_ITEMS:
-		me.onCmplItems(req, resp.withSrcIntel())
+		this.onCmplItems(req, resp.withSrcIntel())
 	case IPCID_SRCINTEL_CMPL_DETAILS:
-		me.onCmplDetails(req, resp.withSrcIntel())
+		this.onCmplDetails(req, resp.withSrcIntel())
 	case IPCID_SRCINTEL_HIGHLIGHTS:
-		me.onHighlights(req, resp.withSrcIntel())
+		this.onHighlights(req, resp.withSrcIntel())
 	case IPCID_SRCINTEL_SIGNATURE:
-		me.onSignature(req, resp.withSrcIntel())
+		this.onSignature(req, resp.withSrcIntel())
 	case IPCID_SRCINTEL_REFERENCES:
-		me.onReferences(req, resp.withSrcIntel())
+		this.onReferences(req, resp.withSrcIntel())
 	case IPCID_SRCINTEL_DEFIMPL:
-		me.onDefinition(req, resp.withSrcIntel(), me.Impl.DefImpl)
+		this.onDefinition(req, resp.withSrcIntel(), this.Impl.DefImpl)
 	case IPCID_SRCINTEL_DEFSYM:
-		me.onDefinition(req, resp.withSrcIntel(), me.Impl.DefSym)
+		this.onDefinition(req, resp.withSrcIntel(), this.Impl.DefSym)
 	case IPCID_SRCINTEL_DEFTYPE:
-		me.onDefinition(req, resp.withSrcIntel(), me.Impl.DefType)
+		this.onDefinition(req, resp.withSrcIntel(), this.Impl.DefType)
 	default:
 		return false
 	}
 	return true
 }
 
-func (me *SrcIntelBase) onCmplItems(req *ipcReq, resp *ipcResp) {
-	if lex := me.posLex(req.SrcLens); lex.canIntel() {
-		resp.SrcIntel.Cmpl = me.Impl.ComplItems(req.SrcLens)
-		if me.Impl.ComplItemsShouldSort(req.SrcLens) {
+func (this *SrcIntelBase) onCmplItems(req *ipcReq, resp *ipcResp) {
+	if lex := this.posLex(req.SrcLens); lex.canIntel() {
+		resp.SrcIntel.Cmpl = this.Impl.ComplItems(req.SrcLens)
+		if this.Impl.ComplItemsShouldSort(req.SrcLens) {
 			for _, c := range resp.SrcIntel.Cmpl {
 				if c.SortText == "" {
 					c.SortText = ustr.Lo(c.Label)
@@ -139,9 +139,9 @@ func (me *SrcIntelBase) onCmplItems(req *ipcReq, resp *ipcResp) {
 	}
 }
 
-func (me *SrcIntelBase) onCmplDetails(req *ipcReq, resp *ipcResp) {
+func (this *SrcIntelBase) onCmplDetails(req *ipcReq, resp *ipcResp) {
 	itemtext, _ := req.IpcArgs.(string)
-	if cmpl := me.Impl.ComplDetails(req.SrcLens, itemtext); cmpl != nil {
+	if cmpl := this.Impl.ComplDetails(req.SrcLens, itemtext); cmpl != nil {
 		resp.SrcIntel.Cmpl = SrcIntelCompls{cmpl}
 	}
 }
@@ -150,14 +150,14 @@ func (*SrcIntelBase) onDefinition(req *ipcReq, resp *ipcResp, def func(*SrcLens)
 	resp.SrcIntel.Refs = def(req.SrcLens)
 }
 
-func (me *SrcIntelBase) onHighlights(req *ipcReq, resp *ipcResp) {
+func (this *SrcIntelBase) onHighlights(req *ipcReq, resp *ipcResp) {
 	curword, _ := req.IpcArgs.(string)
-	resp.SrcIntel.Refs = me.Impl.Highlights(req.SrcLens, curword)
+	resp.SrcIntel.Refs = this.Impl.Highlights(req.SrcLens, curword)
 }
 
-func (me *SrcIntelBase) onHover(req *ipcReq, resp *ipcResp) {
-	if lex := me.posLex(req.SrcLens); lex.canIntel() {
-		resp.SrcIntel.Info = me.Impl.Hovers(req.SrcLens)
+func (this *SrcIntelBase) onHover(req *ipcReq, resp *ipcResp) {
+	if lex := this.posLex(req.SrcLens); lex.canIntel() {
+		resp.SrcIntel.Info = this.Impl.Hovers(req.SrcLens)
 	} else {
 		var hov InfoTip
 		if lex.Char != "" {
@@ -199,18 +199,18 @@ func (me *SrcIntelBase) onHover(req *ipcReq, resp *ipcResp) {
 	}
 }
 
-func (me *SrcIntelBase) onReferences(req *ipcReq, resp *ipcResp) {
+func (this *SrcIntelBase) onReferences(req *ipcReq, resp *ipcResp) {
 	includeDeclaration := false
 	if ctx, _ := req.IpcArgs.(map[string]interface{}); ctx != nil {
 		if incldecl, ok := ctx["includeDeclaration"]; ok {
 			includeDeclaration, _ = incldecl.(bool)
 		}
 	}
-	resp.SrcIntel.Refs = me.Impl.References(req.SrcLens, includeDeclaration)
+	resp.SrcIntel.Refs = this.Impl.References(req.SrcLens, includeDeclaration)
 }
 
-func (me *SrcIntelBase) onSignature(req *ipcReq, resp *ipcResp) {
-	if resp.SrcIntel.Sig = me.Impl.Signature(req.SrcLens); resp.SrcIntel.Sig != nil {
+func (this *SrcIntelBase) onSignature(req *ipcReq, resp *ipcResp) {
+	if resp.SrcIntel.Sig = this.Impl.Signature(req.SrcLens); resp.SrcIntel.Sig != nil {
 		for i := range resp.SrcIntel.Sig.Signatures { // vsc can't handle `null` for `parameters` but can handle `[]`
 			if resp.SrcIntel.Sig.Signatures[i].Documentation.IsTrusted = true; resp.SrcIntel.Sig.Signatures[i].Parameters == nil {
 				resp.SrcIntel.Sig.Signatures[i].Parameters = []SrcIntelSigParam{}
@@ -219,20 +219,20 @@ func (me *SrcIntelBase) onSignature(req *ipcReq, resp *ipcResp) {
 	}
 }
 
-func (me *SrcIntelBase) onSyms(req *ipcReq, resp *ipcResp) {
+func (this *SrcIntelBase) onSyms(req *ipcReq, resp *ipcResp) {
 	var query string
 	if req.IpcID == IPCID_SRCINTEL_SYMS_PROJ {
 		query, _ = req.IpcArgs.(string)
 	}
-	resp.SrcIntel.Syms = me.Impl.Symbols(req.SrcLens, query, req.IpcID == IPCID_SRCINTEL_SYMS_FILE)
+	resp.SrcIntel.Syms = this.Impl.Symbols(req.SrcLens, query, req.IpcID == IPCID_SRCINTEL_SYMS_FILE)
 }
 
-func (me *SrcIntelBase) posLex(srcLens *SrcLens) (poslex *srcIntelLex) {
+func (this *SrcIntelBase) posLex(srcLens *SrcLens) (poslex *srcIntelLex) {
 	if srcLens.EnsureSrcFull(); srcLens.Txt != "" {
 		var scan scanner.Scanner
 		scan.Init(ustr.Reader(srcLens.Txt)).Filename = srcLens.FilePath
 		scan.Mode = scanner.ScanIdents | scanner.ScanFloats | scanner.ScanChars | scanner.ScanStrings | scanner.ScanRawStrings | scanner.ScanComments
-		scan.Error = me.posLexErrNoOp
+		scan.Error = this.posLexErrNoOp
 		var lr rune
 		var ls string
 		for r := scan.Scan(); scan.ErrorCount == 0 && r != scanner.EOF; r = scan.Scan() {

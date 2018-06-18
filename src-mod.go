@@ -18,8 +18,8 @@ type ISrcMod interface {
 
 type SrcModEdits []srcModEdit
 
-func (me *SrcModEdits) dropConflictingEdits() (droppedOffenders []srcModEdit) {
-	all := *me
+func (this *SrcModEdits) dropConflictingEdits() (droppedOffenders []srcModEdit) {
+	all := *this
 	for i := 0; i < len(all); i++ {
 		for disedit, j := all[i], i+1; j < len(all); j++ {
 			if datedit := all[j]; disedit.At.overlapsWith(datedit.At) {
@@ -29,14 +29,14 @@ func (me *SrcModEdits) dropConflictingEdits() (droppedOffenders []srcModEdit) {
 			}
 		}
 	}
-	*me = all
+	*this = all
 	return
 }
 
-func (me SrcModEdits) Len() int          { return len(me) }
-func (me SrcModEdits) Swap(i int, j int) { me[i], me[j] = me[j], me[i] }
-func (me SrcModEdits) Less(i int, j int) bool {
-	return me[i].At.Start.isSameOrGreaterThan(&me[j].At.End)
+func (this SrcModEdits) Len() int          { return len(this) }
+func (this SrcModEdits) Swap(i int, j int) { this[i], this[j] = this[j], this[i] }
+func (this SrcModEdits) Less(i int, j int) bool {
+	return this[i].At.Start.isSameOrGreaterThan(&this[j].At.End)
 }
 
 func (*SrcModEdits) lensForNewEdit(srcFilePath string) *SrcLens {
@@ -45,8 +45,8 @@ func (*SrcModEdits) lensForNewEdit(srcFilePath string) *SrcLens {
 	return &lens
 }
 
-func (me *SrcModEdits) AddDeleteLine(srcFilePath string, lineAt *SrcPos) {
-	lens := me.lensForNewEdit(srcFilePath)
+func (this *SrcModEdits) AddDeleteLine(srcFilePath string, lineAt *SrcPos) {
+	lens := this.lensForNewEdit(srcFilePath)
 	lens.Pos = lineAt
 	edit := srcModEdit{At: &SrcRange{}}
 	bo := lens.ByteOffsetForPos(lens.Pos)
@@ -54,15 +54,15 @@ func (me *SrcModEdits) AddDeleteLine(srcFilePath string, lineAt *SrcPos) {
 	edit.At.Start.Off = lens.Rune1OffsetForByte0Offset(bo)
 	bo2 := strings.IndexRune(lens.Txt[bo:], '\n') + 1
 	edit.At.End.Off = lens.Rune1OffsetForByte0Offset(bo + bo2)
-	*me = append(*me, edit)
+	*this = append(*this, edit)
 }
 
-func (me *SrcModEdits) AddInsert(srcFilePath string, atPos func(*SrcLens, *SrcPos) string) {
-	lens := me.lensForNewEdit(srcFilePath)
+func (this *SrcModEdits) AddInsert(srcFilePath string, atPos func(*SrcLens, *SrcPos) string) {
+	lens := this.lensForNewEdit(srcFilePath)
 	edit := srcModEdit{At: &SrcRange{}}
 	if ins := atPos(lens, &edit.At.Start); ins != "" {
 		edit.Val = ins
-		*me = append(*me, edit)
+		*this = append(*this, edit)
 	}
 }
 
@@ -84,27 +84,27 @@ type SrcFormattingClientPrefs struct {
 	TabSize      *int
 }
 
-func (me *SrcModBase) Init() {
-	me.cmdFmtSetDef = &MenuItem{
+func (this *SrcModBase) Init() {
+	this.cmdFmtSetDef = &MenuItem{
 		IpcID: IPCID_SRCMOD_FMT_SETDEFMENU,
 		Title: Strf("Choose Default %s Formatter", Lang.Title),
 		Desc:  "Specify your preferred default source formatter",
 	}
-	me.cmdFmtRunOnFile = &MenuItem{
+	this.cmdFmtRunOnFile = &MenuItem{
 		IpcID: IPCID_SRCMOD_FMT_RUNONFILE,
 		Title: "Format Document",
 	}
-	me.cmdFmtRunOnSel = &MenuItem{
+	this.cmdFmtRunOnSel = &MenuItem{
 		IpcID: IPCID_SRCMOD_FMT_RUNONSEL,
 		Title: "Format Selection",
 	}
 }
 
-func (me *SrcModBase) menuItems(srcLens *SrcLens) (cmds MenuItems) {
+func (this *SrcModBase) menuItems(srcLens *SrcLens) (cmds MenuItems) {
 	if srcLens != nil {
-		srcfilepath, hint := srcLens.FilePath, "("+me.cmdFmtSetDef.Desc+" first)"
-		if me.hasFormatter() {
-			if hint = "➜ using "; me.isFormatterCustom() {
+		srcfilepath, hint := srcLens.FilePath, "("+this.cmdFmtSetDef.Desc+" first)"
+		if this.hasFormatter() {
+			if hint = "➜ using "; this.isFormatterCustom() {
 				hint += "'" + Prog.Cfg.FormatterProg + "' like "
 			}
 			hint += "'" + Prog.Cfg.FormatterName + "'"
@@ -112,25 +112,25 @@ func (me *SrcModBase) menuItems(srcLens *SrcLens) (cmds MenuItems) {
 
 		if isfp := srcfilepath != ""; isfp || srcLens.Txt != "" {
 			srcfilepath = Lang.Workspace.PrettyPath(srcfilepath)
-			if me.cmdFmtRunOnFile.Desc, me.cmdFmtRunOnFile.Hint = srcfilepath, hint; !isfp {
-				me.cmdFmtRunOnFile.Desc = srcLens.Txt
+			if this.cmdFmtRunOnFile.Desc, this.cmdFmtRunOnFile.Hint = srcfilepath, hint; !isfp {
+				this.cmdFmtRunOnFile.Desc = srcLens.Txt
 			}
-			cmds = append(cmds, me.cmdFmtRunOnFile)
+			cmds = append(cmds, this.cmdFmtRunOnFile)
 		}
 		if srcLens.Str != "" {
-			me.cmdFmtRunOnSel.Desc = srcLens.Str
-			me.cmdFmtRunOnSel.Hint = hint
-			cmds = append(cmds, me.cmdFmtRunOnSel)
+			this.cmdFmtRunOnSel.Desc = srcLens.Str
+			this.cmdFmtRunOnSel.Hint = hint
+			cmds = append(cmds, this.cmdFmtRunOnSel)
 		}
 	}
 
-	if me.cmdFmtSetDef.Hint = "(none)"; me.hasFormatter() {
-		if me.cmdFmtSetDef.Hint = "'" + Prog.Cfg.FormatterName + "'"; me.isFormatterCustom() {
-			me.cmdFmtSetDef.Hint += "-compatible '" + Prog.Cfg.FormatterProg + "'"
+	if this.cmdFmtSetDef.Hint = "(none)"; this.hasFormatter() {
+		if this.cmdFmtSetDef.Hint = "'" + Prog.Cfg.FormatterName + "'"; this.isFormatterCustom() {
+			this.cmdFmtSetDef.Hint += "-compatible '" + Prog.Cfg.FormatterProg + "'"
 		}
 	}
-	me.cmdFmtSetDef.Hint = "Current: " + me.cmdFmtSetDef.Hint
-	cmds = append(cmds, me.cmdFmtSetDef)
+	this.cmdFmtSetDef.Hint = "Current: " + this.cmdFmtSetDef.Hint
+	cmds = append(cmds, this.cmdFmtSetDef)
 	return
 }
 
@@ -154,38 +154,38 @@ func (*SrcModBase) isFormatterCustom() bool {
 	return Prog.Cfg.FormatterProg != "" && Prog.Cfg.FormatterProg != Prog.Cfg.FormatterName
 }
 
-func (me *SrcModBase) dispatch(req *ipcReq, resp *ipcResp) bool {
+func (this *SrcModBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	switch req.IpcID {
 	case IPCID_SRCMOD_FMT_SETDEFMENU:
-		me.onSetDefMenu(req, resp)
+		this.onSetDefMenu(req, resp)
 	case IPCID_SRCMOD_FMT_SETDEFPICK:
-		me.onSetDefPick(req, resp)
+		this.onSetDefPick(req, resp)
 	case IPCID_SRCMOD_FMT_RUNONFILE, IPCID_SRCMOD_FMT_RUNONSEL:
-		me.onRunFormatter(req, resp)
+		this.onRunFormatter(req, resp)
 	case IPCID_SRCMOD_RENAME:
-		me.onRename(req, resp)
+		this.onRename(req, resp)
 	case IPCID_SRCMOD_ACTIONS:
-		me.onActions(req, resp)
+		this.onActions(req, resp)
 	default:
 		return false
 	}
 	return true
 }
 
-func (me *SrcModBase) onActions(req *ipcReq, resp *ipcResp) {
-	resp.SrcActions = me.Impl.CodeActions(req.SrcLens)
+func (this *SrcModBase) onActions(req *ipcReq, resp *ipcResp) {
+	resp.SrcActions = this.Impl.CodeActions(req.SrcLens)
 }
 
-func (me *SrcModBase) onRename(req *ipcReq, resp *ipcResp) {
+func (this *SrcModBase) onRename(req *ipcReq, resp *ipcResp) {
 	newname, _ := req.IpcArgs.(string)
 	if newname == "" {
 		resp.ErrMsg = "Rename: missing new-name"
 	} else {
-		resp.SrcMods = me.Impl.RunRenamer(req.SrcLens, newname)
+		resp.SrcMods = this.Impl.RunRenamer(req.SrcLens, newname)
 	}
 }
 
-func (me *SrcModBase) onRunFormatter(req *ipcReq, resp *ipcResp) {
+func (this *SrcModBase) onRunFormatter(req *ipcReq, resp *ipcResp) {
 	optraw, _ := req.IpcArgs.(map[string]interface{})
 	var prefs *SrcFormattingClientPrefs
 	if optraw != nil {
@@ -203,7 +203,7 @@ func (me *SrcModBase) onRunFormatter(req *ipcReq, resp *ipcResp) {
 		resp.Menu = &menuResp{}
 	}
 
-	formatter := me.Impl.KnownFormatters().byName(Prog.Cfg.FormatterName)
+	formatter := this.Impl.KnownFormatters().byName(Prog.Cfg.FormatterName)
 	if formatter == nil {
 		if resp.Menu == nil {
 			resp.ErrMsg = "Select a Default Formatter first via the Zentient Main Menu."
@@ -216,7 +216,7 @@ func (me *SrcModBase) onRunFormatter(req *ipcReq, resp *ipcResp) {
 	}
 
 	srcfilepath := req.SrcLens.FilePath
-	withfilepathcmdarg := me.Impl.DoesStdoutWithFilePathArg(formatter)
+	withfilepathcmdarg := this.Impl.DoesStdoutWithFilePathArg(formatter)
 	if !(ufs.IsFile(srcfilepath) && withfilepathcmdarg) {
 		srcfilepath = ""
 	}
@@ -241,27 +241,27 @@ func (me *SrcModBase) onRunFormatter(req *ipcReq, resp *ipcResp) {
 		cmdname = Prog.Cfg.FormatterProg
 	}
 
-	if srcformatted, stderr := me.Impl.RunFormatter(formatter, cmdname, prefs, srcfilepath, *src); srcformatted != "" {
+	if srcformatted, stderr := this.Impl.RunFormatter(formatter, cmdname, prefs, srcfilepath, *src); srcformatted != "" {
 		*src, resp.SrcMods = srcformatted, SrcLenses{req.SrcLens}
 	} else if stderr != "" {
 		resp.ErrMsg = stderr
 	}
 }
 
-func (me *SrcModBase) onSetDefMenu(req *ipcReq, resp *ipcResp) {
+func (this *SrcModBase) onSetDefMenu(req *ipcReq, resp *ipcResp) {
 	m := Menu{Desc: "First pick a known formatter, then optionally specify a custom tool name:"}
-	for _, kf := range me.Impl.KnownFormatters() {
+	for _, kf := range this.Impl.KnownFormatters() {
 		var cmd = MenuItem{Title: kf.Name, IpcID: IPCID_SRCMOD_FMT_SETDEFPICK}
 		cmd.IpcArgs = map[string]interface{}{"fn": kf.Name, "fp": menuItemIpcArgPrompt{Placeholder: kf.Name,
 			Prompt: Strf("Optionally enter the name of an alternative '%s'-compatible equivalent tool to use", kf.Name)}}
 		cmd.Desc = Strf("➜ Pick to use '%s' (or compatible equivalent) as the default %s formatter", kf.Name, Lang.Title)
-		if kf.Name != Prog.Cfg.FormatterName || !me.isFormatterCustom() {
+		if kf.Name != Prog.Cfg.FormatterName || !this.isFormatterCustom() {
 			if cmd.Hint = "· Installed "; !kf.Installed {
 				cmd.Hint = "· Not Installed "
 			}
 		}
 		if kf.Name == Prog.Cfg.FormatterName {
-			if cmd.Hint += "· Current Default "; me.isFormatterCustom() {
+			if cmd.Hint += "· Current Default "; this.isFormatterCustom() {
 				cmd.Hint += "— Using '" + Prog.Cfg.FormatterProg + "' "
 			}
 		}
@@ -271,7 +271,7 @@ func (me *SrcModBase) onSetDefMenu(req *ipcReq, resp *ipcResp) {
 	resp.Menu = &menuResp{SubMenu: &m}
 }
 
-func (me *SrcModBase) onSetDefPick(req *ipcReq, resp *ipcResp) {
+func (this *SrcModBase) onSetDefPick(req *ipcReq, resp *ipcResp) {
 	m := req.IpcArgs.(map[string]interface{})
 	Prog.Cfg.FormatterName = m["fn"].(string)
 	if Prog.Cfg.FormatterProg = m["fp"].(string); Prog.Cfg.FormatterProg == Prog.Cfg.FormatterName {
@@ -282,7 +282,7 @@ func (me *SrcModBase) onSetDefPick(req *ipcReq, resp *ipcResp) {
 	} else {
 		resp.Menu = &menuResp{}
 		resp.Menu.NoteInfo = Strf("Default %s formatter changed to '%s'", Lang.Title, Prog.Cfg.FormatterName)
-		if me.isFormatterCustom() {
+		if this.isFormatterCustom() {
 			resp.Menu.NoteInfo += Strf("-compatible equivalent '%s'", Prog.Cfg.FormatterProg)
 		}
 		resp.Menu.NoteInfo += "."

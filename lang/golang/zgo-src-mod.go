@@ -19,13 +19,13 @@ type goSrcMod struct {
 	knownFormatters z.Tools
 }
 
-func (me *goSrcMod) onPreInit() {
-	me.knownFormatters = z.Tools{
+func (this *goSrcMod) onPreInit() {
+	this.knownFormatters = z.Tools{
 		tools.goformat, tools.gofmt, tools.goimports, tools.goreturns,
 	}
 }
 
-func (me *goSrcMod) onPostInit() {
+func (*goSrcMod) onPostInit() {
 	if z.Prog.Cfg.FormatterName == "" && tools.gofmt.Installed {
 		z.Prog.Cfg.FormatterName = "gofmt"
 	}
@@ -35,11 +35,11 @@ func (*goSrcMod) DoesStdoutWithFilePathArg(*z.Tool) bool {
 	return true
 }
 
-func (me *goSrcMod) KnownFormatters() z.Tools {
-	return me.knownFormatters
+func (this *goSrcMod) KnownFormatters() z.Tools {
+	return this.knownFormatters
 }
 
-func (me *goSrcMod) RunRenamer(srcLens *z.SrcLens, newName string) (srcMods z.SrcLenses) {
+func (*goSrcMod) RunRenamer(srcLens *z.SrcLens, newName string) (srcMods z.SrcLenses) {
 	if !tools.gorename.Installed {
 		panic(tools.gorename.NotInstalledMessage())
 	}
@@ -60,7 +60,7 @@ func (me *goSrcMod) RunRenamer(srcLens *z.SrcLens, newName string) (srcMods z.Sr
 	return
 }
 
-func (me *goSrcMod) RunFormatter(formatter *z.Tool, cmdName string, _ *z.SrcFormattingClientPrefs, srcFilePath string, src string) (string, string) {
+func (*goSrcMod) RunFormatter(formatter *z.Tool, cmdName string, _ *z.SrcFormattingClientPrefs, srcFilePath string, src string) (string, string) {
 	if formatter == tools.goformat {
 		fmtsrc, err := format.Source([]byte(src))
 		if err != nil {

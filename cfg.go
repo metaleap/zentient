@@ -18,8 +18,8 @@ type ISettings interface {
 
 type Settings []*Setting
 
-func (me Settings) byId(id string) *Setting {
-	for _, s := range me {
+func (this Settings) byId(id string) *Setting {
+	for _, s := range this {
 		if s.Id == id {
 			return s
 		}
@@ -27,8 +27,8 @@ func (me Settings) byId(id string) *Setting {
 	return nil
 }
 
-func (me Settings) numCust() (n int) {
-	for _, s := range me {
+func (this Settings) numCust() (n int) {
+	for _, s := range this {
 		if s.ValCfg != nil {
 			n++
 		}
@@ -36,9 +36,9 @@ func (me Settings) numCust() (n int) {
 	return
 }
 
-func (me Settings) titles() (all []string) {
-	all = make([]string, len(me))
-	for i, s := range me {
+func (this Settings) titles() (all []string) {
+	all = make([]string, len(this))
+	for i, s := range this {
 		all[i] = s.Title
 	}
 	return
@@ -57,30 +57,30 @@ type Setting struct {
 	menuItem *MenuItem
 }
 
-func (me *Setting) Val() interface{} {
-	if me.ValCfg != nil {
-		return me.ValCfg
+func (this *Setting) Val() interface{} {
+	if this.ValCfg != nil {
+		return this.ValCfg
 	}
-	return me.ValDef
+	return this.ValDef
 }
 
-func (me *Setting) ValBool() (val bool) {
-	val, _ = me.Val().(bool)
+func (this *Setting) ValBool() (val bool) {
+	val, _ = this.Val().(bool)
 	return
 }
 
-func (me *Setting) ValInt() (val int64) {
-	val, _ = me.Val().(int64)
+func (this *Setting) ValInt() (val int64) {
+	val, _ = this.Val().(int64)
 	return
 }
 
-func (me *Setting) ValUInt() (val uint64) {
-	val, _ = me.Val().(uint64)
+func (this *Setting) ValUInt() (val uint64) {
+	val, _ = this.Val().(uint64)
 	return
 }
 
-func (me *Setting) ValStr() (val string) {
-	v := me.Val()
+func (this *Setting) ValStr() (val string) {
+	v := this.Val()
 	switch vx := v.(type) {
 	case string:
 		val = vx
@@ -92,8 +92,8 @@ func (me *Setting) ValStr() (val string) {
 	return
 }
 
-func (me *Setting) ValStrs() (val []string) {
-	val, _ = me.Val().([]string)
+func (this *Setting) ValStrs() (val []string) {
+	val, _ = this.Val().([]string)
 	return
 }
 
@@ -109,20 +109,20 @@ type Config struct {
 	timeLastLoaded int64
 }
 
-func (me *Config) reload() {
-	if stale, _ := ufs.IsNewerThanTime(me.filePath, me.timeLastLoaded); stale {
+func (this *Config) reload() {
+	if stale, _ := ufs.IsNewerThanTime(this.filePath, this.timeLastLoaded); stale {
 		// 1. re-initialize me
 		var empty Config
-		*me = empty
-		me.filePath = filepath.Join(Prog.Dir.Config, Prog.Name+".config.json")
+		*this = empty
+		this.filePath = filepath.Join(Prog.Dir.Config, Prog.Name+".config.json")
 
 		// 2. load
-		if ufs.IsFile(me.filePath) { // otherwise, it's a fresh setup
-			if me.err = ustd.JsonDecodeFromFile(me.filePath, me); me.err == nil {
-				me.timeLastLoaded = time.Now().UnixNano()
-				if Lang.Settings != nil && me.Internal != nil {
+		if ufs.IsFile(this.filePath) { // otherwise, it's a fresh setup
+			if this.err = ustd.JsonDecodeFromFile(this.filePath, this); this.err == nil {
+				this.timeLastLoaded = time.Now().UnixNano()
+				if Lang.Settings != nil && this.Internal != nil {
 					for _, ks := range Lang.Settings.KnownSettings() {
-						if val, ok := me.Internal[ks.Id]; ok {
+						if val, ok := this.Internal[ks.Id]; ok {
 							switch vx := val.(type) {
 							case []interface{}:
 								strs := make([]string, len(vx))
@@ -147,41 +147,41 @@ func (me *Config) reload() {
 							}
 						}
 					}
-					me.Internal = nil
+					this.Internal = nil
 				}
 			}
 		}
 	}
 }
 
-// func (me *Config) recall() {
-// 	me.recallFilePath = filepath.Join(Prog.Dir.Cache, Prog.Name+".recall.json")
-// 	if ufs.IsFile(me.recallFilePath) {
-// 		ustd.JsonDecodeFromFile(me.recallFilePath, &Prog.recall)
+// func (this *Config) recall() {
+// 	this.recallFilePath = filepath.Join(Prog.Dir.Cache, Prog.Name+".recall.json")
+// 	if ufs.IsFile(this.recallFilePath) {
+// 		ustd.JsonDecodeFromFile(this.recallFilePath, &Prog.recall)
 // 	}
 // 	if Prog.recall.i64 == nil {
 // 		Prog.recall.i64 = map[string]int64{}
 // 	}
 // }
 
-// func (me *Config) saveRecall() {
-// 	ustd.JsonEncodeToFile(&Prog.recall, me.recallFilePath)
+// func (this *Config) saveRecall() {
+// 	ustd.JsonEncodeToFile(&Prog.recall, this.recallFilePath)
 // }
 
-func (me *Config) Save() (err error) {
+func (this *Config) Save() (err error) {
 	if Lang.Settings != nil {
-		me.Internal = map[string]interface{}{}
+		this.Internal = map[string]interface{}{}
 		for _, ks := range Lang.Settings.KnownSettings() {
 			if ks.ValCfg != nil {
-				me.Internal[ks.Id] = ks.ValCfg
+				this.Internal[ks.Id] = ks.ValCfg
 			}
 		}
-		if len(me.Internal) == 0 {
-			me.Internal = nil
+		if len(this.Internal) == 0 {
+			this.Internal = nil
 		}
 	}
-	err = ustd.JsonEncodeToFile(me, me.filePath)
-	me.Internal = nil
+	err = ustd.JsonEncodeToFile(this, this.filePath)
+	this.Internal = nil
 	return
 }
 
@@ -192,27 +192,27 @@ type SettingsBase struct {
 	cmdResetAll *MenuItem
 }
 
-func (me *SettingsBase) Init() {
+func (this *SettingsBase) Init() {
 	if Lang.Settings != nil {
-		ks := me.Impl.KnownSettings()
-		me.cmdListAll = &MenuItem{IpcID: IPCID_CFG_LIST, Title: Strf("%s-Specific", Lang.Title), Hint: Strf("%d setting(s)", len(ks)), Desc: Strf("Customize ➜ %s", strings.Join(ks.titles(), " · "))}
-		me.cmdResetAll = &MenuItem{IpcID: IPCID_CFG_RESETALL, Title: "Reset All", Hint: Strf("%s-Specific Settings", Lang.Title)}
-		me.cmdResetAll.Confirm = Strf("Are you sure you want to %s %s?", me.cmdResetAll.Title, me.cmdResetAll.Hint)
+		ks := this.Impl.KnownSettings()
+		this.cmdListAll = &MenuItem{IpcID: IPCID_CFG_LIST, Title: Strf("%s-Specific", Lang.Title), Hint: Strf("%d setting(s)", len(ks)), Desc: Strf("Customize ➜ %s", strings.Join(ks.titles(), " · "))}
+		this.cmdResetAll = &MenuItem{IpcID: IPCID_CFG_RESETALL, Title: "Reset All", Hint: Strf("%s-Specific Settings", Lang.Title)}
+		this.cmdResetAll.Confirm = Strf("Are you sure you want to %s %s?", this.cmdResetAll.Title, this.cmdResetAll.Hint)
 		for _, s := range ks {
 			s.menuItem = &MenuItem{Title: s.Title, Desc: s.Desc, IpcID: IPCID_CFG_SET}
 		}
 	}
 }
 
-func (me *SettingsBase) dispatch(req *ipcReq, resp *ipcResp) bool {
+func (this *SettingsBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	switch req.IpcID {
 	case IPCID_CFG_LIST:
-		me.onListAll(resp.withMenu())
+		this.onListAll(resp.withMenu())
 	case IPCID_CFG_SET:
 		args := req.IpcArgs.(map[string]interface{})
-		me.onSet(args["id"].(string), args["val"].(string), resp.withMenu())
+		this.onSet(args["id"].(string), args["val"].(string), resp.withMenu())
 	case IPCID_CFG_RESETALL:
-		if num, err := me.onResetAll(); err != nil {
+		if num, err := this.onResetAll(); err != nil {
 			resp.ErrMsg = err.Error()
 		} else {
 			resp.withMenu().NoteInfo = Strf("%d customized setting(s) just reset to factory defaults.", num)
@@ -223,15 +223,15 @@ func (me *SettingsBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	return true
 }
 
-func (me *SettingsBase) KnownSettings() Settings {
+func (this *SettingsBase) KnownSettings() Settings {
 	if Lang.Diag == nil {
 		return nil
 	}
 	return Settings{cfgLintStickiness}
 }
 
-func (me *SettingsBase) onSet(cfgId string, cfgVal string, menu *menuResp) {
-	info, setting := "changed", me.Impl.KnownSettings().byId(cfgId)
+func (this *SettingsBase) onSet(cfgId string, cfgVal string, menu *menuResp) {
+	info, setting := "changed", this.Impl.KnownSettings().byId(cfgId)
 	if setting == nil {
 		BadPanic("setting ID", cfgId)
 	}
@@ -273,9 +273,9 @@ func (me *SettingsBase) onSet(cfgId string, cfgVal string, menu *menuResp) {
 	}
 }
 
-func (me *SettingsBase) onListAll(menu *menuResp) {
-	menu.SubMenu = &Menu{Desc: Strf("%s — %s:", me.MenuCategory(), me.cmdListAll.Title)}
-	for _, ks := range me.Impl.KnownSettings() {
+func (this *SettingsBase) onListAll(menu *menuResp) {
+	menu.SubMenu = &Menu{Desc: Strf("%s — %s:", this.MenuCategory(), this.cmdListAll.Title)}
+	for _, ks := range this.Impl.KnownSettings() {
 		svdef, svcur := "(empty)", "(default)"
 		if ks.ValDef != nil && ks.ValDef != "" {
 			svdef = Strf("%v", ks.ValDef)
@@ -290,7 +290,7 @@ func (me *SettingsBase) onListAll(menu *menuResp) {
 	}
 }
 
-func (me *SettingsBase) onResetAll() (num int, err error) {
+func (this *SettingsBase) onResetAll() (num int, err error) {
 	for _, ks := range Lang.Settings.KnownSettings() {
 		if ks.ValCfg != nil {
 			num, ks.ValCfg = num+1, nil
@@ -300,12 +300,12 @@ func (me *SettingsBase) onResetAll() (num int, err error) {
 	return
 }
 
-func (me *SettingsBase) menuItems(*SrcLens) (menuItems MenuItems) {
+func (this *SettingsBase) menuItems(*SrcLens) (menuItems MenuItems) {
 	if Lang.Settings != nil {
-		menuItems = MenuItems{me.cmdListAll}
+		menuItems = MenuItems{this.cmdListAll}
 		if num := Lang.Settings.KnownSettings().numCust(); num > 0 {
-			me.cmdResetAll.Desc = Strf("Forgets %d current customization(s)", num)
-			menuItems = append(menuItems, me.cmdResetAll)
+			this.cmdResetAll.Desc = Strf("Forgets %d current customization(s)", num)
+			menuItems = append(menuItems, this.cmdResetAll)
 		}
 	}
 	return

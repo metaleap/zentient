@@ -96,7 +96,7 @@ func (*goSrcIntel) ComplItems(srcLens *z.SrcLens) (all z.SrcIntelCompls) {
 	return
 }
 
-func (me *goSrcIntel) ComplDetails(srcLens *z.SrcLens, itemText string) (itemDoc *z.SrcIntelCompl) {
+func (this *goSrcIntel) ComplDetails(srcLens *z.SrcLens, itemText string) (itemDoc *z.SrcIntelCompl) {
 	if !(tools.gogetdoc.Installed || tools.godef.Installed) {
 		return
 	}
@@ -111,7 +111,7 @@ func (me *goSrcIntel) ComplDetails(srcLens *z.SrcLens, itemText string) (itemDoc
 	if tools.gogetdoc.Installed {
 		ggd := udevgo.Query_Gogetdoc(srcLens.FilePath, srcLens.Txt, spos, true, true)
 		if decl = ggd.Decl; decl != "" {
-			decl = me.goFuncDeclLineBreaks(udevgo.PkgImpPathsToNamesInLn(decl, filepath.Dir(srcLens.FilePath)), 23)
+			decl = this.goFuncDeclLineBreaks(udevgo.PkgImpPathsToNamesInLn(decl, filepath.Dir(srcLens.FilePath)), 23)
 		}
 		if ggd.Doc != "" {
 			itemDoc.Documentation.Value = strings.TrimSpace(ggd.Doc)
@@ -124,13 +124,12 @@ func (me *goSrcIntel) ComplDetails(srcLens *z.SrcLens, itemText string) (itemDoc
 	}
 	if decl == "" && tools.godef.Installed {
 		if decl = udevgo.QueryDefDecl_GoDef(srcLens.FilePath, srcLens.Txt, spos); decl != "" {
-			decl = me.goFuncDeclLineBreaks(decl, 23)
+			decl = this.goFuncDeclLineBreaks(decl, 23)
 		}
 	}
-	itemDoc.Detail = me.goDeclSnip(decl)
+	itemDoc.Detail = this.goDeclSnip(decl)
 	return
 }
-
 func (*goSrcIntel) goFuncDeclLineBreaks(decl string, maxlen int) string {
 	if len(decl) > maxlen && !strings.Contains(decl, "\n") {
 		dl, dr := decl[:6], decl[6:]
@@ -152,7 +151,7 @@ func (*goSrcIntel) goFuncDeclLineBreaks(decl string, maxlen int) string {
 	return decl
 }
 
-func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
+func (this *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 	var ggd *udevgo.Gogetdoc
 	var decl *z.InfoTip
 	offset := z.Strf("%d", srcLens.ByteOffsetForPos(srcLens.Pos))
@@ -174,7 +173,7 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 				headline = udevgo.PkgImpPathsToNamesInLn(headline, curpkgdir)
 				hovs = append(hovs, z.InfoTip{Value: "### " + headline})
 			}
-			if ggd.Decl = me.goFuncDeclLineBreaks(ggd.Decl, 42); ggd.Decl != "" {
+			if ggd.Decl = this.goFuncDeclLineBreaks(ggd.Decl, 42); ggd.Decl != "" {
 				if ggd.ImpP != "" {
 					ggd.Decl = strings.Replace(ggd.Decl, ggd.ImpP+".", "", -1)
 				}
@@ -202,7 +201,7 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 	}
 	if decl == nil && tools.godef.Installed {
 		if defdecl := udevgo.QueryDefDecl_GoDef(srcLens.FilePath, srcLens.Txt, offset); defdecl != "" {
-			decl = &z.InfoTip{Language: z.Lang.ID, Value: me.goFuncDeclLineBreaks(defdecl, 42)}
+			decl = &z.InfoTip{Language: z.Lang.ID, Value: this.goFuncDeclLineBreaks(defdecl, 42)}
 		}
 	}
 	if decl != nil {
@@ -215,7 +214,7 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 	return
 }
 
-func (me *goSrcIntel) Signature(srcLens *z.SrcLens) (sig *z.SrcIntelSigHelp) {
+func (this *goSrcIntel) Signature(srcLens *z.SrcLens) (sig *z.SrcIntelSigHelp) {
 	sig = &z.SrcIntelSigHelp{Signatures: []z.SrcIntelSigInfo{{}}}
 	sig0 := &sig.Signatures[0]
 	if !(tools.guru.Installed && (tools.gogetdoc.Installed || tools.godef.Installed)) {
@@ -273,7 +272,7 @@ func (me *goSrcIntel) Signature(srcLens *z.SrcLens) (sig *z.SrcIntelSigHelp) {
 			if decl == "" {
 				sig = nil
 			} else {
-				sig0.Label = me.goDeclSnip(me.goFuncDeclLineBreaks(decl, 42))
+				sig0.Label = this.goDeclSnip(this.goFuncDeclLineBreaks(decl, 42))
 			}
 		}
 	}

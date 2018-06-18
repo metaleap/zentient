@@ -68,7 +68,7 @@ func (*goSrcIntel) DefSym(srcLens *z.SrcLens) (defs z.SrcLocs) {
 	return
 }
 
-func (me *goSrcIntel) DefType(srcLens *z.SrcLens) (defs z.SrcLocs) {
+func (this *goSrcIntel) DefType(srcLens *z.SrcLens) (defs z.SrcLocs) {
 	if !tools.guru.Installed {
 		return
 	}
@@ -109,7 +109,7 @@ func (me *goSrcIntel) DefType(srcLens *z.SrcLens) (defs z.SrcLocs) {
 			}
 			srcLens.Pos = &z.SrcPos{Off: len(srcLens.Txt) + len(hacky1) + 1}
 			srcLens.Txt = srcLens.Txt + hacky1 + typename + hacky2
-			return me.DefSym(srcLens)
+			return this.DefSym(srcLens)
 		}
 	}
 	defs.AddFrom(refloc, nil)
@@ -214,7 +214,7 @@ func (*goSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (all z.SrcLocs
 	return
 }
 
-func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (allsyms z.SrcLenses) {
+func (this *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (allsyms z.SrcLenses) {
 	onerr := func(label string, detail string) z.SrcLenses {
 		return z.SrcLenses{&z.SrcLens{Str: label, Txt: detail,
 			SrcLoc: z.SrcLoc{FilePath: sL.FilePath, Flag: int(z.SYM_EVENT), Pos: sL.Pos, Range: sL.Range}}}
@@ -269,7 +269,7 @@ func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (al
 			case "var":
 				sym.Flag, sym.Txt = int(z.SYM_VARIABLE), pmtype
 			case "func":
-				fnargs, fnret := me.symFuncSigBreak(pmtype)
+				fnargs, fnret := this.symFuncSigBreak(pmtype)
 				sym.Flag, sym.Txt = int(z.SYM_FUNCTION), udevgo.PkgImpPathsToNamesInLn(fnret, curpkgdir)
 				sym.Str += "  " + udevgo.PkgImpPathsToNamesInLn(strings.TrimPrefix(fnargs, "func"), curpkgdir)
 			case "type":
@@ -319,7 +319,7 @@ func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (al
 					// if !ispmlisted { // if method's receiver type not in the symbols listing, prepend it's name to the pretend-indentation
 					lens.Str = methodtype + "  " + lens.Str
 					// }
-					lens.Str, lens.Txt = me.symFuncSigBreak(lens.Str)
+					lens.Str, lens.Txt = this.symFuncSigBreak(lens.Str)
 					lens.Str, lens.Txt = udevgo.PkgImpPathsToNamesInLn(lens.Str, curpkgdir), udevgo.PkgImpPathsToNamesInLn(lens.Txt, curpkgdir)
 					if i := strings.Index(lens.Str, "("); i > 0 { // insert some spacing between name and args
 						lens.Str = lens.Str[:i] + "  " + lens.Str[i:]

@@ -8,12 +8,12 @@ type IPkgIntel interface {
 
 type PkgInfos []*PkgInfo
 
-func (me *PkgInfos) Add(pkg *PkgInfo) {
-	*me = append(*me, pkg)
+func (this *PkgInfos) Add(pkg *PkgInfo) {
+	*this = append(*this, pkg)
 }
 
-func (me PkgInfos) ById(id string) *PkgInfo {
-	for _, pkg := range me {
+func (this PkgInfos) ById(id string) *PkgInfo {
+	for _, pkg := range this {
 		if pkg.Id == id {
 			return pkg
 		}
@@ -45,29 +45,29 @@ type PkgIntelBase struct {
 	pkgs PkgInfos
 }
 
-func (me *PkgIntelBase) Init() {
-	me.ListMenuBase.init(me.Impl, "Packages", "Lists %s packages %s")
+func (this *PkgIntelBase) Init() {
+	this.ListMenuBase.init(this.Impl, "Packages", "Lists %s packages %s")
 }
 
-func (me *PkgIntelBase) ipcID(_ *ListFilter) IpcIDs {
+func (this *PkgIntelBase) ipcID(_ *ListFilter) IpcIDs {
 	return IPCID_MENUS_PKGS
 }
 
-func (me *PkgIntelBase) ObjSnapPrefix() string {
+func (this *PkgIntelBase) ObjSnapPrefix() string {
 	return Lang.ID + ".pkgIntel."
 }
 
-func (me *PkgIntelBase) dispatch(req *ipcReq, resp *ipcResp) bool {
+func (this *PkgIntelBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	switch req.IpcID {
 	case IPCID_MENUS_PKGS:
 		filterid, _ := req.IpcArgs.(string)
-		filter := me.Impl.FilterByID(filterid)
+		filter := this.Impl.FilterByID(filterid)
 		var filters ListFilters
 		if filterid != "" {
 			filters = ListFilters{filter: true}
 		}
 		resp.Menu = &menuResp{
-			SubMenu: me.Impl.listItemsSubMenu(filter.Title, filter.Desc, filters),
+			SubMenu: this.Impl.listItemsSubMenu(filter.Title, filter.Desc, filters),
 		}
 	default:
 		return false
@@ -75,11 +75,11 @@ func (me *PkgIntelBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	return true
 }
 
-func (me *PkgIntelBase) PkgsAdd(pkg *PkgInfo) {
-	me.pkgs.Add(pkg)
+func (this *PkgIntelBase) PkgsAdd(pkg *PkgInfo) {
+	this.pkgs.Add(pkg)
 	Lang.sideViews.sendOnChanged("", sideViewTreeItem{pkg.Id})
 }
 
-func (me *PkgIntelBase) Pkgs() PkgInfos {
-	return me.pkgs
+func (this *PkgIntelBase) Pkgs() PkgInfos {
+	return this.pkgs
 }

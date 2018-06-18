@@ -11,7 +11,7 @@ import (
 	"github.com/metaleap/zentient"
 )
 
-func (me *hsDiag) OnUpdateBuildDiags(writtenFilePaths []string) (jobs z.DiagBuildJobs) {
+func (this *hsDiag) OnUpdateBuildDiags(writtenFilePaths []string) (jobs z.DiagBuildJobs) {
 	stackyamlfilepaths := map[string]bool{}
 	for _, fp := range writtenFilePaths {
 		if stackyamlfilepath := ufs.Locate(fp, "stack.yaml"); stackyamlfilepath != "" {
@@ -27,7 +27,7 @@ func (me *hsDiag) OnUpdateBuildDiags(writtenFilePaths []string) (jobs z.DiagBuil
 	return
 }
 
-func (me *hsDiag) RunBuildJobs(jobs z.DiagBuildJobs, workspaceFiles z.WorkspaceFiles) (diags z.DiagItems) {
+func (this *hsDiag) RunBuildJobs(jobs z.DiagBuildJobs, workspaceFiles z.WorkspaceFiles) (diags z.DiagItems) {
 	progress := z.NewBuildProgress(len(jobs))
 	for i := 0; i < progress.NumJobs; i++ {
 		progress.AddPkgName(jobs[i].Target.(string))
@@ -45,10 +45,10 @@ func (me *hsDiag) RunBuildJobs(jobs z.DiagBuildJobs, workspaceFiles z.WorkspaceF
 		lns := ustr.Split(stderr+"\n"+ustr.Trim(stdout), "\n")
 
 		lnstackwarns, _w := []string{}, "Warning: "+stackyamlfilepath+": "
-		for i := 0; i < len(lns); i++ {
-			if ustr.Pref(lns[i], _w) {
-				lnstackwarns = append(lnstackwarns, lns[i][len(_w):])
-				i, lns = i-1, append(lns[:i], lns[i+1:]...)
+		for j := 0; j < len(lns); j++ {
+			if ustr.Pref(lns[j], _w) {
+				lnstackwarns = append(lnstackwarns, lns[j][len(_w):])
+				j, lns = j-1, append(lns[:j], lns[j+1:]...)
 			}
 		}
 
@@ -58,8 +58,8 @@ func (me *hsDiag) RunBuildJobs(jobs z.DiagBuildJobs, workspaceFiles z.WorkspaceF
 		wasnoop := len(lns) == 0
 		if len(lns) > 3 && ustr.Pref(lns[0], "Copying from ") && len(lns[1]) == 0 && ustr.Pref(lns[2], "Copied executables to ") {
 			wasnoop = true
-			for i := 3; i < len(lns); i++ {
-				if !ustr.Pref(lns[i], "- ") {
+			for j := 3; j < len(lns); j++ {
+				if !ustr.Pref(lns[j], "- ") {
 					wasnoop = false
 				}
 			}
@@ -103,11 +103,11 @@ func (me *hsDiag) RunBuildJobs(jobs z.DiagBuildJobs, workspaceFiles z.WorkspaceF
 					if !ustr.Suff(cur.Ref, ".hs") {
 						toolname = "stack"
 					}
-					if i := ustr.Pos(cur.Msg, "]"); ustr.Pref(cur.Msg, "[") && i > 0 {
-						toolname = toolname + "  » " + cur.Msg[1:i]
-						cur.Msg = ustr.Trim(cur.Msg[i+1:])
+					if j := ustr.Pos(cur.Msg, "]"); ustr.Pref(cur.Msg, "[") && j > 0 {
+						toolname = toolname + "  » " + cur.Msg[1:j]
+						cur.Msg = ustr.Trim(cur.Msg[j+1:])
 					}
-					diag := me.DiagBase.NewDiagItemFrom(cur, toolname, func() string { return stackyamlfilepath })
+					diag := this.DiagBase.NewDiagItemFrom(cur, toolname, func() string { return stackyamlfilepath })
 					if diags = append(diags, diag); diag.Loc.Flag == int(z.DIAG_SEV_ERR) {
 						haderrs = true
 					}

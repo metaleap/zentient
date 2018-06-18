@@ -25,22 +25,22 @@ type goPages struct {
 	z.PagesBase
 }
 
-func (me *goPages) PageBodyInnerHtml(rawUri string, path []string, query url.Values, fragment string) string {
+func (this *goPages) PageBodyInnerHtml(rawUri string, path []string, query url.Values, fragment string) string {
 	if len(path) > 1 {
 		switch path[0] {
 		case "godoc":
 			subpath := strings.Join(path[1:], "/")
-			return me.onGoDoc(subpath, fragment)
+			return this.onGoDoc(subpath, fragment)
 		}
 	}
-	return me.PagesBase.PageBodyInnerHtml(rawUri, path, query, fragment)
+	return this.PagesBase.PageBodyInnerHtml(rawUri, path, query, fragment)
 }
 
 func (*goPages) linkifyUri(uri string) string {
 	return z.Strf("command:zen.internal.page?\"%s\"", template.URLQueryEscaper(uri))
 }
 
-func (me *goPages) onGoDoc(uriPath string, identName string) string {
+func (this *goPages) onGoDoc(uriPath string, identName string) string {
 	cmdout, cmderr, err := urun.CmdExec("godoc", "-url", uriPath)
 	if err != nil {
 		return err.Error()
@@ -84,7 +84,7 @@ func (me *goPages) onGoDoc(uriPath string, identName string) string {
 					}
 					if !link2srcfilepos {
 						href = "zentient://" + z.Lang.ID + "/godoc" + href
-						href = me.linkifyUri(href)
+						href = this.linkifyUri(href)
 					}
 				}
 				left, right = left+right[:i]+" href='"+href, "'"+right[i+7:][j+1:]
