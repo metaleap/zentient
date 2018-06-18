@@ -3,7 +3,7 @@ package z
 // DO NOT EDIT: code generated with zentient-dbg-vsc-go-demo-go-gent using github.com/metaleap/go-gent
 
 import (
-	strconv "strconv"
+	pkg__strconv "strconv"
 )
 
 // Valid returns whether the value of this `CaddyStatus` is between `CADDY_PENDING` (inclusive) and `CADDY_GOOD` (inclusive).
@@ -35,7 +35,7 @@ func (this CaddyStatus) String() (ret string) {
 	case CADDY_GOOD:
 		ret = "CADDY_GOOD"
 	default:
-		ret = strconv.FormatUint(uint64(this), 10)
+		ret = pkg__strconv.FormatUint(uint64(this), 10)
 	}
 	return
 }
@@ -381,7 +381,7 @@ func (this IpcIDs) String() (ret string) {
 	case IPCID_EXTRAS_QUERY_RUN:
 		ret = "IPCID_EXTRAS_QUERY_RUN"
 	default:
-		ret = strconv.FormatUint(uint64(this), 10)
+		ret = pkg__strconv.FormatUint(uint64(this), 10)
 	}
 	return
 }
@@ -415,7 +415,7 @@ func (this DiagSeverity) String() (ret string) {
 	case DIAG_SEV_HINT:
 		ret = "DIAG_SEV_HINT"
 	default:
-		ret = strconv.Itoa(int(this))
+		ret = pkg__strconv.Itoa(int(this))
 	}
 	return
 }
@@ -559,7 +559,7 @@ func (this Symbol) String() (ret string) {
 	case SYM_TYPEPARAMETER:
 		ret = "SYM_TYPEPARAMETER"
 	default:
-		ret = strconv.FormatUint(uint64(this), 10)
+		ret = pkg__strconv.FormatUint(uint64(this), 10)
 	}
 	return
 }
@@ -698,7 +698,7 @@ func (this Completion) String() (ret string) {
 	case CMPL_TYPEPARAMETER:
 		ret = "CMPL_TYPEPARAMETER"
 	default:
-		ret = strconv.FormatUint(uint64(this), 10)
+		ret = pkg__strconv.FormatUint(uint64(this), 10)
 	}
 	return
 }
