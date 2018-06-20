@@ -40,7 +40,7 @@ func (this CaddyStatus) String() (ret string) {
 	return
 }
 
-func CaddyStatusFromString() {}
+func CaddyStatusFromString(s string) (this CaddyStatus, err error) { return }
 
 // Valid returns whether the value of this `IpcIDs` is between `IPCID_MENUS_MAIN` (inclusive) and `IPCID_EXTRAS_QUERY_RUN` (inclusive).
 func (this IpcIDs) Valid() (ret bool) {
@@ -388,7 +388,7 @@ func (this IpcIDs) String() (ret string) {
 	return
 }
 
-func IpcIDsFromString() {}
+func IpcIDsFromString(s string) (this IpcIDs, err error) { return }
 
 // Valid returns whether the value of this `DiagSeverity` is between `DIAG_SEV_ERR` (inclusive) and `DIAG_SEV_HINT` (inclusive).
 func (this DiagSeverity) Valid() (ret bool) {
@@ -424,7 +424,7 @@ func (this DiagSeverity) String() (ret string) {
 	return
 }
 
-func DiagSeverityFromString() {}
+func DiagSeverityFromString(s string) (this DiagSeverity, err error) { return }
 
 // Valid returns whether the value of this `Symbol` is between `SYM_FILE` (inclusive) and `SYM_TYPEPARAMETER` (inclusive).
 func (this Symbol) Valid() (ret bool) {
@@ -570,7 +570,7 @@ func (this Symbol) String() (ret string) {
 	return
 }
 
-func SymbolFromString() {}
+func SymbolFromString(s string) (this Symbol, err error) { return }
 
 // Valid returns whether the value of this `Completion` is between `CMPL_TEXT` (inclusive) and `CMPL_TYPEPARAMETER` (inclusive).
 func (this Completion) Valid() (ret bool) {
@@ -711,7 +711,7 @@ func (this Completion) String() (ret string) {
 	return
 }
 
-func CompletionFromString() {}
+func CompletionFromString(s string) (this Completion, err error) { return }
 
 // Valid returns whether the value of this `ToolCats` is between `TOOLS_CAT_MOD_REN` (inclusive) and `TOOLS_CAT_RUNONSAVE` (inclusive).
 func (this ToolCats) Valid() (ret bool) {
