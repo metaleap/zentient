@@ -12,6 +12,7 @@ func (this CaddyStatus) Valid() (ret bool) {
 	return
 }
 
+// String implements the `fmt.Stringer` interface.
 func (this CaddyStatus) String() (ret string) {
 	switch this {
 	case CADDY_PENDING:
@@ -28,6 +29,7 @@ func (this CaddyStatus) String() (ret string) {
 	return
 }
 
+// CaddyStatusFromString returns the `CaddyStatus` represented by `s` (as returned by `String`, and case-sensitively), or an `error` if none exists.
 func CaddyStatusFromString(s string) (this CaddyStatus, err error) {
 	switch {
 	case s == "CADDY_PENDING":
@@ -48,6 +50,7 @@ func CaddyStatusFromString(s string) (this CaddyStatus, err error) {
 	return
 }
 
+// CaddyStatusFromStringOr is like `CaddyStatusFromString` but returns `fallback` for bad inputs.
 func CaddyStatusFromStringOr(s string, fallback CaddyStatus) (this CaddyStatus) {
 	maybeCaddyStatus, err := CaddyStatusFromString(s)
 	if err == nil {
@@ -58,6 +61,7 @@ func CaddyStatusFromStringOr(s string, fallback CaddyStatus) (this CaddyStatus) 
 	return
 }
 
+// WellknownCaddyStatuses returns the `names` and `values` of all 4 well-known `CaddyStatus` enumerants.
 func WellknownCaddyStatuses() (names []string, values []CaddyStatus) {
 	names, values = []string{"CADDY_PENDING", "CADDY_ERROR", "CADDY_BUSY", "CADDY_GOOD"}, []CaddyStatus{CADDY_PENDING, CADDY_ERROR, CADDY_BUSY, CADDY_GOOD}
 	return
@@ -69,6 +73,7 @@ func (this IpcIDs) Valid() (ret bool) {
 	return
 }
 
+// String implements the `fmt.Stringer` interface.
 func (this IpcIDs) String() (ret string) {
 	switch this {
 	case IPCID_MENUS_MAIN:
@@ -175,6 +180,7 @@ func (this IpcIDs) String() (ret string) {
 	return
 }
 
+// IpcIDsFromString returns the `IpcIDs` represented by `s` (as returned by `String`, and case-sensitively), or an `error` if none exists.
 func IpcIDsFromString(s string) (this IpcIDs, err error) {
 	switch {
 	case s == "IPCID_MENUS_MAIN":
@@ -285,6 +291,7 @@ func IpcIDsFromString(s string) (this IpcIDs, err error) {
 	return
 }
 
+// IpcIDsFromStringOr is like `IpcIDsFromString` but returns `fallback` for bad inputs.
 func IpcIDsFromStringOr(s string, fallback IpcIDs) (this IpcIDs) {
 	maybeIpcIDs, err := IpcIDsFromString(s)
 	if err == nil {
@@ -295,6 +302,7 @@ func IpcIDsFromStringOr(s string, fallback IpcIDs) (this IpcIDs) {
 	return
 }
 
+// WellknownIpcIDses returns the `names` and `values` of all 49 well-known `IpcIDs` enumerants.
 func WellknownIpcIDses() (names []string, values []IpcIDs) {
 	names, values = []string{"IPCID_MENUS_MAIN", "IPCID_MENUS_PKGS", "IPCID_MENUS_TOOLS", "IPCID_OBJ_SNAPSHOT", "IPCID_PAGE_HTML", "IPCID_TREEVIEW_GETITEM", "IPCID_TREEVIEW_CHILDREN", "IPCID_TREEVIEW_CHANGED", "IPCID_CFG_RESETALL", "IPCID_CFG_LIST", "IPCID_CFG_SET", "IPCID_NOTIFY_INFO", "IPCID_NOTIFY_WARN", "IPCID_NOTIFY_ERR", "IPCID_PROJ_CHANGED", "IPCID_PROJ_POLLEVTS", "IPCID_SRCDIAG_LIST", "IPCID_SRCDIAG_RUN_CURFILE", "IPCID_SRCDIAG_RUN_OPENFILES", "IPCID_SRCDIAG_RUN_ALLFILES", "IPCID_SRCDIAG_FORGETALL", "IPCID_SRCDIAG_PEEKHIDDEN", "IPCID_SRCDIAG_PUB", "IPCID_SRCDIAG_AUTO_TOGGLE", "IPCID_SRCDIAG_AUTO_ALL", "IPCID_SRCDIAG_AUTO_NONE", "IPCID_SRCDIAG_STARTED", "IPCID_SRCDIAG_FINISHED", "IPCID_SRCMOD_FMT_SETDEFMENU", "IPCID_SRCMOD_FMT_SETDEFPICK", "IPCID_SRCMOD_FMT_RUNONFILE", "IPCID_SRCMOD_FMT_RUNONSEL", "IPCID_SRCMOD_RENAME", "IPCID_SRCMOD_ACTIONS", "IPCID_SRCINTEL_HOVER", "IPCID_SRCINTEL_SYMS_FILE", "IPCID_SRCINTEL_SYMS_PROJ", "IPCID_SRCINTEL_CMPL_ITEMS", "IPCID_SRCINTEL_CMPL_DETAILS", "IPCID_SRCINTEL_HIGHLIGHTS", "IPCID_SRCINTEL_SIGNATURE", "IPCID_SRCINTEL_REFERENCES", "IPCID_SRCINTEL_DEFSYM", "IPCID_SRCINTEL_DEFTYPE", "IPCID_SRCINTEL_DEFIMPL", "IPCID_EXTRAS_INTEL_LIST", "IPCID_EXTRAS_INTEL_RUN", "IPCID_EXTRAS_QUERY_LIST", "IPCID_EXTRAS_QUERY_RUN"}, []IpcIDs{IPCID_MENUS_MAIN, IPCID_MENUS_PKGS, IPCID_MENUS_TOOLS, IPCID_OBJ_SNAPSHOT, IPCID_PAGE_HTML, IPCID_TREEVIEW_GETITEM, IPCID_TREEVIEW_CHILDREN, IPCID_TREEVIEW_CHANGED, IPCID_CFG_RESETALL, IPCID_CFG_LIST, IPCID_CFG_SET, IPCID_NOTIFY_INFO, IPCID_NOTIFY_WARN, IPCID_NOTIFY_ERR, IPCID_PROJ_CHANGED, IPCID_PROJ_POLLEVTS, IPCID_SRCDIAG_LIST, IPCID_SRCDIAG_RUN_CURFILE, IPCID_SRCDIAG_RUN_OPENFILES, IPCID_SRCDIAG_RUN_ALLFILES, IPCID_SRCDIAG_FORGETALL, IPCID_SRCDIAG_PEEKHIDDEN, IPCID_SRCDIAG_PUB, IPCID_SRCDIAG_AUTO_TOGGLE, IPCID_SRCDIAG_AUTO_ALL, IPCID_SRCDIAG_AUTO_NONE, IPCID_SRCDIAG_STARTED, IPCID_SRCDIAG_FINISHED, IPCID_SRCMOD_FMT_SETDEFMENU, IPCID_SRCMOD_FMT_SETDEFPICK, IPCID_SRCMOD_FMT_RUNONFILE, IPCID_SRCMOD_FMT_RUNONSEL, IPCID_SRCMOD_RENAME, IPCID_SRCMOD_ACTIONS, IPCID_SRCINTEL_HOVER, IPCID_SRCINTEL_SYMS_FILE, IPCID_SRCINTEL_SYMS_PROJ, IPCID_SRCINTEL_CMPL_ITEMS, IPCID_SRCINTEL_CMPL_DETAILS, IPCID_SRCINTEL_HIGHLIGHTS, IPCID_SRCINTEL_SIGNATURE, IPCID_SRCINTEL_REFERENCES, IPCID_SRCINTEL_DEFSYM, IPCID_SRCINTEL_DEFTYPE, IPCID_SRCINTEL_DEFIMPL, IPCID_EXTRAS_INTEL_LIST, IPCID_EXTRAS_INTEL_RUN, IPCID_EXTRAS_QUERY_LIST, IPCID_EXTRAS_QUERY_RUN}
 	return
@@ -306,6 +314,7 @@ func (this DiagSeverity) Valid() (ret bool) {
 	return
 }
 
+// String implements the `fmt.Stringer` interface.
 func (this DiagSeverity) String() (ret string) {
 	switch this {
 	case DIAG_SEV_ERR:
@@ -322,6 +331,7 @@ func (this DiagSeverity) String() (ret string) {
 	return
 }
 
+// DiagSeverityFromString returns the `DiagSeverity` represented by `s` (as returned by `String`, and case-sensitively), or an `error` if none exists.
 func DiagSeverityFromString(s string) (this DiagSeverity, err error) {
 	switch {
 	case s == "DIAG_SEV_ERR":
@@ -342,6 +352,7 @@ func DiagSeverityFromString(s string) (this DiagSeverity, err error) {
 	return
 }
 
+// DiagSeverityFromStringOr is like `DiagSeverityFromString` but returns `fallback` for bad inputs.
 func DiagSeverityFromStringOr(s string, fallback DiagSeverity) (this DiagSeverity) {
 	maybeDiagSeverity, err := DiagSeverityFromString(s)
 	if err == nil {
@@ -352,6 +363,7 @@ func DiagSeverityFromStringOr(s string, fallback DiagSeverity) (this DiagSeverit
 	return
 }
 
+// WellknownDiagSeverities returns the `names` and `values` of all 4 well-known `DiagSeverity` enumerants.
 func WellknownDiagSeverities() (names []string, values []DiagSeverity) {
 	names, values = []string{"DIAG_SEV_ERR", "DIAG_SEV_WARN", "DIAG_SEV_INFO", "DIAG_SEV_HINT"}, []DiagSeverity{DIAG_SEV_ERR, DIAG_SEV_WARN, DIAG_SEV_INFO, DIAG_SEV_HINT}
 	return
@@ -360,6 +372,7 @@ func WellknownDiagSeverities() (names []string, values []DiagSeverity) {
 // Valid returns whether the value of this `Symbol` is between `SYM_FILE` (inclusive) and `SYM_TYPEPARAMETER` (inclusive).
 func (this Symbol) Valid() (ret bool) { ret = (this >= SYM_FILE) && (this <= SYM_TYPEPARAMETER); return }
 
+// String implements the `fmt.Stringer` interface.
 func (this Symbol) String() (ret string) {
 	switch this {
 	case SYM_FILE:
@@ -420,6 +433,7 @@ func (this Symbol) String() (ret string) {
 	return
 }
 
+// SymbolFromString returns the `Symbol` represented by `s` (as returned by `String`, and case-sensitively), or an `error` if none exists.
 func SymbolFromString(s string) (this Symbol, err error) {
 	switch {
 	case s == "SYM_FILE":
@@ -484,6 +498,7 @@ func SymbolFromString(s string) (this Symbol, err error) {
 	return
 }
 
+// SymbolFromStringOr is like `SymbolFromString` but returns `fallback` for bad inputs.
 func SymbolFromStringOr(s string, fallback Symbol) (this Symbol) {
 	maybeSymbol, err := SymbolFromString(s)
 	if err == nil {
@@ -494,6 +509,7 @@ func SymbolFromStringOr(s string, fallback Symbol) (this Symbol) {
 	return
 }
 
+// WellknownSymbols returns the `names` and `values` of all 26 well-known `Symbol` enumerants.
 func WellknownSymbols() (names []string, values []Symbol) {
 	names, values = []string{"SYM_FILE", "SYM_MODULE", "SYM_NAMESPACE", "SYM_PACKAGE", "SYM_CLASS", "SYM_METHOD", "SYM_PROPERTY", "SYM_FIELD", "SYM_CONSTRUCTOR", "SYM_ENUM", "SYM_INTERFACE", "SYM_FUNCTION", "SYM_VARIABLE", "SYM_CONSTANT", "SYM_STRING", "SYM_NUMBER", "SYM_BOOLEAN", "SYM_ARRAY", "SYM_OBJECT", "SYM_KEY", "SYM_NULL", "SYM_ENUMMEMBER", "SYM_STRUCT", "SYM_EVENT", "SYM_OPERATOR", "SYM_TYPEPARAMETER"}, []Symbol{SYM_FILE, SYM_MODULE, SYM_NAMESPACE, SYM_PACKAGE, SYM_CLASS, SYM_METHOD, SYM_PROPERTY, SYM_FIELD, SYM_CONSTRUCTOR, SYM_ENUM, SYM_INTERFACE, SYM_FUNCTION, SYM_VARIABLE, SYM_CONSTANT, SYM_STRING, SYM_NUMBER, SYM_BOOLEAN, SYM_ARRAY, SYM_OBJECT, SYM_KEY, SYM_NULL, SYM_ENUMMEMBER, SYM_STRUCT, SYM_EVENT, SYM_OPERATOR, SYM_TYPEPARAMETER}
 	return
@@ -505,6 +521,7 @@ func (this Completion) Valid() (ret bool) {
 	return
 }
 
+// String implements the `fmt.Stringer` interface.
 func (this Completion) String() (ret string) {
 	switch this {
 	case CMPL_TEXT:
@@ -563,6 +580,7 @@ func (this Completion) String() (ret string) {
 	return
 }
 
+// CompletionFromString returns the `Completion` represented by `s` (as returned by `String`, and case-sensitively), or an `error` if none exists.
 func CompletionFromString(s string) (this Completion, err error) {
 	switch {
 	case s == "CMPL_TEXT":
@@ -625,6 +643,7 @@ func CompletionFromString(s string) (this Completion, err error) {
 	return
 }
 
+// CompletionFromStringOr is like `CompletionFromString` but returns `fallback` for bad inputs.
 func CompletionFromStringOr(s string, fallback Completion) (this Completion) {
 	maybeCompletion, err := CompletionFromString(s)
 	if err == nil {
@@ -635,6 +654,7 @@ func CompletionFromStringOr(s string, fallback Completion) (this Completion) {
 	return
 }
 
+// WellknownCompletions returns the `names` and `values` of all 25 well-known `Completion` enumerants.
 func WellknownCompletions() (names []string, values []Completion) {
 	names, values = []string{"CMPL_TEXT", "CMPL_METHOD", "CMPL_FUNCTION", "CMPL_CONSTRUCTOR", "CMPL_FIELD", "CMPL_VARIABLE", "CMPL_CLASS", "CMPL_INTERFACE", "CMPL_MODULE", "CMPL_PROPERTY", "CMPL_UNIT", "CMPL_VALUE", "CMPL_ENUM", "CMPL_KEYWORD", "CMPL_SNIPPET", "CMPL_COLOR", "CMPL_FILE", "CMPL_REFERENCE", "CMPL_FOLDER", "CMPL_ENUMMEMBER", "CMPL_CONSTANT", "CMPL_STRUCT", "CMPL_EVENT", "CMPL_OPERATOR", "CMPL_TYPEPARAMETER"}, []Completion{CMPL_TEXT, CMPL_METHOD, CMPL_FUNCTION, CMPL_CONSTRUCTOR, CMPL_FIELD, CMPL_VARIABLE, CMPL_CLASS, CMPL_INTERFACE, CMPL_MODULE, CMPL_PROPERTY, CMPL_UNIT, CMPL_VALUE, CMPL_ENUM, CMPL_KEYWORD, CMPL_SNIPPET, CMPL_COLOR, CMPL_FILE, CMPL_REFERENCE, CMPL_FOLDER, CMPL_ENUMMEMBER, CMPL_CONSTANT, CMPL_STRUCT, CMPL_EVENT, CMPL_OPERATOR, CMPL_TYPEPARAMETER}
 	return
@@ -646,6 +666,7 @@ func (this ToolCats) Valid() (ret bool) {
 	return
 }
 
+// WellknownToolCatses returns the `names` and `values` of all 10 well-known `ToolCats` enumerants.
 func WellknownToolCatses() (names []string, values []ToolCats) {
 	names, values = []string{"TOOLS_CAT_MOD_REN", "TOOLS_CAT_MOD_FMT", "TOOLS_CAT_INTEL_TIPS", "TOOLS_CAT_INTEL_SYMS", "TOOLS_CAT_INTEL_HIGH", "TOOLS_CAT_INTEL_CMPL", "TOOLS_CAT_INTEL_NAV", "TOOLS_CAT_EXTRAS_QUERY", "TOOLS_CAT_DIAGS", "TOOLS_CAT_RUNONSAVE"}, []ToolCats{TOOLS_CAT_MOD_REN, TOOLS_CAT_MOD_FMT, TOOLS_CAT_INTEL_TIPS, TOOLS_CAT_INTEL_SYMS, TOOLS_CAT_INTEL_HIGH, TOOLS_CAT_INTEL_CMPL, TOOLS_CAT_INTEL_NAV, TOOLS_CAT_EXTRAS_QUERY, TOOLS_CAT_DIAGS, TOOLS_CAT_RUNONSAVE}
 	return
