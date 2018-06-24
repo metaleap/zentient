@@ -7,24 +7,21 @@ import (
 )
 
 // Valid returns whether the value of this `CaddyStatus` is between `CADDY_PENDING` (inclusive) and `CADDY_GOOD` (inclusive).
-func (this CaddyStatus) Valid() (ret bool) {
-	ret = (this >= CADDY_PENDING) && (this <= CADDY_GOOD)
-	return
-}
+func (this CaddyStatus) Valid() (r bool) { r = (this >= CADDY_PENDING) && (this <= CADDY_GOOD); return }
 
 // String implements the `fmt.Stringer` interface.
-func (this CaddyStatus) String() (ret string) {
+func (this CaddyStatus) String() (r string) {
 	switch this {
 	case CADDY_PENDING:
-		ret = "CADDY_PENDING"
+		r = "CADDY_PENDING"
 	case CADDY_ERROR:
-		ret = "CADDY_ERROR"
+		r = "CADDY_ERROR"
 	case CADDY_BUSY:
-		ret = "CADDY_BUSY"
+		r = "CADDY_BUSY"
 	case CADDY_GOOD:
-		ret = "CADDY_GOOD"
+		r = "CADDY_GOOD"
 	default:
-		ret = pkg__strconv.FormatUint(uint64(this), 10)
+		r = pkg__strconv.FormatUint(uint64(this), 10)
 	}
 	return
 }
@@ -67,117 +64,133 @@ func WellknownCaddyStatuses() (names []string, values []CaddyStatus) {
 	return
 }
 
-func (this Settings) Indices(predicate func(*Setting) bool) (ret []int) { return }
+func (this Settings) Indices(eq *Setting) (r []int) {
+	for i := range this {
+		if this[i] == eq {
+			r = append(r, i)
+		}
+	}
+	return
+}
+
+func (this Settings) IndicesFunc(ok func(*Setting) bool) (r []int) {
+	for i := range this {
+		if ok(this[i]) {
+			r = append(r, i)
+		}
+	}
+	return
+}
 
 // Valid returns whether the value of this `IpcIDs` is between `IPCID_MENUS_MAIN` (inclusive) and `IPCID_EXTRAS_QUERY_RUN` (inclusive).
-func (this IpcIDs) Valid() (ret bool) {
-	ret = (this >= IPCID_MENUS_MAIN) && (this <= IPCID_EXTRAS_QUERY_RUN)
+func (this IpcIDs) Valid() (r bool) {
+	r = (this >= IPCID_MENUS_MAIN) && (this <= IPCID_EXTRAS_QUERY_RUN)
 	return
 }
 
 // String implements the `fmt.Stringer` interface.
-func (this IpcIDs) String() (ret string) {
+func (this IpcIDs) String() (r string) {
 	switch this {
 	case IPCID_MENUS_MAIN:
-		ret = "IPCID_MENUS_MAIN"
+		r = "IPCID_MENUS_MAIN"
 	case IPCID_MENUS_PKGS:
-		ret = "IPCID_MENUS_PKGS"
+		r = "IPCID_MENUS_PKGS"
 	case IPCID_MENUS_TOOLS:
-		ret = "IPCID_MENUS_TOOLS"
+		r = "IPCID_MENUS_TOOLS"
 	case IPCID_OBJ_SNAPSHOT:
-		ret = "IPCID_OBJ_SNAPSHOT"
+		r = "IPCID_OBJ_SNAPSHOT"
 	case IPCID_PAGE_HTML:
-		ret = "IPCID_PAGE_HTML"
+		r = "IPCID_PAGE_HTML"
 	case IPCID_TREEVIEW_GETITEM:
-		ret = "IPCID_TREEVIEW_GETITEM"
+		r = "IPCID_TREEVIEW_GETITEM"
 	case IPCID_TREEVIEW_CHILDREN:
-		ret = "IPCID_TREEVIEW_CHILDREN"
+		r = "IPCID_TREEVIEW_CHILDREN"
 	case IPCID_TREEVIEW_CHANGED:
-		ret = "IPCID_TREEVIEW_CHANGED"
+		r = "IPCID_TREEVIEW_CHANGED"
 	case IPCID_CFG_RESETALL:
-		ret = "IPCID_CFG_RESETALL"
+		r = "IPCID_CFG_RESETALL"
 	case IPCID_CFG_LIST:
-		ret = "IPCID_CFG_LIST"
+		r = "IPCID_CFG_LIST"
 	case IPCID_CFG_SET:
-		ret = "IPCID_CFG_SET"
+		r = "IPCID_CFG_SET"
 	case IPCID_NOTIFY_INFO:
-		ret = "IPCID_NOTIFY_INFO"
+		r = "IPCID_NOTIFY_INFO"
 	case IPCID_NOTIFY_WARN:
-		ret = "IPCID_NOTIFY_WARN"
+		r = "IPCID_NOTIFY_WARN"
 	case IPCID_NOTIFY_ERR:
-		ret = "IPCID_NOTIFY_ERR"
+		r = "IPCID_NOTIFY_ERR"
 	case IPCID_PROJ_CHANGED:
-		ret = "IPCID_PROJ_CHANGED"
+		r = "IPCID_PROJ_CHANGED"
 	case IPCID_PROJ_POLLEVTS:
-		ret = "IPCID_PROJ_POLLEVTS"
+		r = "IPCID_PROJ_POLLEVTS"
 	case IPCID_SRCDIAG_LIST:
-		ret = "IPCID_SRCDIAG_LIST"
+		r = "IPCID_SRCDIAG_LIST"
 	case IPCID_SRCDIAG_RUN_CURFILE:
-		ret = "IPCID_SRCDIAG_RUN_CURFILE"
+		r = "IPCID_SRCDIAG_RUN_CURFILE"
 	case IPCID_SRCDIAG_RUN_OPENFILES:
-		ret = "IPCID_SRCDIAG_RUN_OPENFILES"
+		r = "IPCID_SRCDIAG_RUN_OPENFILES"
 	case IPCID_SRCDIAG_RUN_ALLFILES:
-		ret = "IPCID_SRCDIAG_RUN_ALLFILES"
+		r = "IPCID_SRCDIAG_RUN_ALLFILES"
 	case IPCID_SRCDIAG_FORGETALL:
-		ret = "IPCID_SRCDIAG_FORGETALL"
+		r = "IPCID_SRCDIAG_FORGETALL"
 	case IPCID_SRCDIAG_PEEKHIDDEN:
-		ret = "IPCID_SRCDIAG_PEEKHIDDEN"
+		r = "IPCID_SRCDIAG_PEEKHIDDEN"
 	case IPCID_SRCDIAG_PUB:
-		ret = "IPCID_SRCDIAG_PUB"
+		r = "IPCID_SRCDIAG_PUB"
 	case IPCID_SRCDIAG_AUTO_TOGGLE:
-		ret = "IPCID_SRCDIAG_AUTO_TOGGLE"
+		r = "IPCID_SRCDIAG_AUTO_TOGGLE"
 	case IPCID_SRCDIAG_AUTO_ALL:
-		ret = "IPCID_SRCDIAG_AUTO_ALL"
+		r = "IPCID_SRCDIAG_AUTO_ALL"
 	case IPCID_SRCDIAG_AUTO_NONE:
-		ret = "IPCID_SRCDIAG_AUTO_NONE"
+		r = "IPCID_SRCDIAG_AUTO_NONE"
 	case IPCID_SRCDIAG_STARTED:
-		ret = "IPCID_SRCDIAG_STARTED"
+		r = "IPCID_SRCDIAG_STARTED"
 	case IPCID_SRCDIAG_FINISHED:
-		ret = "IPCID_SRCDIAG_FINISHED"
+		r = "IPCID_SRCDIAG_FINISHED"
 	case IPCID_SRCMOD_FMT_SETDEFMENU:
-		ret = "IPCID_SRCMOD_FMT_SETDEFMENU"
+		r = "IPCID_SRCMOD_FMT_SETDEFMENU"
 	case IPCID_SRCMOD_FMT_SETDEFPICK:
-		ret = "IPCID_SRCMOD_FMT_SETDEFPICK"
+		r = "IPCID_SRCMOD_FMT_SETDEFPICK"
 	case IPCID_SRCMOD_FMT_RUNONFILE:
-		ret = "IPCID_SRCMOD_FMT_RUNONFILE"
+		r = "IPCID_SRCMOD_FMT_RUNONFILE"
 	case IPCID_SRCMOD_FMT_RUNONSEL:
-		ret = "IPCID_SRCMOD_FMT_RUNONSEL"
+		r = "IPCID_SRCMOD_FMT_RUNONSEL"
 	case IPCID_SRCMOD_RENAME:
-		ret = "IPCID_SRCMOD_RENAME"
+		r = "IPCID_SRCMOD_RENAME"
 	case IPCID_SRCMOD_ACTIONS:
-		ret = "IPCID_SRCMOD_ACTIONS"
+		r = "IPCID_SRCMOD_ACTIONS"
 	case IPCID_SRCINTEL_HOVER:
-		ret = "IPCID_SRCINTEL_HOVER"
+		r = "IPCID_SRCINTEL_HOVER"
 	case IPCID_SRCINTEL_SYMS_FILE:
-		ret = "IPCID_SRCINTEL_SYMS_FILE"
+		r = "IPCID_SRCINTEL_SYMS_FILE"
 	case IPCID_SRCINTEL_SYMS_PROJ:
-		ret = "IPCID_SRCINTEL_SYMS_PROJ"
+		r = "IPCID_SRCINTEL_SYMS_PROJ"
 	case IPCID_SRCINTEL_CMPL_ITEMS:
-		ret = "IPCID_SRCINTEL_CMPL_ITEMS"
+		r = "IPCID_SRCINTEL_CMPL_ITEMS"
 	case IPCID_SRCINTEL_CMPL_DETAILS:
-		ret = "IPCID_SRCINTEL_CMPL_DETAILS"
+		r = "IPCID_SRCINTEL_CMPL_DETAILS"
 	case IPCID_SRCINTEL_HIGHLIGHTS:
-		ret = "IPCID_SRCINTEL_HIGHLIGHTS"
+		r = "IPCID_SRCINTEL_HIGHLIGHTS"
 	case IPCID_SRCINTEL_SIGNATURE:
-		ret = "IPCID_SRCINTEL_SIGNATURE"
+		r = "IPCID_SRCINTEL_SIGNATURE"
 	case IPCID_SRCINTEL_REFERENCES:
-		ret = "IPCID_SRCINTEL_REFERENCES"
+		r = "IPCID_SRCINTEL_REFERENCES"
 	case IPCID_SRCINTEL_DEFSYM:
-		ret = "IPCID_SRCINTEL_DEFSYM"
+		r = "IPCID_SRCINTEL_DEFSYM"
 	case IPCID_SRCINTEL_DEFTYPE:
-		ret = "IPCID_SRCINTEL_DEFTYPE"
+		r = "IPCID_SRCINTEL_DEFTYPE"
 	case IPCID_SRCINTEL_DEFIMPL:
-		ret = "IPCID_SRCINTEL_DEFIMPL"
+		r = "IPCID_SRCINTEL_DEFIMPL"
 	case IPCID_EXTRAS_INTEL_LIST:
-		ret = "IPCID_EXTRAS_INTEL_LIST"
+		r = "IPCID_EXTRAS_INTEL_LIST"
 	case IPCID_EXTRAS_INTEL_RUN:
-		ret = "IPCID_EXTRAS_INTEL_RUN"
+		r = "IPCID_EXTRAS_INTEL_RUN"
 	case IPCID_EXTRAS_QUERY_LIST:
-		ret = "IPCID_EXTRAS_QUERY_LIST"
+		r = "IPCID_EXTRAS_QUERY_LIST"
 	case IPCID_EXTRAS_QUERY_RUN:
-		ret = "IPCID_EXTRAS_QUERY_RUN"
+		r = "IPCID_EXTRAS_QUERY_RUN"
 	default:
-		ret = pkg__strconv.FormatUint(uint64(this), 10)
+		r = pkg__strconv.FormatUint(uint64(this), 10)
 	}
 	return
 }
@@ -311,24 +324,24 @@ func WellknownIpcIDses() (names []string, values []IpcIDs) {
 }
 
 // Valid returns whether the value of this `DiagSeverity` is between `DIAG_SEV_ERR` (inclusive) and `DIAG_SEV_HINT` (inclusive).
-func (this DiagSeverity) Valid() (ret bool) {
-	ret = (this >= DIAG_SEV_ERR) && (this <= DIAG_SEV_HINT)
+func (this DiagSeverity) Valid() (r bool) {
+	r = (this >= DIAG_SEV_ERR) && (this <= DIAG_SEV_HINT)
 	return
 }
 
 // String implements the `fmt.Stringer` interface.
-func (this DiagSeverity) String() (ret string) {
+func (this DiagSeverity) String() (r string) {
 	switch this {
 	case DIAG_SEV_ERR:
-		ret = "DIAG_SEV_ERR"
+		r = "DIAG_SEV_ERR"
 	case DIAG_SEV_WARN:
-		ret = "DIAG_SEV_WARN"
+		r = "DIAG_SEV_WARN"
 	case DIAG_SEV_INFO:
-		ret = "DIAG_SEV_INFO"
+		r = "DIAG_SEV_INFO"
 	case DIAG_SEV_HINT:
-		ret = "DIAG_SEV_HINT"
+		r = "DIAG_SEV_HINT"
 	default:
-		ret = pkg__strconv.Itoa(int(this))
+		r = pkg__strconv.Itoa(int(this))
 	}
 	return
 }
@@ -372,65 +385,65 @@ func WellknownDiagSeverities() (names []string, values []DiagSeverity) {
 }
 
 // Valid returns whether the value of this `Symbol` is between `SYM_FILE` (inclusive) and `SYM_TYPEPARAMETER` (inclusive).
-func (this Symbol) Valid() (ret bool) { ret = (this >= SYM_FILE) && (this <= SYM_TYPEPARAMETER); return }
+func (this Symbol) Valid() (r bool) { r = (this >= SYM_FILE) && (this <= SYM_TYPEPARAMETER); return }
 
 // String implements the `fmt.Stringer` interface.
-func (this Symbol) String() (ret string) {
+func (this Symbol) String() (r string) {
 	switch this {
 	case SYM_FILE:
-		ret = "SYM_FILE"
+		r = "SYM_FILE"
 	case SYM_MODULE:
-		ret = "SYM_MODULE"
+		r = "SYM_MODULE"
 	case SYM_NAMESPACE:
-		ret = "SYM_NAMESPACE"
+		r = "SYM_NAMESPACE"
 	case SYM_PACKAGE:
-		ret = "SYM_PACKAGE"
+		r = "SYM_PACKAGE"
 	case SYM_CLASS:
-		ret = "SYM_CLASS"
+		r = "SYM_CLASS"
 	case SYM_METHOD:
-		ret = "SYM_METHOD"
+		r = "SYM_METHOD"
 	case SYM_PROPERTY:
-		ret = "SYM_PROPERTY"
+		r = "SYM_PROPERTY"
 	case SYM_FIELD:
-		ret = "SYM_FIELD"
+		r = "SYM_FIELD"
 	case SYM_CONSTRUCTOR:
-		ret = "SYM_CONSTRUCTOR"
+		r = "SYM_CONSTRUCTOR"
 	case SYM_ENUM:
-		ret = "SYM_ENUM"
+		r = "SYM_ENUM"
 	case SYM_INTERFACE:
-		ret = "SYM_INTERFACE"
+		r = "SYM_INTERFACE"
 	case SYM_FUNCTION:
-		ret = "SYM_FUNCTION"
+		r = "SYM_FUNCTION"
 	case SYM_VARIABLE:
-		ret = "SYM_VARIABLE"
+		r = "SYM_VARIABLE"
 	case SYM_CONSTANT:
-		ret = "SYM_CONSTANT"
+		r = "SYM_CONSTANT"
 	case SYM_STRING:
-		ret = "SYM_STRING"
+		r = "SYM_STRING"
 	case SYM_NUMBER:
-		ret = "SYM_NUMBER"
+		r = "SYM_NUMBER"
 	case SYM_BOOLEAN:
-		ret = "SYM_BOOLEAN"
+		r = "SYM_BOOLEAN"
 	case SYM_ARRAY:
-		ret = "SYM_ARRAY"
+		r = "SYM_ARRAY"
 	case SYM_OBJECT:
-		ret = "SYM_OBJECT"
+		r = "SYM_OBJECT"
 	case SYM_KEY:
-		ret = "SYM_KEY"
+		r = "SYM_KEY"
 	case SYM_NULL:
-		ret = "SYM_NULL"
+		r = "SYM_NULL"
 	case SYM_ENUMMEMBER:
-		ret = "SYM_ENUMMEMBER"
+		r = "SYM_ENUMMEMBER"
 	case SYM_STRUCT:
-		ret = "SYM_STRUCT"
+		r = "SYM_STRUCT"
 	case SYM_EVENT:
-		ret = "SYM_EVENT"
+		r = "SYM_EVENT"
 	case SYM_OPERATOR:
-		ret = "SYM_OPERATOR"
+		r = "SYM_OPERATOR"
 	case SYM_TYPEPARAMETER:
-		ret = "SYM_TYPEPARAMETER"
+		r = "SYM_TYPEPARAMETER"
 	default:
-		ret = pkg__strconv.FormatUint(uint64(this), 10)
+		r = pkg__strconv.FormatUint(uint64(this), 10)
 	}
 	return
 }
@@ -518,66 +531,66 @@ func WellknownSymbols() (names []string, values []Symbol) {
 }
 
 // Valid returns whether the value of this `Completion` is between `CMPL_TEXT` (inclusive) and `CMPL_TYPEPARAMETER` (inclusive).
-func (this Completion) Valid() (ret bool) {
-	ret = (this >= CMPL_TEXT) && (this <= CMPL_TYPEPARAMETER)
+func (this Completion) Valid() (r bool) {
+	r = (this >= CMPL_TEXT) && (this <= CMPL_TYPEPARAMETER)
 	return
 }
 
 // String implements the `fmt.Stringer` interface.
-func (this Completion) String() (ret string) {
+func (this Completion) String() (r string) {
 	switch this {
 	case CMPL_TEXT:
-		ret = "CMPL_TEXT"
+		r = "CMPL_TEXT"
 	case CMPL_METHOD:
-		ret = "CMPL_METHOD"
+		r = "CMPL_METHOD"
 	case CMPL_FUNCTION:
-		ret = "CMPL_FUNCTION"
+		r = "CMPL_FUNCTION"
 	case CMPL_CONSTRUCTOR:
-		ret = "CMPL_CONSTRUCTOR"
+		r = "CMPL_CONSTRUCTOR"
 	case CMPL_FIELD:
-		ret = "CMPL_FIELD"
+		r = "CMPL_FIELD"
 	case CMPL_VARIABLE:
-		ret = "CMPL_VARIABLE"
+		r = "CMPL_VARIABLE"
 	case CMPL_CLASS:
-		ret = "CMPL_CLASS"
+		r = "CMPL_CLASS"
 	case CMPL_INTERFACE:
-		ret = "CMPL_INTERFACE"
+		r = "CMPL_INTERFACE"
 	case CMPL_MODULE:
-		ret = "CMPL_MODULE"
+		r = "CMPL_MODULE"
 	case CMPL_PROPERTY:
-		ret = "CMPL_PROPERTY"
+		r = "CMPL_PROPERTY"
 	case CMPL_UNIT:
-		ret = "CMPL_UNIT"
+		r = "CMPL_UNIT"
 	case CMPL_VALUE:
-		ret = "CMPL_VALUE"
+		r = "CMPL_VALUE"
 	case CMPL_ENUM:
-		ret = "CMPL_ENUM"
+		r = "CMPL_ENUM"
 	case CMPL_KEYWORD:
-		ret = "CMPL_KEYWORD"
+		r = "CMPL_KEYWORD"
 	case CMPL_SNIPPET:
-		ret = "CMPL_SNIPPET"
+		r = "CMPL_SNIPPET"
 	case CMPL_COLOR:
-		ret = "CMPL_COLOR"
+		r = "CMPL_COLOR"
 	case CMPL_FILE:
-		ret = "CMPL_FILE"
+		r = "CMPL_FILE"
 	case CMPL_REFERENCE:
-		ret = "CMPL_REFERENCE"
+		r = "CMPL_REFERENCE"
 	case CMPL_FOLDER:
-		ret = "CMPL_FOLDER"
+		r = "CMPL_FOLDER"
 	case CMPL_ENUMMEMBER:
-		ret = "CMPL_ENUMMEMBER"
+		r = "CMPL_ENUMMEMBER"
 	case CMPL_CONSTANT:
-		ret = "CMPL_CONSTANT"
+		r = "CMPL_CONSTANT"
 	case CMPL_STRUCT:
-		ret = "CMPL_STRUCT"
+		r = "CMPL_STRUCT"
 	case CMPL_EVENT:
-		ret = "CMPL_EVENT"
+		r = "CMPL_EVENT"
 	case CMPL_OPERATOR:
-		ret = "CMPL_OPERATOR"
+		r = "CMPL_OPERATOR"
 	case CMPL_TYPEPARAMETER:
-		ret = "CMPL_TYPEPARAMETER"
+		r = "CMPL_TYPEPARAMETER"
 	default:
-		ret = pkg__strconv.FormatUint(uint64(this), 10)
+		r = pkg__strconv.FormatUint(uint64(this), 10)
 	}
 	return
 }
@@ -662,27 +675,171 @@ func WellknownCompletions() (names []string, values []Completion) {
 	return
 }
 
-func (this ListItems) Indices(predicate func(IListItem) bool) (ret []int) { return }
+func (this ListItems) Indices(eq IListItem) (r []int) {
+	for i := range this {
+		if this[i] == eq {
+			r = append(r, i)
+		}
+	}
+	return
+}
 
-func (this PkgInfos) Indices(predicate func(*PkgInfo) bool) (ret []int) { return }
+func (this ListItems) IndicesFunc(ok func(IListItem) bool) (r []int) {
+	for i := range this {
+		if ok(this[i]) {
+			r = append(r, i)
+		}
+	}
+	return
+}
 
-func (this DiagItems) Indices(predicate func(*DiagItem) bool) (ret []int) { return }
+func (this PkgInfos) Indices(eq *PkgInfo) (r []int) {
+	for i := range this {
+		if this[i] == eq {
+			r = append(r, i)
+		}
+	}
+	return
+}
 
-func (this DiagBuildJobs) Indices(predicate func(*DiagJobBuild) bool) (ret []int) { return }
+func (this PkgInfos) IndicesFunc(ok func(*PkgInfo) bool) (r []int) {
+	for i := range this {
+		if ok(this[i]) {
+			r = append(r, i)
+		}
+	}
+	return
+}
 
-func (this DiagLintJobs) Indices(predicate func(*DiagJobLint) bool) (ret []int) { return }
+func (this DiagItems) Indices(eq *DiagItem) (r []int) {
+	for i := range this {
+		if this[i] == eq {
+			r = append(r, i)
+		}
+	}
+	return
+}
 
-func (this SrcIntelCompls) Indices(predicate func(*SrcIntelCompl) bool) (ret []int) { return }
+func (this DiagItems) IndicesFunc(ok func(*DiagItem) bool) (r []int) {
+	for i := range this {
+		if ok(this[i]) {
+			r = append(r, i)
+		}
+	}
+	return
+}
 
-func (this SrcLocs) Indices(predicate func(*SrcLoc) bool) (ret []int) { return }
+func (this DiagBuildJobs) Indices(eq *DiagJobBuild) (r []int) {
+	for i := range this {
+		if this[i] == eq {
+			r = append(r, i)
+		}
+	}
+	return
+}
 
-func (this SrcLenses) Indices(predicate func(*SrcLens) bool) (ret []int) { return }
+func (this DiagBuildJobs) IndicesFunc(ok func(*DiagJobBuild) bool) (r []int) {
+	for i := range this {
+		if ok(this[i]) {
+			r = append(r, i)
+		}
+	}
+	return
+}
 
-func (this SrcModEdits) Indices(predicate func(srcModEdit) bool) (ret []int) { return }
+func (this DiagLintJobs) Indices(eq *DiagJobLint) (r []int) {
+	for i := range this {
+		if this[i] == eq {
+			r = append(r, i)
+		}
+	}
+	return
+}
+
+func (this DiagLintJobs) IndicesFunc(ok func(*DiagJobLint) bool) (r []int) {
+	for i := range this {
+		if ok(this[i]) {
+			r = append(r, i)
+		}
+	}
+	return
+}
+
+func (this SrcIntelCompls) Indices(eq *SrcIntelCompl) (r []int) {
+	for i := range this {
+		if this[i] == eq {
+			r = append(r, i)
+		}
+	}
+	return
+}
+
+func (this SrcIntelCompls) IndicesFunc(ok func(*SrcIntelCompl) bool) (r []int) {
+	for i := range this {
+		if ok(this[i]) {
+			r = append(r, i)
+		}
+	}
+	return
+}
+
+func (this SrcLocs) Indices(eq *SrcLoc) (r []int) {
+	for i := range this {
+		if this[i] == eq {
+			r = append(r, i)
+		}
+	}
+	return
+}
+
+func (this SrcLocs) IndicesFunc(ok func(*SrcLoc) bool) (r []int) {
+	for i := range this {
+		if ok(this[i]) {
+			r = append(r, i)
+		}
+	}
+	return
+}
+
+func (this SrcLenses) Indices(eq *SrcLens) (r []int) {
+	for i := range this {
+		if this[i] == eq {
+			r = append(r, i)
+		}
+	}
+	return
+}
+
+func (this SrcLenses) IndicesFunc(ok func(*SrcLens) bool) (r []int) {
+	for i := range this {
+		if ok(this[i]) {
+			r = append(r, i)
+		}
+	}
+	return
+}
+
+func (this SrcModEdits) Indices(eq srcModEdit) (r []int) {
+	for i := range this {
+		if this[i] == eq {
+			r = append(r, i)
+		}
+	}
+	return
+}
+
+func (this SrcModEdits) IndicesFunc(ok func(srcModEdit) bool) (r []int) {
+	for i := range this {
+		if ok(this[i]) {
+			r = append(r, i)
+		}
+	}
+	return
+}
 
 // Valid returns whether the value of this `ToolCats` is between `TOOLS_CAT_MOD_REN` (inclusive) and `TOOLS_CAT_RUNONSAVE` (inclusive).
-func (this ToolCats) Valid() (ret bool) {
-	ret = (this >= TOOLS_CAT_MOD_REN) && (this <= TOOLS_CAT_RUNONSAVE)
+func (this ToolCats) Valid() (r bool) {
+	r = (this >= TOOLS_CAT_MOD_REN) && (this <= TOOLS_CAT_RUNONSAVE)
 	return
 }
 
@@ -692,8 +849,56 @@ func WellknownToolCatses() (names []string, values []ToolCats) {
 	return
 }
 
-func (this Tools) Indices(predicate func(*Tool) bool) (ret []int) { return }
+func (this Tools) Indices(eq *Tool) (r []int) {
+	for i := range this {
+		if this[i] == eq {
+			r = append(r, i)
+		}
+	}
+	return
+}
 
-func (this MenuItems) Indices(predicate func(*MenuItem) bool) (ret []int) { return }
+func (this Tools) IndicesFunc(ok func(*Tool) bool) (r []int) {
+	for i := range this {
+		if ok(this[i]) {
+			r = append(r, i)
+		}
+	}
+	return
+}
 
-func (this sideViewTreeItem) Indices(predicate func(string) bool) (ret []int) { return }
+func (this MenuItems) Indices(eq *MenuItem) (r []int) {
+	for i := range this {
+		if this[i] == eq {
+			r = append(r, i)
+		}
+	}
+	return
+}
+
+func (this MenuItems) IndicesFunc(ok func(*MenuItem) bool) (r []int) {
+	for i := range this {
+		if ok(this[i]) {
+			r = append(r, i)
+		}
+	}
+	return
+}
+
+func (this sideViewTreeItem) Indices(eq string) (r []int) {
+	for i := range this {
+		if this[i] == eq {
+			r = append(r, i)
+		}
+	}
+	return
+}
+
+func (this sideViewTreeItem) IndicesFunc(ok func(string) bool) (r []int) {
+	for i := range this {
+		if ok(this[i]) {
+			r = append(r, i)
+		}
+	}
+	return
+}
