@@ -67,7 +67,7 @@ func WellknownCaddyStatuses() (names []string, values []CaddyStatus) {
 	return
 }
 
-func (this Settings) Indices(predicate func(Settings) bool) { return }
+func (this Settings) Indices(predicate func(*Setting) bool) (ret []int) { return }
 
 // Valid returns whether the value of this `IpcIDs` is between `IPCID_MENUS_MAIN` (inclusive) and `IPCID_EXTRAS_QUERY_RUN` (inclusive).
 func (this IpcIDs) Valid() (ret bool) {
@@ -662,23 +662,23 @@ func WellknownCompletions() (names []string, values []Completion) {
 	return
 }
 
-func (this ListItems) Indices(predicate func(ListItems) bool) { return }
+func (this ListItems) Indices(predicate func(IListItem) bool) (ret []int) { return }
 
-func (this PkgInfos) Indices(predicate func(PkgInfos) bool) { return }
+func (this PkgInfos) Indices(predicate func(*PkgInfo) bool) (ret []int) { return }
 
-func (this DiagItems) Indices(predicate func(DiagItems) bool) { return }
+func (this DiagItems) Indices(predicate func(*DiagItem) bool) (ret []int) { return }
 
-func (this DiagBuildJobs) Indices(predicate func(DiagBuildJobs) bool) { return }
+func (this DiagBuildJobs) Indices(predicate func(*DiagJobBuild) bool) (ret []int) { return }
 
-func (this DiagLintJobs) Indices(predicate func(DiagLintJobs) bool) { return }
+func (this DiagLintJobs) Indices(predicate func(*DiagJobLint) bool) (ret []int) { return }
 
-func (this SrcIntelCompls) Indices(predicate func(SrcIntelCompls) bool) { return }
+func (this SrcIntelCompls) Indices(predicate func(*SrcIntelCompl) bool) (ret []int) { return }
 
-func (this SrcLocs) Indices(predicate func(SrcLocs) bool) { return }
+func (this SrcLocs) Indices(predicate func(*SrcLoc) bool) (ret []int) { return }
 
-func (this SrcLenses) Indices(predicate func(SrcLenses) bool) { return }
+func (this SrcLenses) Indices(predicate func(*SrcLens) bool) (ret []int) { return }
 
-func (this SrcModEdits) Indices(predicate func(SrcModEdits) bool) { return }
+func (this SrcModEdits) Indices(predicate func(srcModEdit) bool) (ret []int) { return }
 
 // Valid returns whether the value of this `ToolCats` is between `TOOLS_CAT_MOD_REN` (inclusive) and `TOOLS_CAT_RUNONSAVE` (inclusive).
 func (this ToolCats) Valid() (ret bool) {
@@ -692,8 +692,8 @@ func WellknownToolCatses() (names []string, values []ToolCats) {
 	return
 }
 
-func (this Tools) Indices(predicate func(Tools) bool) { return }
+func (this Tools) Indices(predicate func(*Tool) bool) (ret []int) { return }
 
-func (this MenuItems) Indices(predicate func(MenuItems) bool) { return }
+func (this MenuItems) Indices(predicate func(*MenuItem) bool) (ret []int) { return }
 
-func (this sideViewTreeItem) Indices(predicate func(sideViewTreeItem) bool) { return }
+func (this sideViewTreeItem) Indices(predicate func(string) bool) (ret []int) { return }
