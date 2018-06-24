@@ -64,6 +64,50 @@ func WellknownCaddyStatuses() (names []string, values []CaddyStatus) {
 	return
 }
 
+func (this Settings) Index(eq *Setting) (r int) {
+	for i := range this {
+		if this[i] == eq {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this Settings) IndexFunc(ok func(*Setting) bool) (r int) {
+	for i := range this {
+		if ok(this[i]) {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this Settings) LastIndex(eq *Setting) (r int) {
+	for i := len(this) - 1; i >= 0; i-- {
+		if this[i] == eq {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this Settings) LastIndexFunc(ok func(*Setting) bool) (r int) {
+	for i := len(this) - 1; i >= 0; i-- {
+		if ok(this[i]) {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
 func (this Settings) Indices(eq *Setting) (r []int) {
 	for i := range this {
 		if this[i] == eq {
@@ -675,6 +719,50 @@ func WellknownCompletions() (names []string, values []Completion) {
 	return
 }
 
+func (this ListItems) Index(eq IListItem) (r int) {
+	for i := range this {
+		if this[i] == eq {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this ListItems) IndexFunc(ok func(IListItem) bool) (r int) {
+	for i := range this {
+		if ok(this[i]) {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this ListItems) LastIndex(eq IListItem) (r int) {
+	for i := len(this) - 1; i >= 0; i-- {
+		if this[i] == eq {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this ListItems) LastIndexFunc(ok func(IListItem) bool) (r int) {
+	for i := len(this) - 1; i >= 0; i-- {
+		if ok(this[i]) {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
 func (this ListItems) Indices(eq IListItem) (r []int) {
 	for i := range this {
 		if this[i] == eq {
@@ -690,6 +778,50 @@ func (this ListItems) IndicesFunc(ok func(IListItem) bool) (r []int) {
 			r = append(r, i)
 		}
 	}
+	return
+}
+
+func (this PkgInfos) Index(eq *PkgInfo) (r int) {
+	for i := range this {
+		if this[i] == eq {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this PkgInfos) IndexFunc(ok func(*PkgInfo) bool) (r int) {
+	for i := range this {
+		if ok(this[i]) {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this PkgInfos) LastIndex(eq *PkgInfo) (r int) {
+	for i := len(this) - 1; i >= 0; i-- {
+		if this[i] == eq {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this PkgInfos) LastIndexFunc(ok func(*PkgInfo) bool) (r int) {
+	for i := len(this) - 1; i >= 0; i-- {
+		if ok(this[i]) {
+			r = i
+			return
+		}
+	}
+	r = -1
 	return
 }
 
@@ -711,6 +843,50 @@ func (this PkgInfos) IndicesFunc(ok func(*PkgInfo) bool) (r []int) {
 	return
 }
 
+func (this DiagItems) Index(eq *DiagItem) (r int) {
+	for i := range this {
+		if this[i] == eq {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this DiagItems) IndexFunc(ok func(*DiagItem) bool) (r int) {
+	for i := range this {
+		if ok(this[i]) {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this DiagItems) LastIndex(eq *DiagItem) (r int) {
+	for i := len(this) - 1; i >= 0; i-- {
+		if this[i] == eq {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this DiagItems) LastIndexFunc(ok func(*DiagItem) bool) (r int) {
+	for i := len(this) - 1; i >= 0; i-- {
+		if ok(this[i]) {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
 func (this DiagItems) Indices(eq *DiagItem) (r []int) {
 	for i := range this {
 		if this[i] == eq {
@@ -726,6 +902,50 @@ func (this DiagItems) IndicesFunc(ok func(*DiagItem) bool) (r []int) {
 			r = append(r, i)
 		}
 	}
+	return
+}
+
+func (this DiagBuildJobs) Index(eq *DiagJobBuild) (r int) {
+	for i := range this {
+		if this[i] == eq {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this DiagBuildJobs) IndexFunc(ok func(*DiagJobBuild) bool) (r int) {
+	for i := range this {
+		if ok(this[i]) {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this DiagBuildJobs) LastIndex(eq *DiagJobBuild) (r int) {
+	for i := len(this) - 1; i >= 0; i-- {
+		if this[i] == eq {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this DiagBuildJobs) LastIndexFunc(ok func(*DiagJobBuild) bool) (r int) {
+	for i := len(this) - 1; i >= 0; i-- {
+		if ok(this[i]) {
+			r = i
+			return
+		}
+	}
+	r = -1
 	return
 }
 
@@ -747,6 +967,50 @@ func (this DiagBuildJobs) IndicesFunc(ok func(*DiagJobBuild) bool) (r []int) {
 	return
 }
 
+func (this DiagLintJobs) Index(eq *DiagJobLint) (r int) {
+	for i := range this {
+		if this[i] == eq {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this DiagLintJobs) IndexFunc(ok func(*DiagJobLint) bool) (r int) {
+	for i := range this {
+		if ok(this[i]) {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this DiagLintJobs) LastIndex(eq *DiagJobLint) (r int) {
+	for i := len(this) - 1; i >= 0; i-- {
+		if this[i] == eq {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this DiagLintJobs) LastIndexFunc(ok func(*DiagJobLint) bool) (r int) {
+	for i := len(this) - 1; i >= 0; i-- {
+		if ok(this[i]) {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
 func (this DiagLintJobs) Indices(eq *DiagJobLint) (r []int) {
 	for i := range this {
 		if this[i] == eq {
@@ -762,6 +1026,50 @@ func (this DiagLintJobs) IndicesFunc(ok func(*DiagJobLint) bool) (r []int) {
 			r = append(r, i)
 		}
 	}
+	return
+}
+
+func (this SrcIntelCompls) Index(eq *SrcIntelCompl) (r int) {
+	for i := range this {
+		if this[i] == eq {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this SrcIntelCompls) IndexFunc(ok func(*SrcIntelCompl) bool) (r int) {
+	for i := range this {
+		if ok(this[i]) {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this SrcIntelCompls) LastIndex(eq *SrcIntelCompl) (r int) {
+	for i := len(this) - 1; i >= 0; i-- {
+		if this[i] == eq {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this SrcIntelCompls) LastIndexFunc(ok func(*SrcIntelCompl) bool) (r int) {
+	for i := len(this) - 1; i >= 0; i-- {
+		if ok(this[i]) {
+			r = i
+			return
+		}
+	}
+	r = -1
 	return
 }
 
@@ -783,6 +1091,50 @@ func (this SrcIntelCompls) IndicesFunc(ok func(*SrcIntelCompl) bool) (r []int) {
 	return
 }
 
+func (this SrcLocs) Index(eq *SrcLoc) (r int) {
+	for i := range this {
+		if this[i] == eq {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this SrcLocs) IndexFunc(ok func(*SrcLoc) bool) (r int) {
+	for i := range this {
+		if ok(this[i]) {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this SrcLocs) LastIndex(eq *SrcLoc) (r int) {
+	for i := len(this) - 1; i >= 0; i-- {
+		if this[i] == eq {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this SrcLocs) LastIndexFunc(ok func(*SrcLoc) bool) (r int) {
+	for i := len(this) - 1; i >= 0; i-- {
+		if ok(this[i]) {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
 func (this SrcLocs) Indices(eq *SrcLoc) (r []int) {
 	for i := range this {
 		if this[i] == eq {
@@ -801,6 +1153,50 @@ func (this SrcLocs) IndicesFunc(ok func(*SrcLoc) bool) (r []int) {
 	return
 }
 
+func (this SrcLenses) Index(eq *SrcLens) (r int) {
+	for i := range this {
+		if this[i] == eq {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this SrcLenses) IndexFunc(ok func(*SrcLens) bool) (r int) {
+	for i := range this {
+		if ok(this[i]) {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this SrcLenses) LastIndex(eq *SrcLens) (r int) {
+	for i := len(this) - 1; i >= 0; i-- {
+		if this[i] == eq {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this SrcLenses) LastIndexFunc(ok func(*SrcLens) bool) (r int) {
+	for i := len(this) - 1; i >= 0; i-- {
+		if ok(this[i]) {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
 func (this SrcLenses) Indices(eq *SrcLens) (r []int) {
 	for i := range this {
 		if this[i] == eq {
@@ -816,6 +1212,50 @@ func (this SrcLenses) IndicesFunc(ok func(*SrcLens) bool) (r []int) {
 			r = append(r, i)
 		}
 	}
+	return
+}
+
+func (this SrcModEdits) Index(eq srcModEdit) (r int) {
+	for i := range this {
+		if this[i] == eq {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this SrcModEdits) IndexFunc(ok func(srcModEdit) bool) (r int) {
+	for i := range this {
+		if ok(this[i]) {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this SrcModEdits) LastIndex(eq srcModEdit) (r int) {
+	for i := len(this) - 1; i >= 0; i-- {
+		if this[i] == eq {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this SrcModEdits) LastIndexFunc(ok func(srcModEdit) bool) (r int) {
+	for i := len(this) - 1; i >= 0; i-- {
+		if ok(this[i]) {
+			r = i
+			return
+		}
+	}
+	r = -1
 	return
 }
 
@@ -849,6 +1289,50 @@ func WellknownToolCatses() (names []string, values []ToolCats) {
 	return
 }
 
+func (this Tools) Index(eq *Tool) (r int) {
+	for i := range this {
+		if this[i] == eq {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this Tools) IndexFunc(ok func(*Tool) bool) (r int) {
+	for i := range this {
+		if ok(this[i]) {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this Tools) LastIndex(eq *Tool) (r int) {
+	for i := len(this) - 1; i >= 0; i-- {
+		if this[i] == eq {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this Tools) LastIndexFunc(ok func(*Tool) bool) (r int) {
+	for i := len(this) - 1; i >= 0; i-- {
+		if ok(this[i]) {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
 func (this Tools) Indices(eq *Tool) (r []int) {
 	for i := range this {
 		if this[i] == eq {
@@ -867,6 +1351,50 @@ func (this Tools) IndicesFunc(ok func(*Tool) bool) (r []int) {
 	return
 }
 
+func (this MenuItems) Index(eq *MenuItem) (r int) {
+	for i := range this {
+		if this[i] == eq {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this MenuItems) IndexFunc(ok func(*MenuItem) bool) (r int) {
+	for i := range this {
+		if ok(this[i]) {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this MenuItems) LastIndex(eq *MenuItem) (r int) {
+	for i := len(this) - 1; i >= 0; i-- {
+		if this[i] == eq {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this MenuItems) LastIndexFunc(ok func(*MenuItem) bool) (r int) {
+	for i := len(this) - 1; i >= 0; i-- {
+		if ok(this[i]) {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
 func (this MenuItems) Indices(eq *MenuItem) (r []int) {
 	for i := range this {
 		if this[i] == eq {
@@ -882,6 +1410,50 @@ func (this MenuItems) IndicesFunc(ok func(*MenuItem) bool) (r []int) {
 			r = append(r, i)
 		}
 	}
+	return
+}
+
+func (this sideViewTreeItem) Index(eq string) (r int) {
+	for i := range this {
+		if this[i] == eq {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this sideViewTreeItem) IndexFunc(ok func(string) bool) (r int) {
+	for i := range this {
+		if ok(this[i]) {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this sideViewTreeItem) LastIndex(eq string) (r int) {
+	for i := len(this) - 1; i >= 0; i-- {
+		if this[i] == eq {
+			r = i
+			return
+		}
+	}
+	r = -1
+	return
+}
+
+func (this sideViewTreeItem) LastIndexFunc(ok func(string) bool) (r int) {
+	for i := len(this) - 1; i >= 0; i-- {
+		if ok(this[i]) {
+			r = i
+			return
+		}
+	}
+	r = -1
 	return
 }
 
