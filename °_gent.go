@@ -1,6 +1,6 @@
 package z
 
-// DO NOT EDIT: code generated with zentient-dbg-vsc-go-demo-go-gent using github.com/metaleap/go-gent
+// DO NOT EDIT: code generated with `demo-go-gent` using `github.com/metaleap/go-gent`
 
 import (
 	pkg__strconv "strconv"
