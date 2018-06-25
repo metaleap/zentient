@@ -64,7 +64,7 @@ func (this Settings) Index(eq *Setting) (r int) {
 	return
 }
 
-func (this Settings) Contains(eq *Setting) (r bool) { return }
+func (this Settings) Contains(eq ...*Setting) (r bool) { return }
 
 // Valid returns whether the value of this `IpcIDs` is between `IPCID_MENUS_MAIN` (inclusive) and `IPCID_EXTRAS_QUERY_RUN` (inclusive).
 func (this IpcIDs) Valid() (r bool) {
@@ -626,7 +626,7 @@ func (this ListItems) Index(eq IListItem) (r int) {
 	return
 }
 
-func (this ListItems) Contains(eq IListItem) (r bool) { return }
+func (this ListItems) Contains(eq ...IListItem) (r bool) { return }
 
 func (this PkgInfos) Index(eq *PkgInfo) (r int) {
 	for i := range this {
@@ -639,7 +639,7 @@ func (this PkgInfos) Index(eq *PkgInfo) (r int) {
 	return
 }
 
-func (this PkgInfos) Contains(eq *PkgInfo) (r bool) { return }
+func (this PkgInfos) Contains(eq ...*PkgInfo) (r bool) { return }
 
 func (this DiagItems) Index(eq *DiagItem) (r int) {
 	for i := range this {
@@ -652,7 +652,7 @@ func (this DiagItems) Index(eq *DiagItem) (r int) {
 	return
 }
 
-func (this DiagItems) Contains(eq *DiagItem) (r bool) { return }
+func (this DiagItems) Contains(eq ...*DiagItem) (r bool) { return }
 
 func (this DiagBuildJobs) Index(eq *DiagJobBuild) (r int) {
 	for i := range this {
@@ -665,7 +665,7 @@ func (this DiagBuildJobs) Index(eq *DiagJobBuild) (r int) {
 	return
 }
 
-func (this DiagBuildJobs) Contains(eq *DiagJobBuild) (r bool) { return }
+func (this DiagBuildJobs) Contains(eq ...*DiagJobBuild) (r bool) { return }
 
 func (this DiagLintJobs) Index(eq *DiagJobLint) (r int) {
 	for i := range this {
@@ -678,7 +678,7 @@ func (this DiagLintJobs) Index(eq *DiagJobLint) (r int) {
 	return
 }
 
-func (this DiagLintJobs) Contains(eq *DiagJobLint) (r bool) { return }
+func (this DiagLintJobs) Contains(eq ...*DiagJobLint) (r bool) { return }
 
 func (this SrcIntelCompls) Index(eq *SrcIntelCompl) (r int) {
 	for i := range this {
@@ -691,7 +691,7 @@ func (this SrcIntelCompls) Index(eq *SrcIntelCompl) (r int) {
 	return
 }
 
-func (this SrcIntelCompls) Contains(eq *SrcIntelCompl) (r bool) { return }
+func (this SrcIntelCompls) Contains(eq ...*SrcIntelCompl) (r bool) { return }
 
 func (this SrcLocs) Index(eq *SrcLoc) (r int) {
 	for i := range this {
@@ -704,7 +704,7 @@ func (this SrcLocs) Index(eq *SrcLoc) (r int) {
 	return
 }
 
-func (this SrcLocs) Contains(eq *SrcLoc) (r bool) { return }
+func (this SrcLocs) Contains(eq ...*SrcLoc) (r bool) { return }
 
 func (this SrcLenses) Index(eq *SrcLens) (r int) {
 	for i := range this {
@@ -717,7 +717,7 @@ func (this SrcLenses) Index(eq *SrcLens) (r int) {
 	return
 }
 
-func (this SrcLenses) Contains(eq *SrcLens) (r bool) { return }
+func (this SrcLenses) Contains(eq ...*SrcLens) (r bool) { return }
 
 func (this SrcModEdits) Index(eq srcModEdit) (r int) {
 	for i := range this {
@@ -730,7 +730,7 @@ func (this SrcModEdits) Index(eq srcModEdit) (r int) {
 	return
 }
 
-func (this SrcModEdits) Contains(eq srcModEdit) (r bool) { return }
+func (this SrcModEdits) Contains(eq ...srcModEdit) (r bool) { return }
 
 // Valid returns whether the value of this `ToolCats` is between `TOOLS_CAT_MOD_REN` (inclusive) and `TOOLS_CAT_RUNONSAVE` (inclusive).
 func (this ToolCats) Valid() (r bool) {
@@ -755,7 +755,7 @@ func (this Tools) Index(eq *Tool) (r int) {
 	return
 }
 
-func (this Tools) Contains(eq *Tool) (r bool) { return }
+func (this Tools) Contains(eq ...*Tool) (r bool) { return }
 
 func (this MenuItems) Index(eq *MenuItem) (r int) {
 	for i := range this {
@@ -768,7 +768,7 @@ func (this MenuItems) Index(eq *MenuItem) (r int) {
 	return
 }
 
-func (this MenuItems) Contains(eq *MenuItem) (r bool) { return }
+func (this MenuItems) Contains(eq ...*MenuItem) (r bool) { return }
 
 func (this sideViewTreeItem) Index(eq string) (r int) {
 	for i := range this {
@@ -781,4 +781,4 @@ func (this sideViewTreeItem) Index(eq string) (r int) {
 	return
 }
 
-func (this sideViewTreeItem) Contains(eq string) (r bool) { return }
+func (this sideViewTreeItem) Contains(eq ...string) (r bool) { return }
