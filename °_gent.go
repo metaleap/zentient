@@ -21,7 +21,7 @@ func (this CaddyStatus) String() (r string) {
 	case CADDY_GOOD:
 		r = "CADDY_GOOD"
 	default:
-		r = pkg__strconv.FormatUint(uint64(this), 10)
+		r = pkg__strconv.FormatUint((uint64)(this), 10)
 	}
 	return
 }
@@ -174,7 +174,7 @@ func (this IpcIDs) String() (r string) {
 	case IPCID_EXTRAS_QUERY_RUN:
 		r = "IPCID_EXTRAS_QUERY_RUN"
 	default:
-		r = pkg__strconv.FormatUint(uint64(this), 10)
+		r = pkg__strconv.FormatUint((uint64)(this), 10)
 	}
 	return
 }
@@ -314,7 +314,7 @@ func (this DiagSeverity) String() (r string) {
 	case DIAG_SEV_HINT:
 		r = "DIAG_SEV_HINT"
 	default:
-		r = pkg__strconv.Itoa(int(this))
+		r = pkg__strconv.Itoa((int)(this))
 	}
 	return
 }
@@ -405,7 +405,7 @@ func (this Symbol) String() (r string) {
 	case SYM_TYPEPARAMETER:
 		r = "SYM_TYPEPARAMETER"
 	default:
-		r = pkg__strconv.FormatUint(uint64(this), 10)
+		r = pkg__strconv.FormatUint((uint64)(this), 10)
 	}
 	return
 }
@@ -541,7 +541,7 @@ func (this Completion) String() (r string) {
 	case CMPL_TYPEPARAMETER:
 		r = "CMPL_TYPEPARAMETER"
 	default:
-		r = pkg__strconv.FormatUint(uint64(this), 10)
+		r = pkg__strconv.FormatUint((uint64)(this), 10)
 	}
 	return
 }
