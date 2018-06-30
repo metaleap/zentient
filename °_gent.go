@@ -26,7 +26,7 @@ func (this CaddyStatus) String() (r string) {
 	return
 }
 
-// CaddyStatusFromString returns the `CaddyStatus` represented by `s` (as returned by `String`, and case-sensitively), or an `error` if none exists.
+// CaddyStatusFromString returns the `CaddyStatus` represented by `s` (as returned by `CaddyStatus.String`, and case-sensitively), or an `error` if none exists.
 func CaddyStatusFromString(s string) (this CaddyStatus, err error) {
 	switch {
 	case s == "CADDY_PENDING":
@@ -179,7 +179,7 @@ func (this IpcIDs) String() (r string) {
 	return
 }
 
-// IpcIDsFromString returns the `IpcIDs` represented by `s` (as returned by `String`, and case-sensitively), or an `error` if none exists.
+// IpcIDsFromString returns the `IpcIDs` represented by `s` (as returned by `IpcIDs.String`, and case-sensitively), or an `error` if none exists.
 func IpcIDsFromString(s string) (this IpcIDs, err error) {
 	switch {
 	case s == "IPCID_MENUS_MAIN":
@@ -319,7 +319,7 @@ func (this DiagSeverity) String() (r string) {
 	return
 }
 
-// DiagSeverityFromString returns the `DiagSeverity` represented by `s` (as returned by `String`, and case-sensitively), or an `error` if none exists.
+// DiagSeverityFromString returns the `DiagSeverity` represented by `s` (as returned by `DiagSeverity.String`, and case-sensitively), or an `error` if none exists.
 func DiagSeverityFromString(s string) (this DiagSeverity, err error) {
 	switch {
 	case s == "DIAG_SEV_ERR":
@@ -410,7 +410,7 @@ func (this Symbol) String() (r string) {
 	return
 }
 
-// SymbolFromString returns the `Symbol` represented by `s` (as returned by `String`, and case-sensitively), or an `error` if none exists.
+// SymbolFromString returns the `Symbol` represented by `s` (as returned by `Symbol.String`, and case-sensitively), or an `error` if none exists.
 func SymbolFromString(s string) (this Symbol, err error) {
 	switch {
 	case s == "SYM_FILE":
@@ -546,7 +546,7 @@ func (this Completion) String() (r string) {
 	return
 }
 
-// CompletionFromString returns the `Completion` represented by `s` (as returned by `String`, and case-sensitively), or an `error` if none exists.
+// CompletionFromString returns the `Completion` represented by `s` (as returned by `Completion.String`, and case-sensitively), or an `error` if none exists.
 func CompletionFromString(s string) (this Completion, err error) {
 	switch {
 	case s == "CMPL_TEXT":
