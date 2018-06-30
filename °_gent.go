@@ -41,7 +41,7 @@ func CaddyStatusFromString(s string) (this CaddyStatus, err error) {
 		var thisuint8 uint64
 		thisuint8, err = pkg__strconv.ParseUint(s, 10, 8)
 		if err == nil {
-			this = CaddyStatus(thisuint8)
+			this = (CaddyStatus)(thisuint8)
 		}
 	}
 	return
@@ -284,7 +284,7 @@ func IpcIDsFromString(s string) (this IpcIDs, err error) {
 		var thisuint8 uint64
 		thisuint8, err = pkg__strconv.ParseUint(s, 10, 8)
 		if err == nil {
-			this = IpcIDs(thisuint8)
+			this = (IpcIDs)(thisuint8)
 		}
 	}
 	return
@@ -334,7 +334,7 @@ func DiagSeverityFromString(s string) (this DiagSeverity, err error) {
 		var thisint int
 		thisint, err = pkg__strconv.Atoi(s)
 		if err == nil {
-			this = DiagSeverity(thisint)
+			this = (DiagSeverity)(thisint)
 		}
 	}
 	return
@@ -469,7 +469,7 @@ func SymbolFromString(s string) (this Symbol, err error) {
 		var thisuint8 uint64
 		thisuint8, err = pkg__strconv.ParseUint(s, 10, 8)
 		if err == nil {
-			this = Symbol(thisuint8)
+			this = (Symbol)(thisuint8)
 		}
 	}
 	return
@@ -603,7 +603,7 @@ func CompletionFromString(s string) (this Completion, err error) {
 		var thisuint8 uint64
 		thisuint8, err = pkg__strconv.ParseUint(s, 10, 8)
 		if err == nil {
-			this = Completion(thisuint8)
+			this = (Completion)(thisuint8)
 		}
 	}
 	return
