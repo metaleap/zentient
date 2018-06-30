@@ -28,6 +28,9 @@ func (this CaddyStatus) String() (r string) {
 
 // CaddyStatusFromString returns the `CaddyStatus` represented by `s` (as returned by `CaddyStatus.String`, and case-sensitively), or an `error` if none exists.
 func CaddyStatusFromString(s string) (this CaddyStatus, err error) {
+	if (len(s) < 10) || (s[0:6] != "CADDY_") {
+		goto tryParseNum
+	}
 	switch {
 	case s == "CADDY_PENDING":
 		this = CADDY_PENDING
@@ -38,11 +41,14 @@ func CaddyStatusFromString(s string) (this CaddyStatus, err error) {
 	case s == "CADDY_GOOD":
 		this = CADDY_GOOD
 	default:
-		var thisuint8 uint64
-		thisuint8, err = pkg__strconv.ParseUint(s, 10, 8)
-		if err == nil {
-			this = (CaddyStatus)(thisuint8)
-		}
+		goto tryParseNum
+	}
+	return
+tryParseNum:
+	var thisuint8 uint64
+	thisuint8, err = pkg__strconv.ParseUint(s, 10, 8)
+	if err == nil {
+		this = (CaddyStatus)(thisuint8)
 	}
 	return
 }
@@ -181,6 +187,9 @@ func (this IpcIDs) String() (r string) {
 
 // IpcIDsFromString returns the `IpcIDs` represented by `s` (as returned by `IpcIDs.String`, and case-sensitively), or an `error` if none exists.
 func IpcIDsFromString(s string) (this IpcIDs, err error) {
+	if (len(s) < 13) || (s[0:6] != "IPCID_") {
+		goto tryParseNum
+	}
 	switch {
 	case s == "IPCID_MENUS_MAIN":
 		this = IPCID_MENUS_MAIN
@@ -281,11 +290,14 @@ func IpcIDsFromString(s string) (this IpcIDs, err error) {
 	case s == "IPCID_EXTRAS_QUERY_RUN":
 		this = IPCID_EXTRAS_QUERY_RUN
 	default:
-		var thisuint8 uint64
-		thisuint8, err = pkg__strconv.ParseUint(s, 10, 8)
-		if err == nil {
-			this = (IpcIDs)(thisuint8)
-		}
+		goto tryParseNum
+	}
+	return
+tryParseNum:
+	var thisuint8 uint64
+	thisuint8, err = pkg__strconv.ParseUint(s, 10, 8)
+	if err == nil {
+		this = (IpcIDs)(thisuint8)
 	}
 	return
 }
@@ -321,6 +333,9 @@ func (this DiagSeverity) String() (r string) {
 
 // DiagSeverityFromString returns the `DiagSeverity` represented by `s` (as returned by `DiagSeverity.String`, and case-sensitively), or an `error` if none exists.
 func DiagSeverityFromString(s string) (this DiagSeverity, err error) {
+	if (len(s) < 12) || (s[0:9] != "DIAG_SEV_") {
+		goto tryParseNum
+	}
 	switch {
 	case s == "DIAG_SEV_ERR":
 		this = DIAG_SEV_ERR
@@ -331,11 +346,14 @@ func DiagSeverityFromString(s string) (this DiagSeverity, err error) {
 	case s == "DIAG_SEV_HINT":
 		this = DIAG_SEV_HINT
 	default:
-		var thisint int
-		thisint, err = pkg__strconv.Atoi(s)
-		if err == nil {
-			this = (DiagSeverity)(thisint)
-		}
+		goto tryParseNum
+	}
+	return
+tryParseNum:
+	var thisint int
+	thisint, err = pkg__strconv.Atoi(s)
+	if err == nil {
+		this = (DiagSeverity)(thisint)
 	}
 	return
 }
@@ -412,6 +430,9 @@ func (this Symbol) String() (r string) {
 
 // SymbolFromString returns the `Symbol` represented by `s` (as returned by `Symbol.String`, and case-sensitively), or an `error` if none exists.
 func SymbolFromString(s string) (this Symbol, err error) {
+	if (len(s) < 7) || (s[0:4] != "SYM_") {
+		goto tryParseNum
+	}
 	switch {
 	case s == "SYM_FILE":
 		this = SYM_FILE
@@ -466,11 +487,14 @@ func SymbolFromString(s string) (this Symbol, err error) {
 	case s == "SYM_TYPEPARAMETER":
 		this = SYM_TYPEPARAMETER
 	default:
-		var thisuint8 uint64
-		thisuint8, err = pkg__strconv.ParseUint(s, 10, 8)
-		if err == nil {
-			this = (Symbol)(thisuint8)
-		}
+		goto tryParseNum
+	}
+	return
+tryParseNum:
+	var thisuint8 uint64
+	thisuint8, err = pkg__strconv.ParseUint(s, 10, 8)
+	if err == nil {
+		this = (Symbol)(thisuint8)
 	}
 	return
 }
@@ -548,6 +572,9 @@ func (this Completion) String() (r string) {
 
 // CompletionFromString returns the `Completion` represented by `s` (as returned by `Completion.String`, and case-sensitively), or an `error` if none exists.
 func CompletionFromString(s string) (this Completion, err error) {
+	if (len(s) < 9) || (s[0:5] != "CMPL_") {
+		goto tryParseNum
+	}
 	switch {
 	case s == "CMPL_TEXT":
 		this = CMPL_TEXT
@@ -600,11 +627,14 @@ func CompletionFromString(s string) (this Completion, err error) {
 	case s == "CMPL_TYPEPARAMETER":
 		this = CMPL_TYPEPARAMETER
 	default:
-		var thisuint8 uint64
-		thisuint8, err = pkg__strconv.ParseUint(s, 10, 8)
-		if err == nil {
-			this = (Completion)(thisuint8)
-		}
+		goto tryParseNum
+	}
+	return
+tryParseNum:
+	var thisuint8 uint64
+	thisuint8, err = pkg__strconv.ParseUint(s, 10, 8)
+	if err == nil {
+		this = (Completion)(thisuint8)
 	}
 	return
 }
