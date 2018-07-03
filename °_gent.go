@@ -32,13 +32,13 @@ func WellknownCaddyStatuses() (names []string, values []CaddyStatus) {
 func (this CaddyStatus) String() (r string) {
 	switch this {
 	case CADDY_PENDING:
-		r = "CADDY_PENDING"
+		r = "Caddy·Pending"
 	case CADDY_ERROR:
-		r = "CADDY_ERROR"
+		r = "Caddy·Error"
 	case CADDY_BUSY:
-		r = "CADDY_BUSY"
+		r = "Caddy·Busy"
 	case CADDY_GOOD:
-		r = "CADDY_GOOD"
+		r = "Caddy·Good"
 	default:
 		r = pkg__strconv.FormatUint((uint64)(this), 10)
 	}
@@ -47,17 +47,17 @@ func (this CaddyStatus) String() (r string) {
 
 // CaddyStatusFromString returns the `CaddyStatus` represented by `s` (as returned by `CaddyStatus.String`, but case-insensitively), or an `error` if none exists.
 func CaddyStatusFromString(s string) (this CaddyStatus, err error) {
-	if len(s) < 10 {
+	if (len(s) < 11) || (!pkg__strings.EqualFold(s[0:7], "Caddy·")) {
 		goto tryParseNum
 	}
 	switch {
-	case (s == "CADDY_PENDING") || pkg__strings.EqualFold(s, "CADDY_PENDING"):
+	case (s == "Caddy·Pending") || pkg__strings.EqualFold(s, "Caddy·Pending"):
 		this = CADDY_PENDING
-	case (s == "CADDY_ERROR") || pkg__strings.EqualFold(s, "CADDY_ERROR"):
+	case (s == "Caddy·Error") || pkg__strings.EqualFold(s, "Caddy·Error"):
 		this = CADDY_ERROR
-	case (s == "CADDY_BUSY") || pkg__strings.EqualFold(s, "CADDY_BUSY"):
+	case (s == "Caddy·Busy") || pkg__strings.EqualFold(s, "Caddy·Busy"):
 		this = CADDY_BUSY
-	case (s == "CADDY_GOOD") || pkg__strings.EqualFold(s, "CADDY_GOOD"):
+	case (s == "Caddy·Good") || pkg__strings.EqualFold(s, "Caddy·Good"):
 		this = CADDY_GOOD
 	default:
 		goto tryParseNum
@@ -105,14 +105,14 @@ func CaddyStatusFromGoString(s string) (this CaddyStatus, err error) {
 	if (len(s) < 10) || (s[0:6] != "CADDY_") {
 		goto tryParseNum
 	}
-	switch {
-	case s == "CADDY_PENDING":
+	switch s {
+	case "CADDY_PENDING":
 		this = CADDY_PENDING
-	case s == "CADDY_ERROR":
+	case "CADDY_ERROR":
 		this = CADDY_ERROR
-	case s == "CADDY_BUSY":
+	case "CADDY_BUSY":
 		this = CADDY_BUSY
-	case s == "CADDY_GOOD":
+	case "CADDY_GOOD":
 		this = CADDY_GOOD
 	default:
 		goto tryParseNum
@@ -399,103 +399,103 @@ func WellknownIpcIDses() (names []string, values []IpcIDs) {
 func (this IpcIDs) String() (r string) {
 	switch this {
 	case IPCID_MENUS_MAIN:
-		r = "IPCID_MENUS_MAIN"
+		r = "Ipcid·Menus·Main"
 	case IPCID_MENUS_PKGS:
-		r = "IPCID_MENUS_PKGS"
+		r = "Ipcid·Menus·Pkgs"
 	case IPCID_MENUS_TOOLS:
-		r = "IPCID_MENUS_TOOLS"
+		r = "Ipcid·Menus·Tools"
 	case IPCID_OBJ_SNAPSHOT:
-		r = "IPCID_OBJ_SNAPSHOT"
+		r = "Ipcid·Obj·Snapshot"
 	case IPCID_PAGE_HTML:
-		r = "IPCID_PAGE_HTML"
+		r = "Ipcid·Page·Html"
 	case IPCID_TREEVIEW_GETITEM:
-		r = "IPCID_TREEVIEW_GETITEM"
+		r = "Ipcid·Treeview·Getitem"
 	case IPCID_TREEVIEW_CHILDREN:
-		r = "IPCID_TREEVIEW_CHILDREN"
+		r = "Ipcid·Treeview·Children"
 	case IPCID_TREEVIEW_CHANGED:
-		r = "IPCID_TREEVIEW_CHANGED"
+		r = "Ipcid·Treeview·Changed"
 	case IPCID_CFG_RESETALL:
-		r = "IPCID_CFG_RESETALL"
+		r = "Ipcid·Cfg·Resetall"
 	case IPCID_CFG_LIST:
-		r = "IPCID_CFG_LIST"
+		r = "Ipcid·Cfg·List"
 	case IPCID_CFG_SET:
-		r = "IPCID_CFG_SET"
+		r = "Ipcid·Cfg·Set"
 	case IPCID_NOTIFY_INFO:
-		r = "IPCID_NOTIFY_INFO"
+		r = "Ipcid·Notify·Info"
 	case IPCID_NOTIFY_WARN:
-		r = "IPCID_NOTIFY_WARN"
+		r = "Ipcid·Notify·Warn"
 	case IPCID_NOTIFY_ERR:
-		r = "IPCID_NOTIFY_ERR"
+		r = "Ipcid·Notify·Err"
 	case IPCID_PROJ_CHANGED:
-		r = "IPCID_PROJ_CHANGED"
+		r = "Ipcid·Proj·Changed"
 	case IPCID_PROJ_POLLEVTS:
-		r = "IPCID_PROJ_POLLEVTS"
+		r = "Ipcid·Proj·Pollevts"
 	case IPCID_SRCDIAG_LIST:
-		r = "IPCID_SRCDIAG_LIST"
+		r = "Ipcid·Srcdiag·List"
 	case IPCID_SRCDIAG_RUN_CURFILE:
-		r = "IPCID_SRCDIAG_RUN_CURFILE"
+		r = "Ipcid·Srcdiag·Run·Curfile"
 	case IPCID_SRCDIAG_RUN_OPENFILES:
-		r = "IPCID_SRCDIAG_RUN_OPENFILES"
+		r = "Ipcid·Srcdiag·Run·Openfiles"
 	case IPCID_SRCDIAG_RUN_ALLFILES:
-		r = "IPCID_SRCDIAG_RUN_ALLFILES"
+		r = "Ipcid·Srcdiag·Run·Allfiles"
 	case IPCID_SRCDIAG_FORGETALL:
-		r = "IPCID_SRCDIAG_FORGETALL"
+		r = "Ipcid·Srcdiag·Forgetall"
 	case IPCID_SRCDIAG_PEEKHIDDEN:
-		r = "IPCID_SRCDIAG_PEEKHIDDEN"
+		r = "Ipcid·Srcdiag·Peekhidden"
 	case IPCID_SRCDIAG_PUB:
-		r = "IPCID_SRCDIAG_PUB"
+		r = "Ipcid·Srcdiag·Pub"
 	case IPCID_SRCDIAG_AUTO_TOGGLE:
-		r = "IPCID_SRCDIAG_AUTO_TOGGLE"
+		r = "Ipcid·Srcdiag·Auto·Toggle"
 	case IPCID_SRCDIAG_AUTO_ALL:
-		r = "IPCID_SRCDIAG_AUTO_ALL"
+		r = "Ipcid·Srcdiag·Auto·All"
 	case IPCID_SRCDIAG_AUTO_NONE:
-		r = "IPCID_SRCDIAG_AUTO_NONE"
+		r = "Ipcid·Srcdiag·Auto·None"
 	case IPCID_SRCDIAG_STARTED:
-		r = "IPCID_SRCDIAG_STARTED"
+		r = "Ipcid·Srcdiag·Started"
 	case IPCID_SRCDIAG_FINISHED:
-		r = "IPCID_SRCDIAG_FINISHED"
+		r = "Ipcid·Srcdiag·Finished"
 	case IPCID_SRCMOD_FMT_SETDEFMENU:
-		r = "IPCID_SRCMOD_FMT_SETDEFMENU"
+		r = "Ipcid·Srcmod·Fmt·Setdefmenu"
 	case IPCID_SRCMOD_FMT_SETDEFPICK:
-		r = "IPCID_SRCMOD_FMT_SETDEFPICK"
+		r = "Ipcid·Srcmod·Fmt·Setdefpick"
 	case IPCID_SRCMOD_FMT_RUNONFILE:
-		r = "IPCID_SRCMOD_FMT_RUNONFILE"
+		r = "Ipcid·Srcmod·Fmt·Runonfile"
 	case IPCID_SRCMOD_FMT_RUNONSEL:
-		r = "IPCID_SRCMOD_FMT_RUNONSEL"
+		r = "Ipcid·Srcmod·Fmt·Runonsel"
 	case IPCID_SRCMOD_RENAME:
-		r = "IPCID_SRCMOD_RENAME"
+		r = "Ipcid·Srcmod·Rename"
 	case IPCID_SRCMOD_ACTIONS:
-		r = "IPCID_SRCMOD_ACTIONS"
+		r = "Ipcid·Srcmod·Actions"
 	case IPCID_SRCINTEL_HOVER:
-		r = "IPCID_SRCINTEL_HOVER"
+		r = "Ipcid·Srcintel·Hover"
 	case IPCID_SRCINTEL_SYMS_FILE:
-		r = "IPCID_SRCINTEL_SYMS_FILE"
+		r = "Ipcid·Srcintel·Syms·File"
 	case IPCID_SRCINTEL_SYMS_PROJ:
-		r = "IPCID_SRCINTEL_SYMS_PROJ"
+		r = "Ipcid·Srcintel·Syms·Proj"
 	case IPCID_SRCINTEL_CMPL_ITEMS:
-		r = "IPCID_SRCINTEL_CMPL_ITEMS"
+		r = "Ipcid·Srcintel·Cmpl·Items"
 	case IPCID_SRCINTEL_CMPL_DETAILS:
-		r = "IPCID_SRCINTEL_CMPL_DETAILS"
+		r = "Ipcid·Srcintel·Cmpl·Details"
 	case IPCID_SRCINTEL_HIGHLIGHTS:
-		r = "IPCID_SRCINTEL_HIGHLIGHTS"
+		r = "Ipcid·Srcintel·Highlights"
 	case IPCID_SRCINTEL_SIGNATURE:
-		r = "IPCID_SRCINTEL_SIGNATURE"
+		r = "Ipcid·Srcintel·Signature"
 	case IPCID_SRCINTEL_REFERENCES:
-		r = "IPCID_SRCINTEL_REFERENCES"
+		r = "Ipcid·Srcintel·References"
 	case IPCID_SRCINTEL_DEFSYM:
-		r = "IPCID_SRCINTEL_DEFSYM"
+		r = "Ipcid·Srcintel·Defsym"
 	case IPCID_SRCINTEL_DEFTYPE:
-		r = "IPCID_SRCINTEL_DEFTYPE"
+		r = "Ipcid·Srcintel·Deftype"
 	case IPCID_SRCINTEL_DEFIMPL:
-		r = "IPCID_SRCINTEL_DEFIMPL"
+		r = "Ipcid·Srcintel·Defimpl"
 	case IPCID_EXTRAS_INTEL_LIST:
-		r = "IPCID_EXTRAS_INTEL_LIST"
+		r = "Ipcid·Extras·Intel·List"
 	case IPCID_EXTRAS_INTEL_RUN:
-		r = "IPCID_EXTRAS_INTEL_RUN"
+		r = "Ipcid·Extras·Intel·Run"
 	case IPCID_EXTRAS_QUERY_LIST:
-		r = "IPCID_EXTRAS_QUERY_LIST"
+		r = "Ipcid·Extras·Query·List"
 	case IPCID_EXTRAS_QUERY_RUN:
-		r = "IPCID_EXTRAS_QUERY_RUN"
+		r = "Ipcid·Extras·Query·Run"
 	default:
 		r = pkg__strconv.FormatUint((uint64)(this), 10)
 	}
@@ -504,107 +504,107 @@ func (this IpcIDs) String() (r string) {
 
 // IpcIDsFromString returns the `IpcIDs` represented by `s` (as returned by `IpcIDs.String`, but case-insensitively), or an `error` if none exists.
 func IpcIDsFromString(s string) (this IpcIDs, err error) {
-	if len(s) < 13 {
+	if (len(s) < 15) || (!pkg__strings.EqualFold(s[0:7], "Ipcid·")) {
 		goto tryParseNum
 	}
 	switch {
-	case (s == "IPCID_MENUS_MAIN") || pkg__strings.EqualFold(s, "IPCID_MENUS_MAIN"):
+	case (s == "Ipcid·Menus·Main") || pkg__strings.EqualFold(s, "Ipcid·Menus·Main"):
 		this = IPCID_MENUS_MAIN
-	case (s == "IPCID_MENUS_PKGS") || pkg__strings.EqualFold(s, "IPCID_MENUS_PKGS"):
+	case (s == "Ipcid·Menus·Pkgs") || pkg__strings.EqualFold(s, "Ipcid·Menus·Pkgs"):
 		this = IPCID_MENUS_PKGS
-	case (s == "IPCID_MENUS_TOOLS") || pkg__strings.EqualFold(s, "IPCID_MENUS_TOOLS"):
+	case (s == "Ipcid·Menus·Tools") || pkg__strings.EqualFold(s, "Ipcid·Menus·Tools"):
 		this = IPCID_MENUS_TOOLS
-	case (s == "IPCID_OBJ_SNAPSHOT") || pkg__strings.EqualFold(s, "IPCID_OBJ_SNAPSHOT"):
+	case (s == "Ipcid·Obj·Snapshot") || pkg__strings.EqualFold(s, "Ipcid·Obj·Snapshot"):
 		this = IPCID_OBJ_SNAPSHOT
-	case (s == "IPCID_PAGE_HTML") || pkg__strings.EqualFold(s, "IPCID_PAGE_HTML"):
+	case (s == "Ipcid·Page·Html") || pkg__strings.EqualFold(s, "Ipcid·Page·Html"):
 		this = IPCID_PAGE_HTML
-	case (s == "IPCID_TREEVIEW_GETITEM") || pkg__strings.EqualFold(s, "IPCID_TREEVIEW_GETITEM"):
+	case (s == "Ipcid·Treeview·Getitem") || pkg__strings.EqualFold(s, "Ipcid·Treeview·Getitem"):
 		this = IPCID_TREEVIEW_GETITEM
-	case (s == "IPCID_TREEVIEW_CHILDREN") || pkg__strings.EqualFold(s, "IPCID_TREEVIEW_CHILDREN"):
+	case (s == "Ipcid·Treeview·Children") || pkg__strings.EqualFold(s, "Ipcid·Treeview·Children"):
 		this = IPCID_TREEVIEW_CHILDREN
-	case (s == "IPCID_TREEVIEW_CHANGED") || pkg__strings.EqualFold(s, "IPCID_TREEVIEW_CHANGED"):
+	case (s == "Ipcid·Treeview·Changed") || pkg__strings.EqualFold(s, "Ipcid·Treeview·Changed"):
 		this = IPCID_TREEVIEW_CHANGED
-	case (s == "IPCID_CFG_RESETALL") || pkg__strings.EqualFold(s, "IPCID_CFG_RESETALL"):
+	case (s == "Ipcid·Cfg·Resetall") || pkg__strings.EqualFold(s, "Ipcid·Cfg·Resetall"):
 		this = IPCID_CFG_RESETALL
-	case (s == "IPCID_CFG_LIST") || pkg__strings.EqualFold(s, "IPCID_CFG_LIST"):
+	case (s == "Ipcid·Cfg·List") || pkg__strings.EqualFold(s, "Ipcid·Cfg·List"):
 		this = IPCID_CFG_LIST
-	case (s == "IPCID_CFG_SET") || pkg__strings.EqualFold(s, "IPCID_CFG_SET"):
+	case (s == "Ipcid·Cfg·Set") || pkg__strings.EqualFold(s, "Ipcid·Cfg·Set"):
 		this = IPCID_CFG_SET
-	case (s == "IPCID_NOTIFY_INFO") || pkg__strings.EqualFold(s, "IPCID_NOTIFY_INFO"):
+	case (s == "Ipcid·Notify·Info") || pkg__strings.EqualFold(s, "Ipcid·Notify·Info"):
 		this = IPCID_NOTIFY_INFO
-	case (s == "IPCID_NOTIFY_WARN") || pkg__strings.EqualFold(s, "IPCID_NOTIFY_WARN"):
+	case (s == "Ipcid·Notify·Warn") || pkg__strings.EqualFold(s, "Ipcid·Notify·Warn"):
 		this = IPCID_NOTIFY_WARN
-	case (s == "IPCID_NOTIFY_ERR") || pkg__strings.EqualFold(s, "IPCID_NOTIFY_ERR"):
+	case (s == "Ipcid·Notify·Err") || pkg__strings.EqualFold(s, "Ipcid·Notify·Err"):
 		this = IPCID_NOTIFY_ERR
-	case (s == "IPCID_PROJ_CHANGED") || pkg__strings.EqualFold(s, "IPCID_PROJ_CHANGED"):
+	case (s == "Ipcid·Proj·Changed") || pkg__strings.EqualFold(s, "Ipcid·Proj·Changed"):
 		this = IPCID_PROJ_CHANGED
-	case (s == "IPCID_PROJ_POLLEVTS") || pkg__strings.EqualFold(s, "IPCID_PROJ_POLLEVTS"):
+	case (s == "Ipcid·Proj·Pollevts") || pkg__strings.EqualFold(s, "Ipcid·Proj·Pollevts"):
 		this = IPCID_PROJ_POLLEVTS
-	case (s == "IPCID_SRCDIAG_LIST") || pkg__strings.EqualFold(s, "IPCID_SRCDIAG_LIST"):
+	case (s == "Ipcid·Srcdiag·List") || pkg__strings.EqualFold(s, "Ipcid·Srcdiag·List"):
 		this = IPCID_SRCDIAG_LIST
-	case (s == "IPCID_SRCDIAG_RUN_CURFILE") || pkg__strings.EqualFold(s, "IPCID_SRCDIAG_RUN_CURFILE"):
+	case (s == "Ipcid·Srcdiag·Run·Curfile") || pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Run·Curfile"):
 		this = IPCID_SRCDIAG_RUN_CURFILE
-	case (s == "IPCID_SRCDIAG_RUN_OPENFILES") || pkg__strings.EqualFold(s, "IPCID_SRCDIAG_RUN_OPENFILES"):
+	case (s == "Ipcid·Srcdiag·Run·Openfiles") || pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Run·Openfiles"):
 		this = IPCID_SRCDIAG_RUN_OPENFILES
-	case (s == "IPCID_SRCDIAG_RUN_ALLFILES") || pkg__strings.EqualFold(s, "IPCID_SRCDIAG_RUN_ALLFILES"):
+	case (s == "Ipcid·Srcdiag·Run·Allfiles") || pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Run·Allfiles"):
 		this = IPCID_SRCDIAG_RUN_ALLFILES
-	case (s == "IPCID_SRCDIAG_FORGETALL") || pkg__strings.EqualFold(s, "IPCID_SRCDIAG_FORGETALL"):
+	case (s == "Ipcid·Srcdiag·Forgetall") || pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Forgetall"):
 		this = IPCID_SRCDIAG_FORGETALL
-	case (s == "IPCID_SRCDIAG_PEEKHIDDEN") || pkg__strings.EqualFold(s, "IPCID_SRCDIAG_PEEKHIDDEN"):
+	case (s == "Ipcid·Srcdiag·Peekhidden") || pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Peekhidden"):
 		this = IPCID_SRCDIAG_PEEKHIDDEN
-	case (s == "IPCID_SRCDIAG_PUB") || pkg__strings.EqualFold(s, "IPCID_SRCDIAG_PUB"):
+	case (s == "Ipcid·Srcdiag·Pub") || pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Pub"):
 		this = IPCID_SRCDIAG_PUB
-	case (s == "IPCID_SRCDIAG_AUTO_TOGGLE") || pkg__strings.EqualFold(s, "IPCID_SRCDIAG_AUTO_TOGGLE"):
+	case (s == "Ipcid·Srcdiag·Auto·Toggle") || pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Auto·Toggle"):
 		this = IPCID_SRCDIAG_AUTO_TOGGLE
-	case (s == "IPCID_SRCDIAG_AUTO_ALL") || pkg__strings.EqualFold(s, "IPCID_SRCDIAG_AUTO_ALL"):
+	case (s == "Ipcid·Srcdiag·Auto·All") || pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Auto·All"):
 		this = IPCID_SRCDIAG_AUTO_ALL
-	case (s == "IPCID_SRCDIAG_AUTO_NONE") || pkg__strings.EqualFold(s, "IPCID_SRCDIAG_AUTO_NONE"):
+	case (s == "Ipcid·Srcdiag·Auto·None") || pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Auto·None"):
 		this = IPCID_SRCDIAG_AUTO_NONE
-	case (s == "IPCID_SRCDIAG_STARTED") || pkg__strings.EqualFold(s, "IPCID_SRCDIAG_STARTED"):
+	case (s == "Ipcid·Srcdiag·Started") || pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Started"):
 		this = IPCID_SRCDIAG_STARTED
-	case (s == "IPCID_SRCDIAG_FINISHED") || pkg__strings.EqualFold(s, "IPCID_SRCDIAG_FINISHED"):
+	case (s == "Ipcid·Srcdiag·Finished") || pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Finished"):
 		this = IPCID_SRCDIAG_FINISHED
-	case (s == "IPCID_SRCMOD_FMT_SETDEFMENU") || pkg__strings.EqualFold(s, "IPCID_SRCMOD_FMT_SETDEFMENU"):
+	case (s == "Ipcid·Srcmod·Fmt·Setdefmenu") || pkg__strings.EqualFold(s, "Ipcid·Srcmod·Fmt·Setdefmenu"):
 		this = IPCID_SRCMOD_FMT_SETDEFMENU
-	case (s == "IPCID_SRCMOD_FMT_SETDEFPICK") || pkg__strings.EqualFold(s, "IPCID_SRCMOD_FMT_SETDEFPICK"):
+	case (s == "Ipcid·Srcmod·Fmt·Setdefpick") || pkg__strings.EqualFold(s, "Ipcid·Srcmod·Fmt·Setdefpick"):
 		this = IPCID_SRCMOD_FMT_SETDEFPICK
-	case (s == "IPCID_SRCMOD_FMT_RUNONFILE") || pkg__strings.EqualFold(s, "IPCID_SRCMOD_FMT_RUNONFILE"):
+	case (s == "Ipcid·Srcmod·Fmt·Runonfile") || pkg__strings.EqualFold(s, "Ipcid·Srcmod·Fmt·Runonfile"):
 		this = IPCID_SRCMOD_FMT_RUNONFILE
-	case (s == "IPCID_SRCMOD_FMT_RUNONSEL") || pkg__strings.EqualFold(s, "IPCID_SRCMOD_FMT_RUNONSEL"):
+	case (s == "Ipcid·Srcmod·Fmt·Runonsel") || pkg__strings.EqualFold(s, "Ipcid·Srcmod·Fmt·Runonsel"):
 		this = IPCID_SRCMOD_FMT_RUNONSEL
-	case (s == "IPCID_SRCMOD_RENAME") || pkg__strings.EqualFold(s, "IPCID_SRCMOD_RENAME"):
+	case (s == "Ipcid·Srcmod·Rename") || pkg__strings.EqualFold(s, "Ipcid·Srcmod·Rename"):
 		this = IPCID_SRCMOD_RENAME
-	case (s == "IPCID_SRCMOD_ACTIONS") || pkg__strings.EqualFold(s, "IPCID_SRCMOD_ACTIONS"):
+	case (s == "Ipcid·Srcmod·Actions") || pkg__strings.EqualFold(s, "Ipcid·Srcmod·Actions"):
 		this = IPCID_SRCMOD_ACTIONS
-	case (s == "IPCID_SRCINTEL_HOVER") || pkg__strings.EqualFold(s, "IPCID_SRCINTEL_HOVER"):
+	case (s == "Ipcid·Srcintel·Hover") || pkg__strings.EqualFold(s, "Ipcid·Srcintel·Hover"):
 		this = IPCID_SRCINTEL_HOVER
-	case (s == "IPCID_SRCINTEL_SYMS_FILE") || pkg__strings.EqualFold(s, "IPCID_SRCINTEL_SYMS_FILE"):
+	case (s == "Ipcid·Srcintel·Syms·File") || pkg__strings.EqualFold(s, "Ipcid·Srcintel·Syms·File"):
 		this = IPCID_SRCINTEL_SYMS_FILE
-	case (s == "IPCID_SRCINTEL_SYMS_PROJ") || pkg__strings.EqualFold(s, "IPCID_SRCINTEL_SYMS_PROJ"):
+	case (s == "Ipcid·Srcintel·Syms·Proj") || pkg__strings.EqualFold(s, "Ipcid·Srcintel·Syms·Proj"):
 		this = IPCID_SRCINTEL_SYMS_PROJ
-	case (s == "IPCID_SRCINTEL_CMPL_ITEMS") || pkg__strings.EqualFold(s, "IPCID_SRCINTEL_CMPL_ITEMS"):
+	case (s == "Ipcid·Srcintel·Cmpl·Items") || pkg__strings.EqualFold(s, "Ipcid·Srcintel·Cmpl·Items"):
 		this = IPCID_SRCINTEL_CMPL_ITEMS
-	case (s == "IPCID_SRCINTEL_CMPL_DETAILS") || pkg__strings.EqualFold(s, "IPCID_SRCINTEL_CMPL_DETAILS"):
+	case (s == "Ipcid·Srcintel·Cmpl·Details") || pkg__strings.EqualFold(s, "Ipcid·Srcintel·Cmpl·Details"):
 		this = IPCID_SRCINTEL_CMPL_DETAILS
-	case (s == "IPCID_SRCINTEL_HIGHLIGHTS") || pkg__strings.EqualFold(s, "IPCID_SRCINTEL_HIGHLIGHTS"):
+	case (s == "Ipcid·Srcintel·Highlights") || pkg__strings.EqualFold(s, "Ipcid·Srcintel·Highlights"):
 		this = IPCID_SRCINTEL_HIGHLIGHTS
-	case (s == "IPCID_SRCINTEL_SIGNATURE") || pkg__strings.EqualFold(s, "IPCID_SRCINTEL_SIGNATURE"):
+	case (s == "Ipcid·Srcintel·Signature") || pkg__strings.EqualFold(s, "Ipcid·Srcintel·Signature"):
 		this = IPCID_SRCINTEL_SIGNATURE
-	case (s == "IPCID_SRCINTEL_REFERENCES") || pkg__strings.EqualFold(s, "IPCID_SRCINTEL_REFERENCES"):
+	case (s == "Ipcid·Srcintel·References") || pkg__strings.EqualFold(s, "Ipcid·Srcintel·References"):
 		this = IPCID_SRCINTEL_REFERENCES
-	case (s == "IPCID_SRCINTEL_DEFSYM") || pkg__strings.EqualFold(s, "IPCID_SRCINTEL_DEFSYM"):
+	case (s == "Ipcid·Srcintel·Defsym") || pkg__strings.EqualFold(s, "Ipcid·Srcintel·Defsym"):
 		this = IPCID_SRCINTEL_DEFSYM
-	case (s == "IPCID_SRCINTEL_DEFTYPE") || pkg__strings.EqualFold(s, "IPCID_SRCINTEL_DEFTYPE"):
+	case (s == "Ipcid·Srcintel·Deftype") || pkg__strings.EqualFold(s, "Ipcid·Srcintel·Deftype"):
 		this = IPCID_SRCINTEL_DEFTYPE
-	case (s == "IPCID_SRCINTEL_DEFIMPL") || pkg__strings.EqualFold(s, "IPCID_SRCINTEL_DEFIMPL"):
+	case (s == "Ipcid·Srcintel·Defimpl") || pkg__strings.EqualFold(s, "Ipcid·Srcintel·Defimpl"):
 		this = IPCID_SRCINTEL_DEFIMPL
-	case (s == "IPCID_EXTRAS_INTEL_LIST") || pkg__strings.EqualFold(s, "IPCID_EXTRAS_INTEL_LIST"):
+	case (s == "Ipcid·Extras·Intel·List") || pkg__strings.EqualFold(s, "Ipcid·Extras·Intel·List"):
 		this = IPCID_EXTRAS_INTEL_LIST
-	case (s == "IPCID_EXTRAS_INTEL_RUN") || pkg__strings.EqualFold(s, "IPCID_EXTRAS_INTEL_RUN"):
+	case (s == "Ipcid·Extras·Intel·Run") || pkg__strings.EqualFold(s, "Ipcid·Extras·Intel·Run"):
 		this = IPCID_EXTRAS_INTEL_RUN
-	case (s == "IPCID_EXTRAS_QUERY_LIST") || pkg__strings.EqualFold(s, "IPCID_EXTRAS_QUERY_LIST"):
+	case (s == "Ipcid·Extras·Query·List") || pkg__strings.EqualFold(s, "Ipcid·Extras·Query·List"):
 		this = IPCID_EXTRAS_QUERY_LIST
-	case (s == "IPCID_EXTRAS_QUERY_RUN") || pkg__strings.EqualFold(s, "IPCID_EXTRAS_QUERY_RUN"):
+	case (s == "Ipcid·Extras·Query·Run") || pkg__strings.EqualFold(s, "Ipcid·Extras·Query·Run"):
 		this = IPCID_EXTRAS_QUERY_RUN
 	default:
 		goto tryParseNum
@@ -742,104 +742,104 @@ func IpcIDsFromGoString(s string) (this IpcIDs, err error) {
 	if (len(s) < 13) || (s[0:6] != "IPCID_") {
 		goto tryParseNum
 	}
-	switch {
-	case s == "IPCID_MENUS_MAIN":
+	switch s {
+	case "IPCID_MENUS_MAIN":
 		this = IPCID_MENUS_MAIN
-	case s == "IPCID_MENUS_PKGS":
+	case "IPCID_MENUS_PKGS":
 		this = IPCID_MENUS_PKGS
-	case s == "IPCID_MENUS_TOOLS":
+	case "IPCID_MENUS_TOOLS":
 		this = IPCID_MENUS_TOOLS
-	case s == "IPCID_OBJ_SNAPSHOT":
+	case "IPCID_OBJ_SNAPSHOT":
 		this = IPCID_OBJ_SNAPSHOT
-	case s == "IPCID_PAGE_HTML":
+	case "IPCID_PAGE_HTML":
 		this = IPCID_PAGE_HTML
-	case s == "IPCID_TREEVIEW_GETITEM":
+	case "IPCID_TREEVIEW_GETITEM":
 		this = IPCID_TREEVIEW_GETITEM
-	case s == "IPCID_TREEVIEW_CHILDREN":
+	case "IPCID_TREEVIEW_CHILDREN":
 		this = IPCID_TREEVIEW_CHILDREN
-	case s == "IPCID_TREEVIEW_CHANGED":
+	case "IPCID_TREEVIEW_CHANGED":
 		this = IPCID_TREEVIEW_CHANGED
-	case s == "IPCID_CFG_RESETALL":
+	case "IPCID_CFG_RESETALL":
 		this = IPCID_CFG_RESETALL
-	case s == "IPCID_CFG_LIST":
+	case "IPCID_CFG_LIST":
 		this = IPCID_CFG_LIST
-	case s == "IPCID_CFG_SET":
+	case "IPCID_CFG_SET":
 		this = IPCID_CFG_SET
-	case s == "IPCID_NOTIFY_INFO":
+	case "IPCID_NOTIFY_INFO":
 		this = IPCID_NOTIFY_INFO
-	case s == "IPCID_NOTIFY_WARN":
+	case "IPCID_NOTIFY_WARN":
 		this = IPCID_NOTIFY_WARN
-	case s == "IPCID_NOTIFY_ERR":
+	case "IPCID_NOTIFY_ERR":
 		this = IPCID_NOTIFY_ERR
-	case s == "IPCID_PROJ_CHANGED":
+	case "IPCID_PROJ_CHANGED":
 		this = IPCID_PROJ_CHANGED
-	case s == "IPCID_PROJ_POLLEVTS":
+	case "IPCID_PROJ_POLLEVTS":
 		this = IPCID_PROJ_POLLEVTS
-	case s == "IPCID_SRCDIAG_LIST":
+	case "IPCID_SRCDIAG_LIST":
 		this = IPCID_SRCDIAG_LIST
-	case s == "IPCID_SRCDIAG_RUN_CURFILE":
+	case "IPCID_SRCDIAG_RUN_CURFILE":
 		this = IPCID_SRCDIAG_RUN_CURFILE
-	case s == "IPCID_SRCDIAG_RUN_OPENFILES":
+	case "IPCID_SRCDIAG_RUN_OPENFILES":
 		this = IPCID_SRCDIAG_RUN_OPENFILES
-	case s == "IPCID_SRCDIAG_RUN_ALLFILES":
+	case "IPCID_SRCDIAG_RUN_ALLFILES":
 		this = IPCID_SRCDIAG_RUN_ALLFILES
-	case s == "IPCID_SRCDIAG_FORGETALL":
+	case "IPCID_SRCDIAG_FORGETALL":
 		this = IPCID_SRCDIAG_FORGETALL
-	case s == "IPCID_SRCDIAG_PEEKHIDDEN":
+	case "IPCID_SRCDIAG_PEEKHIDDEN":
 		this = IPCID_SRCDIAG_PEEKHIDDEN
-	case s == "IPCID_SRCDIAG_PUB":
+	case "IPCID_SRCDIAG_PUB":
 		this = IPCID_SRCDIAG_PUB
-	case s == "IPCID_SRCDIAG_AUTO_TOGGLE":
+	case "IPCID_SRCDIAG_AUTO_TOGGLE":
 		this = IPCID_SRCDIAG_AUTO_TOGGLE
-	case s == "IPCID_SRCDIAG_AUTO_ALL":
+	case "IPCID_SRCDIAG_AUTO_ALL":
 		this = IPCID_SRCDIAG_AUTO_ALL
-	case s == "IPCID_SRCDIAG_AUTO_NONE":
+	case "IPCID_SRCDIAG_AUTO_NONE":
 		this = IPCID_SRCDIAG_AUTO_NONE
-	case s == "IPCID_SRCDIAG_STARTED":
+	case "IPCID_SRCDIAG_STARTED":
 		this = IPCID_SRCDIAG_STARTED
-	case s == "IPCID_SRCDIAG_FINISHED":
+	case "IPCID_SRCDIAG_FINISHED":
 		this = IPCID_SRCDIAG_FINISHED
-	case s == "IPCID_SRCMOD_FMT_SETDEFMENU":
+	case "IPCID_SRCMOD_FMT_SETDEFMENU":
 		this = IPCID_SRCMOD_FMT_SETDEFMENU
-	case s == "IPCID_SRCMOD_FMT_SETDEFPICK":
+	case "IPCID_SRCMOD_FMT_SETDEFPICK":
 		this = IPCID_SRCMOD_FMT_SETDEFPICK
-	case s == "IPCID_SRCMOD_FMT_RUNONFILE":
+	case "IPCID_SRCMOD_FMT_RUNONFILE":
 		this = IPCID_SRCMOD_FMT_RUNONFILE
-	case s == "IPCID_SRCMOD_FMT_RUNONSEL":
+	case "IPCID_SRCMOD_FMT_RUNONSEL":
 		this = IPCID_SRCMOD_FMT_RUNONSEL
-	case s == "IPCID_SRCMOD_RENAME":
+	case "IPCID_SRCMOD_RENAME":
 		this = IPCID_SRCMOD_RENAME
-	case s == "IPCID_SRCMOD_ACTIONS":
+	case "IPCID_SRCMOD_ACTIONS":
 		this = IPCID_SRCMOD_ACTIONS
-	case s == "IPCID_SRCINTEL_HOVER":
+	case "IPCID_SRCINTEL_HOVER":
 		this = IPCID_SRCINTEL_HOVER
-	case s == "IPCID_SRCINTEL_SYMS_FILE":
+	case "IPCID_SRCINTEL_SYMS_FILE":
 		this = IPCID_SRCINTEL_SYMS_FILE
-	case s == "IPCID_SRCINTEL_SYMS_PROJ":
+	case "IPCID_SRCINTEL_SYMS_PROJ":
 		this = IPCID_SRCINTEL_SYMS_PROJ
-	case s == "IPCID_SRCINTEL_CMPL_ITEMS":
+	case "IPCID_SRCINTEL_CMPL_ITEMS":
 		this = IPCID_SRCINTEL_CMPL_ITEMS
-	case s == "IPCID_SRCINTEL_CMPL_DETAILS":
+	case "IPCID_SRCINTEL_CMPL_DETAILS":
 		this = IPCID_SRCINTEL_CMPL_DETAILS
-	case s == "IPCID_SRCINTEL_HIGHLIGHTS":
+	case "IPCID_SRCINTEL_HIGHLIGHTS":
 		this = IPCID_SRCINTEL_HIGHLIGHTS
-	case s == "IPCID_SRCINTEL_SIGNATURE":
+	case "IPCID_SRCINTEL_SIGNATURE":
 		this = IPCID_SRCINTEL_SIGNATURE
-	case s == "IPCID_SRCINTEL_REFERENCES":
+	case "IPCID_SRCINTEL_REFERENCES":
 		this = IPCID_SRCINTEL_REFERENCES
-	case s == "IPCID_SRCINTEL_DEFSYM":
+	case "IPCID_SRCINTEL_DEFSYM":
 		this = IPCID_SRCINTEL_DEFSYM
-	case s == "IPCID_SRCINTEL_DEFTYPE":
+	case "IPCID_SRCINTEL_DEFTYPE":
 		this = IPCID_SRCINTEL_DEFTYPE
-	case s == "IPCID_SRCINTEL_DEFIMPL":
+	case "IPCID_SRCINTEL_DEFIMPL":
 		this = IPCID_SRCINTEL_DEFIMPL
-	case s == "IPCID_EXTRAS_INTEL_LIST":
+	case "IPCID_EXTRAS_INTEL_LIST":
 		this = IPCID_EXTRAS_INTEL_LIST
-	case s == "IPCID_EXTRAS_INTEL_RUN":
+	case "IPCID_EXTRAS_INTEL_RUN":
 		this = IPCID_EXTRAS_INTEL_RUN
-	case s == "IPCID_EXTRAS_QUERY_LIST":
+	case "IPCID_EXTRAS_QUERY_LIST":
 		this = IPCID_EXTRAS_QUERY_LIST
-	case s == "IPCID_EXTRAS_QUERY_RUN":
+	case "IPCID_EXTRAS_QUERY_RUN":
 		this = IPCID_EXTRAS_QUERY_RUN
 	default:
 		goto tryParseNum
@@ -893,13 +893,13 @@ func WellknownDiagSeverities() (names []string, values []DiagSeverity) {
 func (this DiagSeverity) String() (r string) {
 	switch this {
 	case DIAG_SEV_ERR:
-		r = "DIAG_SEV_ERR"
+		r = "Diag·Sev·Err"
 	case DIAG_SEV_WARN:
-		r = "DIAG_SEV_WARN"
+		r = "Diag·Sev·Warn"
 	case DIAG_SEV_INFO:
-		r = "DIAG_SEV_INFO"
+		r = "Diag·Sev·Info"
 	case DIAG_SEV_HINT:
-		r = "DIAG_SEV_HINT"
+		r = "Diag·Sev·Hint"
 	default:
 		r = pkg__strconv.Itoa((int)(this))
 	}
@@ -908,17 +908,17 @@ func (this DiagSeverity) String() (r string) {
 
 // DiagSeverityFromString returns the `DiagSeverity` represented by `s` (as returned by `DiagSeverity.String`, but case-insensitively), or an `error` if none exists.
 func DiagSeverityFromString(s string) (this DiagSeverity, err error) {
-	if len(s) < 12 {
+	if (len(s) < 14) || (!pkg__strings.EqualFold(s[0:11], "Diag·Sev·")) {
 		goto tryParseNum
 	}
 	switch {
-	case (s == "DIAG_SEV_ERR") || pkg__strings.EqualFold(s, "DIAG_SEV_ERR"):
+	case (s == "Diag·Sev·Err") || pkg__strings.EqualFold(s, "Diag·Sev·Err"):
 		this = DIAG_SEV_ERR
-	case (s == "DIAG_SEV_WARN") || pkg__strings.EqualFold(s, "DIAG_SEV_WARN"):
+	case (s == "Diag·Sev·Warn") || pkg__strings.EqualFold(s, "Diag·Sev·Warn"):
 		this = DIAG_SEV_WARN
-	case (s == "DIAG_SEV_INFO") || pkg__strings.EqualFold(s, "DIAG_SEV_INFO"):
+	case (s == "Diag·Sev·Info") || pkg__strings.EqualFold(s, "Diag·Sev·Info"):
 		this = DIAG_SEV_INFO
-	case (s == "DIAG_SEV_HINT") || pkg__strings.EqualFold(s, "DIAG_SEV_HINT"):
+	case (s == "Diag·Sev·Hint") || pkg__strings.EqualFold(s, "Diag·Sev·Hint"):
 		this = DIAG_SEV_HINT
 	default:
 		goto tryParseNum
@@ -966,14 +966,14 @@ func DiagSeverityFromGoString(s string) (this DiagSeverity, err error) {
 	if (len(s) < 12) || (s[0:9] != "DIAG_SEV_") {
 		goto tryParseNum
 	}
-	switch {
-	case s == "DIAG_SEV_ERR":
+	switch s {
+	case "DIAG_SEV_ERR":
 		this = DIAG_SEV_ERR
-	case s == "DIAG_SEV_WARN":
+	case "DIAG_SEV_WARN":
 		this = DIAG_SEV_WARN
-	case s == "DIAG_SEV_INFO":
+	case "DIAG_SEV_INFO":
 		this = DIAG_SEV_INFO
-	case s == "DIAG_SEV_HINT":
+	case "DIAG_SEV_HINT":
 		this = DIAG_SEV_HINT
 	default:
 		goto tryParseNum
@@ -1090,57 +1090,57 @@ func WellknownSymbols() (names []string, values []Symbol) {
 func (this Symbol) String() (r string) {
 	switch this {
 	case SYM_FILE:
-		r = "SYM_FILE"
+		r = "Sym·File"
 	case SYM_MODULE:
-		r = "SYM_MODULE"
+		r = "Sym·Module"
 	case SYM_NAMESPACE:
-		r = "SYM_NAMESPACE"
+		r = "Sym·Namespace"
 	case SYM_PACKAGE:
-		r = "SYM_PACKAGE"
+		r = "Sym·Package"
 	case SYM_CLASS:
-		r = "SYM_CLASS"
+		r = "Sym·Class"
 	case SYM_METHOD:
-		r = "SYM_METHOD"
+		r = "Sym·Method"
 	case SYM_PROPERTY:
-		r = "SYM_PROPERTY"
+		r = "Sym·Property"
 	case SYM_FIELD:
-		r = "SYM_FIELD"
+		r = "Sym·Field"
 	case SYM_CONSTRUCTOR:
-		r = "SYM_CONSTRUCTOR"
+		r = "Sym·Constructor"
 	case SYM_ENUM:
-		r = "SYM_ENUM"
+		r = "Sym·Enum"
 	case SYM_INTERFACE:
-		r = "SYM_INTERFACE"
+		r = "Sym·Interface"
 	case SYM_FUNCTION:
-		r = "SYM_FUNCTION"
+		r = "Sym·Function"
 	case SYM_VARIABLE:
-		r = "SYM_VARIABLE"
+		r = "Sym·Variable"
 	case SYM_CONSTANT:
-		r = "SYM_CONSTANT"
+		r = "Sym·Constant"
 	case SYM_STRING:
-		r = "SYM_STRING"
+		r = "Sym·String"
 	case SYM_NUMBER:
-		r = "SYM_NUMBER"
+		r = "Sym·Number"
 	case SYM_BOOLEAN:
-		r = "SYM_BOOLEAN"
+		r = "Sym·Boolean"
 	case SYM_ARRAY:
-		r = "SYM_ARRAY"
+		r = "Sym·Array"
 	case SYM_OBJECT:
-		r = "SYM_OBJECT"
+		r = "Sym·Object"
 	case SYM_KEY:
-		r = "SYM_KEY"
+		r = "Sym·Key"
 	case SYM_NULL:
-		r = "SYM_NULL"
+		r = "Sym·Null"
 	case SYM_ENUMMEMBER:
-		r = "SYM_ENUMMEMBER"
+		r = "Sym·Enummember"
 	case SYM_STRUCT:
-		r = "SYM_STRUCT"
+		r = "Sym·Struct"
 	case SYM_EVENT:
-		r = "SYM_EVENT"
+		r = "Sym·Event"
 	case SYM_OPERATOR:
-		r = "SYM_OPERATOR"
+		r = "Sym·Operator"
 	case SYM_TYPEPARAMETER:
-		r = "SYM_TYPEPARAMETER"
+		r = "Sym·Typeparameter"
 	default:
 		r = pkg__strconv.FormatUint((uint64)(this), 10)
 	}
@@ -1149,61 +1149,61 @@ func (this Symbol) String() (r string) {
 
 // SymbolFromString returns the `Symbol` represented by `s` (as returned by `Symbol.String`, but case-insensitively), or an `error` if none exists.
 func SymbolFromString(s string) (this Symbol, err error) {
-	if len(s) < 7 {
+	if (len(s) < 8) || (!pkg__strings.EqualFold(s[0:5], "Sym·")) {
 		goto tryParseNum
 	}
 	switch {
-	case (s == "SYM_FILE") || pkg__strings.EqualFold(s, "SYM_FILE"):
+	case (s == "Sym·File") || pkg__strings.EqualFold(s, "Sym·File"):
 		this = SYM_FILE
-	case (s == "SYM_MODULE") || pkg__strings.EqualFold(s, "SYM_MODULE"):
+	case (s == "Sym·Module") || pkg__strings.EqualFold(s, "Sym·Module"):
 		this = SYM_MODULE
-	case (s == "SYM_NAMESPACE") || pkg__strings.EqualFold(s, "SYM_NAMESPACE"):
+	case (s == "Sym·Namespace") || pkg__strings.EqualFold(s, "Sym·Namespace"):
 		this = SYM_NAMESPACE
-	case (s == "SYM_PACKAGE") || pkg__strings.EqualFold(s, "SYM_PACKAGE"):
+	case (s == "Sym·Package") || pkg__strings.EqualFold(s, "Sym·Package"):
 		this = SYM_PACKAGE
-	case (s == "SYM_CLASS") || pkg__strings.EqualFold(s, "SYM_CLASS"):
+	case (s == "Sym·Class") || pkg__strings.EqualFold(s, "Sym·Class"):
 		this = SYM_CLASS
-	case (s == "SYM_METHOD") || pkg__strings.EqualFold(s, "SYM_METHOD"):
+	case (s == "Sym·Method") || pkg__strings.EqualFold(s, "Sym·Method"):
 		this = SYM_METHOD
-	case (s == "SYM_PROPERTY") || pkg__strings.EqualFold(s, "SYM_PROPERTY"):
+	case (s == "Sym·Property") || pkg__strings.EqualFold(s, "Sym·Property"):
 		this = SYM_PROPERTY
-	case (s == "SYM_FIELD") || pkg__strings.EqualFold(s, "SYM_FIELD"):
+	case (s == "Sym·Field") || pkg__strings.EqualFold(s, "Sym·Field"):
 		this = SYM_FIELD
-	case (s == "SYM_CONSTRUCTOR") || pkg__strings.EqualFold(s, "SYM_CONSTRUCTOR"):
+	case (s == "Sym·Constructor") || pkg__strings.EqualFold(s, "Sym·Constructor"):
 		this = SYM_CONSTRUCTOR
-	case (s == "SYM_ENUM") || pkg__strings.EqualFold(s, "SYM_ENUM"):
+	case (s == "Sym·Enum") || pkg__strings.EqualFold(s, "Sym·Enum"):
 		this = SYM_ENUM
-	case (s == "SYM_INTERFACE") || pkg__strings.EqualFold(s, "SYM_INTERFACE"):
+	case (s == "Sym·Interface") || pkg__strings.EqualFold(s, "Sym·Interface"):
 		this = SYM_INTERFACE
-	case (s == "SYM_FUNCTION") || pkg__strings.EqualFold(s, "SYM_FUNCTION"):
+	case (s == "Sym·Function") || pkg__strings.EqualFold(s, "Sym·Function"):
 		this = SYM_FUNCTION
-	case (s == "SYM_VARIABLE") || pkg__strings.EqualFold(s, "SYM_VARIABLE"):
+	case (s == "Sym·Variable") || pkg__strings.EqualFold(s, "Sym·Variable"):
 		this = SYM_VARIABLE
-	case (s == "SYM_CONSTANT") || pkg__strings.EqualFold(s, "SYM_CONSTANT"):
+	case (s == "Sym·Constant") || pkg__strings.EqualFold(s, "Sym·Constant"):
 		this = SYM_CONSTANT
-	case (s == "SYM_STRING") || pkg__strings.EqualFold(s, "SYM_STRING"):
+	case (s == "Sym·String") || pkg__strings.EqualFold(s, "Sym·String"):
 		this = SYM_STRING
-	case (s == "SYM_NUMBER") || pkg__strings.EqualFold(s, "SYM_NUMBER"):
+	case (s == "Sym·Number") || pkg__strings.EqualFold(s, "Sym·Number"):
 		this = SYM_NUMBER
-	case (s == "SYM_BOOLEAN") || pkg__strings.EqualFold(s, "SYM_BOOLEAN"):
+	case (s == "Sym·Boolean") || pkg__strings.EqualFold(s, "Sym·Boolean"):
 		this = SYM_BOOLEAN
-	case (s == "SYM_ARRAY") || pkg__strings.EqualFold(s, "SYM_ARRAY"):
+	case (s == "Sym·Array") || pkg__strings.EqualFold(s, "Sym·Array"):
 		this = SYM_ARRAY
-	case (s == "SYM_OBJECT") || pkg__strings.EqualFold(s, "SYM_OBJECT"):
+	case (s == "Sym·Object") || pkg__strings.EqualFold(s, "Sym·Object"):
 		this = SYM_OBJECT
-	case (s == "SYM_KEY") || pkg__strings.EqualFold(s, "SYM_KEY"):
+	case (s == "Sym·Key") || pkg__strings.EqualFold(s, "Sym·Key"):
 		this = SYM_KEY
-	case (s == "SYM_NULL") || pkg__strings.EqualFold(s, "SYM_NULL"):
+	case (s == "Sym·Null") || pkg__strings.EqualFold(s, "Sym·Null"):
 		this = SYM_NULL
-	case (s == "SYM_ENUMMEMBER") || pkg__strings.EqualFold(s, "SYM_ENUMMEMBER"):
+	case (s == "Sym·Enummember") || pkg__strings.EqualFold(s, "Sym·Enummember"):
 		this = SYM_ENUMMEMBER
-	case (s == "SYM_STRUCT") || pkg__strings.EqualFold(s, "SYM_STRUCT"):
+	case (s == "Sym·Struct") || pkg__strings.EqualFold(s, "Sym·Struct"):
 		this = SYM_STRUCT
-	case (s == "SYM_EVENT") || pkg__strings.EqualFold(s, "SYM_EVENT"):
+	case (s == "Sym·Event") || pkg__strings.EqualFold(s, "Sym·Event"):
 		this = SYM_EVENT
-	case (s == "SYM_OPERATOR") || pkg__strings.EqualFold(s, "SYM_OPERATOR"):
+	case (s == "Sym·Operator") || pkg__strings.EqualFold(s, "Sym·Operator"):
 		this = SYM_OPERATOR
-	case (s == "SYM_TYPEPARAMETER") || pkg__strings.EqualFold(s, "SYM_TYPEPARAMETER"):
+	case (s == "Sym·Typeparameter") || pkg__strings.EqualFold(s, "Sym·Typeparameter"):
 		this = SYM_TYPEPARAMETER
 	default:
 		goto tryParseNum
@@ -1295,58 +1295,58 @@ func SymbolFromGoString(s string) (this Symbol, err error) {
 	if (len(s) < 7) || (s[0:4] != "SYM_") {
 		goto tryParseNum
 	}
-	switch {
-	case s == "SYM_FILE":
+	switch s {
+	case "SYM_FILE":
 		this = SYM_FILE
-	case s == "SYM_MODULE":
+	case "SYM_MODULE":
 		this = SYM_MODULE
-	case s == "SYM_NAMESPACE":
+	case "SYM_NAMESPACE":
 		this = SYM_NAMESPACE
-	case s == "SYM_PACKAGE":
+	case "SYM_PACKAGE":
 		this = SYM_PACKAGE
-	case s == "SYM_CLASS":
+	case "SYM_CLASS":
 		this = SYM_CLASS
-	case s == "SYM_METHOD":
+	case "SYM_METHOD":
 		this = SYM_METHOD
-	case s == "SYM_PROPERTY":
+	case "SYM_PROPERTY":
 		this = SYM_PROPERTY
-	case s == "SYM_FIELD":
+	case "SYM_FIELD":
 		this = SYM_FIELD
-	case s == "SYM_CONSTRUCTOR":
+	case "SYM_CONSTRUCTOR":
 		this = SYM_CONSTRUCTOR
-	case s == "SYM_ENUM":
+	case "SYM_ENUM":
 		this = SYM_ENUM
-	case s == "SYM_INTERFACE":
+	case "SYM_INTERFACE":
 		this = SYM_INTERFACE
-	case s == "SYM_FUNCTION":
+	case "SYM_FUNCTION":
 		this = SYM_FUNCTION
-	case s == "SYM_VARIABLE":
+	case "SYM_VARIABLE":
 		this = SYM_VARIABLE
-	case s == "SYM_CONSTANT":
+	case "SYM_CONSTANT":
 		this = SYM_CONSTANT
-	case s == "SYM_STRING":
+	case "SYM_STRING":
 		this = SYM_STRING
-	case s == "SYM_NUMBER":
+	case "SYM_NUMBER":
 		this = SYM_NUMBER
-	case s == "SYM_BOOLEAN":
+	case "SYM_BOOLEAN":
 		this = SYM_BOOLEAN
-	case s == "SYM_ARRAY":
+	case "SYM_ARRAY":
 		this = SYM_ARRAY
-	case s == "SYM_OBJECT":
+	case "SYM_OBJECT":
 		this = SYM_OBJECT
-	case s == "SYM_KEY":
+	case "SYM_KEY":
 		this = SYM_KEY
-	case s == "SYM_NULL":
+	case "SYM_NULL":
 		this = SYM_NULL
-	case s == "SYM_ENUMMEMBER":
+	case "SYM_ENUMMEMBER":
 		this = SYM_ENUMMEMBER
-	case s == "SYM_STRUCT":
+	case "SYM_STRUCT":
 		this = SYM_STRUCT
-	case s == "SYM_EVENT":
+	case "SYM_EVENT":
 		this = SYM_EVENT
-	case s == "SYM_OPERATOR":
+	case "SYM_OPERATOR":
 		this = SYM_OPERATOR
-	case s == "SYM_TYPEPARAMETER":
+	case "SYM_TYPEPARAMETER":
 		this = SYM_TYPEPARAMETER
 	default:
 		goto tryParseNum
@@ -1463,55 +1463,55 @@ func WellknownCompletions() (names []string, values []Completion) {
 func (this Completion) String() (r string) {
 	switch this {
 	case CMPL_TEXT:
-		r = "CMPL_TEXT"
+		r = "Cmpl·Text"
 	case CMPL_METHOD:
-		r = "CMPL_METHOD"
+		r = "Cmpl·Method"
 	case CMPL_FUNCTION:
-		r = "CMPL_FUNCTION"
+		r = "Cmpl·Function"
 	case CMPL_CONSTRUCTOR:
-		r = "CMPL_CONSTRUCTOR"
+		r = "Cmpl·Constructor"
 	case CMPL_FIELD:
-		r = "CMPL_FIELD"
+		r = "Cmpl·Field"
 	case CMPL_VARIABLE:
-		r = "CMPL_VARIABLE"
+		r = "Cmpl·Variable"
 	case CMPL_CLASS:
-		r = "CMPL_CLASS"
+		r = "Cmpl·Class"
 	case CMPL_INTERFACE:
-		r = "CMPL_INTERFACE"
+		r = "Cmpl·Interface"
 	case CMPL_MODULE:
-		r = "CMPL_MODULE"
+		r = "Cmpl·Module"
 	case CMPL_PROPERTY:
-		r = "CMPL_PROPERTY"
+		r = "Cmpl·Property"
 	case CMPL_UNIT:
-		r = "CMPL_UNIT"
+		r = "Cmpl·Unit"
 	case CMPL_VALUE:
-		r = "CMPL_VALUE"
+		r = "Cmpl·Value"
 	case CMPL_ENUM:
-		r = "CMPL_ENUM"
+		r = "Cmpl·Enum"
 	case CMPL_KEYWORD:
-		r = "CMPL_KEYWORD"
+		r = "Cmpl·Keyword"
 	case CMPL_SNIPPET:
-		r = "CMPL_SNIPPET"
+		r = "Cmpl·Snippet"
 	case CMPL_COLOR:
-		r = "CMPL_COLOR"
+		r = "Cmpl·Color"
 	case CMPL_FILE:
-		r = "CMPL_FILE"
+		r = "Cmpl·File"
 	case CMPL_REFERENCE:
-		r = "CMPL_REFERENCE"
+		r = "Cmpl·Reference"
 	case CMPL_FOLDER:
-		r = "CMPL_FOLDER"
+		r = "Cmpl·Folder"
 	case CMPL_ENUMMEMBER:
-		r = "CMPL_ENUMMEMBER"
+		r = "Cmpl·Enummember"
 	case CMPL_CONSTANT:
-		r = "CMPL_CONSTANT"
+		r = "Cmpl·Constant"
 	case CMPL_STRUCT:
-		r = "CMPL_STRUCT"
+		r = "Cmpl·Struct"
 	case CMPL_EVENT:
-		r = "CMPL_EVENT"
+		r = "Cmpl·Event"
 	case CMPL_OPERATOR:
-		r = "CMPL_OPERATOR"
+		r = "Cmpl·Operator"
 	case CMPL_TYPEPARAMETER:
-		r = "CMPL_TYPEPARAMETER"
+		r = "Cmpl·Typeparameter"
 	default:
 		r = pkg__strconv.FormatUint((uint64)(this), 10)
 	}
@@ -1520,59 +1520,59 @@ func (this Completion) String() (r string) {
 
 // CompletionFromString returns the `Completion` represented by `s` (as returned by `Completion.String`, but case-insensitively), or an `error` if none exists.
 func CompletionFromString(s string) (this Completion, err error) {
-	if len(s) < 9 {
+	if (len(s) < 10) || (!pkg__strings.EqualFold(s[0:6], "Cmpl·")) {
 		goto tryParseNum
 	}
 	switch {
-	case (s == "CMPL_TEXT") || pkg__strings.EqualFold(s, "CMPL_TEXT"):
+	case (s == "Cmpl·Text") || pkg__strings.EqualFold(s, "Cmpl·Text"):
 		this = CMPL_TEXT
-	case (s == "CMPL_METHOD") || pkg__strings.EqualFold(s, "CMPL_METHOD"):
+	case (s == "Cmpl·Method") || pkg__strings.EqualFold(s, "Cmpl·Method"):
 		this = CMPL_METHOD
-	case (s == "CMPL_FUNCTION") || pkg__strings.EqualFold(s, "CMPL_FUNCTION"):
+	case (s == "Cmpl·Function") || pkg__strings.EqualFold(s, "Cmpl·Function"):
 		this = CMPL_FUNCTION
-	case (s == "CMPL_CONSTRUCTOR") || pkg__strings.EqualFold(s, "CMPL_CONSTRUCTOR"):
+	case (s == "Cmpl·Constructor") || pkg__strings.EqualFold(s, "Cmpl·Constructor"):
 		this = CMPL_CONSTRUCTOR
-	case (s == "CMPL_FIELD") || pkg__strings.EqualFold(s, "CMPL_FIELD"):
+	case (s == "Cmpl·Field") || pkg__strings.EqualFold(s, "Cmpl·Field"):
 		this = CMPL_FIELD
-	case (s == "CMPL_VARIABLE") || pkg__strings.EqualFold(s, "CMPL_VARIABLE"):
+	case (s == "Cmpl·Variable") || pkg__strings.EqualFold(s, "Cmpl·Variable"):
 		this = CMPL_VARIABLE
-	case (s == "CMPL_CLASS") || pkg__strings.EqualFold(s, "CMPL_CLASS"):
+	case (s == "Cmpl·Class") || pkg__strings.EqualFold(s, "Cmpl·Class"):
 		this = CMPL_CLASS
-	case (s == "CMPL_INTERFACE") || pkg__strings.EqualFold(s, "CMPL_INTERFACE"):
+	case (s == "Cmpl·Interface") || pkg__strings.EqualFold(s, "Cmpl·Interface"):
 		this = CMPL_INTERFACE
-	case (s == "CMPL_MODULE") || pkg__strings.EqualFold(s, "CMPL_MODULE"):
+	case (s == "Cmpl·Module") || pkg__strings.EqualFold(s, "Cmpl·Module"):
 		this = CMPL_MODULE
-	case (s == "CMPL_PROPERTY") || pkg__strings.EqualFold(s, "CMPL_PROPERTY"):
+	case (s == "Cmpl·Property") || pkg__strings.EqualFold(s, "Cmpl·Property"):
 		this = CMPL_PROPERTY
-	case (s == "CMPL_UNIT") || pkg__strings.EqualFold(s, "CMPL_UNIT"):
+	case (s == "Cmpl·Unit") || pkg__strings.EqualFold(s, "Cmpl·Unit"):
 		this = CMPL_UNIT
-	case (s == "CMPL_VALUE") || pkg__strings.EqualFold(s, "CMPL_VALUE"):
+	case (s == "Cmpl·Value") || pkg__strings.EqualFold(s, "Cmpl·Value"):
 		this = CMPL_VALUE
-	case (s == "CMPL_ENUM") || pkg__strings.EqualFold(s, "CMPL_ENUM"):
+	case (s == "Cmpl·Enum") || pkg__strings.EqualFold(s, "Cmpl·Enum"):
 		this = CMPL_ENUM
-	case (s == "CMPL_KEYWORD") || pkg__strings.EqualFold(s, "CMPL_KEYWORD"):
+	case (s == "Cmpl·Keyword") || pkg__strings.EqualFold(s, "Cmpl·Keyword"):
 		this = CMPL_KEYWORD
-	case (s == "CMPL_SNIPPET") || pkg__strings.EqualFold(s, "CMPL_SNIPPET"):
+	case (s == "Cmpl·Snippet") || pkg__strings.EqualFold(s, "Cmpl·Snippet"):
 		this = CMPL_SNIPPET
-	case (s == "CMPL_COLOR") || pkg__strings.EqualFold(s, "CMPL_COLOR"):
+	case (s == "Cmpl·Color") || pkg__strings.EqualFold(s, "Cmpl·Color"):
 		this = CMPL_COLOR
-	case (s == "CMPL_FILE") || pkg__strings.EqualFold(s, "CMPL_FILE"):
+	case (s == "Cmpl·File") || pkg__strings.EqualFold(s, "Cmpl·File"):
 		this = CMPL_FILE
-	case (s == "CMPL_REFERENCE") || pkg__strings.EqualFold(s, "CMPL_REFERENCE"):
+	case (s == "Cmpl·Reference") || pkg__strings.EqualFold(s, "Cmpl·Reference"):
 		this = CMPL_REFERENCE
-	case (s == "CMPL_FOLDER") || pkg__strings.EqualFold(s, "CMPL_FOLDER"):
+	case (s == "Cmpl·Folder") || pkg__strings.EqualFold(s, "Cmpl·Folder"):
 		this = CMPL_FOLDER
-	case (s == "CMPL_ENUMMEMBER") || pkg__strings.EqualFold(s, "CMPL_ENUMMEMBER"):
+	case (s == "Cmpl·Enummember") || pkg__strings.EqualFold(s, "Cmpl·Enummember"):
 		this = CMPL_ENUMMEMBER
-	case (s == "CMPL_CONSTANT") || pkg__strings.EqualFold(s, "CMPL_CONSTANT"):
+	case (s == "Cmpl·Constant") || pkg__strings.EqualFold(s, "Cmpl·Constant"):
 		this = CMPL_CONSTANT
-	case (s == "CMPL_STRUCT") || pkg__strings.EqualFold(s, "CMPL_STRUCT"):
+	case (s == "Cmpl·Struct") || pkg__strings.EqualFold(s, "Cmpl·Struct"):
 		this = CMPL_STRUCT
-	case (s == "CMPL_EVENT") || pkg__strings.EqualFold(s, "CMPL_EVENT"):
+	case (s == "Cmpl·Event") || pkg__strings.EqualFold(s, "Cmpl·Event"):
 		this = CMPL_EVENT
-	case (s == "CMPL_OPERATOR") || pkg__strings.EqualFold(s, "CMPL_OPERATOR"):
+	case (s == "Cmpl·Operator") || pkg__strings.EqualFold(s, "Cmpl·Operator"):
 		this = CMPL_OPERATOR
-	case (s == "CMPL_TYPEPARAMETER") || pkg__strings.EqualFold(s, "CMPL_TYPEPARAMETER"):
+	case (s == "Cmpl·Typeparameter") || pkg__strings.EqualFold(s, "Cmpl·Typeparameter"):
 		this = CMPL_TYPEPARAMETER
 	default:
 		goto tryParseNum
@@ -1662,56 +1662,56 @@ func CompletionFromGoString(s string) (this Completion, err error) {
 	if (len(s) < 9) || (s[0:5] != "CMPL_") {
 		goto tryParseNum
 	}
-	switch {
-	case s == "CMPL_TEXT":
+	switch s {
+	case "CMPL_TEXT":
 		this = CMPL_TEXT
-	case s == "CMPL_METHOD":
+	case "CMPL_METHOD":
 		this = CMPL_METHOD
-	case s == "CMPL_FUNCTION":
+	case "CMPL_FUNCTION":
 		this = CMPL_FUNCTION
-	case s == "CMPL_CONSTRUCTOR":
+	case "CMPL_CONSTRUCTOR":
 		this = CMPL_CONSTRUCTOR
-	case s == "CMPL_FIELD":
+	case "CMPL_FIELD":
 		this = CMPL_FIELD
-	case s == "CMPL_VARIABLE":
+	case "CMPL_VARIABLE":
 		this = CMPL_VARIABLE
-	case s == "CMPL_CLASS":
+	case "CMPL_CLASS":
 		this = CMPL_CLASS
-	case s == "CMPL_INTERFACE":
+	case "CMPL_INTERFACE":
 		this = CMPL_INTERFACE
-	case s == "CMPL_MODULE":
+	case "CMPL_MODULE":
 		this = CMPL_MODULE
-	case s == "CMPL_PROPERTY":
+	case "CMPL_PROPERTY":
 		this = CMPL_PROPERTY
-	case s == "CMPL_UNIT":
+	case "CMPL_UNIT":
 		this = CMPL_UNIT
-	case s == "CMPL_VALUE":
+	case "CMPL_VALUE":
 		this = CMPL_VALUE
-	case s == "CMPL_ENUM":
+	case "CMPL_ENUM":
 		this = CMPL_ENUM
-	case s == "CMPL_KEYWORD":
+	case "CMPL_KEYWORD":
 		this = CMPL_KEYWORD
-	case s == "CMPL_SNIPPET":
+	case "CMPL_SNIPPET":
 		this = CMPL_SNIPPET
-	case s == "CMPL_COLOR":
+	case "CMPL_COLOR":
 		this = CMPL_COLOR
-	case s == "CMPL_FILE":
+	case "CMPL_FILE":
 		this = CMPL_FILE
-	case s == "CMPL_REFERENCE":
+	case "CMPL_REFERENCE":
 		this = CMPL_REFERENCE
-	case s == "CMPL_FOLDER":
+	case "CMPL_FOLDER":
 		this = CMPL_FOLDER
-	case s == "CMPL_ENUMMEMBER":
+	case "CMPL_ENUMMEMBER":
 		this = CMPL_ENUMMEMBER
-	case s == "CMPL_CONSTANT":
+	case "CMPL_CONSTANT":
 		this = CMPL_CONSTANT
-	case s == "CMPL_STRUCT":
+	case "CMPL_STRUCT":
 		this = CMPL_STRUCT
-	case s == "CMPL_EVENT":
+	case "CMPL_EVENT":
 		this = CMPL_EVENT
-	case s == "CMPL_OPERATOR":
+	case "CMPL_OPERATOR":
 		this = CMPL_OPERATOR
-	case s == "CMPL_TYPEPARAMETER":
+	case "CMPL_TYPEPARAMETER":
 		this = CMPL_TYPEPARAMETER
 	default:
 		goto tryParseNum
