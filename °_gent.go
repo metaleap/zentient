@@ -30,6 +30,9 @@ func WellknownCaddyStatuses() (names []string, values []CaddyStatus) {
 
 // String implements the `fmt.Stringer` interface.
 func (this CaddyStatus) String() (r string) {
+	if (this < CADDY_PENDING) || (this > CADDY_GOOD) {
+		goto formatNum
+	}
 	switch this {
 	case CADDY_PENDING:
 		r = "Caddy·Pending"
@@ -40,34 +43,37 @@ func (this CaddyStatus) String() (r string) {
 	case CADDY_GOOD:
 		r = "Caddy·Good"
 	default:
-		r = pkg__strconv.FormatUint((uint64)(this), 10)
+		goto formatNum
 	}
+	return
+formatNum:
+	r = pkg__strconv.FormatUint((uint64)(this), 10)
 	return
 }
 
 // CaddyStatusFromString returns the `CaddyStatus` represented by `s` (as returned by `CaddyStatus.String`, but case-insensitively), or an `error` if none exists.
 func CaddyStatusFromString(s string) (this CaddyStatus, err error) {
-	if (len(s) < 11) || (!pkg__strings.EqualFold(s[0:7], "Caddy·")) {
+	if (len(s) < 11) || (len(s) > 14) || (!pkg__strings.EqualFold(s[0:7], "Caddy·")) {
 		goto tryParseNum
 	}
 	switch {
-	case (s == "Caddy·Pending") || pkg__strings.EqualFold(s, "Caddy·Pending"):
+	case pkg__strings.EqualFold(s, "Caddy·Pending"):
 		this = CADDY_PENDING
-	case (s == "Caddy·Error") || pkg__strings.EqualFold(s, "Caddy·Error"):
+	case pkg__strings.EqualFold(s, "Caddy·Error"):
 		this = CADDY_ERROR
-	case (s == "Caddy·Busy") || pkg__strings.EqualFold(s, "Caddy·Busy"):
+	case pkg__strings.EqualFold(s, "Caddy·Busy"):
 		this = CADDY_BUSY
-	case (s == "Caddy·Good") || pkg__strings.EqualFold(s, "Caddy·Good"):
+	case pkg__strings.EqualFold(s, "Caddy·Good"):
 		this = CADDY_GOOD
 	default:
 		goto tryParseNum
 	}
 	return
 tryParseNum:
-	var thisuint8 uint64
-	thisuint8, err = pkg__strconv.ParseUint(s, 10, 8)
+	var v uint64
+	v, err = pkg__strconv.ParseUint(s, 10, 8)
 	if err == nil {
-		this = (CaddyStatus)(thisuint8)
+		this = (CaddyStatus)(v)
 	}
 	return
 }
@@ -85,6 +91,9 @@ func CaddyStatusFromStringOr(s string, fallback CaddyStatus) (this CaddyStatus) 
 
 // GoString implements the `fmt.GoStringer` interface.
 func (this CaddyStatus) GoString() (r string) {
+	if (this < CADDY_PENDING) || (this > CADDY_GOOD) {
+		goto formatNum
+	}
 	switch this {
 	case CADDY_PENDING:
 		r = "CADDY_PENDING"
@@ -95,14 +104,17 @@ func (this CaddyStatus) GoString() (r string) {
 	case CADDY_GOOD:
 		r = "CADDY_GOOD"
 	default:
-		r = pkg__strconv.FormatUint((uint64)(this), 10)
+		goto formatNum
 	}
+	return
+formatNum:
+	r = pkg__strconv.FormatUint((uint64)(this), 10)
 	return
 }
 
 // CaddyStatusFromGoString returns the `CaddyStatus` represented by `s` (as returned by `CaddyStatus.GoString`, and case-sensitively), or an `error` if none exists.
 func CaddyStatusFromGoString(s string) (this CaddyStatus, err error) {
-	if (len(s) < 10) || (s[0:6] != "CADDY_") {
+	if (len(s) < 10) || (len(s) > 13) || (s[0:6] != "CADDY_") {
 		goto tryParseNum
 	}
 	switch s {
@@ -119,10 +131,10 @@ func CaddyStatusFromGoString(s string) (this CaddyStatus, err error) {
 	}
 	return
 tryParseNum:
-	var thisuint8 uint64
-	thisuint8, err = pkg__strconv.ParseUint(s, 10, 8)
+	var v uint64
+	v, err = pkg__strconv.ParseUint(s, 10, 8)
 	if err == nil {
-		this = (CaddyStatus)(thisuint8)
+		this = (CaddyStatus)(v)
 	}
 	return
 }
@@ -397,6 +409,9 @@ func WellknownIpcIDses() (names []string, values []IpcIDs) {
 
 // String implements the `fmt.Stringer` interface.
 func (this IpcIDs) String() (r string) {
+	if (this < IPCID_MENUS_MAIN) || (this > IPCID_EXTRAS_QUERY_RUN) {
+		goto formatNum
+	}
 	switch this {
 	case IPCID_MENUS_MAIN:
 		r = "Ipcid·Menus·Main"
@@ -497,124 +512,127 @@ func (this IpcIDs) String() (r string) {
 	case IPCID_EXTRAS_QUERY_RUN:
 		r = "Ipcid·Extras·Query·Run"
 	default:
-		r = pkg__strconv.FormatUint((uint64)(this), 10)
+		goto formatNum
 	}
+	return
+formatNum:
+	r = pkg__strconv.FormatUint((uint64)(this), 10)
 	return
 }
 
 // IpcIDsFromString returns the `IpcIDs` represented by `s` (as returned by `IpcIDs.String`, but case-insensitively), or an `error` if none exists.
 func IpcIDsFromString(s string) (this IpcIDs, err error) {
-	if (len(s) < 15) || (!pkg__strings.EqualFold(s[0:7], "Ipcid·")) {
+	if (len(s) < 15) || (len(s) > 30) || (!pkg__strings.EqualFold(s[0:7], "Ipcid·")) {
 		goto tryParseNum
 	}
 	switch {
-	case (s == "Ipcid·Menus·Main") || pkg__strings.EqualFold(s, "Ipcid·Menus·Main"):
+	case pkg__strings.EqualFold(s, "Ipcid·Menus·Main"):
 		this = IPCID_MENUS_MAIN
-	case (s == "Ipcid·Menus·Pkgs") || pkg__strings.EqualFold(s, "Ipcid·Menus·Pkgs"):
+	case pkg__strings.EqualFold(s, "Ipcid·Menus·Pkgs"):
 		this = IPCID_MENUS_PKGS
-	case (s == "Ipcid·Menus·Tools") || pkg__strings.EqualFold(s, "Ipcid·Menus·Tools"):
+	case pkg__strings.EqualFold(s, "Ipcid·Menus·Tools"):
 		this = IPCID_MENUS_TOOLS
-	case (s == "Ipcid·Obj·Snapshot") || pkg__strings.EqualFold(s, "Ipcid·Obj·Snapshot"):
+	case pkg__strings.EqualFold(s, "Ipcid·Obj·Snapshot"):
 		this = IPCID_OBJ_SNAPSHOT
-	case (s == "Ipcid·Page·Html") || pkg__strings.EqualFold(s, "Ipcid·Page·Html"):
+	case pkg__strings.EqualFold(s, "Ipcid·Page·Html"):
 		this = IPCID_PAGE_HTML
-	case (s == "Ipcid·Treeview·Getitem") || pkg__strings.EqualFold(s, "Ipcid·Treeview·Getitem"):
+	case pkg__strings.EqualFold(s, "Ipcid·Treeview·Getitem"):
 		this = IPCID_TREEVIEW_GETITEM
-	case (s == "Ipcid·Treeview·Children") || pkg__strings.EqualFold(s, "Ipcid·Treeview·Children"):
+	case pkg__strings.EqualFold(s, "Ipcid·Treeview·Children"):
 		this = IPCID_TREEVIEW_CHILDREN
-	case (s == "Ipcid·Treeview·Changed") || pkg__strings.EqualFold(s, "Ipcid·Treeview·Changed"):
+	case pkg__strings.EqualFold(s, "Ipcid·Treeview·Changed"):
 		this = IPCID_TREEVIEW_CHANGED
-	case (s == "Ipcid·Cfg·Resetall") || pkg__strings.EqualFold(s, "Ipcid·Cfg·Resetall"):
+	case pkg__strings.EqualFold(s, "Ipcid·Cfg·Resetall"):
 		this = IPCID_CFG_RESETALL
-	case (s == "Ipcid·Cfg·List") || pkg__strings.EqualFold(s, "Ipcid·Cfg·List"):
+	case pkg__strings.EqualFold(s, "Ipcid·Cfg·List"):
 		this = IPCID_CFG_LIST
-	case (s == "Ipcid·Cfg·Set") || pkg__strings.EqualFold(s, "Ipcid·Cfg·Set"):
+	case pkg__strings.EqualFold(s, "Ipcid·Cfg·Set"):
 		this = IPCID_CFG_SET
-	case (s == "Ipcid·Notify·Info") || pkg__strings.EqualFold(s, "Ipcid·Notify·Info"):
+	case pkg__strings.EqualFold(s, "Ipcid·Notify·Info"):
 		this = IPCID_NOTIFY_INFO
-	case (s == "Ipcid·Notify·Warn") || pkg__strings.EqualFold(s, "Ipcid·Notify·Warn"):
+	case pkg__strings.EqualFold(s, "Ipcid·Notify·Warn"):
 		this = IPCID_NOTIFY_WARN
-	case (s == "Ipcid·Notify·Err") || pkg__strings.EqualFold(s, "Ipcid·Notify·Err"):
+	case pkg__strings.EqualFold(s, "Ipcid·Notify·Err"):
 		this = IPCID_NOTIFY_ERR
-	case (s == "Ipcid·Proj·Changed") || pkg__strings.EqualFold(s, "Ipcid·Proj·Changed"):
+	case pkg__strings.EqualFold(s, "Ipcid·Proj·Changed"):
 		this = IPCID_PROJ_CHANGED
-	case (s == "Ipcid·Proj·Pollevts") || pkg__strings.EqualFold(s, "Ipcid·Proj·Pollevts"):
+	case pkg__strings.EqualFold(s, "Ipcid·Proj·Pollevts"):
 		this = IPCID_PROJ_POLLEVTS
-	case (s == "Ipcid·Srcdiag·List") || pkg__strings.EqualFold(s, "Ipcid·Srcdiag·List"):
+	case pkg__strings.EqualFold(s, "Ipcid·Srcdiag·List"):
 		this = IPCID_SRCDIAG_LIST
-	case (s == "Ipcid·Srcdiag·Run·Curfile") || pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Run·Curfile"):
+	case pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Run·Curfile"):
 		this = IPCID_SRCDIAG_RUN_CURFILE
-	case (s == "Ipcid·Srcdiag·Run·Openfiles") || pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Run·Openfiles"):
+	case pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Run·Openfiles"):
 		this = IPCID_SRCDIAG_RUN_OPENFILES
-	case (s == "Ipcid·Srcdiag·Run·Allfiles") || pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Run·Allfiles"):
+	case pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Run·Allfiles"):
 		this = IPCID_SRCDIAG_RUN_ALLFILES
-	case (s == "Ipcid·Srcdiag·Forgetall") || pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Forgetall"):
+	case pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Forgetall"):
 		this = IPCID_SRCDIAG_FORGETALL
-	case (s == "Ipcid·Srcdiag·Peekhidden") || pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Peekhidden"):
+	case pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Peekhidden"):
 		this = IPCID_SRCDIAG_PEEKHIDDEN
-	case (s == "Ipcid·Srcdiag·Pub") || pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Pub"):
+	case pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Pub"):
 		this = IPCID_SRCDIAG_PUB
-	case (s == "Ipcid·Srcdiag·Auto·Toggle") || pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Auto·Toggle"):
+	case pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Auto·Toggle"):
 		this = IPCID_SRCDIAG_AUTO_TOGGLE
-	case (s == "Ipcid·Srcdiag·Auto·All") || pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Auto·All"):
+	case pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Auto·All"):
 		this = IPCID_SRCDIAG_AUTO_ALL
-	case (s == "Ipcid·Srcdiag·Auto·None") || pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Auto·None"):
+	case pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Auto·None"):
 		this = IPCID_SRCDIAG_AUTO_NONE
-	case (s == "Ipcid·Srcdiag·Started") || pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Started"):
+	case pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Started"):
 		this = IPCID_SRCDIAG_STARTED
-	case (s == "Ipcid·Srcdiag·Finished") || pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Finished"):
+	case pkg__strings.EqualFold(s, "Ipcid·Srcdiag·Finished"):
 		this = IPCID_SRCDIAG_FINISHED
-	case (s == "Ipcid·Srcmod·Fmt·Setdefmenu") || pkg__strings.EqualFold(s, "Ipcid·Srcmod·Fmt·Setdefmenu"):
+	case pkg__strings.EqualFold(s, "Ipcid·Srcmod·Fmt·Setdefmenu"):
 		this = IPCID_SRCMOD_FMT_SETDEFMENU
-	case (s == "Ipcid·Srcmod·Fmt·Setdefpick") || pkg__strings.EqualFold(s, "Ipcid·Srcmod·Fmt·Setdefpick"):
+	case pkg__strings.EqualFold(s, "Ipcid·Srcmod·Fmt·Setdefpick"):
 		this = IPCID_SRCMOD_FMT_SETDEFPICK
-	case (s == "Ipcid·Srcmod·Fmt·Runonfile") || pkg__strings.EqualFold(s, "Ipcid·Srcmod·Fmt·Runonfile"):
+	case pkg__strings.EqualFold(s, "Ipcid·Srcmod·Fmt·Runonfile"):
 		this = IPCID_SRCMOD_FMT_RUNONFILE
-	case (s == "Ipcid·Srcmod·Fmt·Runonsel") || pkg__strings.EqualFold(s, "Ipcid·Srcmod·Fmt·Runonsel"):
+	case pkg__strings.EqualFold(s, "Ipcid·Srcmod·Fmt·Runonsel"):
 		this = IPCID_SRCMOD_FMT_RUNONSEL
-	case (s == "Ipcid·Srcmod·Rename") || pkg__strings.EqualFold(s, "Ipcid·Srcmod·Rename"):
+	case pkg__strings.EqualFold(s, "Ipcid·Srcmod·Rename"):
 		this = IPCID_SRCMOD_RENAME
-	case (s == "Ipcid·Srcmod·Actions") || pkg__strings.EqualFold(s, "Ipcid·Srcmod·Actions"):
+	case pkg__strings.EqualFold(s, "Ipcid·Srcmod·Actions"):
 		this = IPCID_SRCMOD_ACTIONS
-	case (s == "Ipcid·Srcintel·Hover") || pkg__strings.EqualFold(s, "Ipcid·Srcintel·Hover"):
+	case pkg__strings.EqualFold(s, "Ipcid·Srcintel·Hover"):
 		this = IPCID_SRCINTEL_HOVER
-	case (s == "Ipcid·Srcintel·Syms·File") || pkg__strings.EqualFold(s, "Ipcid·Srcintel·Syms·File"):
+	case pkg__strings.EqualFold(s, "Ipcid·Srcintel·Syms·File"):
 		this = IPCID_SRCINTEL_SYMS_FILE
-	case (s == "Ipcid·Srcintel·Syms·Proj") || pkg__strings.EqualFold(s, "Ipcid·Srcintel·Syms·Proj"):
+	case pkg__strings.EqualFold(s, "Ipcid·Srcintel·Syms·Proj"):
 		this = IPCID_SRCINTEL_SYMS_PROJ
-	case (s == "Ipcid·Srcintel·Cmpl·Items") || pkg__strings.EqualFold(s, "Ipcid·Srcintel·Cmpl·Items"):
+	case pkg__strings.EqualFold(s, "Ipcid·Srcintel·Cmpl·Items"):
 		this = IPCID_SRCINTEL_CMPL_ITEMS
-	case (s == "Ipcid·Srcintel·Cmpl·Details") || pkg__strings.EqualFold(s, "Ipcid·Srcintel·Cmpl·Details"):
+	case pkg__strings.EqualFold(s, "Ipcid·Srcintel·Cmpl·Details"):
 		this = IPCID_SRCINTEL_CMPL_DETAILS
-	case (s == "Ipcid·Srcintel·Highlights") || pkg__strings.EqualFold(s, "Ipcid·Srcintel·Highlights"):
+	case pkg__strings.EqualFold(s, "Ipcid·Srcintel·Highlights"):
 		this = IPCID_SRCINTEL_HIGHLIGHTS
-	case (s == "Ipcid·Srcintel·Signature") || pkg__strings.EqualFold(s, "Ipcid·Srcintel·Signature"):
+	case pkg__strings.EqualFold(s, "Ipcid·Srcintel·Signature"):
 		this = IPCID_SRCINTEL_SIGNATURE
-	case (s == "Ipcid·Srcintel·References") || pkg__strings.EqualFold(s, "Ipcid·Srcintel·References"):
+	case pkg__strings.EqualFold(s, "Ipcid·Srcintel·References"):
 		this = IPCID_SRCINTEL_REFERENCES
-	case (s == "Ipcid·Srcintel·Defsym") || pkg__strings.EqualFold(s, "Ipcid·Srcintel·Defsym"):
+	case pkg__strings.EqualFold(s, "Ipcid·Srcintel·Defsym"):
 		this = IPCID_SRCINTEL_DEFSYM
-	case (s == "Ipcid·Srcintel·Deftype") || pkg__strings.EqualFold(s, "Ipcid·Srcintel·Deftype"):
+	case pkg__strings.EqualFold(s, "Ipcid·Srcintel·Deftype"):
 		this = IPCID_SRCINTEL_DEFTYPE
-	case (s == "Ipcid·Srcintel·Defimpl") || pkg__strings.EqualFold(s, "Ipcid·Srcintel·Defimpl"):
+	case pkg__strings.EqualFold(s, "Ipcid·Srcintel·Defimpl"):
 		this = IPCID_SRCINTEL_DEFIMPL
-	case (s == "Ipcid·Extras·Intel·List") || pkg__strings.EqualFold(s, "Ipcid·Extras·Intel·List"):
+	case pkg__strings.EqualFold(s, "Ipcid·Extras·Intel·List"):
 		this = IPCID_EXTRAS_INTEL_LIST
-	case (s == "Ipcid·Extras·Intel·Run") || pkg__strings.EqualFold(s, "Ipcid·Extras·Intel·Run"):
+	case pkg__strings.EqualFold(s, "Ipcid·Extras·Intel·Run"):
 		this = IPCID_EXTRAS_INTEL_RUN
-	case (s == "Ipcid·Extras·Query·List") || pkg__strings.EqualFold(s, "Ipcid·Extras·Query·List"):
+	case pkg__strings.EqualFold(s, "Ipcid·Extras·Query·List"):
 		this = IPCID_EXTRAS_QUERY_LIST
-	case (s == "Ipcid·Extras·Query·Run") || pkg__strings.EqualFold(s, "Ipcid·Extras·Query·Run"):
+	case pkg__strings.EqualFold(s, "Ipcid·Extras·Query·Run"):
 		this = IPCID_EXTRAS_QUERY_RUN
 	default:
 		goto tryParseNum
 	}
 	return
 tryParseNum:
-	var thisuint8 uint64
-	thisuint8, err = pkg__strconv.ParseUint(s, 10, 8)
+	var v uint64
+	v, err = pkg__strconv.ParseUint(s, 10, 8)
 	if err == nil {
-		this = (IpcIDs)(thisuint8)
+		this = (IpcIDs)(v)
 	}
 	return
 }
@@ -632,6 +650,9 @@ func IpcIDsFromStringOr(s string, fallback IpcIDs) (this IpcIDs) {
 
 // GoString implements the `fmt.GoStringer` interface.
 func (this IpcIDs) GoString() (r string) {
+	if (this < IPCID_MENUS_MAIN) || (this > IPCID_EXTRAS_QUERY_RUN) {
+		goto formatNum
+	}
 	switch this {
 	case IPCID_MENUS_MAIN:
 		r = "IPCID_MENUS_MAIN"
@@ -732,14 +753,17 @@ func (this IpcIDs) GoString() (r string) {
 	case IPCID_EXTRAS_QUERY_RUN:
 		r = "IPCID_EXTRAS_QUERY_RUN"
 	default:
-		r = pkg__strconv.FormatUint((uint64)(this), 10)
+		goto formatNum
 	}
+	return
+formatNum:
+	r = pkg__strconv.FormatUint((uint64)(this), 10)
 	return
 }
 
 // IpcIDsFromGoString returns the `IpcIDs` represented by `s` (as returned by `IpcIDs.GoString`, and case-sensitively), or an `error` if none exists.
 func IpcIDsFromGoString(s string) (this IpcIDs, err error) {
-	if (len(s) < 13) || (s[0:6] != "IPCID_") {
+	if (len(s) < 13) || (len(s) > 27) || (s[0:6] != "IPCID_") {
 		goto tryParseNum
 	}
 	switch s {
@@ -846,10 +870,10 @@ func IpcIDsFromGoString(s string) (this IpcIDs, err error) {
 	}
 	return
 tryParseNum:
-	var thisuint8 uint64
-	thisuint8, err = pkg__strconv.ParseUint(s, 10, 8)
+	var v uint64
+	v, err = pkg__strconv.ParseUint(s, 10, 8)
 	if err == nil {
-		this = (IpcIDs)(thisuint8)
+		this = (IpcIDs)(v)
 	}
 	return
 }
@@ -891,6 +915,9 @@ func WellknownDiagSeverities() (names []string, values []DiagSeverity) {
 
 // String implements the `fmt.Stringer` interface.
 func (this DiagSeverity) String() (r string) {
+	if (this < DIAG_SEV_ERR) || (this > DIAG_SEV_HINT) {
+		goto formatNum
+	}
 	switch this {
 	case DIAG_SEV_ERR:
 		r = "Diag·Sev·Err"
@@ -901,34 +928,37 @@ func (this DiagSeverity) String() (r string) {
 	case DIAG_SEV_HINT:
 		r = "Diag·Sev·Hint"
 	default:
-		r = pkg__strconv.Itoa((int)(this))
+		goto formatNum
 	}
+	return
+formatNum:
+	r = pkg__strconv.Itoa((int)(this))
 	return
 }
 
 // DiagSeverityFromString returns the `DiagSeverity` represented by `s` (as returned by `DiagSeverity.String`, but case-insensitively), or an `error` if none exists.
 func DiagSeverityFromString(s string) (this DiagSeverity, err error) {
-	if (len(s) < 14) || (!pkg__strings.EqualFold(s[0:11], "Diag·Sev·")) {
+	if (len(s) < 14) || (len(s) > 15) || (!pkg__strings.EqualFold(s[0:11], "Diag·Sev·")) {
 		goto tryParseNum
 	}
 	switch {
-	case (s == "Diag·Sev·Err") || pkg__strings.EqualFold(s, "Diag·Sev·Err"):
+	case pkg__strings.EqualFold(s, "Diag·Sev·Err"):
 		this = DIAG_SEV_ERR
-	case (s == "Diag·Sev·Warn") || pkg__strings.EqualFold(s, "Diag·Sev·Warn"):
+	case pkg__strings.EqualFold(s, "Diag·Sev·Warn"):
 		this = DIAG_SEV_WARN
-	case (s == "Diag·Sev·Info") || pkg__strings.EqualFold(s, "Diag·Sev·Info"):
+	case pkg__strings.EqualFold(s, "Diag·Sev·Info"):
 		this = DIAG_SEV_INFO
-	case (s == "Diag·Sev·Hint") || pkg__strings.EqualFold(s, "Diag·Sev·Hint"):
+	case pkg__strings.EqualFold(s, "Diag·Sev·Hint"):
 		this = DIAG_SEV_HINT
 	default:
 		goto tryParseNum
 	}
 	return
 tryParseNum:
-	var thisint int
-	thisint, err = pkg__strconv.Atoi(s)
+	var v int
+	v, err = pkg__strconv.Atoi(s)
 	if err == nil {
-		this = (DiagSeverity)(thisint)
+		this = (DiagSeverity)(v)
 	}
 	return
 }
@@ -946,6 +976,9 @@ func DiagSeverityFromStringOr(s string, fallback DiagSeverity) (this DiagSeverit
 
 // GoString implements the `fmt.GoStringer` interface.
 func (this DiagSeverity) GoString() (r string) {
+	if (this < DIAG_SEV_ERR) || (this > DIAG_SEV_HINT) {
+		goto formatNum
+	}
 	switch this {
 	case DIAG_SEV_ERR:
 		r = "DIAG_SEV_ERR"
@@ -956,14 +989,17 @@ func (this DiagSeverity) GoString() (r string) {
 	case DIAG_SEV_HINT:
 		r = "DIAG_SEV_HINT"
 	default:
-		r = pkg__strconv.Itoa((int)(this))
+		goto formatNum
 	}
+	return
+formatNum:
+	r = pkg__strconv.Itoa((int)(this))
 	return
 }
 
 // DiagSeverityFromGoString returns the `DiagSeverity` represented by `s` (as returned by `DiagSeverity.GoString`, and case-sensitively), or an `error` if none exists.
 func DiagSeverityFromGoString(s string) (this DiagSeverity, err error) {
-	if (len(s) < 12) || (s[0:9] != "DIAG_SEV_") {
+	if (len(s) < 12) || (len(s) > 13) || (s[0:9] != "DIAG_SEV_") {
 		goto tryParseNum
 	}
 	switch s {
@@ -980,10 +1016,10 @@ func DiagSeverityFromGoString(s string) (this DiagSeverity, err error) {
 	}
 	return
 tryParseNum:
-	var thisint int
-	thisint, err = pkg__strconv.Atoi(s)
+	var v int
+	v, err = pkg__strconv.Atoi(s)
 	if err == nil {
-		this = (DiagSeverity)(thisint)
+		this = (DiagSeverity)(v)
 	}
 	return
 }
@@ -1088,6 +1124,9 @@ func WellknownSymbols() (names []string, values []Symbol) {
 
 // String implements the `fmt.Stringer` interface.
 func (this Symbol) String() (r string) {
+	if (this < SYM_FILE) || (this > SYM_TYPEPARAMETER) {
+		goto formatNum
+	}
 	switch this {
 	case SYM_FILE:
 		r = "Sym·File"
@@ -1142,78 +1181,81 @@ func (this Symbol) String() (r string) {
 	case SYM_TYPEPARAMETER:
 		r = "Sym·Typeparameter"
 	default:
-		r = pkg__strconv.FormatUint((uint64)(this), 10)
+		goto formatNum
 	}
+	return
+formatNum:
+	r = pkg__strconv.FormatUint((uint64)(this), 10)
 	return
 }
 
 // SymbolFromString returns the `Symbol` represented by `s` (as returned by `Symbol.String`, but case-insensitively), or an `error` if none exists.
 func SymbolFromString(s string) (this Symbol, err error) {
-	if (len(s) < 8) || (!pkg__strings.EqualFold(s[0:5], "Sym·")) {
+	if (len(s) < 8) || (len(s) > 18) || (!pkg__strings.EqualFold(s[0:5], "Sym·")) {
 		goto tryParseNum
 	}
 	switch {
-	case (s == "Sym·File") || pkg__strings.EqualFold(s, "Sym·File"):
+	case pkg__strings.EqualFold(s, "Sym·File"):
 		this = SYM_FILE
-	case (s == "Sym·Module") || pkg__strings.EqualFold(s, "Sym·Module"):
+	case pkg__strings.EqualFold(s, "Sym·Module"):
 		this = SYM_MODULE
-	case (s == "Sym·Namespace") || pkg__strings.EqualFold(s, "Sym·Namespace"):
+	case pkg__strings.EqualFold(s, "Sym·Namespace"):
 		this = SYM_NAMESPACE
-	case (s == "Sym·Package") || pkg__strings.EqualFold(s, "Sym·Package"):
+	case pkg__strings.EqualFold(s, "Sym·Package"):
 		this = SYM_PACKAGE
-	case (s == "Sym·Class") || pkg__strings.EqualFold(s, "Sym·Class"):
+	case pkg__strings.EqualFold(s, "Sym·Class"):
 		this = SYM_CLASS
-	case (s == "Sym·Method") || pkg__strings.EqualFold(s, "Sym·Method"):
+	case pkg__strings.EqualFold(s, "Sym·Method"):
 		this = SYM_METHOD
-	case (s == "Sym·Property") || pkg__strings.EqualFold(s, "Sym·Property"):
+	case pkg__strings.EqualFold(s, "Sym·Property"):
 		this = SYM_PROPERTY
-	case (s == "Sym·Field") || pkg__strings.EqualFold(s, "Sym·Field"):
+	case pkg__strings.EqualFold(s, "Sym·Field"):
 		this = SYM_FIELD
-	case (s == "Sym·Constructor") || pkg__strings.EqualFold(s, "Sym·Constructor"):
+	case pkg__strings.EqualFold(s, "Sym·Constructor"):
 		this = SYM_CONSTRUCTOR
-	case (s == "Sym·Enum") || pkg__strings.EqualFold(s, "Sym·Enum"):
+	case pkg__strings.EqualFold(s, "Sym·Enum"):
 		this = SYM_ENUM
-	case (s == "Sym·Interface") || pkg__strings.EqualFold(s, "Sym·Interface"):
+	case pkg__strings.EqualFold(s, "Sym·Interface"):
 		this = SYM_INTERFACE
-	case (s == "Sym·Function") || pkg__strings.EqualFold(s, "Sym·Function"):
+	case pkg__strings.EqualFold(s, "Sym·Function"):
 		this = SYM_FUNCTION
-	case (s == "Sym·Variable") || pkg__strings.EqualFold(s, "Sym·Variable"):
+	case pkg__strings.EqualFold(s, "Sym·Variable"):
 		this = SYM_VARIABLE
-	case (s == "Sym·Constant") || pkg__strings.EqualFold(s, "Sym·Constant"):
+	case pkg__strings.EqualFold(s, "Sym·Constant"):
 		this = SYM_CONSTANT
-	case (s == "Sym·String") || pkg__strings.EqualFold(s, "Sym·String"):
+	case pkg__strings.EqualFold(s, "Sym·String"):
 		this = SYM_STRING
-	case (s == "Sym·Number") || pkg__strings.EqualFold(s, "Sym·Number"):
+	case pkg__strings.EqualFold(s, "Sym·Number"):
 		this = SYM_NUMBER
-	case (s == "Sym·Boolean") || pkg__strings.EqualFold(s, "Sym·Boolean"):
+	case pkg__strings.EqualFold(s, "Sym·Boolean"):
 		this = SYM_BOOLEAN
-	case (s == "Sym·Array") || pkg__strings.EqualFold(s, "Sym·Array"):
+	case pkg__strings.EqualFold(s, "Sym·Array"):
 		this = SYM_ARRAY
-	case (s == "Sym·Object") || pkg__strings.EqualFold(s, "Sym·Object"):
+	case pkg__strings.EqualFold(s, "Sym·Object"):
 		this = SYM_OBJECT
-	case (s == "Sym·Key") || pkg__strings.EqualFold(s, "Sym·Key"):
+	case pkg__strings.EqualFold(s, "Sym·Key"):
 		this = SYM_KEY
-	case (s == "Sym·Null") || pkg__strings.EqualFold(s, "Sym·Null"):
+	case pkg__strings.EqualFold(s, "Sym·Null"):
 		this = SYM_NULL
-	case (s == "Sym·Enummember") || pkg__strings.EqualFold(s, "Sym·Enummember"):
+	case pkg__strings.EqualFold(s, "Sym·Enummember"):
 		this = SYM_ENUMMEMBER
-	case (s == "Sym·Struct") || pkg__strings.EqualFold(s, "Sym·Struct"):
+	case pkg__strings.EqualFold(s, "Sym·Struct"):
 		this = SYM_STRUCT
-	case (s == "Sym·Event") || pkg__strings.EqualFold(s, "Sym·Event"):
+	case pkg__strings.EqualFold(s, "Sym·Event"):
 		this = SYM_EVENT
-	case (s == "Sym·Operator") || pkg__strings.EqualFold(s, "Sym·Operator"):
+	case pkg__strings.EqualFold(s, "Sym·Operator"):
 		this = SYM_OPERATOR
-	case (s == "Sym·Typeparameter") || pkg__strings.EqualFold(s, "Sym·Typeparameter"):
+	case pkg__strings.EqualFold(s, "Sym·Typeparameter"):
 		this = SYM_TYPEPARAMETER
 	default:
 		goto tryParseNum
 	}
 	return
 tryParseNum:
-	var thisuint8 uint64
-	thisuint8, err = pkg__strconv.ParseUint(s, 10, 8)
+	var v uint64
+	v, err = pkg__strconv.ParseUint(s, 10, 8)
 	if err == nil {
-		this = (Symbol)(thisuint8)
+		this = (Symbol)(v)
 	}
 	return
 }
@@ -1231,6 +1273,9 @@ func SymbolFromStringOr(s string, fallback Symbol) (this Symbol) {
 
 // GoString implements the `fmt.GoStringer` interface.
 func (this Symbol) GoString() (r string) {
+	if (this < SYM_FILE) || (this > SYM_TYPEPARAMETER) {
+		goto formatNum
+	}
 	switch this {
 	case SYM_FILE:
 		r = "SYM_FILE"
@@ -1285,14 +1330,17 @@ func (this Symbol) GoString() (r string) {
 	case SYM_TYPEPARAMETER:
 		r = "SYM_TYPEPARAMETER"
 	default:
-		r = pkg__strconv.FormatUint((uint64)(this), 10)
+		goto formatNum
 	}
+	return
+formatNum:
+	r = pkg__strconv.FormatUint((uint64)(this), 10)
 	return
 }
 
 // SymbolFromGoString returns the `Symbol` represented by `s` (as returned by `Symbol.GoString`, and case-sensitively), or an `error` if none exists.
 func SymbolFromGoString(s string) (this Symbol, err error) {
-	if (len(s) < 7) || (s[0:4] != "SYM_") {
+	if (len(s) < 7) || (len(s) > 17) || (s[0:4] != "SYM_") {
 		goto tryParseNum
 	}
 	switch s {
@@ -1353,10 +1401,10 @@ func SymbolFromGoString(s string) (this Symbol, err error) {
 	}
 	return
 tryParseNum:
-	var thisuint8 uint64
-	thisuint8, err = pkg__strconv.ParseUint(s, 10, 8)
+	var v uint64
+	v, err = pkg__strconv.ParseUint(s, 10, 8)
 	if err == nil {
-		this = (Symbol)(thisuint8)
+		this = (Symbol)(v)
 	}
 	return
 }
@@ -1461,6 +1509,9 @@ func WellknownCompletions() (names []string, values []Completion) {
 
 // String implements the `fmt.Stringer` interface.
 func (this Completion) String() (r string) {
+	if (this < CMPL_TEXT) || (this > CMPL_TYPEPARAMETER) {
+		goto formatNum
+	}
 	switch this {
 	case CMPL_TEXT:
 		r = "Cmpl·Text"
@@ -1513,76 +1564,79 @@ func (this Completion) String() (r string) {
 	case CMPL_TYPEPARAMETER:
 		r = "Cmpl·Typeparameter"
 	default:
-		r = pkg__strconv.FormatUint((uint64)(this), 10)
+		goto formatNum
 	}
+	return
+formatNum:
+	r = pkg__strconv.FormatUint((uint64)(this), 10)
 	return
 }
 
 // CompletionFromString returns the `Completion` represented by `s` (as returned by `Completion.String`, but case-insensitively), or an `error` if none exists.
 func CompletionFromString(s string) (this Completion, err error) {
-	if (len(s) < 10) || (!pkg__strings.EqualFold(s[0:6], "Cmpl·")) {
+	if (len(s) < 10) || (len(s) > 19) || (!pkg__strings.EqualFold(s[0:6], "Cmpl·")) {
 		goto tryParseNum
 	}
 	switch {
-	case (s == "Cmpl·Text") || pkg__strings.EqualFold(s, "Cmpl·Text"):
+	case pkg__strings.EqualFold(s, "Cmpl·Text"):
 		this = CMPL_TEXT
-	case (s == "Cmpl·Method") || pkg__strings.EqualFold(s, "Cmpl·Method"):
+	case pkg__strings.EqualFold(s, "Cmpl·Method"):
 		this = CMPL_METHOD
-	case (s == "Cmpl·Function") || pkg__strings.EqualFold(s, "Cmpl·Function"):
+	case pkg__strings.EqualFold(s, "Cmpl·Function"):
 		this = CMPL_FUNCTION
-	case (s == "Cmpl·Constructor") || pkg__strings.EqualFold(s, "Cmpl·Constructor"):
+	case pkg__strings.EqualFold(s, "Cmpl·Constructor"):
 		this = CMPL_CONSTRUCTOR
-	case (s == "Cmpl·Field") || pkg__strings.EqualFold(s, "Cmpl·Field"):
+	case pkg__strings.EqualFold(s, "Cmpl·Field"):
 		this = CMPL_FIELD
-	case (s == "Cmpl·Variable") || pkg__strings.EqualFold(s, "Cmpl·Variable"):
+	case pkg__strings.EqualFold(s, "Cmpl·Variable"):
 		this = CMPL_VARIABLE
-	case (s == "Cmpl·Class") || pkg__strings.EqualFold(s, "Cmpl·Class"):
+	case pkg__strings.EqualFold(s, "Cmpl·Class"):
 		this = CMPL_CLASS
-	case (s == "Cmpl·Interface") || pkg__strings.EqualFold(s, "Cmpl·Interface"):
+	case pkg__strings.EqualFold(s, "Cmpl·Interface"):
 		this = CMPL_INTERFACE
-	case (s == "Cmpl·Module") || pkg__strings.EqualFold(s, "Cmpl·Module"):
+	case pkg__strings.EqualFold(s, "Cmpl·Module"):
 		this = CMPL_MODULE
-	case (s == "Cmpl·Property") || pkg__strings.EqualFold(s, "Cmpl·Property"):
+	case pkg__strings.EqualFold(s, "Cmpl·Property"):
 		this = CMPL_PROPERTY
-	case (s == "Cmpl·Unit") || pkg__strings.EqualFold(s, "Cmpl·Unit"):
+	case pkg__strings.EqualFold(s, "Cmpl·Unit"):
 		this = CMPL_UNIT
-	case (s == "Cmpl·Value") || pkg__strings.EqualFold(s, "Cmpl·Value"):
+	case pkg__strings.EqualFold(s, "Cmpl·Value"):
 		this = CMPL_VALUE
-	case (s == "Cmpl·Enum") || pkg__strings.EqualFold(s, "Cmpl·Enum"):
+	case pkg__strings.EqualFold(s, "Cmpl·Enum"):
 		this = CMPL_ENUM
-	case (s == "Cmpl·Keyword") || pkg__strings.EqualFold(s, "Cmpl·Keyword"):
+	case pkg__strings.EqualFold(s, "Cmpl·Keyword"):
 		this = CMPL_KEYWORD
-	case (s == "Cmpl·Snippet") || pkg__strings.EqualFold(s, "Cmpl·Snippet"):
+	case pkg__strings.EqualFold(s, "Cmpl·Snippet"):
 		this = CMPL_SNIPPET
-	case (s == "Cmpl·Color") || pkg__strings.EqualFold(s, "Cmpl·Color"):
+	case pkg__strings.EqualFold(s, "Cmpl·Color"):
 		this = CMPL_COLOR
-	case (s == "Cmpl·File") || pkg__strings.EqualFold(s, "Cmpl·File"):
+	case pkg__strings.EqualFold(s, "Cmpl·File"):
 		this = CMPL_FILE
-	case (s == "Cmpl·Reference") || pkg__strings.EqualFold(s, "Cmpl·Reference"):
+	case pkg__strings.EqualFold(s, "Cmpl·Reference"):
 		this = CMPL_REFERENCE
-	case (s == "Cmpl·Folder") || pkg__strings.EqualFold(s, "Cmpl·Folder"):
+	case pkg__strings.EqualFold(s, "Cmpl·Folder"):
 		this = CMPL_FOLDER
-	case (s == "Cmpl·Enummember") || pkg__strings.EqualFold(s, "Cmpl·Enummember"):
+	case pkg__strings.EqualFold(s, "Cmpl·Enummember"):
 		this = CMPL_ENUMMEMBER
-	case (s == "Cmpl·Constant") || pkg__strings.EqualFold(s, "Cmpl·Constant"):
+	case pkg__strings.EqualFold(s, "Cmpl·Constant"):
 		this = CMPL_CONSTANT
-	case (s == "Cmpl·Struct") || pkg__strings.EqualFold(s, "Cmpl·Struct"):
+	case pkg__strings.EqualFold(s, "Cmpl·Struct"):
 		this = CMPL_STRUCT
-	case (s == "Cmpl·Event") || pkg__strings.EqualFold(s, "Cmpl·Event"):
+	case pkg__strings.EqualFold(s, "Cmpl·Event"):
 		this = CMPL_EVENT
-	case (s == "Cmpl·Operator") || pkg__strings.EqualFold(s, "Cmpl·Operator"):
+	case pkg__strings.EqualFold(s, "Cmpl·Operator"):
 		this = CMPL_OPERATOR
-	case (s == "Cmpl·Typeparameter") || pkg__strings.EqualFold(s, "Cmpl·Typeparameter"):
+	case pkg__strings.EqualFold(s, "Cmpl·Typeparameter"):
 		this = CMPL_TYPEPARAMETER
 	default:
 		goto tryParseNum
 	}
 	return
 tryParseNum:
-	var thisuint8 uint64
-	thisuint8, err = pkg__strconv.ParseUint(s, 10, 8)
+	var v uint64
+	v, err = pkg__strconv.ParseUint(s, 10, 8)
 	if err == nil {
-		this = (Completion)(thisuint8)
+		this = (Completion)(v)
 	}
 	return
 }
@@ -1600,6 +1654,9 @@ func CompletionFromStringOr(s string, fallback Completion) (this Completion) {
 
 // GoString implements the `fmt.GoStringer` interface.
 func (this Completion) GoString() (r string) {
+	if (this < CMPL_TEXT) || (this > CMPL_TYPEPARAMETER) {
+		goto formatNum
+	}
 	switch this {
 	case CMPL_TEXT:
 		r = "CMPL_TEXT"
@@ -1652,14 +1709,17 @@ func (this Completion) GoString() (r string) {
 	case CMPL_TYPEPARAMETER:
 		r = "CMPL_TYPEPARAMETER"
 	default:
-		r = pkg__strconv.FormatUint((uint64)(this), 10)
+		goto formatNum
 	}
+	return
+formatNum:
+	r = pkg__strconv.FormatUint((uint64)(this), 10)
 	return
 }
 
 // CompletionFromGoString returns the `Completion` represented by `s` (as returned by `Completion.GoString`, and case-sensitively), or an `error` if none exists.
 func CompletionFromGoString(s string) (this Completion, err error) {
-	if (len(s) < 9) || (s[0:5] != "CMPL_") {
+	if (len(s) < 9) || (len(s) > 18) || (s[0:5] != "CMPL_") {
 		goto tryParseNum
 	}
 	switch s {
@@ -1718,10 +1778,10 @@ func CompletionFromGoString(s string) (this Completion, err error) {
 	}
 	return
 tryParseNum:
-	var thisuint8 uint64
-	thisuint8, err = pkg__strconv.ParseUint(s, 10, 8)
+	var v uint64
+	v, err = pkg__strconv.ParseUint(s, 10, 8)
 	if err == nil {
-		this = (Completion)(thisuint8)
+		this = (Completion)(v)
 	}
 	return
 }
