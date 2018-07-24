@@ -22,9 +22,31 @@ func (this CaddyStatus) IsCADDY_GOOD() (r bool) { r = this == CADDY_GOOD; return
 // Valid returns whether the value of this `CaddyStatus` is between `CADDY_PENDING` (inclusive) and `CADDY_GOOD` (inclusive).
 func (this CaddyStatus) Valid() (r bool) { r = (this >= CADDY_PENDING) && (this <= CADDY_GOOD); return }
 
+// WellknownCaddyStatusNamesAndValues returns the `names` and `values` of all 4 well-known `CaddyStatus` enumerants.
+func WellknownCaddyStatusNamesAndValues() (namesToValues map[string]CaddyStatus) {
+	namesToValues = make(map[string]CaddyStatus, 4)
+	namesToValues["CADDY_PENDING"] = CADDY_PENDING
+	namesToValues["CADDY_ERROR"] = CADDY_ERROR
+	namesToValues["CADDY_BUSY"] = CADDY_BUSY
+	namesToValues["CADDY_GOOD"] = CADDY_GOOD
+	return
+}
+
 // WellknownCaddyStatuses returns the `names` and `values` of all 4 well-known `CaddyStatus` enumerants.
 func WellknownCaddyStatuses() (names []string, values []CaddyStatus) {
-	names, values = []string{"CADDY_PENDING", "CADDY_ERROR", "CADDY_BUSY", "CADDY_GOOD"}, []CaddyStatus{CADDY_PENDING, CADDY_ERROR, CADDY_BUSY, CADDY_GOOD}
+	names, values = WellknownCaddyStatusNames(), WellknownCaddyStatusValues()
+	return
+}
+
+// WellknownCaddyStatusNames returns the `names` of all 4 well-known `CaddyStatus` enumerants.
+func WellknownCaddyStatusNames() (names []string) {
+	names = []string{"CADDY_PENDING", "CADDY_ERROR", "CADDY_BUSY", "CADDY_GOOD"}
+	return
+}
+
+// WellknownCaddyStatusValues returns the `values` of all 4 well-known `CaddyStatus` enumerants.
+func WellknownCaddyStatusValues() (values []CaddyStatus) {
+	values = []CaddyStatus{CADDY_PENDING, CADDY_ERROR, CADDY_BUSY, CADDY_GOOD}
 	return
 }
 
@@ -211,6 +233,29 @@ func (this Settings) IndicesFunc(ok func(*Setting) bool) (r []int) {
 	}
 	return
 }
+
+func (this Settings) NonNils() (r Settings) {
+	r = this
+	for i := 0; i < len(r); i++ {
+		if r[i] == nil {
+			r = append(r[:i], r[(i+1):]...)
+			i--
+		}
+	}
+	return
+}
+
+func (this Settings) SelectWhere(ok func(*Setting) bool) (r Settings) {
+	r = make(Settings, 0, len(this)/2)
+	for i := range this {
+		if ok(this[i]) {
+			r = append(r, this[i])
+		}
+	}
+	return
+}
+
+func (this *Settings) Append(v ...*Setting) { *this = append(*this, v...) }
 
 // IsIPCID_MENUS_MAIN returns whether the value of this `IpcIDs` equals `IPCID_MENUS_MAIN`.
 func (this IpcIDs) IsIPCID_MENUS_MAIN() (r bool) { r = this == IPCID_MENUS_MAIN; return }
@@ -401,9 +446,76 @@ func (this IpcIDs) Valid() (r bool) {
 	return
 }
 
+// WellknownIpcIDsNamesAndValues returns the `names` and `values` of all 49 well-known `IpcIDs` enumerants.
+func WellknownIpcIDsNamesAndValues() (namesToValues map[string]IpcIDs) {
+	namesToValues = make(map[string]IpcIDs, 49)
+	namesToValues["IPCID_MENUS_MAIN"] = IPCID_MENUS_MAIN
+	namesToValues["IPCID_MENUS_PKGS"] = IPCID_MENUS_PKGS
+	namesToValues["IPCID_MENUS_TOOLS"] = IPCID_MENUS_TOOLS
+	namesToValues["IPCID_OBJ_SNAPSHOT"] = IPCID_OBJ_SNAPSHOT
+	namesToValues["IPCID_PAGE_HTML"] = IPCID_PAGE_HTML
+	namesToValues["IPCID_TREEVIEW_GETITEM"] = IPCID_TREEVIEW_GETITEM
+	namesToValues["IPCID_TREEVIEW_CHILDREN"] = IPCID_TREEVIEW_CHILDREN
+	namesToValues["IPCID_TREEVIEW_CHANGED"] = IPCID_TREEVIEW_CHANGED
+	namesToValues["IPCID_CFG_RESETALL"] = IPCID_CFG_RESETALL
+	namesToValues["IPCID_CFG_LIST"] = IPCID_CFG_LIST
+	namesToValues["IPCID_CFG_SET"] = IPCID_CFG_SET
+	namesToValues["IPCID_NOTIFY_INFO"] = IPCID_NOTIFY_INFO
+	namesToValues["IPCID_NOTIFY_WARN"] = IPCID_NOTIFY_WARN
+	namesToValues["IPCID_NOTIFY_ERR"] = IPCID_NOTIFY_ERR
+	namesToValues["IPCID_PROJ_CHANGED"] = IPCID_PROJ_CHANGED
+	namesToValues["IPCID_PROJ_POLLEVTS"] = IPCID_PROJ_POLLEVTS
+	namesToValues["IPCID_SRCDIAG_LIST"] = IPCID_SRCDIAG_LIST
+	namesToValues["IPCID_SRCDIAG_RUN_CURFILE"] = IPCID_SRCDIAG_RUN_CURFILE
+	namesToValues["IPCID_SRCDIAG_RUN_OPENFILES"] = IPCID_SRCDIAG_RUN_OPENFILES
+	namesToValues["IPCID_SRCDIAG_RUN_ALLFILES"] = IPCID_SRCDIAG_RUN_ALLFILES
+	namesToValues["IPCID_SRCDIAG_FORGETALL"] = IPCID_SRCDIAG_FORGETALL
+	namesToValues["IPCID_SRCDIAG_PEEKHIDDEN"] = IPCID_SRCDIAG_PEEKHIDDEN
+	namesToValues["IPCID_SRCDIAG_PUB"] = IPCID_SRCDIAG_PUB
+	namesToValues["IPCID_SRCDIAG_AUTO_TOGGLE"] = IPCID_SRCDIAG_AUTO_TOGGLE
+	namesToValues["IPCID_SRCDIAG_AUTO_ALL"] = IPCID_SRCDIAG_AUTO_ALL
+	namesToValues["IPCID_SRCDIAG_AUTO_NONE"] = IPCID_SRCDIAG_AUTO_NONE
+	namesToValues["IPCID_SRCDIAG_STARTED"] = IPCID_SRCDIAG_STARTED
+	namesToValues["IPCID_SRCDIAG_FINISHED"] = IPCID_SRCDIAG_FINISHED
+	namesToValues["IPCID_SRCMOD_FMT_SETDEFMENU"] = IPCID_SRCMOD_FMT_SETDEFMENU
+	namesToValues["IPCID_SRCMOD_FMT_SETDEFPICK"] = IPCID_SRCMOD_FMT_SETDEFPICK
+	namesToValues["IPCID_SRCMOD_FMT_RUNONFILE"] = IPCID_SRCMOD_FMT_RUNONFILE
+	namesToValues["IPCID_SRCMOD_FMT_RUNONSEL"] = IPCID_SRCMOD_FMT_RUNONSEL
+	namesToValues["IPCID_SRCMOD_RENAME"] = IPCID_SRCMOD_RENAME
+	namesToValues["IPCID_SRCMOD_ACTIONS"] = IPCID_SRCMOD_ACTIONS
+	namesToValues["IPCID_SRCINTEL_HOVER"] = IPCID_SRCINTEL_HOVER
+	namesToValues["IPCID_SRCINTEL_SYMS_FILE"] = IPCID_SRCINTEL_SYMS_FILE
+	namesToValues["IPCID_SRCINTEL_SYMS_PROJ"] = IPCID_SRCINTEL_SYMS_PROJ
+	namesToValues["IPCID_SRCINTEL_CMPL_ITEMS"] = IPCID_SRCINTEL_CMPL_ITEMS
+	namesToValues["IPCID_SRCINTEL_CMPL_DETAILS"] = IPCID_SRCINTEL_CMPL_DETAILS
+	namesToValues["IPCID_SRCINTEL_HIGHLIGHTS"] = IPCID_SRCINTEL_HIGHLIGHTS
+	namesToValues["IPCID_SRCINTEL_SIGNATURE"] = IPCID_SRCINTEL_SIGNATURE
+	namesToValues["IPCID_SRCINTEL_REFERENCES"] = IPCID_SRCINTEL_REFERENCES
+	namesToValues["IPCID_SRCINTEL_DEFSYM"] = IPCID_SRCINTEL_DEFSYM
+	namesToValues["IPCID_SRCINTEL_DEFTYPE"] = IPCID_SRCINTEL_DEFTYPE
+	namesToValues["IPCID_SRCINTEL_DEFIMPL"] = IPCID_SRCINTEL_DEFIMPL
+	namesToValues["IPCID_EXTRAS_INTEL_LIST"] = IPCID_EXTRAS_INTEL_LIST
+	namesToValues["IPCID_EXTRAS_INTEL_RUN"] = IPCID_EXTRAS_INTEL_RUN
+	namesToValues["IPCID_EXTRAS_QUERY_LIST"] = IPCID_EXTRAS_QUERY_LIST
+	namesToValues["IPCID_EXTRAS_QUERY_RUN"] = IPCID_EXTRAS_QUERY_RUN
+	return
+}
+
 // WellknownIpcIDses returns the `names` and `values` of all 49 well-known `IpcIDs` enumerants.
 func WellknownIpcIDses() (names []string, values []IpcIDs) {
-	names, values = []string{"IPCID_MENUS_MAIN", "IPCID_MENUS_PKGS", "IPCID_MENUS_TOOLS", "IPCID_OBJ_SNAPSHOT", "IPCID_PAGE_HTML", "IPCID_TREEVIEW_GETITEM", "IPCID_TREEVIEW_CHILDREN", "IPCID_TREEVIEW_CHANGED", "IPCID_CFG_RESETALL", "IPCID_CFG_LIST", "IPCID_CFG_SET", "IPCID_NOTIFY_INFO", "IPCID_NOTIFY_WARN", "IPCID_NOTIFY_ERR", "IPCID_PROJ_CHANGED", "IPCID_PROJ_POLLEVTS", "IPCID_SRCDIAG_LIST", "IPCID_SRCDIAG_RUN_CURFILE", "IPCID_SRCDIAG_RUN_OPENFILES", "IPCID_SRCDIAG_RUN_ALLFILES", "IPCID_SRCDIAG_FORGETALL", "IPCID_SRCDIAG_PEEKHIDDEN", "IPCID_SRCDIAG_PUB", "IPCID_SRCDIAG_AUTO_TOGGLE", "IPCID_SRCDIAG_AUTO_ALL", "IPCID_SRCDIAG_AUTO_NONE", "IPCID_SRCDIAG_STARTED", "IPCID_SRCDIAG_FINISHED", "IPCID_SRCMOD_FMT_SETDEFMENU", "IPCID_SRCMOD_FMT_SETDEFPICK", "IPCID_SRCMOD_FMT_RUNONFILE", "IPCID_SRCMOD_FMT_RUNONSEL", "IPCID_SRCMOD_RENAME", "IPCID_SRCMOD_ACTIONS", "IPCID_SRCINTEL_HOVER", "IPCID_SRCINTEL_SYMS_FILE", "IPCID_SRCINTEL_SYMS_PROJ", "IPCID_SRCINTEL_CMPL_ITEMS", "IPCID_SRCINTEL_CMPL_DETAILS", "IPCID_SRCINTEL_HIGHLIGHTS", "IPCID_SRCINTEL_SIGNATURE", "IPCID_SRCINTEL_REFERENCES", "IPCID_SRCINTEL_DEFSYM", "IPCID_SRCINTEL_DEFTYPE", "IPCID_SRCINTEL_DEFIMPL", "IPCID_EXTRAS_INTEL_LIST", "IPCID_EXTRAS_INTEL_RUN", "IPCID_EXTRAS_QUERY_LIST", "IPCID_EXTRAS_QUERY_RUN"}, []IpcIDs{IPCID_MENUS_MAIN, IPCID_MENUS_PKGS, IPCID_MENUS_TOOLS, IPCID_OBJ_SNAPSHOT, IPCID_PAGE_HTML, IPCID_TREEVIEW_GETITEM, IPCID_TREEVIEW_CHILDREN, IPCID_TREEVIEW_CHANGED, IPCID_CFG_RESETALL, IPCID_CFG_LIST, IPCID_CFG_SET, IPCID_NOTIFY_INFO, IPCID_NOTIFY_WARN, IPCID_NOTIFY_ERR, IPCID_PROJ_CHANGED, IPCID_PROJ_POLLEVTS, IPCID_SRCDIAG_LIST, IPCID_SRCDIAG_RUN_CURFILE, IPCID_SRCDIAG_RUN_OPENFILES, IPCID_SRCDIAG_RUN_ALLFILES, IPCID_SRCDIAG_FORGETALL, IPCID_SRCDIAG_PEEKHIDDEN, IPCID_SRCDIAG_PUB, IPCID_SRCDIAG_AUTO_TOGGLE, IPCID_SRCDIAG_AUTO_ALL, IPCID_SRCDIAG_AUTO_NONE, IPCID_SRCDIAG_STARTED, IPCID_SRCDIAG_FINISHED, IPCID_SRCMOD_FMT_SETDEFMENU, IPCID_SRCMOD_FMT_SETDEFPICK, IPCID_SRCMOD_FMT_RUNONFILE, IPCID_SRCMOD_FMT_RUNONSEL, IPCID_SRCMOD_RENAME, IPCID_SRCMOD_ACTIONS, IPCID_SRCINTEL_HOVER, IPCID_SRCINTEL_SYMS_FILE, IPCID_SRCINTEL_SYMS_PROJ, IPCID_SRCINTEL_CMPL_ITEMS, IPCID_SRCINTEL_CMPL_DETAILS, IPCID_SRCINTEL_HIGHLIGHTS, IPCID_SRCINTEL_SIGNATURE, IPCID_SRCINTEL_REFERENCES, IPCID_SRCINTEL_DEFSYM, IPCID_SRCINTEL_DEFTYPE, IPCID_SRCINTEL_DEFIMPL, IPCID_EXTRAS_INTEL_LIST, IPCID_EXTRAS_INTEL_RUN, IPCID_EXTRAS_QUERY_LIST, IPCID_EXTRAS_QUERY_RUN}
+	names, values = WellknownIpcIDsNames(), WellknownIpcIDsValues()
+	return
+}
+
+// WellknownIpcIDsNames returns the `names` of all 49 well-known `IpcIDs` enumerants.
+func WellknownIpcIDsNames() (names []string) {
+	names = []string{"IPCID_MENUS_MAIN", "IPCID_MENUS_PKGS", "IPCID_MENUS_TOOLS", "IPCID_OBJ_SNAPSHOT", "IPCID_PAGE_HTML", "IPCID_TREEVIEW_GETITEM", "IPCID_TREEVIEW_CHILDREN", "IPCID_TREEVIEW_CHANGED", "IPCID_CFG_RESETALL", "IPCID_CFG_LIST", "IPCID_CFG_SET", "IPCID_NOTIFY_INFO", "IPCID_NOTIFY_WARN", "IPCID_NOTIFY_ERR", "IPCID_PROJ_CHANGED", "IPCID_PROJ_POLLEVTS", "IPCID_SRCDIAG_LIST", "IPCID_SRCDIAG_RUN_CURFILE", "IPCID_SRCDIAG_RUN_OPENFILES", "IPCID_SRCDIAG_RUN_ALLFILES", "IPCID_SRCDIAG_FORGETALL", "IPCID_SRCDIAG_PEEKHIDDEN", "IPCID_SRCDIAG_PUB", "IPCID_SRCDIAG_AUTO_TOGGLE", "IPCID_SRCDIAG_AUTO_ALL", "IPCID_SRCDIAG_AUTO_NONE", "IPCID_SRCDIAG_STARTED", "IPCID_SRCDIAG_FINISHED", "IPCID_SRCMOD_FMT_SETDEFMENU", "IPCID_SRCMOD_FMT_SETDEFPICK", "IPCID_SRCMOD_FMT_RUNONFILE", "IPCID_SRCMOD_FMT_RUNONSEL", "IPCID_SRCMOD_RENAME", "IPCID_SRCMOD_ACTIONS", "IPCID_SRCINTEL_HOVER", "IPCID_SRCINTEL_SYMS_FILE", "IPCID_SRCINTEL_SYMS_PROJ", "IPCID_SRCINTEL_CMPL_ITEMS", "IPCID_SRCINTEL_CMPL_DETAILS", "IPCID_SRCINTEL_HIGHLIGHTS", "IPCID_SRCINTEL_SIGNATURE", "IPCID_SRCINTEL_REFERENCES", "IPCID_SRCINTEL_DEFSYM", "IPCID_SRCINTEL_DEFTYPE", "IPCID_SRCINTEL_DEFIMPL", "IPCID_EXTRAS_INTEL_LIST", "IPCID_EXTRAS_INTEL_RUN", "IPCID_EXTRAS_QUERY_LIST", "IPCID_EXTRAS_QUERY_RUN"}
+	return
+}
+
+// WellknownIpcIDsValues returns the `values` of all 49 well-known `IpcIDs` enumerants.
+func WellknownIpcIDsValues() (values []IpcIDs) {
+	values = []IpcIDs{IPCID_MENUS_MAIN, IPCID_MENUS_PKGS, IPCID_MENUS_TOOLS, IPCID_OBJ_SNAPSHOT, IPCID_PAGE_HTML, IPCID_TREEVIEW_GETITEM, IPCID_TREEVIEW_CHILDREN, IPCID_TREEVIEW_CHANGED, IPCID_CFG_RESETALL, IPCID_CFG_LIST, IPCID_CFG_SET, IPCID_NOTIFY_INFO, IPCID_NOTIFY_WARN, IPCID_NOTIFY_ERR, IPCID_PROJ_CHANGED, IPCID_PROJ_POLLEVTS, IPCID_SRCDIAG_LIST, IPCID_SRCDIAG_RUN_CURFILE, IPCID_SRCDIAG_RUN_OPENFILES, IPCID_SRCDIAG_RUN_ALLFILES, IPCID_SRCDIAG_FORGETALL, IPCID_SRCDIAG_PEEKHIDDEN, IPCID_SRCDIAG_PUB, IPCID_SRCDIAG_AUTO_TOGGLE, IPCID_SRCDIAG_AUTO_ALL, IPCID_SRCDIAG_AUTO_NONE, IPCID_SRCDIAG_STARTED, IPCID_SRCDIAG_FINISHED, IPCID_SRCMOD_FMT_SETDEFMENU, IPCID_SRCMOD_FMT_SETDEFPICK, IPCID_SRCMOD_FMT_RUNONFILE, IPCID_SRCMOD_FMT_RUNONSEL, IPCID_SRCMOD_RENAME, IPCID_SRCMOD_ACTIONS, IPCID_SRCINTEL_HOVER, IPCID_SRCINTEL_SYMS_FILE, IPCID_SRCINTEL_SYMS_PROJ, IPCID_SRCINTEL_CMPL_ITEMS, IPCID_SRCINTEL_CMPL_DETAILS, IPCID_SRCINTEL_HIGHLIGHTS, IPCID_SRCINTEL_SIGNATURE, IPCID_SRCINTEL_REFERENCES, IPCID_SRCINTEL_DEFSYM, IPCID_SRCINTEL_DEFTYPE, IPCID_SRCINTEL_DEFIMPL, IPCID_EXTRAS_INTEL_LIST, IPCID_EXTRAS_INTEL_RUN, IPCID_EXTRAS_QUERY_LIST, IPCID_EXTRAS_QUERY_RUN}
 	return
 }
 
@@ -907,9 +1019,31 @@ func (this DiagSeverity) Valid() (r bool) {
 	return
 }
 
+// WellknownDiagSeverityNamesAndValues returns the `names` and `values` of all 4 well-known `DiagSeverity` enumerants.
+func WellknownDiagSeverityNamesAndValues() (namesToValues map[string]DiagSeverity) {
+	namesToValues = make(map[string]DiagSeverity, 4)
+	namesToValues["DIAG_SEV_ERR"] = DIAG_SEV_ERR
+	namesToValues["DIAG_SEV_WARN"] = DIAG_SEV_WARN
+	namesToValues["DIAG_SEV_INFO"] = DIAG_SEV_INFO
+	namesToValues["DIAG_SEV_HINT"] = DIAG_SEV_HINT
+	return
+}
+
 // WellknownDiagSeverities returns the `names` and `values` of all 4 well-known `DiagSeverity` enumerants.
 func WellknownDiagSeverities() (names []string, values []DiagSeverity) {
-	names, values = []string{"DIAG_SEV_ERR", "DIAG_SEV_WARN", "DIAG_SEV_INFO", "DIAG_SEV_HINT"}, []DiagSeverity{DIAG_SEV_ERR, DIAG_SEV_WARN, DIAG_SEV_INFO, DIAG_SEV_HINT}
+	names, values = WellknownDiagSeverityNames(), WellknownDiagSeverityValues()
+	return
+}
+
+// WellknownDiagSeverityNames returns the `names` of all 4 well-known `DiagSeverity` enumerants.
+func WellknownDiagSeverityNames() (names []string) {
+	names = []string{"DIAG_SEV_ERR", "DIAG_SEV_WARN", "DIAG_SEV_INFO", "DIAG_SEV_HINT"}
+	return
+}
+
+// WellknownDiagSeverityValues returns the `values` of all 4 well-known `DiagSeverity` enumerants.
+func WellknownDiagSeverityValues() (values []DiagSeverity) {
+	values = []DiagSeverity{DIAG_SEV_ERR, DIAG_SEV_WARN, DIAG_SEV_INFO, DIAG_SEV_HINT}
 	return
 }
 
@@ -1116,9 +1250,53 @@ func (this Symbol) IsSYM_TYPEPARAMETER() (r bool) { r = this == SYM_TYPEPARAMETE
 // Valid returns whether the value of this `Symbol` is between `SYM_FILE` (inclusive) and `SYM_TYPEPARAMETER` (inclusive).
 func (this Symbol) Valid() (r bool) { r = (this >= SYM_FILE) && (this <= SYM_TYPEPARAMETER); return }
 
+// WellknownSymbolNamesAndValues returns the `names` and `values` of all 26 well-known `Symbol` enumerants.
+func WellknownSymbolNamesAndValues() (namesToValues map[string]Symbol) {
+	namesToValues = make(map[string]Symbol, 26)
+	namesToValues["SYM_FILE"] = SYM_FILE
+	namesToValues["SYM_MODULE"] = SYM_MODULE
+	namesToValues["SYM_NAMESPACE"] = SYM_NAMESPACE
+	namesToValues["SYM_PACKAGE"] = SYM_PACKAGE
+	namesToValues["SYM_CLASS"] = SYM_CLASS
+	namesToValues["SYM_METHOD"] = SYM_METHOD
+	namesToValues["SYM_PROPERTY"] = SYM_PROPERTY
+	namesToValues["SYM_FIELD"] = SYM_FIELD
+	namesToValues["SYM_CONSTRUCTOR"] = SYM_CONSTRUCTOR
+	namesToValues["SYM_ENUM"] = SYM_ENUM
+	namesToValues["SYM_INTERFACE"] = SYM_INTERFACE
+	namesToValues["SYM_FUNCTION"] = SYM_FUNCTION
+	namesToValues["SYM_VARIABLE"] = SYM_VARIABLE
+	namesToValues["SYM_CONSTANT"] = SYM_CONSTANT
+	namesToValues["SYM_STRING"] = SYM_STRING
+	namesToValues["SYM_NUMBER"] = SYM_NUMBER
+	namesToValues["SYM_BOOLEAN"] = SYM_BOOLEAN
+	namesToValues["SYM_ARRAY"] = SYM_ARRAY
+	namesToValues["SYM_OBJECT"] = SYM_OBJECT
+	namesToValues["SYM_KEY"] = SYM_KEY
+	namesToValues["SYM_NULL"] = SYM_NULL
+	namesToValues["SYM_ENUMMEMBER"] = SYM_ENUMMEMBER
+	namesToValues["SYM_STRUCT"] = SYM_STRUCT
+	namesToValues["SYM_EVENT"] = SYM_EVENT
+	namesToValues["SYM_OPERATOR"] = SYM_OPERATOR
+	namesToValues["SYM_TYPEPARAMETER"] = SYM_TYPEPARAMETER
+	return
+}
+
 // WellknownSymbols returns the `names` and `values` of all 26 well-known `Symbol` enumerants.
 func WellknownSymbols() (names []string, values []Symbol) {
-	names, values = []string{"SYM_FILE", "SYM_MODULE", "SYM_NAMESPACE", "SYM_PACKAGE", "SYM_CLASS", "SYM_METHOD", "SYM_PROPERTY", "SYM_FIELD", "SYM_CONSTRUCTOR", "SYM_ENUM", "SYM_INTERFACE", "SYM_FUNCTION", "SYM_VARIABLE", "SYM_CONSTANT", "SYM_STRING", "SYM_NUMBER", "SYM_BOOLEAN", "SYM_ARRAY", "SYM_OBJECT", "SYM_KEY", "SYM_NULL", "SYM_ENUMMEMBER", "SYM_STRUCT", "SYM_EVENT", "SYM_OPERATOR", "SYM_TYPEPARAMETER"}, []Symbol{SYM_FILE, SYM_MODULE, SYM_NAMESPACE, SYM_PACKAGE, SYM_CLASS, SYM_METHOD, SYM_PROPERTY, SYM_FIELD, SYM_CONSTRUCTOR, SYM_ENUM, SYM_INTERFACE, SYM_FUNCTION, SYM_VARIABLE, SYM_CONSTANT, SYM_STRING, SYM_NUMBER, SYM_BOOLEAN, SYM_ARRAY, SYM_OBJECT, SYM_KEY, SYM_NULL, SYM_ENUMMEMBER, SYM_STRUCT, SYM_EVENT, SYM_OPERATOR, SYM_TYPEPARAMETER}
+	names, values = WellknownSymbolNames(), WellknownSymbolValues()
+	return
+}
+
+// WellknownSymbolNames returns the `names` of all 26 well-known `Symbol` enumerants.
+func WellknownSymbolNames() (names []string) {
+	names = []string{"SYM_FILE", "SYM_MODULE", "SYM_NAMESPACE", "SYM_PACKAGE", "SYM_CLASS", "SYM_METHOD", "SYM_PROPERTY", "SYM_FIELD", "SYM_CONSTRUCTOR", "SYM_ENUM", "SYM_INTERFACE", "SYM_FUNCTION", "SYM_VARIABLE", "SYM_CONSTANT", "SYM_STRING", "SYM_NUMBER", "SYM_BOOLEAN", "SYM_ARRAY", "SYM_OBJECT", "SYM_KEY", "SYM_NULL", "SYM_ENUMMEMBER", "SYM_STRUCT", "SYM_EVENT", "SYM_OPERATOR", "SYM_TYPEPARAMETER"}
+	return
+}
+
+// WellknownSymbolValues returns the `values` of all 26 well-known `Symbol` enumerants.
+func WellknownSymbolValues() (values []Symbol) {
+	values = []Symbol{SYM_FILE, SYM_MODULE, SYM_NAMESPACE, SYM_PACKAGE, SYM_CLASS, SYM_METHOD, SYM_PROPERTY, SYM_FIELD, SYM_CONSTRUCTOR, SYM_ENUM, SYM_INTERFACE, SYM_FUNCTION, SYM_VARIABLE, SYM_CONSTANT, SYM_STRING, SYM_NUMBER, SYM_BOOLEAN, SYM_ARRAY, SYM_OBJECT, SYM_KEY, SYM_NULL, SYM_ENUMMEMBER, SYM_STRUCT, SYM_EVENT, SYM_OPERATOR, SYM_TYPEPARAMETER}
 	return
 }
 
@@ -1501,9 +1679,52 @@ func (this Completion) Valid() (r bool) {
 	return
 }
 
+// WellknownCompletionNamesAndValues returns the `names` and `values` of all 25 well-known `Completion` enumerants.
+func WellknownCompletionNamesAndValues() (namesToValues map[string]Completion) {
+	namesToValues = make(map[string]Completion, 25)
+	namesToValues["CMPL_TEXT"] = CMPL_TEXT
+	namesToValues["CMPL_METHOD"] = CMPL_METHOD
+	namesToValues["CMPL_FUNCTION"] = CMPL_FUNCTION
+	namesToValues["CMPL_CONSTRUCTOR"] = CMPL_CONSTRUCTOR
+	namesToValues["CMPL_FIELD"] = CMPL_FIELD
+	namesToValues["CMPL_VARIABLE"] = CMPL_VARIABLE
+	namesToValues["CMPL_CLASS"] = CMPL_CLASS
+	namesToValues["CMPL_INTERFACE"] = CMPL_INTERFACE
+	namesToValues["CMPL_MODULE"] = CMPL_MODULE
+	namesToValues["CMPL_PROPERTY"] = CMPL_PROPERTY
+	namesToValues["CMPL_UNIT"] = CMPL_UNIT
+	namesToValues["CMPL_VALUE"] = CMPL_VALUE
+	namesToValues["CMPL_ENUM"] = CMPL_ENUM
+	namesToValues["CMPL_KEYWORD"] = CMPL_KEYWORD
+	namesToValues["CMPL_SNIPPET"] = CMPL_SNIPPET
+	namesToValues["CMPL_COLOR"] = CMPL_COLOR
+	namesToValues["CMPL_FILE"] = CMPL_FILE
+	namesToValues["CMPL_REFERENCE"] = CMPL_REFERENCE
+	namesToValues["CMPL_FOLDER"] = CMPL_FOLDER
+	namesToValues["CMPL_ENUMMEMBER"] = CMPL_ENUMMEMBER
+	namesToValues["CMPL_CONSTANT"] = CMPL_CONSTANT
+	namesToValues["CMPL_STRUCT"] = CMPL_STRUCT
+	namesToValues["CMPL_EVENT"] = CMPL_EVENT
+	namesToValues["CMPL_OPERATOR"] = CMPL_OPERATOR
+	namesToValues["CMPL_TYPEPARAMETER"] = CMPL_TYPEPARAMETER
+	return
+}
+
 // WellknownCompletions returns the `names` and `values` of all 25 well-known `Completion` enumerants.
 func WellknownCompletions() (names []string, values []Completion) {
-	names, values = []string{"CMPL_TEXT", "CMPL_METHOD", "CMPL_FUNCTION", "CMPL_CONSTRUCTOR", "CMPL_FIELD", "CMPL_VARIABLE", "CMPL_CLASS", "CMPL_INTERFACE", "CMPL_MODULE", "CMPL_PROPERTY", "CMPL_UNIT", "CMPL_VALUE", "CMPL_ENUM", "CMPL_KEYWORD", "CMPL_SNIPPET", "CMPL_COLOR", "CMPL_FILE", "CMPL_REFERENCE", "CMPL_FOLDER", "CMPL_ENUMMEMBER", "CMPL_CONSTANT", "CMPL_STRUCT", "CMPL_EVENT", "CMPL_OPERATOR", "CMPL_TYPEPARAMETER"}, []Completion{CMPL_TEXT, CMPL_METHOD, CMPL_FUNCTION, CMPL_CONSTRUCTOR, CMPL_FIELD, CMPL_VARIABLE, CMPL_CLASS, CMPL_INTERFACE, CMPL_MODULE, CMPL_PROPERTY, CMPL_UNIT, CMPL_VALUE, CMPL_ENUM, CMPL_KEYWORD, CMPL_SNIPPET, CMPL_COLOR, CMPL_FILE, CMPL_REFERENCE, CMPL_FOLDER, CMPL_ENUMMEMBER, CMPL_CONSTANT, CMPL_STRUCT, CMPL_EVENT, CMPL_OPERATOR, CMPL_TYPEPARAMETER}
+	names, values = WellknownCompletionNames(), WellknownCompletionValues()
+	return
+}
+
+// WellknownCompletionNames returns the `names` of all 25 well-known `Completion` enumerants.
+func WellknownCompletionNames() (names []string) {
+	names = []string{"CMPL_TEXT", "CMPL_METHOD", "CMPL_FUNCTION", "CMPL_CONSTRUCTOR", "CMPL_FIELD", "CMPL_VARIABLE", "CMPL_CLASS", "CMPL_INTERFACE", "CMPL_MODULE", "CMPL_PROPERTY", "CMPL_UNIT", "CMPL_VALUE", "CMPL_ENUM", "CMPL_KEYWORD", "CMPL_SNIPPET", "CMPL_COLOR", "CMPL_FILE", "CMPL_REFERENCE", "CMPL_FOLDER", "CMPL_ENUMMEMBER", "CMPL_CONSTANT", "CMPL_STRUCT", "CMPL_EVENT", "CMPL_OPERATOR", "CMPL_TYPEPARAMETER"}
+	return
+}
+
+// WellknownCompletionValues returns the `values` of all 25 well-known `Completion` enumerants.
+func WellknownCompletionValues() (values []Completion) {
+	values = []Completion{CMPL_TEXT, CMPL_METHOD, CMPL_FUNCTION, CMPL_CONSTRUCTOR, CMPL_FIELD, CMPL_VARIABLE, CMPL_CLASS, CMPL_INTERFACE, CMPL_MODULE, CMPL_PROPERTY, CMPL_UNIT, CMPL_VALUE, CMPL_ENUM, CMPL_KEYWORD, CMPL_SNIPPET, CMPL_COLOR, CMPL_FILE, CMPL_REFERENCE, CMPL_FOLDER, CMPL_ENUMMEMBER, CMPL_CONSTANT, CMPL_STRUCT, CMPL_EVENT, CMPL_OPERATOR, CMPL_TYPEPARAMETER}
 	return
 }
 
@@ -1859,6 +2080,18 @@ func (this ListItems) IndicesFunc(ok func(IListItem) bool) (r []int) {
 	return
 }
 
+func (this ListItems) SelectWhere(ok func(IListItem) bool) (r ListItems) {
+	r = make(ListItems, 0, len(this)/2)
+	for i := range this {
+		if ok(this[i]) {
+			r = append(r, this[i])
+		}
+	}
+	return
+}
+
+func (this *ListItems) Append(v ...IListItem) { *this = append(*this, v...) }
+
 func (this PkgInfos) Index(v *PkgInfo) (r int) {
 	for i := range this {
 		if this[i] == v {
@@ -1920,6 +2153,29 @@ func (this PkgInfos) IndicesFunc(ok func(*PkgInfo) bool) (r []int) {
 	}
 	return
 }
+
+func (this PkgInfos) NonNils() (r PkgInfos) {
+	r = this
+	for i := 0; i < len(r); i++ {
+		if r[i] == nil {
+			r = append(r[:i], r[(i+1):]...)
+			i--
+		}
+	}
+	return
+}
+
+func (this PkgInfos) SelectWhere(ok func(*PkgInfo) bool) (r PkgInfos) {
+	r = make(PkgInfos, 0, len(this)/2)
+	for i := range this {
+		if ok(this[i]) {
+			r = append(r, this[i])
+		}
+	}
+	return
+}
+
+func (this *PkgInfos) Append(v ...*PkgInfo) { *this = append(*this, v...) }
 
 func (this DiagItems) Index(v *DiagItem) (r int) {
 	for i := range this {
@@ -1983,6 +2239,29 @@ func (this DiagItems) IndicesFunc(ok func(*DiagItem) bool) (r []int) {
 	return
 }
 
+func (this DiagItems) NonNils() (r DiagItems) {
+	r = this
+	for i := 0; i < len(r); i++ {
+		if r[i] == nil {
+			r = append(r[:i], r[(i+1):]...)
+			i--
+		}
+	}
+	return
+}
+
+func (this DiagItems) SelectWhere(ok func(*DiagItem) bool) (r DiagItems) {
+	r = make(DiagItems, 0, len(this)/2)
+	for i := range this {
+		if ok(this[i]) {
+			r = append(r, this[i])
+		}
+	}
+	return
+}
+
+func (this *DiagItems) Append(v ...*DiagItem) { *this = append(*this, v...) }
+
 func (this DiagBuildJobs) Index(v *DiagJobBuild) (r int) {
 	for i := range this {
 		if this[i] == v {
@@ -2044,6 +2323,29 @@ func (this DiagBuildJobs) IndicesFunc(ok func(*DiagJobBuild) bool) (r []int) {
 	}
 	return
 }
+
+func (this DiagBuildJobs) NonNils() (r DiagBuildJobs) {
+	r = this
+	for i := 0; i < len(r); i++ {
+		if r[i] == nil {
+			r = append(r[:i], r[(i+1):]...)
+			i--
+		}
+	}
+	return
+}
+
+func (this DiagBuildJobs) SelectWhere(ok func(*DiagJobBuild) bool) (r DiagBuildJobs) {
+	r = make(DiagBuildJobs, 0, len(this)/2)
+	for i := range this {
+		if ok(this[i]) {
+			r = append(r, this[i])
+		}
+	}
+	return
+}
+
+func (this *DiagBuildJobs) Append(v ...*DiagJobBuild) { *this = append(*this, v...) }
 
 func (this DiagLintJobs) Index(v *DiagJobLint) (r int) {
 	for i := range this {
@@ -2107,6 +2409,29 @@ func (this DiagLintJobs) IndicesFunc(ok func(*DiagJobLint) bool) (r []int) {
 	return
 }
 
+func (this DiagLintJobs) NonNils() (r DiagLintJobs) {
+	r = this
+	for i := 0; i < len(r); i++ {
+		if r[i] == nil {
+			r = append(r[:i], r[(i+1):]...)
+			i--
+		}
+	}
+	return
+}
+
+func (this DiagLintJobs) SelectWhere(ok func(*DiagJobLint) bool) (r DiagLintJobs) {
+	r = make(DiagLintJobs, 0, len(this)/2)
+	for i := range this {
+		if ok(this[i]) {
+			r = append(r, this[i])
+		}
+	}
+	return
+}
+
+func (this *DiagLintJobs) Append(v ...*DiagJobLint) { *this = append(*this, v...) }
+
 func (this SrcIntelCompls) Index(v *SrcIntelCompl) (r int) {
 	for i := range this {
 		if this[i] == v {
@@ -2168,6 +2493,29 @@ func (this SrcIntelCompls) IndicesFunc(ok func(*SrcIntelCompl) bool) (r []int) {
 	}
 	return
 }
+
+func (this SrcIntelCompls) NonNils() (r SrcIntelCompls) {
+	r = this
+	for i := 0; i < len(r); i++ {
+		if r[i] == nil {
+			r = append(r[:i], r[(i+1):]...)
+			i--
+		}
+	}
+	return
+}
+
+func (this SrcIntelCompls) SelectWhere(ok func(*SrcIntelCompl) bool) (r SrcIntelCompls) {
+	r = make(SrcIntelCompls, 0, len(this)/2)
+	for i := range this {
+		if ok(this[i]) {
+			r = append(r, this[i])
+		}
+	}
+	return
+}
+
+func (this *SrcIntelCompls) Append(v ...*SrcIntelCompl) { *this = append(*this, v...) }
 
 func (this SrcLocs) Index(v *SrcLoc) (r int) {
 	for i := range this {
@@ -2231,6 +2579,29 @@ func (this SrcLocs) IndicesFunc(ok func(*SrcLoc) bool) (r []int) {
 	return
 }
 
+func (this SrcLocs) NonNils() (r SrcLocs) {
+	r = this
+	for i := 0; i < len(r); i++ {
+		if r[i] == nil {
+			r = append(r[:i], r[(i+1):]...)
+			i--
+		}
+	}
+	return
+}
+
+func (this SrcLocs) SelectWhere(ok func(*SrcLoc) bool) (r SrcLocs) {
+	r = make(SrcLocs, 0, len(this)/2)
+	for i := range this {
+		if ok(this[i]) {
+			r = append(r, this[i])
+		}
+	}
+	return
+}
+
+func (this *SrcLocs) Append(v ...*SrcLoc) { *this = append(*this, v...) }
+
 func (this SrcLenses) Index(v *SrcLens) (r int) {
 	for i := range this {
 		if this[i] == v {
@@ -2292,6 +2663,29 @@ func (this SrcLenses) IndicesFunc(ok func(*SrcLens) bool) (r []int) {
 	}
 	return
 }
+
+func (this SrcLenses) NonNils() (r SrcLenses) {
+	r = this
+	for i := 0; i < len(r); i++ {
+		if r[i] == nil {
+			r = append(r[:i], r[(i+1):]...)
+			i--
+		}
+	}
+	return
+}
+
+func (this SrcLenses) SelectWhere(ok func(*SrcLens) bool) (r SrcLenses) {
+	r = make(SrcLenses, 0, len(this)/2)
+	for i := range this {
+		if ok(this[i]) {
+			r = append(r, this[i])
+		}
+	}
+	return
+}
+
+func (this *SrcLenses) Append(v ...*SrcLens) { *this = append(*this, v...) }
 
 func (this SrcModEdits) Index(v srcModEdit) (r int) {
 	for i := range this {
@@ -2355,6 +2749,18 @@ func (this SrcModEdits) IndicesFunc(ok func(srcModEdit) bool) (r []int) {
 	return
 }
 
+func (this SrcModEdits) SelectWhere(ok func(srcModEdit) bool) (r SrcModEdits) {
+	r = make(SrcModEdits, 0, len(this)/2)
+	for i := range this {
+		if ok(this[i]) {
+			r = append(r, this[i])
+		}
+	}
+	return
+}
+
+func (this *SrcModEdits) Append(v ...srcModEdit) { *this = append(*this, v...) }
+
 // IsTOOLS_CAT_MOD_REN returns whether the value of this `ToolCats` equals `TOOLS_CAT_MOD_REN`.
 func (this ToolCats) IsTOOLS_CAT_MOD_REN() (r bool) { r = this == TOOLS_CAT_MOD_REN; return }
 
@@ -2391,9 +2797,37 @@ func (this ToolCats) Valid() (r bool) {
 	return
 }
 
+// WellknownToolCatsNamesAndValues returns the `names` and `values` of all 10 well-known `ToolCats` enumerants.
+func WellknownToolCatsNamesAndValues() (namesToValues map[string]ToolCats) {
+	namesToValues = make(map[string]ToolCats, 10)
+	namesToValues["TOOLS_CAT_MOD_REN"] = TOOLS_CAT_MOD_REN
+	namesToValues["TOOLS_CAT_MOD_FMT"] = TOOLS_CAT_MOD_FMT
+	namesToValues["TOOLS_CAT_INTEL_TIPS"] = TOOLS_CAT_INTEL_TIPS
+	namesToValues["TOOLS_CAT_INTEL_SYMS"] = TOOLS_CAT_INTEL_SYMS
+	namesToValues["TOOLS_CAT_INTEL_HIGH"] = TOOLS_CAT_INTEL_HIGH
+	namesToValues["TOOLS_CAT_INTEL_CMPL"] = TOOLS_CAT_INTEL_CMPL
+	namesToValues["TOOLS_CAT_INTEL_NAV"] = TOOLS_CAT_INTEL_NAV
+	namesToValues["TOOLS_CAT_EXTRAS_QUERY"] = TOOLS_CAT_EXTRAS_QUERY
+	namesToValues["TOOLS_CAT_DIAGS"] = TOOLS_CAT_DIAGS
+	namesToValues["TOOLS_CAT_RUNONSAVE"] = TOOLS_CAT_RUNONSAVE
+	return
+}
+
 // WellknownToolCatses returns the `names` and `values` of all 10 well-known `ToolCats` enumerants.
 func WellknownToolCatses() (names []string, values []ToolCats) {
-	names, values = []string{"TOOLS_CAT_MOD_REN", "TOOLS_CAT_MOD_FMT", "TOOLS_CAT_INTEL_TIPS", "TOOLS_CAT_INTEL_SYMS", "TOOLS_CAT_INTEL_HIGH", "TOOLS_CAT_INTEL_CMPL", "TOOLS_CAT_INTEL_NAV", "TOOLS_CAT_EXTRAS_QUERY", "TOOLS_CAT_DIAGS", "TOOLS_CAT_RUNONSAVE"}, []ToolCats{TOOLS_CAT_MOD_REN, TOOLS_CAT_MOD_FMT, TOOLS_CAT_INTEL_TIPS, TOOLS_CAT_INTEL_SYMS, TOOLS_CAT_INTEL_HIGH, TOOLS_CAT_INTEL_CMPL, TOOLS_CAT_INTEL_NAV, TOOLS_CAT_EXTRAS_QUERY, TOOLS_CAT_DIAGS, TOOLS_CAT_RUNONSAVE}
+	names, values = WellknownToolCatsNames(), WellknownToolCatsValues()
+	return
+}
+
+// WellknownToolCatsNames returns the `names` of all 10 well-known `ToolCats` enumerants.
+func WellknownToolCatsNames() (names []string) {
+	names = []string{"TOOLS_CAT_MOD_REN", "TOOLS_CAT_MOD_FMT", "TOOLS_CAT_INTEL_TIPS", "TOOLS_CAT_INTEL_SYMS", "TOOLS_CAT_INTEL_HIGH", "TOOLS_CAT_INTEL_CMPL", "TOOLS_CAT_INTEL_NAV", "TOOLS_CAT_EXTRAS_QUERY", "TOOLS_CAT_DIAGS", "TOOLS_CAT_RUNONSAVE"}
+	return
+}
+
+// WellknownToolCatsValues returns the `values` of all 10 well-known `ToolCats` enumerants.
+func WellknownToolCatsValues() (values []ToolCats) {
+	values = []ToolCats{TOOLS_CAT_MOD_REN, TOOLS_CAT_MOD_FMT, TOOLS_CAT_INTEL_TIPS, TOOLS_CAT_INTEL_SYMS, TOOLS_CAT_INTEL_HIGH, TOOLS_CAT_INTEL_CMPL, TOOLS_CAT_INTEL_NAV, TOOLS_CAT_EXTRAS_QUERY, TOOLS_CAT_DIAGS, TOOLS_CAT_RUNONSAVE}
 	return
 }
 
@@ -2459,6 +2893,29 @@ func (this Tools) IndicesFunc(ok func(*Tool) bool) (r []int) {
 	return
 }
 
+func (this Tools) NonNils() (r Tools) {
+	r = this
+	for i := 0; i < len(r); i++ {
+		if r[i] == nil {
+			r = append(r[:i], r[(i+1):]...)
+			i--
+		}
+	}
+	return
+}
+
+func (this Tools) SelectWhere(ok func(*Tool) bool) (r Tools) {
+	r = make(Tools, 0, len(this)/2)
+	for i := range this {
+		if ok(this[i]) {
+			r = append(r, this[i])
+		}
+	}
+	return
+}
+
+func (this *Tools) Append(v ...*Tool) { *this = append(*this, v...) }
+
 func (this MenuItems) Index(v *MenuItem) (r int) {
 	for i := range this {
 		if this[i] == v {
@@ -2521,6 +2978,29 @@ func (this MenuItems) IndicesFunc(ok func(*MenuItem) bool) (r []int) {
 	return
 }
 
+func (this MenuItems) NonNils() (r MenuItems) {
+	r = this
+	for i := 0; i < len(r); i++ {
+		if r[i] == nil {
+			r = append(r[:i], r[(i+1):]...)
+			i--
+		}
+	}
+	return
+}
+
+func (this MenuItems) SelectWhere(ok func(*MenuItem) bool) (r MenuItems) {
+	r = make(MenuItems, 0, len(this)/2)
+	for i := range this {
+		if ok(this[i]) {
+			r = append(r, this[i])
+		}
+	}
+	return
+}
+
+func (this *MenuItems) Append(v ...*MenuItem) { *this = append(*this, v...) }
+
 func (this sideViewTreeItem) Index(v string) (r int) {
 	for i := range this {
 		if this[i] == v {
@@ -2582,3 +3062,15 @@ func (this sideViewTreeItem) IndicesFunc(ok func(string) bool) (r []int) {
 	}
 	return
 }
+
+func (this sideViewTreeItem) SelectWhere(ok func(string) bool) (r sideViewTreeItem) {
+	r = make(sideViewTreeItem, 0, len(this)/2)
+	for i := range this {
+		if ok(this[i]) {
+			r = append(r, this[i])
+		}
+	}
+	return
+}
+
+func (this *sideViewTreeItem) Append(v ...string) { *this = append(*this, v...) }
