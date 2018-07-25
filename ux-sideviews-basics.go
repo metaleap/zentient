@@ -33,13 +33,12 @@ type iTreeDataProvider interface {
 type sideViews struct {
 	treeDataProviders       []iTreeDataProvider
 	treeDataProviderPkgDeps treeDataProviderPkgIntel
-	treeDataProviderPkgSyms treeDataProviderPkgIntel
 }
 
 func (this *sideViews) Init() {
-	this.treeDataProviderPkgDeps.onChanged, this.treeDataProviderPkgSyms.onChanged = this.sendOnChanged, this.sendOnChanged
-	this.treeDataProviderPkgDeps.treeViewId, this.treeDataProviderPkgSyms.treeViewId = "pkgDeps", "pkgSyms"
-	this.treeDataProviders = []iTreeDataProvider{&this.treeDataProviderPkgDeps, &this.treeDataProviderPkgSyms}
+	this.treeDataProviderPkgDeps.onChanged = this.sendOnChanged
+	this.treeDataProviderPkgDeps.treeViewId = "pkgDeps"
+	this.treeDataProviders = []iTreeDataProvider{&this.treeDataProviderPkgDeps}
 }
 
 func (this *sideViews) dispatch(req *ipcReq, resp *ipcResp) bool {
@@ -80,7 +79,6 @@ func (this *sideViews) sendOnChanged(treeViewId string, item sideViewTreeItem) {
 		_ = send(&ipcResp{IpcID: IPCID_TREEVIEW_CHANGED, Val: []string{treeViewId, item.String()}})
 	} else {
 		_ = send(&ipcResp{IpcID: IPCID_TREEVIEW_CHANGED, Val: []string{this.treeDataProviderPkgDeps.treeViewId, item.String()}})
-		_ = send(&ipcResp{IpcID: IPCID_TREEVIEW_CHANGED, Val: []string{this.treeDataProviderPkgSyms.treeViewId, item.String()}})
 	}
 }
 
