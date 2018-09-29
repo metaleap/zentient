@@ -9,6 +9,7 @@ import (
 )
 
 const (
+	origuri = "https://raw.githubusercontent.com/Microsoft/vscode-debugadapter-node/master/debugProtocol.json"
 	srcpath = "github.com/metaleap/zentient/cmd/zentient-dbg-vsc-genprotocol/vscdbgprotocol.json"
 	dstpath = "github.com/metaleap/zentient/dbg/vsc/protocol/protocol.go"
 )
@@ -23,8 +24,7 @@ func main() {
 		panic(err)
 	}
 
-	jsd.Defs["DisconnectArguments"].EnsureProps(map[string]string{"restart": "boolean"})
-	// jsd.Defs["LaunchRequestArguments"].EnsureProps(map[string]string{})
+	jsd.Defs["DisconnectArguments"].EnsureProps(nil)
 	jsd.ForceCopyProps("Request", "Response", "command")
 
 	unmarshalHints := map[string]string{"ProtocolMessage": "type", "Event": "event", "Request": "command", "Response": "command"}
