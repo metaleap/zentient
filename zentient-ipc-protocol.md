@@ -20,11 +20,12 @@ Line-based JSON message exchange:
 
 ## The _server_ perspective:
 
-M.O.: long-running process that however could be killed with no warning any moment
+Modus operandi: long-running process that however could be killed without advance notice at any moment
   - long-running indicates: it's worth performing precompuations and cache things in memory (eg. AST-based-until-source-changes etc.), and it's feasible to have its own background tasks
   - server may for diagnostic purposes perform its own logging to its `stderr` in whatever way suits it
-  - server should handle incoming messages in (a) separate thread(s), such that its `stdin` stream is always reading and ready (therefore it must also guard its `stdout` against concurrent output writes)
+  - handling of fully-read incoming messages should happen concurrently to the `stdin` reading itself: incoming messages should be accepted as soon as they come in
+    - obviously, any *server* implementation must guard its `stdout` against any concurrent response writes to it
 
 ### Caddies
 
-are an abstraction server can keep around zero-or-more of. They change their own status (busy, ready etc.) and description / notices over time, and **tend to represent background tasks like build-on-save, lint-on-save, lint-on-open, package-tree refreshing,** or whatever specific concept might fit the abstraction. (In the real world, a caddy seems to be some sort of "an on-demand runner, otherwise on constant stand-by", hence the term).
+are an abstraction that servers can keep around zero-or-more of. They change their own status (busy, ready etc.) and description / notices over time, and **tend to represent background tasks like build-on-save, lint-on-save, lint-on-open, package-tree refreshing,** or whatever specific concept might fit the abstraction. (In the real world, a caddy seems to be some sort of "an on-demand runner, otherwise on constant stand-by when idle", hence the term).
