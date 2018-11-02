@@ -29,3 +29,61 @@ Modus operandi: long-running process that however could be killed without advanc
 ### Caddies
 
 are an abstraction that servers can keep around zero-or-more of. They change their own status (busy, ready etc.) and description / notices over time, and **tend to represent background tasks like build-on-save, lint-on-save, lint-on-open, package-tree refreshing,** or whatever specific concept might fit the abstraction. (In the real world, a caddy seems to be some sort of "an on-demand runner, otherwise on constant stand-by when idle", hence the term).
+
+# Protocol message-types *("IPC-IDs")*
+
+	IPCID_MENUS_MAIN              = 01
+	IPCID_MENUS_PKGS              = 02
+	IPCID_MENUS_TOOLS             = 03
+
+	IPCID_OBJ_SNAPSHOT            = 04
+	IPCID_PAGE_HTML               = 05
+	IPCID_TREEVIEW_GETITEM        = 06
+	IPCID_TREEVIEW_CHILDREN       = 07
+	IPCID_TREEVIEW_CHANGED        = 08
+	IPCID_CFG_RESETALL            = 09
+	IPCID_CFG_LIST                = 10
+	IPCID_CFG_SET                 = 11
+	IPCID_NOTIFY_INFO             = 12
+	IPCID_NOTIFY_WARN             = 13
+	IPCID_NOTIFY_ERR              = 14
+
+	IPCID_PROJ_CHANGED            = 15
+	IPCID_PROJ_POLLEVTS           = 16
+
+	IPCID_SRCDIAG_LIST            = 17
+	IPCID_SRCDIAG_RUN_CURFILE     = 18
+	IPCID_SRCDIAG_RUN_OPENFILES   = 19
+	IPCID_SRCDIAG_RUN_ALLFILES    = 20
+	IPCID_SRCDIAG_FORGETALL       = 21
+	IPCID_SRCDIAG_PEEKHIDDEN      = 22
+	IPCID_SRCDIAG_PUB             = 23
+	IPCID_SRCDIAG_AUTO_TOGGLE     = 24
+	IPCID_SRCDIAG_AUTO_ALL        = 25
+	IPCID_SRCDIAG_AUTO_NONE       = 26
+	IPCID_SRCDIAG_STARTED         = 27
+	IPCID_SRCDIAG_FINISHED        = 28
+
+	IPCID_SRCMOD_FMT_SETDEFMENU   = 29
+	IPCID_SRCMOD_FMT_SETDEFPICK   = 30
+	IPCID_SRCMOD_FMT_RUNONFILE    = 31
+	IPCID_SRCMOD_FMT_RUNONSEL     = 32
+	IPCID_SRCMOD_RENAME           = 33
+	IPCID_SRCMOD_ACTIONS          = 34
+
+	IPCID_SRCINTEL_HOVER          = 35
+	IPCID_SRCINTEL_SYMS_FILE      = 36
+	IPCID_SRCINTEL_SYMS_PROJ      = 37
+	IPCID_SRCINTEL_CMPL_ITEMS     = 38
+	IPCID_SRCINTEL_CMPL_DETAILS   = 39
+	IPCID_SRCINTEL_HIGHLIGHTS     = 40
+	IPCID_SRCINTEL_SIGNATURE      = 41
+	IPCID_SRCINTEL_REFERENCES     = 42
+	IPCID_SRCINTEL_DEFSYM         = 43
+	IPCID_SRCINTEL_DEFTYPE        = 44
+	IPCID_SRCINTEL_DEFIMPL        = 45
+
+	IPCID_EXTRAS_INTEL_LIST       = 46
+	IPCID_EXTRAS_INTEL_RUN        = 47
+	IPCID_EXTRAS_QUERY_LIST       = 48
+	IPCID_EXTRAS_QUERY_RUN        = 49

@@ -102,7 +102,7 @@ func (this *ToolingBase) MenuCategory() string {
 	return "Tooling"
 }
 
-func (this *ToolingBase) menuItems(srcLens *SrcLens) (menu MenuItems) {
+func (this *ToolingBase) menuItems(*SrcLens) (menu MenuItems) {
 	menu = append(menu, this.cmdListAll)
 	return
 }

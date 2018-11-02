@@ -38,11 +38,12 @@ func (this *DiagBase) MenuCategory() string {
 
 func (this *DiagBase) menuItems(srcLens *SrcLens) (menu MenuItems) {
 	menu = make(MenuItems, 0, 5)
-	autodiags, nonautodiags, srcfilepath, workspacefiles := this.knownLinters(true), this.knownLinters(false), srcLens.FilePath, Lang.Workspace.Files()
+	autodiags, nonautodiags, workspacefiles := this.knownLinters(true), this.knownLinters(false), Lang.Workspace.Files()
 	this.menuItemsUpdateHint(autodiags, this.cmdListDiags)
 	menu = append(menu, this.cmdListDiags)
-	if numnonautos := nonautodiags.len(true); numnonautos > 0 {
+	if srcfilepath, numnonautos := "", nonautodiags.len(true); numnonautos > 0 {
 		if srcLens != nil && srcLens.FilePath != "" {
+			srcfilepath = srcLens.FilePath
 			this.cmdRunDiagsOnCurFile.IpcArgs = srcfilepath
 			this.cmdRunDiagsOnCurFile.Desc = Strf("➜ on: %s", Lang.Workspace.PrettyPath(srcfilepath))
 			this.menuItemsUpdateHint(nonautodiags, this.cmdRunDiagsOnCurFile)

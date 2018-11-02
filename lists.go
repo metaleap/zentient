@@ -97,7 +97,7 @@ func (this *ListMenuBase) init(impl IListMenu, cat string, fdesc string) {
 }
 
 func (this *ListMenuBase) itemDesc(srcLens *SrcLens, lf *ListFilter) string {
-	if lf.OnSrcLens != nil {
+	if lf.OnSrcLens != nil && srcLens != nil {
 		lf.OnSrcLens(lf, srcLens)
 	}
 	return Strf(this.fdesc, Lang.Title, lf.Desc)
