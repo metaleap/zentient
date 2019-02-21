@@ -14,7 +14,7 @@ const (
 )
 
 var (
-	caddyBuildJobs = Caddy{ID: "buildOnSave", Title: "Build-On-Save", Icon: ""}
+	caddyBuildJobs = Caddy{ID: "buildOnSave", Icon: "⚗", Title: "Build-On-Save"}
 )
 
 type Caddy struct {

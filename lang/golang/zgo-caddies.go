@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	caddyRefreshPkgs = z.Caddy{ID: "goPkgs", Title: "Go Package Tracker", Icon: ""}
+	caddyRefreshPkgs = z.Caddy{ID: "goPkgs", Title: "Go Package Tracker", Icon: "📦"}
 )
 
 func init() {
