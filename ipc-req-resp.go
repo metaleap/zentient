@@ -110,6 +110,7 @@ func (this *ipcResp) withMenu() *menuResp {
 	this.Menu = &menuResp{}
 	return this.Menu
 }
+
 func (this *ipcResp) withSrcIntel() *ipcResp {
 	this.SrcIntel = &srcIntelResp{}
 	return this

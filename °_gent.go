@@ -1,8 +1,9 @@
 package z
 
-// DO NOT EDIT: code generated with `zentient-codegen` using `github.com/metaleap/go-gent`.
+// DO NOT EDIT: code generated with `zentient-codegen` using `github.com/metaleap/go-gent`
 
 import (
+	"bytes"
 	pkg__strconv "strconv"
 )
 
@@ -28,7 +29,7 @@ formatNum:
 
 // Valid returns whether the value of this `IpcIDs` is between `IPCID_MENUS_MAIN` (inclusive) and `IPCID_EXTRAS_QUERY_RUN` (inclusive).
 func (this IpcIDs) Valid() (r bool) {
-	r = (this >= IPCID_MENUS_MAIN) && (this <= IPCID_EXTRAS_QUERY_RUN)
+	r = ((this >= IPCID_MENUS_MAIN) && (this <= IPCID_EXTRAS_QUERY_RUN))
 	return
 }
 
@@ -287,3 +288,13 @@ formatNum:
 	r = pkg__strconv.FormatUint((uint64)(this), 10)
 	return
 }
+
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (this xpcResp) MarshalJSON() (r []byte, err error) {
+	var buf bytes.Buffer
+	r = buf.Bytes()
+	return
+}
+
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (this *xpcResp) UnmarshalJSON(v []byte) (err error) { return }

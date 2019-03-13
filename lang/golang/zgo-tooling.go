@@ -74,9 +74,9 @@ func (this *goTooling) onPreInit() {
 	this.govet = &z.Tool{Name: "go vet", Website: "http://golang.org/cmd/vet/", Installed: true, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_WARN}
 	this.ineffassign = &z.Tool{Name: "ineffassign", Website: "http://github.com/gordonklaus/ineffassign#readme", Installed: udevgo.Has_ineffassign, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_WARN}
 	this.golint = &z.Tool{Name: "golint", Website: "http://github.com/golang/lint#readme", Installed: udevgo.Has_golint, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_INFO}
-	this.checkvar = &z.Tool{Name: "varcheck", Website: "http://github.com/opennota/check#readme", Installed: udevgo.Has_checkvar, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_INFO}
-	this.checkalign = &z.Tool{Name: "aligncheck", Website: "http://github.com/opennota/check#readme", Installed: udevgo.Has_checkalign, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_INFO}
-	this.checkstruct = &z.Tool{Name: "structcheck", Website: "http://github.com/opennota/check#readme", Installed: udevgo.Has_checkstruct, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_INFO}
+	this.checkvar = &z.Tool{Name: "varcheck", Website: "http://gitlab.com/opennota/check#readme", Installed: udevgo.Has_checkvar, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_INFO}
+	this.checkalign = &z.Tool{Name: "aligncheck", Website: "http://gitlab.com/opennota/check#readme", Installed: udevgo.Has_checkalign, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_INFO}
+	this.checkstruct = &z.Tool{Name: "structcheck", Website: "http://gitlab.com/opennota/check#readme", Installed: udevgo.Has_checkstruct, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_INFO}
 	this.errcheck = &z.Tool{Name: "errcheck", Website: "http://github.com/kisielk/errcheck#readme", Installed: udevgo.Has_errcheck, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_INFO}
 	this.interfacer = &z.Tool{Name: "interfacer", Website: "http://github.com/mvdan/interfacer#readme", Installed: udevgo.Has_interfacer, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_INFO}
 	this.unparam = &z.Tool{Name: "unparam", Website: "http://github.com/mvdan/unparam#readme", Installed: udevgo.Has_unparam, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_INFO}
