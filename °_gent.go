@@ -3,7 +3,6 @@ package z
 // DO NOT EDIT: code generated with `zentient-codegen` using `github.com/metaleap/go-gent`
 
 import (
-	"bytes"
 	pkg__strconv "strconv"
 )
 
@@ -290,11 +289,30 @@ formatNum:
 }
 
 // MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (this xpcResp) MarshalJSON() (r []byte, err error) {
-	var buf bytes.Buffer
-	r = buf.Bytes()
-	return
-}
+func (this fooResp) MarshalJSON() (r []byte, err error) { return }
 
 // UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (this *xpcResp) UnmarshalJSON(v []byte) (err error) { return }
+func (this *fooResp) UnmarshalJSON(v []byte) (err error) { return }
+
+// StructFieldsTraverse calls `on` 15x: once for each field in this `fooResp` with its name, its pointer, `true` if name (or embed name) begins in upper-case (else `false`), and `true` if field is an embed (else `false`).
+func (this *fooResp) StructFieldsTraverse(on func(name string, ptr interface{}, isNameUpperCase bool, isEmbed bool)) {
+	on("IpcID", &this.IpcID, true, false)
+	on("ReqID", &this.ReqID, true, false)
+	on("ErrMsg", &this.ErrMsg, true, false)
+	on("SrcIntel", &this.SrcIntel, true, false)
+	on("SrcDiags", &this.SrcDiags, true, false)
+	on("ipcReq", &this.ipcReq, false, true)
+	on("SrcMods", &this.SrcMods, true, false)
+	on("muhPrivate", &this.muhPrivate, false, false)
+	on("SrcActions", &this.SrcActions, true, false)
+	on("Extras", &this.Extras, true, false)
+	on("SrcLens", &this.SrcLens, true, true)
+	on("Pats", &this.Pats, true, true)
+	on("Menu", &this.Menu, true, false)
+	on("CaddyUpdate", &this.CaddyUpdate, true, false)
+	on("Val", &this.Val, true, false)
+}
+
+func (this *fooResp) StructFieldsGet(name string) (r interface{}, ok bool) { return }
+
+func (this *fooResp) StructFieldsSet() {}
