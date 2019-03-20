@@ -313,6 +313,166 @@ func (this *fooResp) StructFieldsTraverse(on func(name string, ptr interface{}, 
 	on("Val", &this.Val, true, false)
 }
 
-func (this *fooResp) StructFieldsGet(name string) (r interface{}, ok bool) { return }
+func (this *fooResp) StructFieldsGet(name string, v interface{}) (r interface{}, ok bool) {
+	switch name {
+	case "IpcID":
+		r = this.IpcID
+		ok = true
+	case "ReqID":
+		r = this.ReqID
+		ok = true
+	case "ErrMsg":
+		r = this.ErrMsg
+		ok = true
+	case "SrcIntel":
+		r = this.SrcIntel
+		ok = true
+	case "SrcDiags":
+		r = this.SrcDiags
+		ok = true
+	case "ipcReq":
+		r = this.ipcReq
+		ok = true
+	case "SrcMods":
+		r = this.SrcMods
+		ok = true
+	case "muhPrivate":
+		r = this.muhPrivate
+		ok = true
+	case "SrcActions":
+		r = this.SrcActions
+		ok = true
+	case "Extras":
+		r = this.Extras
+		ok = true
+	case "SrcLens":
+		r = this.SrcLens
+		ok = true
+	case "Pats":
+		r = this.Pats
+		ok = true
+	case "Menu":
+		r = this.Menu
+		ok = true
+	case "CaddyUpdate":
+		r = this.CaddyUpdate
+		ok = true
+	case "Val":
+		r = this.Val
+		ok = true
+	default:
+		r = v
+	}
+	return
+}
 
-func (this *fooResp) StructFieldsSet() {}
+func (this *fooResp) StructFieldsSet(name string, v interface{}) (okName bool, okType bool) {
+	switch name {
+	case "IpcID":
+		okName = true
+		t, ok := v.(IpcIDs)
+		if ok {
+			okType = true
+			this.IpcID = t
+		}
+	case "ReqID":
+		okName = true
+		t, ok := v.(int64)
+		if ok {
+			okType = true
+			this.ReqID = t
+		}
+	case "ErrMsg":
+		okName = true
+		t, ok := v.(string)
+		if ok {
+			okType = true
+			this.ErrMsg = t
+		}
+	case "SrcIntel":
+		okName = true
+		t, ok := v.(*srcIntelResp)
+		if ok {
+			okType = true
+			this.SrcIntel = t
+		}
+	case "SrcDiags":
+		okName = true
+		t, ok := v.(*diagResp)
+		if ok {
+			okType = true
+			this.SrcDiags = t
+		}
+	case "ipcReq":
+		okName = true
+		t, ok := v.(*ipcReq)
+		if ok {
+			okType = true
+			this.ipcReq = t
+		}
+	case "SrcMods":
+		okName = true
+		t, ok := v.(SrcLenses)
+		if ok {
+			okType = true
+			this.SrcMods = t
+		}
+	case "muhPrivate":
+		okName = true
+		t, ok := v.(int)
+		if ok {
+			okType = true
+			this.muhPrivate = t
+		}
+	case "SrcActions":
+		okName = true
+		t, ok := v.([]EditorAction)
+		if ok {
+			okType = true
+			this.SrcActions = t
+		}
+	case "Extras":
+		okName = true
+		t, ok := v.(*ExtrasResp)
+		if ok {
+			okType = true
+			this.Extras = t
+		}
+	case "SrcLens":
+		okName = true
+		t, ok := v.(*SrcLens)
+		if ok {
+			okType = true
+			this.SrcLens = t
+		}
+	case "Pats":
+		okName = true
+		t, ok := v.(ustr.Pats)
+		if ok {
+			okType = true
+			this.Pats = t
+		}
+	case "Menu":
+		okName = true
+		t, ok := v.(*menuResp)
+		if ok {
+			okType = true
+			this.Menu = t
+		}
+	case "CaddyUpdate":
+		okName = true
+		t, ok := v.(*Caddy)
+		if ok {
+			okType = true
+			this.CaddyUpdate = t
+		}
+	case "Val":
+		okName = true
+		t, ok := v.(interface{})
+		if ok {
+			okType = true
+			this.Val = t
+		}
+	}
+	return
+}
