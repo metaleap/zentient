@@ -342,7 +342,7 @@ func (this *WorkspaceBase) PrettyPath(fsPath string, otherEnvs ...string) string
 		candidates := []string{}
 		for _, d := range this.dirs {
 			if rp := rel(d.Path); rp != "" {
-				candidates = append(candidates, filepath.Join("…", filepath.Base(d.Path), rp))
+				candidates = append(candidates, filepath.Join("...", filepath.Base(d.Path), rp))
 			}
 		}
 		if len(candidates) > 0 {

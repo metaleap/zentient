@@ -65,7 +65,7 @@ func caddyBuildOnInit() {
 
 func CaddyBuildOnRunning(numJobs int, cur int, all string) {
 	caddyBuildJobs.Status.Flag, caddyBuildJobs.Status.Desc, caddyBuildJobs.Details =
-		CADDY_BUSY, Strf("Rebuilding: %d/%d…", cur+1, numJobs), all
+		CADDY_BUSY, Strf("Rebuilding: %d/%d...", cur+1, numJobs), all
 	caddyBuildJobs.OnStatusChanged()
 }
 

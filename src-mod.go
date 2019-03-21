@@ -210,7 +210,7 @@ func (this *SrcModBase) onRunFormatter(req *ipcReq, resp *ipcResp) {
 		} else {
 			resp.Menu.NoteWarn = "Select a Default Formatter first, either via the Zentient Main Menu or:"
 			resp.IpcID = IPCID_SRCMOD_FMT_SETDEFMENU
-			resp.Menu.UxActionLabel = Strf("Pick your preferred Zentient default %s formatter…", Lang.Title)
+			resp.Menu.UxActionLabel = Strf("Pick your preferred Zentient default %s formatter...", Lang.Title)
 		}
 		return
 	}

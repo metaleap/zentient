@@ -3,6 +3,7 @@ package z
 // DO NOT EDIT: code generated with `zentient-codegen` using `github.com/metaleap/go-gent`
 
 import (
+	pkg__github_com_go_leap_str "github.com/go-leap/str"
 	pkg__strconv "strconv"
 )
 
@@ -447,7 +448,7 @@ func (this *fooResp) StructFieldsSet(name string, v interface{}) (okName bool, o
 		}
 	case "Pats":
 		okName = true
-		t, ok := v.(ustr.Pats)
+		t, ok := v.(pkg__github_com_go_leap_str.Pats)
 		if ok {
 			okType = true
 			this.Pats = t
