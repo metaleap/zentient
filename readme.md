@@ -215,7 +215,7 @@ const (
 #### func (CaddyStatus) String
 
 ```go
-func (this CaddyStatus) String() (r string)
+func (me CaddyStatus) String() (r string)
 ```
 String implements the Go standard library's `fmt.Stringer` interface.
 
@@ -259,7 +259,7 @@ const (
 #### func (Completion) String
 
 ```go
-func (this Completion) String() (r string)
+func (me Completion) String() (r string)
 ```
 String implements the Go standard library's `fmt.Stringer` interface.
 
@@ -447,7 +447,7 @@ const (
 #### func (DiagSeverity) String
 
 ```go
-func (this DiagSeverity) String() (r string)
+func (me DiagSeverity) String() (r string)
 ```
 String implements the Go standard library's `fmt.Stringer` interface.
 
@@ -822,14 +822,14 @@ const (
 #### func (IpcIDs) String
 
 ```go
-func (this IpcIDs) String() (r string)
+func (me IpcIDs) String() (r string)
 ```
 String implements the Go standard library's `fmt.Stringer` interface.
 
 #### func (IpcIDs) Valid
 
 ```go
-func (this IpcIDs) Valid() (r bool)
+func (me IpcIDs) Valid() (r bool)
 ```
 Valid returns whether the value of this `IpcIDs` is between `IPCID_MENUS_MAIN`
 (inclusive) and `IPCID_EXTRAS_QUERY_RUN` (inclusive).
@@ -1546,7 +1546,7 @@ const (
 #### func (Symbol) String
 
 ```go
-func (this Symbol) String() (r string)
+func (me Symbol) String() (r string)
 ```
 String implements the Go standard library's `fmt.Stringer` interface.
 

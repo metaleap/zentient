@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/go-leap/dev/go/gen"
 	"github.com/metaleap/go-gent"
 	"github.com/metaleap/go-gent/gents/enums"
 	"github.com/metaleap/go-gent/gents/json"
@@ -8,6 +9,7 @@ import (
 )
 
 func main() {
+	udevgogen.Self.Name = "me"
 	pkgs := gent.MustLoadPkgs(map[string]string{
 		"github.com/metaleap/zentient": "°_gent.go",
 	})

@@ -8,8 +8,8 @@ import (
 )
 
 // String implements the Go standard library's `fmt.Stringer` interface.
-func (this CaddyStatus) String() (r string) {
-	switch this {
+func (me CaddyStatus) String() (r string) {
+	switch me {
 	case CADDY_PENDING:
 		r = "CADDY_PENDING"
 	case CADDY_ERROR:
@@ -23,19 +23,19 @@ func (this CaddyStatus) String() (r string) {
 	}
 	return
 formatNum:
-	r = pkg__strconv.FormatUint((uint64)(this), 10)
+	r = pkg__strconv.FormatUint((uint64)(me), 10)
 	return
 }
 
 // Valid returns whether the value of this `IpcIDs` is between `IPCID_MENUS_MAIN` (inclusive) and `IPCID_EXTRAS_QUERY_RUN` (inclusive).
-func (this IpcIDs) Valid() (r bool) {
-	r = ((this >= IPCID_MENUS_MAIN) && (this <= IPCID_EXTRAS_QUERY_RUN))
+func (me IpcIDs) Valid() (r bool) {
+	r = ((me >= IPCID_MENUS_MAIN) && (me <= IPCID_EXTRAS_QUERY_RUN))
 	return
 }
 
 // String implements the Go standard library's `fmt.Stringer` interface.
-func (this IpcIDs) String() (r string) {
-	switch this {
+func (me IpcIDs) String() (r string) {
+	switch me {
 	case IPCID_MENUS_MAIN:
 		r = "IPCID_MENUS_MAIN"
 	case IPCID_MENUS_PKGS:
@@ -139,13 +139,13 @@ func (this IpcIDs) String() (r string) {
 	}
 	return
 formatNum:
-	r = pkg__strconv.FormatUint((uint64)(this), 10)
+	r = pkg__strconv.FormatUint((uint64)(me), 10)
 	return
 }
 
 // String implements the Go standard library's `fmt.Stringer` interface.
-func (this DiagSeverity) String() (r string) {
-	switch this {
+func (me DiagSeverity) String() (r string) {
+	switch me {
 	case DIAG_SEV_ERR:
 		r = "DIAG_SEV_ERR"
 	case DIAG_SEV_WARN:
@@ -159,13 +159,13 @@ func (this DiagSeverity) String() (r string) {
 	}
 	return
 formatNum:
-	r = pkg__strconv.Itoa((int)(this))
+	r = pkg__strconv.Itoa((int)(me))
 	return
 }
 
 // String implements the Go standard library's `fmt.Stringer` interface.
-func (this Symbol) String() (r string) {
-	switch this {
+func (me Symbol) String() (r string) {
+	switch me {
 	case SYM_FILE:
 		r = "SYM_FILE"
 	case SYM_MODULE:
@@ -223,13 +223,13 @@ func (this Symbol) String() (r string) {
 	}
 	return
 formatNum:
-	r = pkg__strconv.FormatUint((uint64)(this), 10)
+	r = pkg__strconv.FormatUint((uint64)(me), 10)
 	return
 }
 
 // String implements the Go standard library's `fmt.Stringer` interface.
-func (this Completion) String() (r string) {
-	switch this {
+func (me Completion) String() (r string) {
+	switch me {
 	case CMPL_TEXT:
 		r = "CMPL_TEXT"
 	case CMPL_METHOD:
@@ -285,81 +285,81 @@ func (this Completion) String() (r string) {
 	}
 	return
 formatNum:
-	r = pkg__strconv.FormatUint((uint64)(this), 10)
+	r = pkg__strconv.FormatUint((uint64)(me), 10)
 	return
 }
 
 // MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (this fooResp) MarshalJSON() (r []byte, err error) { return }
+func (me *fooResp) MarshalJSON() (r []byte, err error) { return }
 
 // UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (this *fooResp) UnmarshalJSON(v []byte) (err error) { return }
+func (me *fooResp) UnmarshalJSON(v []byte) (err error) { return }
 
 // StructFieldsTraverse calls `on` 15x: once for each field in this `fooResp` with its name, its pointer, `true` if name (or embed name) begins in upper-case (else `false`), and `true` if field is an embed (else `false`).
-func (this *fooResp) StructFieldsTraverse(on func(name string, ptr interface{}, isNameUpperCase bool, isEmbed bool)) {
-	on("IpcID", &this.IpcID, true, false)
-	on("ReqID", &this.ReqID, true, false)
-	on("ErrMsg", &this.ErrMsg, true, false)
-	on("SrcIntel", &this.SrcIntel, true, false)
-	on("SrcDiags", &this.SrcDiags, true, false)
-	on("ipcReq", &this.ipcReq, false, true)
-	on("SrcMods", &this.SrcMods, true, false)
-	on("muhPrivate", &this.muhPrivate, false, false)
-	on("SrcActions", &this.SrcActions, true, false)
-	on("Extras", &this.Extras, true, false)
-	on("SrcLens", &this.SrcLens, true, true)
-	on("Pats", &this.Pats, true, true)
-	on("Menu", &this.Menu, true, false)
-	on("CaddyUpdate", &this.CaddyUpdate, true, false)
-	on("Val", &this.Val, true, false)
+func (me *fooResp) StructFieldsTraverse(on func(name string, ptr interface{}, isNameUpperCase bool, isEmbed bool)) {
+	on("IpcID", &me.IpcID, true, false)
+	on("ReqID", &me.ReqID, true, false)
+	on("ErrMsg", &me.ErrMsg, true, false)
+	on("SrcIntel", &me.SrcIntel, true, false)
+	on("SrcDiags", &me.SrcDiags, true, false)
+	on("ipcReq", &me.ipcReq, false, true)
+	on("SrcMods", &me.SrcMods, true, false)
+	on("muhPrivate", &me.muhPrivate, false, false)
+	on("SrcActions", &me.SrcActions, true, false)
+	on("Extras", &me.Extras, true, false)
+	on("SrcLens", &me.SrcLens, true, true)
+	on("Pats", &me.Pats, true, true)
+	on("Menu", &me.Menu, true, false)
+	on("CaddyUpdate", &me.CaddyUpdate, true, false)
+	on("Val", &me.Val, true, false)
 }
 
-func (this *fooResp) StructFieldsGet(name string, v interface{}) (r interface{}, ok bool) {
+func (me *fooResp) StructFieldsGet(name string, v interface{}) (r interface{}, ok bool) {
 	switch name {
 	case "IpcID":
-		r = this.IpcID
+		r = me.IpcID
 		ok = true
 	case "ReqID":
-		r = this.ReqID
+		r = me.ReqID
 		ok = true
 	case "ErrMsg":
-		r = this.ErrMsg
+		r = me.ErrMsg
 		ok = true
 	case "SrcIntel":
-		r = this.SrcIntel
+		r = me.SrcIntel
 		ok = true
 	case "SrcDiags":
-		r = this.SrcDiags
+		r = me.SrcDiags
 		ok = true
 	case "ipcReq":
-		r = this.ipcReq
+		r = me.ipcReq
 		ok = true
 	case "SrcMods":
-		r = this.SrcMods
+		r = me.SrcMods
 		ok = true
 	case "muhPrivate":
-		r = this.muhPrivate
+		r = me.muhPrivate
 		ok = true
 	case "SrcActions":
-		r = this.SrcActions
+		r = me.SrcActions
 		ok = true
 	case "Extras":
-		r = this.Extras
+		r = me.Extras
 		ok = true
 	case "SrcLens":
-		r = this.SrcLens
+		r = me.SrcLens
 		ok = true
 	case "Pats":
-		r = this.Pats
+		r = me.Pats
 		ok = true
 	case "Menu":
-		r = this.Menu
+		r = me.Menu
 		ok = true
 	case "CaddyUpdate":
-		r = this.CaddyUpdate
+		r = me.CaddyUpdate
 		ok = true
 	case "Val":
-		r = this.Val
+		r = me.Val
 		ok = true
 	default:
 		r = v
@@ -367,112 +367,112 @@ func (this *fooResp) StructFieldsGet(name string, v interface{}) (r interface{},
 	return
 }
 
-func (this *fooResp) StructFieldsSet(name string, v interface{}) (okName bool, okType bool) {
+func (me *fooResp) StructFieldsSet(name string, v interface{}) (okName bool, okType bool) {
 	switch name {
 	case "IpcID":
 		okName = true
 		t, ok := v.(IpcIDs)
 		if ok {
 			okType = true
-			this.IpcID = t
+			me.IpcID = t
 		}
 	case "ReqID":
 		okName = true
 		t, ok := v.(int64)
 		if ok {
 			okType = true
-			this.ReqID = t
+			me.ReqID = t
 		}
 	case "ErrMsg":
 		okName = true
 		t, ok := v.(string)
 		if ok {
 			okType = true
-			this.ErrMsg = t
+			me.ErrMsg = t
 		}
 	case "SrcIntel":
 		okName = true
 		t, ok := v.(*srcIntelResp)
 		if ok {
 			okType = true
-			this.SrcIntel = t
+			me.SrcIntel = t
 		}
 	case "SrcDiags":
 		okName = true
 		t, ok := v.(*diagResp)
 		if ok {
 			okType = true
-			this.SrcDiags = t
+			me.SrcDiags = t
 		}
 	case "ipcReq":
 		okName = true
 		t, ok := v.(*ipcReq)
 		if ok {
 			okType = true
-			this.ipcReq = t
+			me.ipcReq = t
 		}
 	case "SrcMods":
 		okName = true
 		t, ok := v.(SrcLenses)
 		if ok {
 			okType = true
-			this.SrcMods = t
+			me.SrcMods = t
 		}
 	case "muhPrivate":
 		okName = true
 		t, ok := v.(int)
 		if ok {
 			okType = true
-			this.muhPrivate = t
+			me.muhPrivate = t
 		}
 	case "SrcActions":
 		okName = true
 		t, ok := v.([]EditorAction)
 		if ok {
 			okType = true
-			this.SrcActions = t
+			me.SrcActions = t
 		}
 	case "Extras":
 		okName = true
 		t, ok := v.(*ExtrasResp)
 		if ok {
 			okType = true
-			this.Extras = t
+			me.Extras = t
 		}
 	case "SrcLens":
 		okName = true
 		t, ok := v.(*SrcLens)
 		if ok {
 			okType = true
-			this.SrcLens = t
+			me.SrcLens = t
 		}
 	case "Pats":
 		okName = true
 		t, ok := v.(pkg__github_com_go_leap_str.Pats)
 		if ok {
 			okType = true
-			this.Pats = t
+			me.Pats = t
 		}
 	case "Menu":
 		okName = true
 		t, ok := v.(*menuResp)
 		if ok {
 			okType = true
-			this.Menu = t
+			me.Menu = t
 		}
 	case "CaddyUpdate":
 		okName = true
 		t, ok := v.(*Caddy)
 		if ok {
 			okType = true
-			this.CaddyUpdate = t
+			me.CaddyUpdate = t
 		}
 	case "Val":
 		okName = true
 		t, ok := v.(interface{})
 		if ok {
 			okType = true
-			this.Val = t
+			me.Val = t
 		}
 	}
 	return

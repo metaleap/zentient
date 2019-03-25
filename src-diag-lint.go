@@ -47,6 +47,7 @@ type DiagJobLint struct {
 }
 
 func (this *DiagJobLint) Yield(diag *DiagItem) { this.lintChan <- diag }
+
 func (this *DiagJobLint) done() {
 	this.timeTaken = time.Since(this.timeStarted)
 	this.lintChan <- nil
