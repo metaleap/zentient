@@ -4,28 +4,28 @@ import (
 	"github.com/metaleap/zentient/dbg"
 )
 
-func (this *Dbg) procStart() (err error) {
+func (me *Dbg) procStart() (err error) {
 	stdout, stdin, stderr :=
-		&zdbg.ProcInOut{Dbg: this.Impl}, &zdbg.ProcInOut{Dbg: this.Impl}, &zdbg.ProcInOut{Dbg: this.Impl, IsStdErr: true}
-	if err = this.Impl.Start(stdout, stdin, stderr); err == nil {
-		go this.procWait()
+		&zdbg.ProcInOut{Dbg: me.Impl}, &zdbg.ProcInOut{Dbg: me.Impl}, &zdbg.ProcInOut{Dbg: me.Impl, IsStdErr: true}
+	if err = me.Impl.Start(stdout, stdin, stderr); err == nil {
+		go me.procWait()
 	}
 	return
 }
 
-func (this *Dbg) procKill() error {
-	return this.Impl.Kill()
+func (me *Dbg) procKill() error {
+	return me.Impl.Kill()
 }
 
-func (this *Dbg) procWait() {
-	this.waitIgnoreTermination = false
-	err := this.Impl.Wait()
-	if this.waitIgnoreTermination {
-		this.waitIgnoreTermination = false
+func (me *Dbg) procWait() {
+	me.waitIgnoreTermination = false
+	err := me.Impl.Wait()
+	if me.waitIgnoreTermination {
+		me.waitIgnoreTermination = false
 	} else {
-		this.onServerEvt_Terminated()
+		me.onServerEvt_Terminated()
 	}
 	if err != nil {
-		this.Impl.PrintLn(true, "IDbg.Wait: "+err.Error())
+		me.Impl.PrintLn(true, "IDbg.Wait: "+err.Error())
 	}
 }

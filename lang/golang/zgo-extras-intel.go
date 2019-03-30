@@ -28,7 +28,7 @@ var (
 		Detail: "For this `<-` operator's channel ➜ find associated allocations, sends, receives and closes."}
 )
 
-func (this *goExtras) runIntel_Guru(guruCmd string, srcLens *z.SrcLens, arg string, resp *z.ExtrasResp) {
+func (me *goExtras) runIntel_Guru(guruCmd string, srcLens *z.SrcLens, arg string, resp *z.ExtrasResp) {
 	if !tools.guru.Installed {
 		z.ToolGonePanic("guru")
 	}
@@ -168,7 +168,7 @@ func (this *goExtras) runIntel_Guru(guruCmd string, srcLens *z.SrcLens, arg stri
 				if len(udevgo.GuruScopeExclPkgs) > oldnumscopeexcl {
 					go z.SendNotificationMessageToClient(z.DIAG_SEV_WARN, z.Strf("guru complained about %d packages, re-running with those excluded: %v", len(errpkgimppaths), errpkgimppaths))
 					resp.Refs = nil
-					this.runIntel_Guru(guruCmd, srcLens, arg, resp)
+					me.runIntel_Guru(guruCmd, srcLens, arg, resp)
 				}
 			}
 		} else {

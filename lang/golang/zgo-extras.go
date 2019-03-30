@@ -28,25 +28,25 @@ func (*goExtras) ListQueryExtras() (all []*z.ExtrasItem) {
 	return
 }
 
-func (this *goExtras) RunIntelExtra(srcLens *z.SrcLens, id string, arg string, resp *z.ExtrasResp) {
+func (me *goExtras) RunIntelExtra(srcLens *z.SrcLens, id string, arg string, resp *z.ExtrasResp) {
 	if strings.HasPrefix(id, "guru.") {
-		this.runIntel_Guru(id[5:], srcLens, strings.TrimSpace(arg), resp)
+		me.runIntel_Guru(id[5:], srcLens, strings.TrimSpace(arg), resp)
 	} else {
 		z.BadPanic("CodeIntel ID", id)
 	}
 }
 
-func (this *goExtras) RunQueryExtra(srcLens *z.SrcLens, id string, arg string, resp *z.ExtrasResp) {
+func (me *goExtras) RunQueryExtra(srcLens *z.SrcLens, id string, arg string, resp *z.ExtrasResp) {
 	var runner func(srcLens *z.SrcLens, arg string, resp *z.ExtrasResp)
 	switch id {
 	case xQuerierGoRun.ID:
-		runner = this.runQuery_GoRun
+		runner = me.runQuery_GoRun
 	case xQuerierGodoc.ID:
-		runner = this.runQuery_Godoc
+		runner = me.runQuery_Godoc
 	case xQuerierGoDoc.ID:
-		runner = this.runQuery_GoDoc
+		runner = me.runQuery_GoDoc
 	case xQuerierStructlayout.ID:
-		runner = this.runQuery_StructLayout
+		runner = me.runQuery_StructLayout
 	default:
 		z.BadPanic("CodeQuery ID", id)
 	}

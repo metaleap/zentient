@@ -11,7 +11,7 @@ import (
 	"github.com/metaleap/zentient"
 )
 
-func (this *hsDiag) OnUpdateBuildDiags(writtenFilePaths []string) (jobs z.DiagBuildJobs) {
+func (me *hsDiag) OnUpdateBuildDiags(writtenFilePaths []string) (jobs z.DiagBuildJobs) {
 	stackyamlfilepaths := map[string]bool{}
 	for _, fp := range writtenFilePaths {
 		if stackyamlfilepath := ufs.Locate(fp, "stack.yaml"); stackyamlfilepath != "" {
@@ -27,7 +27,7 @@ func (this *hsDiag) OnUpdateBuildDiags(writtenFilePaths []string) (jobs z.DiagBu
 	return
 }
 
-func (this *hsDiag) RunBuildJobs(jobs z.DiagBuildJobs, workspaceFiles z.WorkspaceFiles) (diags z.DiagItems) {
+func (me *hsDiag) RunBuildJobs(jobs z.DiagBuildJobs, workspaceFiles z.WorkspaceFiles) (diags z.DiagItems) {
 	progress := z.NewBuildProgress(len(jobs))
 	for i := 0; i < progress.NumJobs; i++ {
 		progress.AddPkgName(jobs[i].Target.(string))
@@ -107,7 +107,7 @@ func (this *hsDiag) RunBuildJobs(jobs z.DiagBuildJobs, workspaceFiles z.Workspac
 						toolname = toolname + "  » " + cur.Msg[1:j]
 						cur.Msg = ustr.Trim(cur.Msg[j+1:])
 					}
-					diag := this.DiagBase.NewDiagItemFrom(cur, toolname, func() string { return stackyamlfilepath })
+					diag := me.DiagBase.NewDiagItemFrom(cur, toolname, func() string { return stackyamlfilepath })
 					if diags = append(diags, diag); diag.Loc.Flag == int(z.DIAG_SEV_ERR) {
 						haderrs = true
 					}

@@ -135,25 +135,25 @@ func NewBuildProgress(numJobs int) *BuildProgress
 #### func (*BuildProgress) AddPkgName
 
 ```go
-func (this *BuildProgress) AddPkgName(pkgName string)
+func (me *BuildProgress) AddPkgName(pkgName string)
 ```
 
 #### func (*BuildProgress) OnDone
 
 ```go
-func (this *BuildProgress) OnDone()
+func (me *BuildProgress) OnDone()
 ```
 
 #### func (*BuildProgress) OnJob
 
 ```go
-func (this *BuildProgress) OnJob(i int)
+func (me *BuildProgress) OnJob(i int)
 ```
 
 #### func (*BuildProgress) String
 
 ```go
-func (this *BuildProgress) String() string
+func (me *BuildProgress) String() string
 ```
 
 #### type Caddy
@@ -181,19 +181,19 @@ type Caddy struct {
 #### func (*Caddy) IsPendingOrBusy
 
 ```go
-func (this *Caddy) IsPendingOrBusy() bool
+func (me *Caddy) IsPendingOrBusy() bool
 ```
 
 #### func (*Caddy) IsReady
 
 ```go
-func (this *Caddy) IsReady() bool
+func (me *Caddy) IsReady() bool
 ```
 
 #### func (*Caddy) OnStatusChanged
 
 ```go
-func (this *Caddy) OnStatusChanged()
+func (me *Caddy) OnStatusChanged()
 ```
 
 #### type CaddyStatus
@@ -278,7 +278,7 @@ type Config struct {
 #### func (*Config) Save
 
 ```go
-func (this *Config) Save() (err error)
+func (me *Config) Save() (err error)
 ```
 
 #### type DiagBase
@@ -299,31 +299,31 @@ func (*DiagBase) FixerUppers() []FixerUpper
 #### func (*DiagBase) Init
 
 ```go
-func (this *DiagBase) Init()
+func (me *DiagBase) Init()
 ```
 
 #### func (*DiagBase) MenuCategory
 
 ```go
-func (this *DiagBase) MenuCategory() string
+func (me *DiagBase) MenuCategory() string
 ```
 
 #### func (*DiagBase) NewDiagItemFrom
 
 ```go
-func (this *DiagBase) NewDiagItemFrom(srcRef *udev.SrcMsg, toolName string, fallbackFilePath func() string) (di *DiagItem)
+func (me *DiagBase) NewDiagItemFrom(srcRef *udev.SrcMsg, toolName string, fallbackFilePath func() string) (di *DiagItem)
 ```
 
 #### func (*DiagBase) UpdateBuildDiagsAsNeeded
 
 ```go
-func (this *DiagBase) UpdateBuildDiagsAsNeeded(workspaceFiles WorkspaceFiles, writtenFiles []string)
+func (me *DiagBase) UpdateBuildDiagsAsNeeded(workspaceFiles WorkspaceFiles, writtenFiles []string)
 ```
 
 #### func (*DiagBase) UpdateLintDiagsIfAndAsNeeded
 
 ```go
-func (this *DiagBase) UpdateLintDiagsIfAndAsNeeded(workspaceFiles WorkspaceFiles, autos bool, onlyFilePaths ...string)
+func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(workspaceFiles WorkspaceFiles, autos bool, onlyFilePaths ...string)
 ```
 
 #### type DiagBuildJobs
@@ -336,19 +336,19 @@ type DiagBuildJobs []*DiagJobBuild
 #### func (DiagBuildJobs) Len
 
 ```go
-func (this DiagBuildJobs) Len() int
+func (me DiagBuildJobs) Len() int
 ```
 
 #### func (DiagBuildJobs) Less
 
 ```go
-func (this DiagBuildJobs) Less(i int, j int) bool
+func (me DiagBuildJobs) Less(i int, j int) bool
 ```
 
 #### func (DiagBuildJobs) Swap
 
 ```go
-func (this DiagBuildJobs) Swap(i int, j int)
+func (me DiagBuildJobs) Swap(i int, j int)
 ```
 
 #### type DiagItem
@@ -385,7 +385,7 @@ type DiagJob struct {
 #### func (*DiagJob) String
 
 ```go
-func (this *DiagJob) String() string
+func (me *DiagJob) String() string
 ```
 
 #### type DiagJobBuild
@@ -402,7 +402,7 @@ type DiagJobBuild struct {
 #### func (*DiagJobBuild) IsSortedPriorTo
 
 ```go
-func (this *DiagJobBuild) IsSortedPriorTo(cmp interface{}) bool
+func (me *DiagJobBuild) IsSortedPriorTo(cmp interface{}) bool
 ```
 
 #### type DiagJobLint
@@ -418,7 +418,7 @@ type DiagJobLint struct {
 #### func (*DiagJobLint) Yield
 
 ```go
-func (this *DiagJobLint) Yield(diag *DiagItem)
+func (me *DiagJobLint) Yield(diag *DiagItem)
 ```
 
 #### type DiagLintJobs
@@ -845,13 +845,13 @@ type ListBase struct {
 #### func (*ListBase) Count
 
 ```go
-func (this *ListBase) Count(all ListFilters) int
+func (me *ListBase) Count(all ListFilters) int
 ```
 
 #### func (*ListBase) FilterByID
 
 ```go
-func (this *ListBase) FilterByID(id string) *ListFilter
+func (me *ListBase) FilterByID(id string) *ListFilter
 ```
 
 #### type ListFilter
@@ -892,19 +892,19 @@ type ListItems []IListItem
 #### func (ListItems) Len
 
 ```go
-func (this ListItems) Len() int
+func (me ListItems) Len() int
 ```
 
 #### func (ListItems) Less
 
 ```go
-func (this ListItems) Less(i int, j int) bool
+func (me ListItems) Less(i int, j int) bool
 ```
 
 #### func (ListItems) Swap
 
 ```go
-func (this ListItems) Swap(i, j int)
+func (me ListItems) Swap(i, j int)
 ```
 
 #### type ListMenuBase
@@ -919,7 +919,7 @@ type ListMenuBase struct {
 #### func (*ListMenuBase) MenuCategory
 
 ```go
-func (this *ListMenuBase) MenuCategory() string
+func (me *ListMenuBase) MenuCategory() string
 ```
 
 #### type Menu
@@ -1000,13 +1000,13 @@ type PkgInfos []*PkgInfo
 #### func (*PkgInfos) Add
 
 ```go
-func (this *PkgInfos) Add(pkg *PkgInfo)
+func (me *PkgInfos) Add(pkg *PkgInfo)
 ```
 
 #### func (PkgInfos) ById
 
 ```go
-func (this PkgInfos) ById(id string) *PkgInfo
+func (me PkgInfos) ById(id string) *PkgInfo
 ```
 
 #### type PkgIntelBase
@@ -1023,25 +1023,25 @@ type PkgIntelBase struct {
 #### func (*PkgIntelBase) Init
 
 ```go
-func (this *PkgIntelBase) Init()
+func (me *PkgIntelBase) Init()
 ```
 
 #### func (*PkgIntelBase) ObjSnapPrefix
 
 ```go
-func (this *PkgIntelBase) ObjSnapPrefix() string
+func (me *PkgIntelBase) ObjSnapPrefix() string
 ```
 
 #### func (*PkgIntelBase) Pkgs
 
 ```go
-func (this *PkgIntelBase) Pkgs() PkgInfos
+func (me *PkgIntelBase) Pkgs() PkgInfos
 ```
 
 #### func (*PkgIntelBase) PkgsAdd
 
 ```go
-func (this *PkgIntelBase) PkgsAdd(pkg *PkgInfo)
+func (me *PkgIntelBase) PkgsAdd(pkg *PkgInfo)
 ```
 
 #### type PkgMemInfo
@@ -1075,37 +1075,37 @@ type Setting struct {
 #### func (*Setting) Val
 
 ```go
-func (this *Setting) Val() interface{}
+func (me *Setting) Val() interface{}
 ```
 
 #### func (*Setting) ValBool
 
 ```go
-func (this *Setting) ValBool() (val bool)
+func (me *Setting) ValBool() (val bool)
 ```
 
 #### func (*Setting) ValInt
 
 ```go
-func (this *Setting) ValInt() (val int64)
+func (me *Setting) ValInt() (val int64)
 ```
 
 #### func (*Setting) ValStr
 
 ```go
-func (this *Setting) ValStr() (val string)
+func (me *Setting) ValStr() (val string)
 ```
 
 #### func (*Setting) ValStrs
 
 ```go
-func (this *Setting) ValStrs() (val []string)
+func (me *Setting) ValStrs() (val []string)
 ```
 
 #### func (*Setting) ValUInt
 
 ```go
-func (this *Setting) ValUInt() (val uint64)
+func (me *Setting) ValUInt() (val uint64)
 ```
 
 #### type Settings
@@ -1127,13 +1127,13 @@ type SettingsBase struct {
 #### func (*SettingsBase) Init
 
 ```go
-func (this *SettingsBase) Init()
+func (me *SettingsBase) Init()
 ```
 
 #### func (*SettingsBase) KnownSettings
 
 ```go
-func (this *SettingsBase) KnownSettings() Settings
+func (me *SettingsBase) KnownSettings() Settings
 ```
 
 #### func (*SettingsBase) MenuCategory
@@ -1260,19 +1260,19 @@ type SrcIntelCompls []*SrcIntelCompl
 #### func (SrcIntelCompls) Len
 
 ```go
-func (this SrcIntelCompls) Len() int
+func (me SrcIntelCompls) Len() int
 ```
 
 #### func (SrcIntelCompls) Less
 
 ```go
-func (this SrcIntelCompls) Less(i int, j int) bool
+func (me SrcIntelCompls) Less(i int, j int) bool
 ```
 
 #### func (SrcIntelCompls) Swap
 
 ```go
-func (this SrcIntelCompls) Swap(i int, j int)
+func (me SrcIntelCompls) Swap(i int, j int)
 ```
 
 #### type SrcIntelDoc
@@ -1342,25 +1342,25 @@ type SrcLens struct {
 #### func (*SrcLens) ByteOffsetForFirstLineBeginningWith
 
 ```go
-func (this *SrcLens) ByteOffsetForFirstLineBeginningWith(prefix string) int
+func (me *SrcLens) ByteOffsetForFirstLineBeginningWith(prefix string) int
 ```
 
 #### func (*SrcLens) ByteOffsetForPos
 
 ```go
-func (this *SrcLens) ByteOffsetForPos(pos *SrcPos) int
+func (me *SrcLens) ByteOffsetForPos(pos *SrcPos) int
 ```
 
 #### func (*SrcLens) EnsureSrcFull
 
 ```go
-func (this *SrcLens) EnsureSrcFull()
+func (me *SrcLens) EnsureSrcFull()
 ```
 
 #### func (*SrcLens) Rune1OffsetForByte0Offset
 
 ```go
-func (this *SrcLens) Rune1OffsetForByte0Offset(byte0off int) (rune1off int)
+func (me *SrcLens) Rune1OffsetForByte0Offset(byte0off int) (rune1off int)
 ```
 
 #### type SrcLenses
@@ -1373,7 +1373,7 @@ type SrcLenses []*SrcLens
 #### func (*SrcLenses) AddFrom
 
 ```go
-func (this *SrcLenses) AddFrom(srcRefLoc *udev.SrcMsg, fallbackFilePath func() string) (lens *SrcLens)
+func (me *SrcLenses) AddFrom(srcRefLoc *udev.SrcMsg, fallbackFilePath func() string) (lens *SrcLens)
 ```
 
 #### type SrcLoc
@@ -1391,7 +1391,7 @@ type SrcLoc struct {
 #### func (*SrcLoc) SetFilePathAndPosOrRangeFrom
 
 ```go
-func (this *SrcLoc) SetFilePathAndPosOrRangeFrom(srcRef *udev.SrcMsg, fallbackFilePath func() string)
+func (me *SrcLoc) SetFilePathAndPosOrRangeFrom(srcRef *udev.SrcMsg, fallbackFilePath func() string)
 ```
 
 #### type SrcLocs
@@ -1404,7 +1404,7 @@ type SrcLocs []*SrcLoc
 #### func (*SrcLocs) AddFrom
 
 ```go
-func (this *SrcLocs) AddFrom(srcRefLoc *udev.SrcMsg, fallbackFilePath func() string) (loc *SrcLoc)
+func (me *SrcLocs) AddFrom(srcRefLoc *udev.SrcMsg, fallbackFilePath func() string) (loc *SrcLoc)
 ```
 
 #### type SrcModBase
@@ -1425,7 +1425,7 @@ func (*SrcModBase) CodeActions(srcLens *SrcLens) (all []EditorAction)
 #### func (*SrcModBase) Init
 
 ```go
-func (this *SrcModBase) Init()
+func (me *SrcModBase) Init()
 ```
 
 #### func (*SrcModBase) MenuCategory
@@ -1450,31 +1450,31 @@ type SrcModEdits []srcModEdit
 #### func (*SrcModEdits) AddDeleteLine
 
 ```go
-func (this *SrcModEdits) AddDeleteLine(srcFilePath string, lineAt *SrcPos)
+func (me *SrcModEdits) AddDeleteLine(srcFilePath string, lineAt *SrcPos)
 ```
 
 #### func (*SrcModEdits) AddInsert
 
 ```go
-func (this *SrcModEdits) AddInsert(srcFilePath string, atPos func(*SrcLens, *SrcPos) string)
+func (me *SrcModEdits) AddInsert(srcFilePath string, atPos func(*SrcLens, *SrcPos) string)
 ```
 
 #### func (SrcModEdits) Len
 
 ```go
-func (this SrcModEdits) Len() int
+func (me SrcModEdits) Len() int
 ```
 
 #### func (SrcModEdits) Less
 
 ```go
-func (this SrcModEdits) Less(i int, j int) bool
+func (me SrcModEdits) Less(i int, j int) bool
 ```
 
 #### func (SrcModEdits) Swap
 
 ```go
-func (this SrcModEdits) Swap(i int, j int)
+func (me SrcModEdits) Swap(i int, j int)
 ```
 
 #### type SrcPos
@@ -1492,7 +1492,7 @@ All public fields are 1-based (so 0 means 'missing') and rune-not-byte-based
 #### func (*SrcPos) String
 
 ```go
-func (this *SrcPos) String() string
+func (me *SrcPos) String() string
 ```
 
 #### type SrcRange
@@ -1572,7 +1572,7 @@ func (*Tool) Exec(panicOnErr bool, stdin string, cmdName string, cmdArgs []strin
 #### func (*Tool) NotInstalledMessage
 
 ```go
-func (this *Tool) NotInstalledMessage() string
+func (me *Tool) NotInstalledMessage() string
 ```
 
 #### type ToolCats
@@ -1600,7 +1600,7 @@ const (
 #### func (ToolCats) String
 
 ```go
-func (this ToolCats) String() string
+func (me ToolCats) String() string
 ```
 
 #### type ToolingBase
@@ -1615,25 +1615,25 @@ type ToolingBase struct {
 #### func (*ToolingBase) CountNumInst
 
 ```go
-func (this *ToolingBase) CountNumInst(all Tools) (numInst int)
+func (me *ToolingBase) CountNumInst(all Tools) (numInst int)
 ```
 
 #### func (*ToolingBase) Init
 
 ```go
-func (this *ToolingBase) Init()
+func (me *ToolingBase) Init()
 ```
 
 #### func (*ToolingBase) KnownToolsFor
 
 ```go
-func (this *ToolingBase) KnownToolsFor(cats ...ToolCats) (tools Tools)
+func (me *ToolingBase) KnownToolsFor(cats ...ToolCats) (tools Tools)
 ```
 
 #### func (*ToolingBase) MenuCategory
 
 ```go
-func (this *ToolingBase) MenuCategory() string
+func (me *ToolingBase) MenuCategory() string
 ```
 
 #### type Tools
@@ -1673,37 +1673,37 @@ type WorkspaceBase struct {
 #### func (*WorkspaceBase) Dirs
 
 ```go
-func (this *WorkspaceBase) Dirs() (dirs WorkspaceDirs)
+func (me *WorkspaceBase) Dirs() (dirs WorkspaceDirs)
 ```
 
 #### func (*WorkspaceBase) Files
 
 ```go
-func (this *WorkspaceBase) Files() (files WorkspaceFiles)
+func (me *WorkspaceBase) Files() (files WorkspaceFiles)
 ```
 
 #### func (*WorkspaceBase) Init
 
 ```go
-func (this *WorkspaceBase) Init()
+func (me *WorkspaceBase) Init()
 ```
 
 #### func (*WorkspaceBase) Lock
 
 ```go
-func (this *WorkspaceBase) Lock()
+func (me *WorkspaceBase) Lock()
 ```
 
 #### func (*WorkspaceBase) MarshalJSON
 
 ```go
-func (this *WorkspaceBase) MarshalJSON() ([]byte, error)
+func (me *WorkspaceBase) MarshalJSON() ([]byte, error)
 ```
 
 #### func (*WorkspaceBase) ObjSnap
 
 ```go
-func (this *WorkspaceBase) ObjSnap(string) interface{}
+func (me *WorkspaceBase) ObjSnap(string) interface{}
 ```
 
 #### func (*WorkspaceBase) ObjSnapPrefix
@@ -1715,13 +1715,13 @@ func (*WorkspaceBase) ObjSnapPrefix() string
 #### func (*WorkspaceBase) PrettyPath
 
 ```go
-func (this *WorkspaceBase) PrettyPath(fsPath string, otherEnvs ...string) string
+func (me *WorkspaceBase) PrettyPath(fsPath string, otherEnvs ...string) string
 ```
 
 #### func (*WorkspaceBase) Unlock
 
 ```go
-func (this *WorkspaceBase) Unlock()
+func (me *WorkspaceBase) Unlock()
 ```
 
 #### type WorkspaceChanges
@@ -1740,7 +1740,7 @@ type WorkspaceChanges struct {
 #### func (*WorkspaceChanges) HasDirChanges
 
 ```go
-func (this *WorkspaceChanges) HasDirChanges() bool
+func (me *WorkspaceChanges) HasDirChanges() bool
 ```
 
 #### type WorkspaceChangesAfter
@@ -1798,5 +1798,5 @@ type WorkspaceFiles map[string]*WorkspaceFile
 #### func (WorkspaceFiles) HasBuildDiags
 
 ```go
-func (this WorkspaceFiles) HasBuildDiags(filePath string) (has bool)
+func (me WorkspaceFiles) HasBuildDiags(filePath string) (has bool)
 ```

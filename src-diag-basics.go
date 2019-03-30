@@ -20,14 +20,14 @@ type diags struct {
 	Items DiagItems `json:",omitempty"`
 }
 
-func (this *diags) forget(onlyFor Tools) {
+func (me *diags) forget(onlyFor Tools) {
 	if len(onlyFor) == 0 {
-		this.Items = nil
+		me.Items = nil
 	} else {
-		for i := 0; i < len(this.Items); i++ {
-			if onlyFor.has(this.Items[i].Cat) {
-				pre, post := this.Items[:i], this.Items[i+1:]
-				i, this.Items = i-1, append(pre, post...)
+		for i := 0; i < len(me.Items); i++ {
+			if onlyFor.has(me.Items[i].Cat) {
+				pre, post := me.Items[:i], me.Items[i+1:]
+				i, me.Items = i-1, append(pre, post...)
 			}
 		}
 	}
@@ -44,16 +44,16 @@ type DiagItem struct {
 	StickyAuto  bool           `json:"Sticky,omitempty"`
 }
 
-func (this *DiagItem) resetAndInferSrcActions(maybeOrigSrcRef *udev.SrcMsg) {
-	this.SrcActions = nil
-	if ilastcolon := ustr.Last(this.Msg, ":"); ilastcolon > 0 {
-		if ustr.ToInt(this.Msg[ilastcolon+1:], 0) > 0 {
-			if ifirstsep := ustr.IdxR(this.Msg, filepath.Separator); ifirstsep >= 0 {
-				refpath := this.Msg[ifirstsep:]
+func (me *DiagItem) resetAndInferSrcActions(maybeOrigSrcRef *udev.SrcMsg) {
+	me.SrcActions = nil
+	if ilastcolon := ustr.Last(me.Msg, ":"); ilastcolon > 0 {
+		if ustr.ToInt(me.Msg[ilastcolon+1:], 0) > 0 {
+			if ifirstsep := ustr.IdxR(me.Msg, filepath.Separator); ifirstsep >= 0 {
+				refpath := me.Msg[ifirstsep:]
 				refpathf := refpath[:ustr.IdxR(refpath, ':')]
 				if !ufs.IsFile(refpathf) {
 					for i := ifirstsep - 1; i > 0; i-- {
-						refpath = this.Msg[i:]
+						refpath = me.Msg[i:]
 						if refpathf = refpath[:ustr.IdxR(refpath, ':')]; ufs.IsFile(refpathf) {
 							break
 						}
@@ -64,7 +64,7 @@ func (this *DiagItem) resetAndInferSrcActions(maybeOrigSrcRef *udev.SrcMsg) {
 				}
 				if ufs.IsFile(refpathf) {
 					fpathref := refpathf + refpath[ustr.IdxR(refpath, ':'):]
-					this.SrcActions = append(this.SrcActions, EditorAction{
+					me.SrcActions = append(me.SrcActions, EditorAction{
 						Cmd:       "zen.internal.openFileAt",
 						Title:     Strf("Jump to %s", filepath.Base(fpathref)),
 						Arguments: []interface{}{fpathref},
@@ -79,22 +79,22 @@ func (this *DiagItem) resetAndInferSrcActions(maybeOrigSrcRef *udev.SrcMsg) {
 			to, _ := xto.(string)
 			notes, _ := xnotes.([]string)
 			if from != "" && to != "" {
-				this.SrcActions = append(this.SrcActions, EditorAction{
+				me.SrcActions = append(me.SrcActions, EditorAction{
 					Cmd:       "zen.internal.replaceText",
 					Title:     "Apply Suggestion",
 					Hint:      ustr.Join(notes, "\n"),
 					Arguments: []interface{}{from, to},
 				})
 			}
-			this.Msg += " —\n" + ustr.Join(append([]string{"Instead of:\n\t" + from, "Consider:\n\t" + to}, notes...), "\n")
+			me.Msg += " —\n" + ustr.Join(append([]string{"Instead of:\n\t" + from, "Consider:\n\t" + to}, notes...), "\n")
 		}
 	}
 }
 
 type DiagItems []*DiagItem
 
-func (this DiagItems) propagate(lintDiags bool, diagsSticky bool, workspaceFiles WorkspaceFiles) {
-	for _, diag := range this {
+func (me DiagItems) propagate(lintDiags bool, diagsSticky bool, workspaceFiles WorkspaceFiles) {
+	for _, diag := range me {
 		f := workspaceFiles.ensure(diag.Loc.FilePath)
 		fd := &f.Diags.Lint
 		if (!lintDiags) && diag.Loc.Flag == int(DIAG_SEV_ERR) {
@@ -118,10 +118,10 @@ type DiagJob struct {
 	Target            IDiagJobTarget
 }
 
-func (this *DiagJob) forgetPrevDiags(diagToolsIfLint Tools, setAutoUpToDateToTrueIfLint bool, workspaceFiles WorkspaceFiles) {
+func (me *DiagJob) forgetPrevDiags(diagToolsIfLint Tools, setAutoUpToDateToTrueIfLint bool, workspaceFiles WorkspaceFiles) {
 	forbuild := len(diagToolsIfLint) == 0
 	var f *WorkspaceFile
-	for _, fpath := range this.AffectedFilePaths {
+	for _, fpath := range me.AffectedFilePaths {
 		if setAutoUpToDateToTrueIfLint {
 			f = workspaceFiles.ensure(fpath)
 		} else {
@@ -139,11 +139,11 @@ func (this *DiagJob) forgetPrevDiags(diagToolsIfLint Tools, setAutoUpToDateToTru
 	}
 }
 
-func (this *DiagJob) String() string {
-	if str, _ := this.Target.(fmt.Stringer); str != nil {
+func (me *DiagJob) String() string {
+	if str, _ := me.Target.(fmt.Stringer); str != nil {
 		return str.String()
 	}
-	return Strf("%v", this.Target)
+	return Strf("%v", me.Target)
 }
 
 type diagResp struct {
@@ -152,7 +152,7 @@ type diagResp struct {
 	LangID string
 }
 
-func (this *DiagBase) NewDiagItemFrom(srcRef *udev.SrcMsg, toolName string, fallbackFilePath func() string) (di *DiagItem) {
+func (me *DiagBase) NewDiagItemFrom(srcRef *udev.SrcMsg, toolName string, fallbackFilePath func() string) (di *DiagItem) {
 	di = &DiagItem{Msg: ustr.Trim(srcRef.Msg), Cat: toolName}
 	di.Loc.Flag = srcRef.Flag
 	di.Loc.SetFilePathAndPosOrRangeFrom(srcRef, fallbackFilePath)

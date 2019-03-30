@@ -36,19 +36,19 @@ type Caddy struct {
 	OnReady func() `json:"-"`
 }
 
-func (this *Caddy) onInit() {
-	this.Status.Flag, this.Status.Desc = CADDY_PENDING, "pending"
+func (me *Caddy) onInit() {
+	me.Status.Flag, me.Status.Desc = CADDY_PENDING, "pending"
 }
 
-func (this *Caddy) OnStatusChanged() {
-	go send(&ipcResp{CaddyUpdate: this})
+func (me *Caddy) OnStatusChanged() {
+	go send(&ipcResp{CaddyUpdate: me})
 }
 
-func (this *Caddy) IsPendingOrBusy() bool {
-	return this.Status.Flag == CADDY_BUSY || this.Status.Flag == CADDY_PENDING
+func (me *Caddy) IsPendingOrBusy() bool {
+	return me.Status.Flag == CADDY_BUSY || me.Status.Flag == CADDY_PENDING
 }
-func (this *Caddy) IsReady() bool {
-	return this.ready
+func (me *Caddy) IsReady() bool {
+	return me.ready
 }
 
 func init() {

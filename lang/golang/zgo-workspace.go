@@ -22,10 +22,10 @@ type goWorkspace struct {
 	z.WorkspaceBase
 }
 
-func (this *goWorkspace) onAfterChanges(upd *z.WorkspaceChanges) {
+func (me *goWorkspace) onAfterChanges(upd *z.WorkspaceChanges) {
 	if sep := string(filepath.Separator); upd.HasDirChanges() {
 		goPathScopes, udevgo.GuruScopes = nil, ""
-		for _, dp := range this.Dirs() {
+		for _, dp := range me.Dirs() {
 			dp_ := dp.Path + sep
 			for _, gp := range udevgo.Gopaths() {
 				if gpsrc := filepath.Join(gp, "src"); strings.HasPrefix(gp, dp_) && ufs.IsDir(gpsrc) {
@@ -66,6 +66,6 @@ func (*goWorkspace) onBeforeChanges(_ *z.WorkspaceChanges, freshFiles []string, 
 	}
 }
 
-func (this *goWorkspace) onPreInit() {
-	this.OnBeforeChanges, this.OnAfterChanges = this.onBeforeChanges, this.onAfterChanges
+func (me *goWorkspace) onPreInit() {
+	me.OnBeforeChanges, me.OnAfterChanges = me.onBeforeChanges, me.onAfterChanges
 }

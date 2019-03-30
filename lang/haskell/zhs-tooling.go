@@ -23,29 +23,29 @@ type hsTooling struct {
 	hlint          *z.Tool
 }
 
-func (this *hsTooling) onPreInit() {
-	this.hindent = &z.Tool{Name: "hindent", Website: "http://github.com/commercialhaskell/hindent#readme", Installed: udevhs.Has_hindent, Cats: []z.ToolCats{z.TOOLS_CAT_MOD_FMT}}
-	this.stylishhaskell = &z.Tool{Name: "stylish-haskell", Website: "http://github.com/jaspervdj/stylish-haskell#readme", Installed: udevhs.Has_stylish_haskell, Cats: []z.ToolCats{z.TOOLS_CAT_MOD_FMT}}
-	this.brittany = &z.Tool{Name: "brittany", Website: "http://github.com/lspitzner/brittany#readme", Installed: udevhs.Has_brittany, Cats: []z.ToolCats{z.TOOLS_CAT_MOD_FMT}}
-	this.hlint = &z.Tool{Name: "hlint", Website: "http://github.com/ndmitchell/hlint#readme", Installed: udevhs.Has_hlint, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_INFO}
+func (me *hsTooling) onPreInit() {
+	me.hindent = &z.Tool{Name: "hindent", Website: "http://github.com/commercialhaskell/hindent#readme", Installed: udevhs.Has_hindent, Cats: []z.ToolCats{z.TOOLS_CAT_MOD_FMT}}
+	me.stylishhaskell = &z.Tool{Name: "stylish-haskell", Website: "http://github.com/jaspervdj/stylish-haskell#readme", Installed: udevhs.Has_stylish_haskell, Cats: []z.ToolCats{z.TOOLS_CAT_MOD_FMT}}
+	me.brittany = &z.Tool{Name: "brittany", Website: "http://github.com/lspitzner/brittany#readme", Installed: udevhs.Has_brittany, Cats: []z.ToolCats{z.TOOLS_CAT_MOD_FMT}}
+	me.hlint = &z.Tool{Name: "hlint", Website: "http://github.com/ndmitchell/hlint#readme", Installed: udevhs.Has_hlint, Cats: []z.ToolCats{z.TOOLS_CAT_DIAGS}, DiagSev: z.DIAG_SEV_INFO}
 
-	this.all = z.Tools{
-		this.hindent,
-		this.stylishhaskell,
-		this.brittany,
-		this.hlint,
+	me.all = z.Tools{
+		me.hindent,
+		me.stylishhaskell,
+		me.brittany,
+		me.hlint,
 	}
-	this.numInst = this.CountNumInst(this.all)
+	me.numInst = me.CountNumInst(me.all)
 }
 
-func (this *hsTooling) KnownTools() z.Tools {
-	return this.all
+func (me *hsTooling) KnownTools() z.Tools {
+	return me.all
 }
 
-func (this *hsTooling) NumInst() int {
-	return this.numInst
+func (me *hsTooling) NumInst() int {
+	return me.numInst
 }
 
-func (this *hsTooling) NumTotal() int {
-	return len(this.all)
+func (me *hsTooling) NumTotal() int {
+	return len(me.all)
 }

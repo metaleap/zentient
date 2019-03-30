@@ -10,8 +10,8 @@ const (
 
 type sideViewTreeItem []string
 
-func (this sideViewTreeItem) String() string {
-	return ustr.Join(this, sideViewsTreeItemSep)
+func (me sideViewTreeItem) String() string {
+	return ustr.Join(me, sideViewsTreeItemSep)
 }
 
 type TreeViewItem struct {
@@ -35,19 +35,19 @@ type sideViews struct {
 	treeDataProviderPkgDeps treeDataProviderPkgIntel
 }
 
-func (this *sideViews) Init() {
-	this.treeDataProviderPkgDeps.onChanged = this.sendOnChanged
-	this.treeDataProviderPkgDeps.treeViewId = "pkgDeps"
-	this.treeDataProviders = []iTreeDataProvider{&this.treeDataProviderPkgDeps}
+func (me *sideViews) Init() {
+	me.treeDataProviderPkgDeps.onChanged = me.sendOnChanged
+	me.treeDataProviderPkgDeps.treeViewId = "pkgDeps"
+	me.treeDataProviders = []iTreeDataProvider{&me.treeDataProviderPkgDeps}
 }
 
-func (this *sideViews) dispatch(req *ipcReq, resp *ipcResp) bool {
+func (me *sideViews) dispatch(req *ipcReq, resp *ipcResp) bool {
 	if reqtreeitem, reqchildren := req.IpcID == IPCID_TREEVIEW_GETITEM, req.IpcID == IPCID_TREEVIEW_CHILDREN; reqtreeitem || reqchildren {
 		var dataprovider iTreeDataProvider
 		ipcargs := req.IpcArgs.([]interface{})
 		treeviewid := ipcargs[0].(string)
 		treeitem, _ := ipcargs[1].(string)
-		for _, dp := range this.treeDataProviders {
+		for _, dp := range me.treeDataProviders {
 			if dp.id() == treeviewid {
 				dataprovider = dp
 				break
@@ -74,11 +74,11 @@ func (this *sideViews) dispatch(req *ipcReq, resp *ipcResp) bool {
 	return false
 }
 
-func (this *sideViews) sendOnChanged(treeViewId string, item sideViewTreeItem) {
+func (me *sideViews) sendOnChanged(treeViewId string, item sideViewTreeItem) {
 	if treeViewId != "" {
 		_ = send(&ipcResp{IpcID: IPCID_TREEVIEW_CHANGED, Val: []string{treeViewId, item.String()}})
 	} else {
-		_ = send(&ipcResp{IpcID: IPCID_TREEVIEW_CHANGED, Val: []string{this.treeDataProviderPkgDeps.treeViewId, item.String()}})
+		_ = send(&ipcResp{IpcID: IPCID_TREEVIEW_CHANGED, Val: []string{me.treeDataProviderPkgDeps.treeViewId, item.String()}})
 	}
 }
 
@@ -87,9 +87,9 @@ type treeDataProviderPkgIntel struct {
 	onChanged  func(string, sideViewTreeItem)
 }
 
-func (this *treeDataProviderPkgIntel) id() string { return this.treeViewId }
+func (me *treeDataProviderPkgIntel) id() string { return me.treeViewId }
 
-func (this *treeDataProviderPkgIntel) getTreeViewItem(item sideViewTreeItem) *TreeViewItem {
+func (me *treeDataProviderPkgIntel) getTreeViewItem(item sideViewTreeItem) *TreeViewItem {
 	if len(item) == 1 && item[0] == "?" {
 		return &TreeViewItem{ID: "?", Label: "(" + Prog.Name + " does not support the PkgIntel interface)"}
 	}
@@ -101,7 +101,7 @@ func (this *treeDataProviderPkgIntel) getTreeViewItem(item sideViewTreeItem) *Tr
 	return &TreeViewItem{ID: "??", Label: "UnExPecTed"}
 }
 
-func (this *treeDataProviderPkgIntel) getChildren(item sideViewTreeItem) []sideViewTreeItem {
+func (me *treeDataProviderPkgIntel) getChildren(item sideViewTreeItem) []sideViewTreeItem {
 	if len(item) == 0 {
 		if Lang.PkgIntel == nil {
 			return []sideViewTreeItem{

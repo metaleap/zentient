@@ -42,28 +42,28 @@ type WorkspaceFile struct {
 	modTime           int64
 }
 
-func (this *WorkspaceFile) updateModTime() (hasChanged bool) {
-	fileinfo, err := os.Stat(this.Path)
-	if this.existsAtLastCheck = (err == nil) && fileinfo.Mode().IsRegular(); this.existsAtLastCheck {
+func (me *WorkspaceFile) updateModTime() (hasChanged bool) {
+	fileinfo, err := os.Stat(me.Path)
+	if me.existsAtLastCheck = (err == nil) && fileinfo.Mode().IsRegular(); me.existsAtLastCheck {
 		modtime := fileinfo.ModTime().UnixNano()
-		this.modTime, hasChanged = modtime, modtime > this.modTime
+		me.modTime, hasChanged = modtime, modtime > me.modTime
 	}
 	return
 }
 
-func (this *WorkspaceFile) resetDiags() {
-	this.Diags.Build.forget(nil)
-	this.Diags.Lint.forget(nil)
-	this.Diags.AutoLintUpToDate = false
+func (me *WorkspaceFile) resetDiags() {
+	me.Diags.Build.forget(nil)
+	me.Diags.Lint.forget(nil)
+	me.Diags.AutoLintUpToDate = false
 }
 
 type WorkspaceFiles map[string]*WorkspaceFile
 
-func (this WorkspaceFiles) ensure(fpath string) (file *WorkspaceFile) {
-	if file = this[fpath]; file == nil {
+func (me WorkspaceFiles) ensure(fpath string) (file *WorkspaceFile) {
+	if file = me[fpath]; file == nil {
 		file = &WorkspaceFile{Path: fpath}
 		if file.updateModTime(); file.existsAtLastCheck {
-			this[fpath] = file
+			me[fpath] = file
 		}
 	}
 	return
@@ -75,9 +75,9 @@ type diagsSummary struct {
 	files    map[*WorkspaceFile]bool
 }
 
-func (this WorkspaceFiles) diagsSummary() *diagsSummary {
-	s := &diagsSummary{files: make(map[*WorkspaceFile]bool, len(this))}
-	for _, f := range this {
+func (me WorkspaceFiles) diagsSummary() *diagsSummary {
+	s := &diagsSummary{files: make(map[*WorkspaceFile]bool, len(me))}
+	for _, f := range me {
 		if nb, nl := len(f.Diags.Build.Items), len(f.Diags.Lint.Items); nb > 0 || nl > 0 {
 			s.numBuild, s.numLint, s.files[f] = s.numBuild+nb, s.numLint+nl, true
 		}
@@ -88,8 +88,8 @@ func (this WorkspaceFiles) diagsSummary() *diagsSummary {
 	return s
 }
 
-func (this WorkspaceFiles) haveAnyDiags(buildDiags bool, lintDiags bool) bool {
-	for _, f := range this {
+func (me WorkspaceFiles) haveAnyDiags(buildDiags bool, lintDiags bool) bool {
+	for _, f := range me {
 		if lb, ll := len(f.Diags.Build.Items), len(f.Diags.Lint.Items); (buildDiags && lb > 0) || (lintDiags && ll > 0) {
 			return true
 		}
@@ -97,20 +97,20 @@ func (this WorkspaceFiles) haveAnyDiags(buildDiags bool, lintDiags bool) bool {
 	return false
 }
 
-func (this WorkspaceFiles) HasBuildDiags(filePath string) (has bool) {
-	if f := this[filePath]; f != nil {
+func (me WorkspaceFiles) HasBuildDiags(filePath string) (has bool) {
+	if f := me[filePath]; f != nil {
 		has = len(f.Diags.Build.Items) > 0
 	}
 	return
 }
 
-func (this WorkspaceFiles) exists(fpath string) bool {
-	return this[fpath] != nil
+func (me WorkspaceFiles) exists(fpath string) bool {
+	return me[fpath] != nil
 }
 
-func (this WorkspaceFiles) filePathsOpened() (all []string) {
-	all = make([]string, 0, len(this))
-	for _, f := range this {
+func (me WorkspaceFiles) filePathsOpened() (all []string) {
+	all = make([]string, 0, len(me))
+	for _, f := range me {
 		if f.IsOpen {
 			all = append(all, f.Path)
 		}
@@ -118,18 +118,18 @@ func (this WorkspaceFiles) filePathsOpened() (all []string) {
 	return
 }
 
-func (this WorkspaceFiles) filePathsKnown() (all []string) {
+func (me WorkspaceFiles) filePathsKnown() (all []string) {
 	var i int
-	all = make([]string, len(this))
-	for fp := range this {
+	all = make([]string, len(me))
+	for fp := range me {
 		all[i], i = fp, i+1
 	}
 	return
 }
 
-func (this WorkspaceFiles) numDirs(incl func(*WorkspaceFile) bool) int {
-	filedirs := make(map[string]bool, len(this))
-	for _, f := range this {
+func (me WorkspaceFiles) numDirs(incl func(*WorkspaceFile) bool) int {
+	filedirs := make(map[string]bool, len(me))
+	for _, f := range me {
 		if incl == nil || incl(f) {
 			filedirs[filepath.Dir(f.Path)] = true
 		}
@@ -145,17 +145,17 @@ type WorkspaceChanges struct {
 	WrittenFiles []string
 }
 
-func (this *WorkspaceChanges) hasChanges() bool {
-	return this.HasDirChanges() || this.hasFileChanges()
+func (me *WorkspaceChanges) hasChanges() bool {
+	return me.HasDirChanges() || me.hasFileChanges()
 }
 
-func (this *WorkspaceChanges) HasDirChanges() bool {
-	return len(this.AddedDirs) > 0 || len(this.RemovedDirs) > 0
+func (me *WorkspaceChanges) HasDirChanges() bool {
+	return len(me.AddedDirs) > 0 || len(me.RemovedDirs) > 0
 }
 
-func (this *WorkspaceChanges) hasFileIn(filePath string, slices ...[]string) bool {
+func (me *WorkspaceChanges) hasFileIn(filePath string, slices ...[]string) bool {
 	if len(slices) == 0 {
-		slices = [][]string{this.ClosedFiles, this.OpenedFiles, this.WrittenFiles}
+		slices = [][]string{me.ClosedFiles, me.OpenedFiles, me.WrittenFiles}
 	}
 	for _, eventfiles := range slices {
 		for _, fpath := range eventfiles {
@@ -167,8 +167,8 @@ func (this *WorkspaceChanges) hasFileIn(filePath string, slices ...[]string) boo
 	return false
 }
 
-func (this *WorkspaceChanges) hasFileChanges() bool {
-	return len(this.OpenedFiles) > 0 || len(this.ClosedFiles) > 0 || len(this.WrittenFiles) > 0
+func (me *WorkspaceChanges) hasFileChanges() bool {
+	return len(me.OpenedFiles) > 0 || len(me.ClosedFiles) > 0 || len(me.WrittenFiles) > 0
 }
 
 type WorkspaceChangesBefore func(upd *WorkspaceChanges, freshFiles []string, willAutoLint bool)
@@ -188,33 +188,33 @@ type WorkspaceBase struct {
 	pollingPaused  bool
 }
 
-func (this *WorkspaceBase) Init()                         { this.dirs, this.files = WorkspaceDirs{}, WorkspaceFiles{} }
-func (this *WorkspaceBase) Dirs() (dirs WorkspaceDirs)    { dirs = this.dirs; return }
-func (this *WorkspaceBase) Files() (files WorkspaceFiles) { files = this.files; return }
+func (me *WorkspaceBase) Init()                         { me.dirs, me.files = WorkspaceDirs{}, WorkspaceFiles{} }
+func (me *WorkspaceBase) Dirs() (dirs WorkspaceDirs)    { dirs = me.dirs; return }
+func (me *WorkspaceBase) Files() (files WorkspaceFiles) { files = me.files; return }
 
-func (this *WorkspaceBase) Lock() {
-	this.pollingPaused = true
-	this.mutex.Lock()
+func (me *WorkspaceBase) Lock() {
+	me.pollingPaused = true
+	me.mutex.Lock()
 }
 
-func (this *WorkspaceBase) Unlock() {
-	this.mutex.Unlock()
-	this.pollingPaused = false
+func (me *WorkspaceBase) Unlock() {
+	me.mutex.Unlock()
+	me.pollingPaused = false
 }
 
-func (this *WorkspaceBase) MarshalJSON() ([]byte, error) {
+func (me *WorkspaceBase) MarshalJSON() ([]byte, error) {
 	var obj struct {
 		Dirs  WorkspaceDirs
 		Files WorkspaceFiles
 	}
-	obj.Dirs, obj.Files = this.dirs, this.files
+	obj.Dirs, obj.Files = me.dirs, me.files
 	return json.Marshal(&obj)
 }
 
-func (this *WorkspaceBase) dispatch(req *ipcReq, resp *ipcResp) bool {
+func (me *WorkspaceBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	switch req.IpcID {
 	case IPCID_PROJ_CHANGED:
-		this.onChanges(req.ProjUpd)
+		me.onChanges(req.ProjUpd)
 	default:
 		return false
 	}
@@ -241,21 +241,21 @@ func (*WorkspaceBase) analyzeChanges(files WorkspaceFiles, upd *WorkspaceChanges
 	return
 }
 
-func (this *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
+func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 	if upd != nil && upd.hasChanges() {
-		dirs, files := this.dirs, this.files
-		freshfiles, hasfreshfiles, hasdiedfiles, dirschanged, needsfreshautolints := this.analyzeChanges(files, upd)
+		dirs, files := me.dirs, me.files
+		freshfiles, hasfreshfiles, hasdiedfiles, dirschanged, needsfreshautolints := me.analyzeChanges(files, upd)
 		if needsfreshautolints || hasfreshfiles || hasdiedfiles || dirschanged {
-			this.Lock()
-			defer this.Unlock()
+			me.Lock()
+			defer me.Unlock()
 		}
-		if this.OnBeforeChanges != nil {
-			this.OnBeforeChanges(upd, freshfiles, needsfreshautolints)
+		if me.OnBeforeChanges != nil {
+			me.OnBeforeChanges(upd, freshfiles, needsfreshautolints)
 		}
 
 		if dirschanged {
-			dirs = make(WorkspaceDirs, len(this.dirs))
-			for k, v := range this.dirs {
+			dirs = make(WorkspaceDirs, len(me.dirs))
+			for k, v := range me.dirs {
 				dirs[k] = v
 			}
 
@@ -271,8 +271,8 @@ func (this *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 		}
 
 		if hasfreshfiles || hasdiedfiles {
-			files = make(WorkspaceFiles, len(this.files))
-			for k, v := range this.files {
+			files = make(WorkspaceFiles, len(me.files))
+			for k, v := range me.files {
 				if v.existsAtLastCheck {
 					files[k] = v
 				}
@@ -296,27 +296,27 @@ func (this *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 				Lang.Diag.UpdateLintDiagsIfAndAsNeeded(files, true)
 			}
 		}
-		this.dirs, this.files = dirs, files
-		if this.OnAfterChanges != nil {
-			this.OnAfterChanges(upd)
+		me.dirs, me.files = dirs, files
+		if me.OnAfterChanges != nil {
+			me.OnAfterChanges(upd)
 		}
 	}
-	if !this.pollingStarted {
-		this.pollingStarted = true
-		go this.pollFileEventsForever()
+	if !me.pollingStarted {
+		me.pollingStarted = true
+		go me.pollFileEventsForever()
 	}
 }
 
-func (this *WorkspaceBase) ObjSnap(string) interface{} { return this.Impl }
+func (me *WorkspaceBase) ObjSnap(string) interface{} { return me.Impl }
 
 func (*WorkspaceBase) ObjSnapPrefix() string { return Lang.ID + ".proj." }
 
-func (this *WorkspaceBase) pollFileEventsForever() {
+func (me *WorkspaceBase) pollFileEventsForever() {
 	interval := 1234 * time.Millisecond
 	msgraw, _ := json.Marshal(&ipcResp{IpcID: IPCID_PROJ_POLLEVTS})
 	msgraw = append(msgraw, '\n')
 	for {
-		if time.Sleep(interval); !this.pollingPaused {
+		if time.Sleep(interval); !me.pollingPaused {
 			if !canSend() {
 				return
 			} else if err := sendRaw(msgraw); err != nil {
@@ -335,12 +335,12 @@ func (*WorkspaceBase) prettyPathRel(path string, fsPath string) string {
 	return ""
 }
 
-func (this *WorkspaceBase) PrettyPath(fsPath string, otherEnvs ...string) string {
+func (me *WorkspaceBase) PrettyPath(fsPath string, otherEnvs ...string) string {
 	if fsPath != "" {
-		rel := func(path string) string { return this.prettyPathRel(path, fsPath) }
+		rel := func(path string) string { return me.prettyPathRel(path, fsPath) }
 
 		candidates := []string{}
-		for _, d := range this.dirs {
+		for _, d := range me.dirs {
 			if rp := rel(d.Path); rp != "" {
 				candidates = append(candidates, filepath.Join("...", filepath.Base(d.Path), rp))
 			}

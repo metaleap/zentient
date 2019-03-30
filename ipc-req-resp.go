@@ -68,52 +68,52 @@ type ipcResp struct {
 	Val         interface{}    `json:"val,omitempty"`
 }
 
-func (this *ipcResp) postProcess() {
-	if this.Menu != nil && this.Menu.SubMenu != nil && this.Menu.SubMenu.Items == nil {
+func (me *ipcResp) postProcess() {
+	if me.Menu != nil && me.Menu.SubMenu != nil && me.Menu.SubMenu.Items == nil {
 		// handles better on the client-side (and UX-wise) --- instead of a "silent nothing", show an empty menu ("nothing to choose from")
-		this.Menu.SubMenu.Items = MenuItems{}
+		me.Menu.SubMenu.Items = MenuItems{}
 	}
 }
 
-func (this *ipcResp) onResponseReady() {
+func (me *ipcResp) onResponseReady() {
 	if except := recover(); except != nil {
-		this.ErrMsg = Strf("%v", except)
+		me.ErrMsg = Strf("%v", except)
 	}
-	if this.ErrMsg != "" {
-		this.ErrMsg = Strf("[%s] %s", Prog.Name, strings.TrimPrefix(this.ErrMsg, Prog.Name+": "))
+	if me.ErrMsg != "" {
+		me.ErrMsg = Strf("[%s] %s", Prog.Name, strings.TrimPrefix(me.ErrMsg, Prog.Name+": "))
 		//	zero out almost-everything for a leaner response. req-ID is only added in afterwards anyways
-		*this = ipcResp{ErrMsg: this.ErrMsg}
+		*me = ipcResp{ErrMsg: me.ErrMsg}
 	}
 }
 
-func (this *ipcResp) to(req *ipcReq) {
-	defer this.onResponseReady()
+func (me *ipcResp) to(req *ipcReq) {
+	defer me.onResponseReady()
 	for _, disp := range Prog.dispatchers {
-		if disp.dispatch(req, this) {
-			this.postProcess()
+		if disp.dispatch(req, me) {
+			me.postProcess()
 			return
 		}
 	}
 	if !req.IpcID.Valid() {
-		this.ErrMsg = BadMsg("IpcID", req.IpcID.String())
+		me.ErrMsg = BadMsg("IpcID", req.IpcID.String())
 	} else {
-		this.ErrMsg = Strf("The requested feature `%s` wasn't yet implemented for %s.", req.IpcID, Lang.Title)
+		me.ErrMsg = Strf("The requested feature `%s` wasn't yet implemented for %s.", req.IpcID, Lang.Title)
 	}
 }
 
-func (this *ipcResp) withExtras() *ipcResp {
-	this.Extras = &ExtrasResp{}
-	return this
+func (me *ipcResp) withExtras() *ipcResp {
+	me.Extras = &ExtrasResp{}
+	return me
 }
 
-func (this *ipcResp) withMenu() *menuResp {
-	this.Menu = &menuResp{}
-	return this.Menu
+func (me *ipcResp) withMenu() *menuResp {
+	me.Menu = &menuResp{}
+	return me.Menu
 }
 
-func (this *ipcResp) withSrcIntel() *ipcResp {
-	this.SrcIntel = &srcIntelResp{}
-	return this
+func (me *ipcResp) withSrcIntel() *ipcResp {
+	me.SrcIntel = &srcIntelResp{}
+	return me
 }
 
 type EditorAction struct {

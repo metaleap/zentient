@@ -16,6 +16,6 @@ type hsDiag struct {
 	knownTools z.Tools
 }
 
-func (this *hsDiag) onPreInit() {
-	this.knownTools = tools.KnownToolsFor(z.TOOLS_CAT_DIAGS)
+func (me *hsDiag) onPreInit() {
+	me.knownTools = tools.KnownToolsFor(z.TOOLS_CAT_DIAGS)
 }

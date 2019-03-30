@@ -17,8 +17,8 @@ type goDiag struct {
 	knownTools z.Tools
 }
 
-func (this *goDiag) onPreInit() {
-	this.knownTools = tools.KnownToolsFor(z.TOOLS_CAT_DIAGS)
+func (me *goDiag) onPreInit() {
+	me.knownTools = tools.KnownToolsFor(z.TOOLS_CAT_DIAGS)
 }
 
 func (*goDiag) onUpdateDiagsPrepPkgJobs(filePaths []string) (jobs []z.DiagJob) {

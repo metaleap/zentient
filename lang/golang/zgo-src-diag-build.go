@@ -13,8 +13,8 @@ func ensureBuildOrder(dis z.IDiagJobTarget, dat z.IDiagJobTarget) bool {
 	return dis.(*udevgo.Pkg).IsSortedPriorToByDeps(dat.(*udevgo.Pkg))
 }
 
-func (this *goDiag) OnUpdateBuildDiags(writtenFilePaths []string) (jobs z.DiagBuildJobs) {
-	if pkgjobs, pkgsbyimp := this.onUpdateDiagsPrepPkgJobs(writtenFilePaths), udevgo.PkgsByImP; len(pkgjobs) > 0 && pkgsbyimp != nil {
+func (me *goDiag) OnUpdateBuildDiags(writtenFilePaths []string) (jobs z.DiagBuildJobs) {
+	if pkgjobs, pkgsbyimp := me.onUpdateDiagsPrepPkgJobs(writtenFilePaths), udevgo.PkgsByImP; len(pkgjobs) > 0 && pkgsbyimp != nil {
 		for _, pj := range pkgjobs {
 			job := &z.DiagJobBuild{DiagJob: pj, TargetCmp: ensureBuildOrder}
 			for _, dependant := range pj.Target.(*udevgo.Pkg).Dependants() {
@@ -41,20 +41,20 @@ func (this *goDiag) OnUpdateBuildDiags(writtenFilePaths []string) (jobs z.DiagBu
 	return
 }
 
-func (this *goDiag) runBuildPkg(pkg *udevgo.Pkg, workspaceFiles z.WorkspaceFiles) (diags z.DiagItems) {
+func (me *goDiag) runBuildPkg(pkg *udevgo.Pkg, workspaceFiles z.WorkspaceFiles) (diags z.DiagItems) {
 	if msgs := udev.CmdExecOnSrc(true, nil, "go", "install", pkg.ImportPath); len(msgs) > 0 {
 		diags = make(z.DiagItems, 0, len(msgs))
-		skipmsg, fallbackfilepath := "package "+pkg.ImportPath+":", func() string { return this.fallbackFilePath(pkg, workspaceFiles) }
+		skipmsg, fallbackfilepath := "package "+pkg.ImportPath+":", func() string { return me.fallbackFilePath(pkg, workspaceFiles) }
 		for _, srcref := range msgs {
 			if srcref.Msg != "too many errors" && !(srcref.Pos1Ch == 1 && srcref.Pos1Ln == 1 && srcref.Msg == skipmsg) {
-				diags = append(diags, this.NewDiagItemFrom(srcref, "", fallbackfilepath))
+				diags = append(diags, me.NewDiagItemFrom(srcref, "", fallbackfilepath))
 			}
 		}
 	}
 	return
 }
 
-func (this *goDiag) RunBuildJobs(jobs z.DiagBuildJobs, workspaceFiles z.WorkspaceFiles) (diags z.DiagItems) {
+func (me *goDiag) RunBuildJobs(jobs z.DiagBuildJobs, workspaceFiles z.WorkspaceFiles) (diags z.DiagItems) {
 	numbuilt, progress := 0, z.NewBuildProgress(len(jobs))
 	for i := 0; i < progress.NumJobs; i++ {
 		progress.AddPkgName(jobs[i].Target.(*udevgo.Pkg).ImportPath)
@@ -72,7 +72,7 @@ func (this *goDiag) RunBuildJobs(jobs z.DiagBuildJobs, workspaceFiles z.Workspac
 			}
 		}
 		if !skip {
-			pkgdiags := this.runBuildPkg(pkg, workspaceFiles)
+			pkgdiags := me.runBuildPkg(pkg, workspaceFiles)
 			if pkgjob.Succeeded, diags = len(pkgdiags) == 0, append(diags, pkgdiags...); pkgjob.Succeeded {
 				numbuilt++
 			} else {
@@ -94,8 +94,8 @@ func (this *goDiag) RunBuildJobs(jobs z.DiagBuildJobs, workspaceFiles z.Workspac
 	return
 }
 
-func (this *goDiag) FixerUppers() []z.FixerUpper {
-	return []z.FixerUpper{this.tryFixImpNotFound, this.tryFixImpMissing}
+func (me *goDiag) FixerUppers() []z.FixerUpper {
+	return []z.FixerUpper{me.tryFixImpNotFound, me.tryFixImpMissing}
 }
 
 func (*goDiag) tryFixImpMissing(d *z.DiagItem) (fix *z.FixUp) {

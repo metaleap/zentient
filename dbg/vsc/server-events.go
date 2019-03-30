@@ -4,28 +4,28 @@ import (
 	"github.com/metaleap/zentient/dbg/vsc/protocol"
 )
 
-func (this *Dbg) onServerEvt_Initialized() {
+func (me *Dbg) onServerEvt_Initialized() {
 	evtInitialized := zdbgvscp.NewInitializedEvent()
-	this.send(evtInitialized)
+	me.send(evtInitialized)
 }
 
-func (this *Dbg) onServerEvt_Output(cat string, msg string) {
+func (me *Dbg) onServerEvt_Output(cat string, msg string) {
 	evtOutput := zdbgvscp.NewOutputEvent()
 	evtOutput.Body.Category, evtOutput.Body.Output = cat, msg
-	this.send(evtOutput)
+	me.send(evtOutput)
 }
 
-func (this *Dbg) onServerEvt_Stopped() {
+func (me *Dbg) onServerEvt_Stopped() {
 	evtStopped := zdbgvscp.NewStoppedEvent()
-	this.send(evtStopped)
+	me.send(evtStopped)
 }
 
-func (this *Dbg) onServerEvt_Exited() {
+func (me *Dbg) onServerEvt_Exited() {
 	evtExited := zdbgvscp.NewExitedEvent()
-	this.send(evtExited)
+	me.send(evtExited)
 }
 
-func (this *Dbg) onServerEvt_Terminated() {
+func (me *Dbg) onServerEvt_Terminated() {
 	evtTerminated := zdbgvscp.NewTerminatedEvent()
-	this.send(evtTerminated)
+	me.send(evtTerminated)
 }

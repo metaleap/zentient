@@ -49,10 +49,10 @@ type menuResp struct {
 type mainMenu struct {
 }
 
-func (this *mainMenu) dispatch(req *ipcReq, resp *ipcResp) bool {
+func (me *mainMenu) dispatch(req *ipcReq, resp *ipcResp) bool {
 	switch req.IpcID {
 	case IPCID_MENUS_MAIN:
-		this.onMainMenu(req, resp)
+		me.onMainMenu(req, resp)
 	default:
 		return false
 	}

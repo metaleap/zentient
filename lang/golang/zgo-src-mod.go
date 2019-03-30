@@ -19,8 +19,8 @@ type goSrcMod struct {
 	knownFormatters z.Tools
 }
 
-func (this *goSrcMod) onPreInit() {
-	this.knownFormatters = z.Tools{
+func (me *goSrcMod) onPreInit() {
+	me.knownFormatters = z.Tools{
 		tools.goformat, tools.gofmt, tools.goimports, tools.goreturns,
 	}
 }
@@ -35,8 +35,8 @@ func (*goSrcMod) DoesStdoutWithFilePathArg(*z.Tool) bool {
 	return true
 }
 
-func (this *goSrcMod) KnownFormatters() z.Tools {
-	return this.knownFormatters
+func (me *goSrcMod) KnownFormatters() z.Tools {
+	return me.knownFormatters
 }
 
 func (*goSrcMod) RunRenamer(srcLens *z.SrcLens, newName string) (srcMods z.SrcLenses) {

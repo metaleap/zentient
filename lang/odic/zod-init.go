@@ -1,4 +1,4 @@
-package zps
+package zod
 
 import (
 	"github.com/metaleap/zentient"
@@ -6,7 +6,7 @@ import (
 
 func OnPreInit() {
 	l := &z.Lang
-	l.ID, l.Title = "mojo", "mojo"
+	l.ID, l.Title = "odic", "odic"
 }
 
 func OnPostInit() {

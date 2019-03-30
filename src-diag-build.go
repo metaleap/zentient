@@ -32,14 +32,14 @@ type IDiagBuild interface {
 
 type DiagBuildJobs []*DiagJobBuild
 
-func (this DiagBuildJobs) Len() int               { return len(this) }
-func (this DiagBuildJobs) Swap(i int, j int)      { this[i], this[j] = this[j], this[i] }
-func (this DiagBuildJobs) Less(i int, j int) bool { return this[i].IsSortedPriorTo(this[j]) }
+func (me DiagBuildJobs) Len() int               { return len(me) }
+func (me DiagBuildJobs) Swap(i int, j int)      { me[i], me[j] = me[j], me[i] }
+func (me DiagBuildJobs) Less(i int, j int) bool { return me[i].IsSortedPriorTo(me[j]) }
 
-func (this DiagBuildJobs) withoutDuplicates() (nu DiagBuildJobs) {
-	nu = make(DiagBuildJobs, 0, len(this))
-	done := make(map[string]bool, len(this))
-	for _, job := range this {
+func (me DiagBuildJobs) withoutDuplicates() (nu DiagBuildJobs) {
+	nu = make(DiagBuildJobs, 0, len(me))
+	done := make(map[string]bool, len(me))
+	for _, job := range me {
 		if s := job.String(); !done[s] {
 			done[s], nu = true, append(nu, job)
 		}
@@ -53,12 +53,12 @@ type DiagJobBuild struct {
 	Succeeded bool
 }
 
-func (this *DiagJobBuild) IsSortedPriorTo(cmp interface{}) bool {
+func (me *DiagJobBuild) IsSortedPriorTo(cmp interface{}) bool {
 	c := cmp.(*DiagJobBuild)
-	if this.TargetCmp != nil {
-		return this.TargetCmp(this.Target, c.Target)
+	if me.TargetCmp != nil {
+		return me.TargetCmp(me.Target, c.Target)
 	}
-	if sortish, _ := this.Target.(ISortable); sortish != nil {
+	if sortish, _ := me.Target.(ISortable); sortish != nil {
 		return sortish.IsSortedPriorTo(c.Target)
 	}
 	return false
@@ -76,26 +76,26 @@ func NewBuildProgress(numJobs int) *BuildProgress {
 	return &BuildProgress{NumJobs: numJobs, StartTime: time.Now(), PkgNames: make([]string, 0, numJobs), Failed: make(map[string]bool, numJobs), Skipped: make(map[string]bool, numJobs)}
 }
 
-func (this *BuildProgress) AddPkgName(pkgName string) {
-	this.PkgNames = append(this.PkgNames, pkgName)
+func (me *BuildProgress) AddPkgName(pkgName string) {
+	me.PkgNames = append(me.PkgNames, pkgName)
 }
 
-func (this *BuildProgress) OnDone() {
-	CaddyBuildOnDone(this.Failed, this.Failed, this.PkgNames, time.Since(this.StartTime))
+func (me *BuildProgress) OnDone() {
+	CaddyBuildOnDone(me.Failed, me.Failed, me.PkgNames, time.Since(me.StartTime))
 }
 
-func (this *BuildProgress) OnJob(i int) {
-	CaddyBuildOnRunning(this.NumJobs, i, this.String())
+func (me *BuildProgress) OnJob(i int) {
+	CaddyBuildOnRunning(me.NumJobs, i, me.String())
 }
 
-func (this *BuildProgress) String() string {
-	return strings.Join(this.PkgNames, "\n")
+func (me *BuildProgress) String() string {
+	return strings.Join(me.PkgNames, "\n")
 }
 
 func (*DiagBase) FixerUppers() []FixerUpper { return nil }
 
-func (this *DiagBase) fixUps(diags DiagItems) {
-	fixers := this.Impl.FixerUppers()
+func (me *DiagBase) fixUps(diags DiagItems) {
+	fixers := me.Impl.FixerUppers()
 	if len(fixers) == 0 {
 		return
 	}
@@ -125,18 +125,18 @@ func (this *DiagBase) fixUps(diags DiagItems) {
 	}
 }
 
-func (this *DiagBase) UpdateBuildDiagsAsNeeded(workspaceFiles WorkspaceFiles, writtenFiles []string) {
-	if jobs := this.Impl.OnUpdateBuildDiags(writtenFiles).withoutDuplicates(); len(jobs) > 0 {
+func (me *DiagBase) UpdateBuildDiagsAsNeeded(workspaceFiles WorkspaceFiles, writtenFiles []string) {
+	if jobs := me.Impl.OnUpdateBuildDiags(writtenFiles).withoutDuplicates(); len(jobs) > 0 {
 		sort.Sort(jobs)
 		for _, job := range jobs {
 			job.forgetPrevDiags(nil, false, workspaceFiles)
 		}
-		go this.send(workspaceFiles, true)
-		diagitems := this.Impl.RunBuildJobs(jobs, workspaceFiles)
+		go me.send(workspaceFiles, true)
+		diagitems := me.Impl.RunBuildJobs(jobs, workspaceFiles)
 		diagitems.propagate(false, true, workspaceFiles)
 		if len(diagitems) > 0 {
-			go this.fixUps(diagitems)
+			go me.fixUps(diagitems)
 		}
 	}
-	go this.send(workspaceFiles, false)
+	go me.send(workspaceFiles, false)
 }
