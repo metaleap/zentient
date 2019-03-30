@@ -97,7 +97,7 @@ func (me *ipcResp) to(req *ipcReq) {
 	if !req.IpcID.Valid() {
 		me.ErrMsg = BadMsg("IpcID", req.IpcID.String())
 	} else {
-		me.ErrMsg = Strf("The requested feature `%s` wasn't yet implemented for %s.", req.IpcID, Lang.Title)
+		// me.ErrMsg = Strf("The requested feature `%s` wasn't yet implemented for %s.", req.IpcID, Lang.Title)
 	}
 }
 

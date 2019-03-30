@@ -6,7 +6,7 @@ import (
 
 func OnPreInit() {
 	l := &z.Lang
-	l.ID, l.Title = "odic", "odic"
+	l.ID, l.Title, l.Enabled = "odic", "odic", true
 }
 
 func OnPostInit() {
