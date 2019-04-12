@@ -1,4 +1,4 @@
-package zod
+package zat
 
 import (
 	"github.com/metaleap/zentient"
@@ -6,7 +6,7 @@ import (
 
 func OnPreInit() {
 	l := &z.Lang
-	l.ID, l.Title, l.Enabled = "odic", "odic", true
+	l.ID, l.Title, l.Enabled = "atem", "atem", true
 }
 
 func OnPostInit() {
