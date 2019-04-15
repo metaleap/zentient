@@ -41,7 +41,7 @@ start:
 	if gorunargs, me.Cmd.Dir, hadmain, err = GoRunEvalPrepCmd(tmpDirPath, srcFilePath, maybeSrcFull, ""); err == nil {
 		if (!hadmain) && jumpFilePath == "" {
 			for pkgdir := filepath.Dir(filepath.Dir(srcFilePath)); len(pkgdir) > 3; pkgdir = filepath.Dir(pkgdir) {
-				ufs.WalkFilesIn(pkgdir, func(fullPath string) (keepWalking bool) {
+				ufs.WalkFilesIn(pkgdir, func(fullPath string, _ os.FileInfo) (keepWalking bool) {
 					if keepWalking = true; strings.HasSuffix(fullPath, ".go") {
 						if src := ufs.ReadTextFileOr(fullPath, ""); strings.HasPrefix(src, "package main\n") || strings.Index(src, "\npackage main\n") >= 2 {
 							jumpFilePath, keepWalking = fullPath, false
