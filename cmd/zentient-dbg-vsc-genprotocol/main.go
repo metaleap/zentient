@@ -2,6 +2,7 @@ package main
 
 import (
 	"path/filepath"
+	"time"
 
 	"github.com/go-leap/dev/go"
 	"github.com/go-leap/fs"
@@ -18,7 +19,7 @@ func main() {
 	gopathsrc := filepath.Join(udevgo.Gopaths()[0], "src")
 	jsonschemaraw := ufs.ReadTextFileOrPanic(filepath.Join(gopathsrc, srcpath))
 
-	fromjsd.GoPkgDesc = "Package codegen'd from " + srcpath + " with github.com/metaleap/zentient/cmd/zentient-dbg-vsc-genprotocol"
+	fromjsd.GoPkgDesc = "Package codegen'd on " + time.Now().Format(time.RFC3339) + " from " + srcpath + " with github.com/metaleap/zentient/cmd/zentient-dbg-vsc-genprotocol"
 	jsd, err := fromjsd.NewJsonSchema(jsonschemaraw)
 	if err != nil {
 		panic(err)
