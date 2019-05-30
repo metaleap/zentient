@@ -27,9 +27,6 @@ func (me *atmoSrcIntel) DefSym(srcLens *z.SrcLens) (locs z.SrcLocs) {
 		Ctx.KitEnsureLoaded(kit)
 		if tlc, nodes := kit.AstNodeAt(srcLens.FilePath, srcLens.ByteOffsetForPos(srcLens.Pos)); len(nodes) > 0 {
 			if ident, _ := nodes[0].(*atmolang.AstIdent); ident != nil && ident.IsName(true) {
-				locs.Add(tlc.SrcFile.SrcFilePath, &ident.Tokens[0].Meta.Position)
-
-				return
 				// points to parent def-arg or def-in-scope?
 				for i := 1; i < len(nodes); i++ {
 					switch n := nodes[i].(type) {
