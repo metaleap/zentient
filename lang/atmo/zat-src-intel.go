@@ -1,9 +1,11 @@
 package zat
 
 import (
+	"fmt"
 	"path/filepath"
 
 	"github.com/metaleap/atmo/lang"
+	"github.com/metaleap/atmo/lang/irfun"
 	"github.com/metaleap/zentient"
 )
 
@@ -39,6 +41,12 @@ func (me *atmoSrcIntel) DefSym(srcLens *z.SrcLens) (locs z.SrcLocs) {
 	if kit := Ctx.KitByDirPath(filepath.Dir(srcLens.FilePath), true); kit != nil {
 		Ctx.KitEnsureLoaded(kit)
 		if tlc, nodes := kit.AstNodeAt(srcLens.FilePath, srcLens.ByteOffsetForPos(srcLens.Pos)); len(nodes) > 0 {
+			if irnodes := kit.AstNodeIrFunFor(tlc.Id(), nodes[0]); len(irnodes) > 0 {
+				if ident, _ := irnodes[0].(*atmolang_irfun.AstIdentName); ident != nil {
+					z.SendNotificationMessageToClient(2, fmt.Sprintf("%v", len(ident.Anns.ResolvesTo)))
+				}
+			}
+
 			if ident, _ := nodes[0].(*atmolang.AstIdent); ident != nil && ident.IsName(true) {
 				// points to parent def-arg or def-in-scope?
 				for i := 1; i < len(nodes); i++ {
