@@ -3,7 +3,6 @@ package zat
 import (
 	"path/filepath"
 
-	// "github.com/metaleap/atmo"
 	"github.com/metaleap/atmo/lang"
 	"github.com/metaleap/zentient"
 )
@@ -19,6 +18,20 @@ func init() {
 }
 
 func (me *atmoSrcIntel) References(srcLens *z.SrcLens, includeDeclaration bool) (locs z.SrcLocs) {
+	if kit := Ctx.KitByDirPath(filepath.Dir(srcLens.FilePath), true); kit != nil {
+		Ctx.KitEnsureLoaded(kit)
+		if _, nodes := kit.AstNodeAt(srcLens.FilePath, srcLens.ByteOffsetForPos(srcLens.Pos)); len(nodes) > 0 {
+			if ident, _ := nodes[0].(*atmolang.AstIdent); ident != nil && ident.IsName(true) {
+				for tld, nodes := range Ctx.KitsCollectReferences(true, ident.Val) {
+					for _, node := range nodes {
+						if tok := node.OrigToks().First(nil); tok != nil {
+							locs.Add(tld.OrigTopLevelChunk.SrcFile.SrcFilePath, &tok.Meta.Position)
+						}
+					}
+				}
+			}
+		}
+	}
 	return
 }
 
