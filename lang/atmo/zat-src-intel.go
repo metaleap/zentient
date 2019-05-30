@@ -1,7 +1,6 @@
 package zat
 
 import (
-	"fmt"
 	"path/filepath"
 
 	// "github.com/metaleap/atmo"
@@ -20,26 +19,53 @@ func init() {
 }
 
 func (me *atmoSrcIntel) References(srcLens *z.SrcLens, includeDeclaration bool) (locs z.SrcLocs) {
-	if kit := Ctx.KitByDirPath(filepath.Dir(srcLens.FilePath), true); kit != nil {
-		if tlc, nodes := kit.AstNodeAt(srcLens.FilePath, srcLens.ByteOffsetForPos(srcLens.Pos)); len(nodes) > 0 {
-			if tok := nodes[len(nodes)-1].Toks().First(nil); tok != nil {
-				locs = append(locs, &z.SrcLoc{FilePath: tlc.SrcFile.SrcFilePath,
-					Pos: &z.SrcPos{Off: tok.Meta.Offset + 1, Ln: tok.Meta.Line, Col: tok.Meta.Column}})
-			}
+	return
+}
 
-			if ident, _ := nodes[len(nodes)-1].(*atmolang.AstIdent); ident != nil && ident.IsName(true) {
+func (me *atmoSrcIntel) DefSym(srcLens *z.SrcLens) (locs z.SrcLocs) {
+	if kit := Ctx.KitByDirPath(filepath.Dir(srcLens.FilePath), true); kit != nil {
+		Ctx.KitEnsureLoaded(kit)
+		if tlc, nodes := kit.AstNodeAt(srcLens.FilePath, srcLens.ByteOffsetForPos(srcLens.Pos)); len(nodes) > 0 {
+			if ident, _ := nodes[0].(*atmolang.AstIdent); ident != nil && ident.IsName(true) {
+				locs.Add(tlc.SrcFile.SrcFilePath, &ident.Tokens[0].Meta.Position)
+
+				return
+				// points to parent def-arg or def-in-scope?
+				for i := 1; i < len(nodes); i++ {
+					switch n := nodes[i].(type) {
+					case *atmolang.AstDefArg:
+						if nid, _ := n.NameOrConstVal.(*atmolang.AstIdent); nid != nil && nid.Val == ident.Val {
+							locs.Add(tlc.SrcFile.SrcFilePath, &nid.Tokens[0].Meta.Position)
+						}
+					case *atmolang.AstDef:
+						if n.Name.Val == ident.Val {
+							locs.Add(tlc.SrcFile.SrcFilePath, &n.Name.Tokens[0].Meta.Position)
+						} else {
+							for da := range n.Args {
+								if nid, _ := n.Args[da].NameOrConstVal.(*atmolang.AstIdent); nid != nil && nid.Val == ident.Val {
+									locs.Add(tlc.SrcFile.SrcFilePath, &nid.Tokens[0].Meta.Position)
+								}
+							}
+						}
+					case *atmolang.AstExprLet:
+						for d := range n.Defs {
+							if n.Defs[d].Name.Val == ident.Val {
+								locs.Add(tlc.SrcFile.SrcFilePath, &n.Defs[d].Name.Tokens[0].Meta.Position)
+							}
+						}
+					}
+				}
+
+				// find all global goal-named defs
 				for _, kit := range Ctx.Kits.All {
 					for _, def := range kit.Defs(ident.Val) {
 						if tok := def.Name.OrigToks().First(nil); tok != nil {
-							locs = append(locs, &z.SrcLoc{FilePath: def.OrigTopLevelChunk.SrcFile.SrcFilePath,
-								Pos: &z.SrcPos{Off: tok.Meta.Offset + 1, Ln: tok.Meta.Line, Col: tok.Meta.Column}})
+							locs.Add(def.OrigTopLevelChunk.SrcFile.SrcFilePath, &tok.Meta.Position)
 						}
 					}
 				}
 			}
 		}
-	} else {
-		z.SendNotificationMessageToClient(z.DIAG_SEV_INFO, fmt.Sprintf("%v", len(Ctx.Kits.All)))
 	}
 	return
 }

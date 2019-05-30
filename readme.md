@@ -1401,6 +1401,12 @@ type SrcLocs []*SrcLoc
 ```
 
 
+#### func (*SrcLocs) Add
+
+```go
+func (me *SrcLocs) Add(srcFilePath string, pos *scanner.Position)
+```
+
 #### func (*SrcLocs) AddFrom
 
 ```go
@@ -1444,6 +1450,12 @@ func (me *SrcModBase) KnownFormatters() Tools
 
 ```go
 func (*SrcModBase) MenuCategory() string
+```
+
+#### func (*SrcModBase) RunFormatter
+
+```go
+func (*SrcModBase) RunFormatter(*Tool, string, *SrcFormattingClientPrefs, string, string) (string, string)
 ```
 
 #### func (*SrcModBase) RunRenamer
