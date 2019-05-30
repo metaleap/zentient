@@ -1422,10 +1422,22 @@ type SrcModBase struct {
 func (*SrcModBase) CodeActions(srcLens *SrcLens) (all []EditorAction)
 ```
 
+#### func (*SrcModBase) DoesStdoutWithFilePathArg
+
+```go
+func (*SrcModBase) DoesStdoutWithFilePathArg(*Tool) bool
+```
+
 #### func (*SrcModBase) Init
 
 ```go
 func (me *SrcModBase) Init()
+```
+
+#### func (*SrcModBase) KnownFormatters
+
+```go
+func (me *SrcModBase) KnownFormatters() Tools
 ```
 
 #### func (*SrcModBase) MenuCategory

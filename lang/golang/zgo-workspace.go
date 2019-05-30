@@ -23,6 +23,23 @@ type goWorkspace struct {
 	z.WorkspaceBase
 }
 
+func (*goWorkspace) onBeforeChanges(_ *z.WorkspaceChanges, freshFiles []string, willAutoLint bool) {
+	if hasnewpkgs, pkgsbydir := false, udevgo.PkgsByDir; pkgsbydir != nil && len(freshFiles) > 0 {
+		for _, ffp := range freshFiles {
+			if hasnewpkgs = strings.ToLower(filepath.Ext(ffp)) == ".go" && (nil == pkgsbydir[filepath.Dir(ffp)]); hasnewpkgs {
+				break
+			}
+		}
+		if hasnewpkgs && caddyRefreshPkgs.IsReady() {
+			if caddyRefreshPkgs.IsPendingOrBusy() {
+				caddyRefreshPkgs.ShouldReRunWhenNextDone = true
+			} else {
+				go caddyRunRefreshPkgs()
+			}
+		}
+	}
+}
+
 func (me *goWorkspace) onAfterChanges(upd *z.WorkspaceChanges) {
 	if sep := string(filepath.Separator); upd.HasDirChanges() {
 		goPathScopes, udevgo.GuruScopes = nil, ""
@@ -46,23 +63,6 @@ func (me *goWorkspace) onAfterChanges(upd *z.WorkspaceChanges) {
 	if pkgsbydir := udevgo.PkgsByDir; pkgsbydir != nil {
 		for _, fp := range upd.OpenedFiles {
 			pkgIntel.ensurePkgInfo(pkgsbydir, filepath.Dir(fp))
-		}
-	}
-}
-
-func (*goWorkspace) onBeforeChanges(_ *z.WorkspaceChanges, freshFiles []string, willAutoLint bool) {
-	if hasnewpkgs, pkgsbydir := false, udevgo.PkgsByDir; pkgsbydir != nil && len(freshFiles) > 0 {
-		for _, ffp := range freshFiles {
-			if hasnewpkgs = strings.ToLower(filepath.Ext(ffp)) == ".go" && (nil == pkgsbydir[filepath.Dir(ffp)]); hasnewpkgs {
-				break
-			}
-		}
-		if hasnewpkgs && caddyRefreshPkgs.IsReady() {
-			if caddyRefreshPkgs.IsPendingOrBusy() {
-				caddyRefreshPkgs.ShouldReRunWhenNextDone = true
-			} else {
-				go caddyRunRefreshPkgs()
-			}
 		}
 	}
 }

@@ -142,6 +142,14 @@ func (*SrcModBase) CodeActions(srcLens *SrcLens) (all []EditorAction) {
 	return
 }
 
+func (*SrcModBase) DoesStdoutWithFilePathArg(*Tool) bool { return false }
+
+func (me *SrcModBase) KnownFormatters() Tools { return nil }
+
+func (*SrcModBase) RunFormatter(*Tool, string, *SrcFormattingClientPrefs, string, string) (string, string) {
+	panic(Strf("Formatting not yet implemented for %s.", Lang.Title))
+}
+
 func (*SrcModBase) RunRenamer(srcLens *SrcLens, newName string) (all SrcLenses) {
 	panic(Strf("Rename not yet implemented for %s.", Lang.Title))
 }
