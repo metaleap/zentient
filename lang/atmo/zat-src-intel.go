@@ -43,8 +43,13 @@ func (me *atmoSrcIntel) DefSym(srcLens *z.SrcLens) (locs z.SrcLocs) {
 
 			// happy smart path: already know the def(s) or def-arg the current name points to
 			if irnodes := kit.AstNodeIrFunFor(tlc.Id(), nodes[0]); len(irnodes) > 0 {
-				if ident, _ := irnodes[0].(*atmolang_irfun.AstIdentName); ident != nil && len(ident.Anns.ResolvesTo) > 0 {
-					for _, node := range ident.Anns.ResolvesTo {
+				switch irnode := irnodes[0].(type) {
+				case *atmolang_irfun.AstDefArg:
+					if tok := irnode.OrigToks().First(nil); tok != nil {
+						locs.Add(tlc.SrcFile.SrcFilePath, &tok.Meta.Position)
+					}
+				case *atmolang_irfun.AstIdentName:
+					for _, node := range irnode.Anns.ResolvesTo {
 						tok := node.OrigToks().First(nil)
 						if def := node.IsDef(); def != nil {
 							if t := def.Name.OrigToks().First(nil); t != nil {
@@ -55,6 +60,8 @@ func (me *atmoSrcIntel) DefSym(srcLens *z.SrcLens) (locs z.SrcLocs) {
 							locs.Add(tlc.SrcFile.SrcFilePath, &tok.Meta.Position)
 						}
 					}
+					// default:
+					// 	z.SendNotificationMessageToClient(2, fmt.Sprintf("%T", irnode))
 				}
 			}
 			return
