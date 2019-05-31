@@ -2,7 +2,6 @@ package zat
 
 import (
 	"path/filepath"
-	"text/scanner"
 
 	"github.com/metaleap/atmo/lang"
 	"github.com/metaleap/atmo/lang/irfun"
@@ -43,34 +42,20 @@ func (me *atmoSrcIntel) DefSym(srcLens *z.SrcLens) (locs z.SrcLocs) {
 		if tlc, nodes := kit.AstNodeAt(srcLens.FilePath, srcLens.ByteOffsetForPos(srcLens.Pos)); len(nodes) > 0 {
 
 			// happy smart path: already know the def(s) or def-arg the current name points to
-			println("ONE")
 			if irnodes := kit.AstNodeIrFunFor(tlc.Id(), nodes[0]); len(irnodes) > 0 {
-				println("TWO")
 				if ident, _ := irnodes[0].(*atmolang_irfun.AstIdentName); ident != nil && len(ident.Anns.ResolvesTo) > 0 {
-					println("TRI", len(ident.Anns.ResolvesTo))
 					for _, node := range ident.Anns.ResolvesTo {
-						println("HUH", node.Print().Toks().String(), "HAH")
-						def, _ := node.(*atmolang_irfun.AstDef)
-						if def == nil {
-							if deftop, _ := node.(*atmolang_irfun.AstDefTop); deftop != nil {
-								def = &deftop.AstDef
-							}
-						}
 						tok := node.OrigToks().First(nil)
-						if def != nil {
+						if def := node.IsDef(); def != nil {
 							if t := def.Name.OrigToks().First(nil); t != nil {
 								tok = t
 							}
 						}
 						if tok != nil {
 							locs.Add(tlc.SrcFile.SrcFilePath, &tok.Meta.Position)
-						} else {
-							locs.Add(tlc.SrcFile.SrcFilePath, &scanner.Position{Line: 1, Column: 1})
 						}
 					}
 				}
-			} else {
-
 			}
 			return
 
