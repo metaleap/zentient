@@ -76,6 +76,9 @@ func (me *ipcResp) postProcess() {
 }
 
 func (me *ipcResp) onResponseReady() {
+	// if 1 > 0 {
+	// 	return
+	// }
 	if except := recover(); except != nil {
 		me.ErrMsg = Strf("%v", except)
 	}
