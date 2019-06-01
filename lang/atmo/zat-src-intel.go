@@ -24,12 +24,16 @@ func (me *atmoSrcIntel) References(srcLens *z.SrcLens, includeDeclaration bool) 
 	if kit := Ctx.KitByDirPath(filepath.Dir(srcLens.FilePath), true); kit != nil {
 		Ctx.KitEnsureLoaded(kit)
 		if _, nodes := kit.AstNodeAt(srcLens.FilePath, srcLens.ByteOffsetForPos(srcLens.Pos)); len(nodes) > 0 {
+			var refs map[*atmolang_irfun.AstDefTop][]atmolang_irfun.IAstExpr
 			if ident, _ := nodes[0].(*atmolang.AstIdent); ident != nil {
-				for tld, nodes := range Ctx.KitsCollectReferences(true, ident.Val) {
-					for _, node := range nodes {
-						if tok := node.OrigToks().First(nil); tok != nil {
-							locs.Add(tld.OrigTopLevelChunk.SrcFile.SrcFilePath, &tok.Meta.Position)
-						}
+				refs = Ctx.KitsCollectReferences(true, ident.Val)
+			} else if atom, _ := nodes[0].(atmolang.IAstExprAtomic); atom != nil {
+				refs = Ctx.KitsCollectReferences(true, atom.String())
+			}
+			for tld, nodes := range refs {
+				for _, node := range nodes {
+					if tok := node.OrigToks().First(nil); tok != nil {
+						locs.Add(tld.OrigTopLevelChunk.SrcFile.SrcFilePath, &tok.Meta.Position)
 					}
 				}
 			}
