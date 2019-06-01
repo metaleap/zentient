@@ -41,18 +41,18 @@ func (me *atmoSrcIntel) DefSym(srcLens *z.SrcLens) (locs z.SrcLocs) {
 		Ctx.KitEnsureLoaded(kit)
 		if tlc, nodes := kit.AstNodeAt(srcLens.FilePath, srcLens.ByteOffsetForPos(srcLens.Pos)); len(nodes) > 0 {
 			// HAPPY SMART PATH: already know the def(s) or def-arg the current name points to
-			addfromtok := func(node atmolang_irfun.IAstNode) {
-				tok := node.OrigToks().First(nil)
-				if def := node.IsDef(); def != nil {
-					if t := def.Name.OrigToks().First(nil); t != nil {
-						tok = t
+			if irnodes := kit.AstNodeIrFunFor(tlc.Id(), nodes[0]); len(irnodes) > 0 {
+				addfromtok := func(node atmolang_irfun.IAstNode) {
+					tok := node.OrigToks().First(nil)
+					if def := node.IsDef(); def != nil {
+						if t := def.Name.OrigToks().First(nil); t != nil {
+							tok = t
+						}
+					}
+					if tok != nil {
+						locs.Add(tlc.SrcFile.SrcFilePath, &tok.Meta.Position)
 					}
 				}
-				if tok != nil {
-					locs.Add(tlc.SrcFile.SrcFilePath, &tok.Meta.Position)
-				}
-			}
-			if irnodes := kit.AstNodeIrFunFor(tlc.Id(), nodes[0]); len(irnodes) > 0 {
 				if ident, _ := irnodes[0].(*atmolang_irfun.AstIdentName); ident == nil {
 					addfromtok(irnodes[0])
 				} else {
@@ -60,8 +60,8 @@ func (me *atmoSrcIntel) DefSym(srcLens *z.SrcLens) (locs z.SrcLocs) {
 						addfromtok(node)
 					}
 				}
+				return
 			}
-			return // TODO when the above is done: move this 1 ln up
 
 			// FALL-BACK DUMB PATH: traversal along the original src AST
 			if ident, _ := nodes[0].(*atmolang.AstIdent); ident != nil && ident.IsName(true) {

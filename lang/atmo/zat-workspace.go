@@ -23,10 +23,10 @@ type atmoWorkspace struct {
 }
 
 func (*atmoWorkspace) onBeforeChanges(workspaceChanges *z.WorkspaceChanges, freshFiles []string, willAutoLint bool) {
-	newkitsimppaths := make([]string, 0, 2)
+	newpotentialkitsimppaths := make([]string, 0, 2)
 	ondir := func(dirpath string) {
-		if kit := Ctx.KitByDirPath(dirpath, true); kit != nil && !ustr.In(kit.ImpPath, newkitsimppaths...) {
-			newkitsimppaths = append(newkitsimppaths, kit.ImpPath)
+		if kit := Ctx.KitByDirPath(dirpath, true); kit != nil && !ustr.In(kit.ImpPath, newpotentialkitsimppaths...) {
+			newpotentialkitsimppaths = append(newpotentialkitsimppaths, kit.ImpPath)
 		}
 	}
 
@@ -40,7 +40,7 @@ func (*atmoWorkspace) onBeforeChanges(workspaceChanges *z.WorkspaceChanges, fres
 			}
 		}
 	}
-	Ctx.KitsEnsureLoaded(false, newkitsimppaths...)
+	Ctx.KitsEnsureLoaded(false, newpotentialkitsimppaths...)
 }
 
 func (me *atmoWorkspace) onPreInit() {
