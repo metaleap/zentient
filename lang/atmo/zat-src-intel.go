@@ -81,10 +81,9 @@ func (me *atmoSrcIntel) DefSym(srcLens *z.SrcLens) (locs z.SrcLocs) {
 						}
 					}
 				}
-
-				// find all global goal-named defs
+				// find all global goal-named defs --- loop isn't all that optimal but good-enough & succinct
 				for _, k := range Ctx.Kits.All {
-					if k == kit || ustr.In(k.ImpPath, kit.Imports...) {
+					if k.ImpPath == kit.ImpPath || ustr.In(k.ImpPath, kit.Imports...) {
 						for _, def := range kit.Defs(ident.Val) {
 							me.addLocFromNode(&locs, def.OrigTopLevelChunk.SrcFile.SrcFilePath, def)
 						}
