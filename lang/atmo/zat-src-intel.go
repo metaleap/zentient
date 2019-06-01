@@ -3,6 +3,8 @@ package zat
 import (
 	"path/filepath"
 
+	"github.com/go-leap/dev/lex"
+	"github.com/go-leap/str"
 	"github.com/metaleap/atmo/lang"
 	"github.com/metaleap/atmo/lang/irfun"
 	"github.com/metaleap/zentient"
@@ -42,60 +44,49 @@ func (me *atmoSrcIntel) DefSym(srcLens *z.SrcLens) (locs z.SrcLocs) {
 		if tlc, nodes := kit.AstNodeAt(srcLens.FilePath, srcLens.ByteOffsetForPos(srcLens.Pos)); len(nodes) > 0 {
 			// HAPPY SMART PATH: already know the def(s) or def-arg the current name points to
 			if irnodes := kit.AstNodeIrFunFor(tlc.Id(), nodes[0]); len(irnodes) > 0 {
-				addfromtok := func(node atmolang_irfun.IAstNode) {
-					tok := node.OrigToks().First(nil)
-					if def := node.IsDef(); def != nil {
-						if t := def.Name.OrigToks().First(nil); t != nil {
-							tok = t
-						}
-					}
-					if tok != nil {
-						locs.Add(tlc.SrcFile.SrcFilePath, &tok.Meta.Position)
-					}
-				}
 				if ident, _ := irnodes[0].(*atmolang_irfun.AstIdentName); ident == nil {
-					addfromtok(irnodes[0])
+					me.addLocFromNode(&locs, tlc.SrcFile.SrcFilePath, irnodes[0])
 				} else {
 					for _, node := range ident.Anns.ResolvesTo {
-						addfromtok(node)
+						me.addLocFromNode(&locs, tlc.SrcFile.SrcFilePath, node)
 					}
 				}
 				return
 			}
 
-			// FALL-BACK DUMB PATH: traversal along the original src AST
+			// FALL-BACK DUMB PATH: merely lexical (traversal up the original src AST, collect any & all defs/def-args technically-in-scope and goal-named)
 			if ident, _ := nodes[0].(*atmolang.AstIdent); ident != nil && ident.IsName(true) {
 				// points to parent def-arg or def-in-scope?
 				for i := 1; i < len(nodes); i++ {
 					switch n := nodes[i].(type) {
 					case *atmolang.AstDefArg:
 						if nid, _ := n.NameOrConstVal.(*atmolang.AstIdent); nid != nil && nid.Val == ident.Val {
-							locs.Add(tlc.SrcFile.SrcFilePath, &nid.Tokens[0].Meta.Position)
+							me.addLocFromToks(&locs, tlc.SrcFile.SrcFilePath, nid.Tokens)
 						}
 					case *atmolang.AstDef:
 						if n.Name.Val == ident.Val {
-							locs.Add(tlc.SrcFile.SrcFilePath, &n.Name.Tokens[0].Meta.Position)
+							me.addLocFromToks(&locs, tlc.SrcFile.SrcFilePath, n.Name.Tokens)
 						} else {
 							for da := range n.Args {
 								if nid, _ := n.Args[da].NameOrConstVal.(*atmolang.AstIdent); nid != nil && nid.Val == ident.Val {
-									locs.Add(tlc.SrcFile.SrcFilePath, &nid.Tokens[0].Meta.Position)
+									me.addLocFromToks(&locs, tlc.SrcFile.SrcFilePath, nid.Tokens)
 								}
 							}
 						}
 					case *atmolang.AstExprLet:
 						for d := range n.Defs {
 							if n.Defs[d].Name.Val == ident.Val {
-								locs.Add(tlc.SrcFile.SrcFilePath, &n.Defs[d].Name.Tokens[0].Meta.Position)
+								me.addLocFromToks(&locs, tlc.SrcFile.SrcFilePath, n.Defs[d].Name.Tokens)
 							}
 						}
 					}
 				}
 
 				// find all global goal-named defs
-				for _, kit := range Ctx.Kits.All {
-					for _, def := range kit.Defs(ident.Val) {
-						if tok := def.Name.OrigToks().First(nil); tok != nil {
-							locs.Add(def.OrigTopLevelChunk.SrcFile.SrcFilePath, &tok.Meta.Position)
+				for _, k := range Ctx.Kits.All {
+					if k == kit || ustr.In(k.ImpPath, kit.Imports...) {
+						for _, def := range kit.Defs(ident.Val) {
+							me.addLocFromNode(&locs, def.OrigTopLevelChunk.SrcFile.SrcFilePath, def)
 						}
 					}
 				}
@@ -103,4 +94,20 @@ func (me *atmoSrcIntel) DefSym(srcLens *z.SrcLens) (locs z.SrcLocs) {
 		}
 	}
 	return
+}
+
+func (me *atmoSrcIntel) addLocFromToks(locs *z.SrcLocs, srcFilePath string, toks udevlex.Tokens) {
+	if tok := toks.First(nil); tok != nil {
+		locs.Add(srcFilePath, &tok.Meta.Position)
+	}
+}
+
+func (me *atmoSrcIntel) addLocFromNode(locs *z.SrcLocs, srcFilePath string, node atmolang_irfun.IAstNode) {
+	toks := node.OrigToks()
+	if def := node.IsDef(); def != nil {
+		if ts := def.Name.OrigToks(); len(ts) > 0 {
+			toks = ts
+		}
+	}
+	me.addLocFromToks(locs, srcFilePath, toks)
 }
