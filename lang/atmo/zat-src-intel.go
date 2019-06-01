@@ -40,33 +40,30 @@ func (me *atmoSrcIntel) DefSym(srcLens *z.SrcLens) (locs z.SrcLocs) {
 	if kit := Ctx.KitByDirPath(filepath.Dir(srcLens.FilePath), true); kit != nil {
 		Ctx.KitEnsureLoaded(kit)
 		if tlc, nodes := kit.AstNodeAt(srcLens.FilePath, srcLens.ByteOffsetForPos(srcLens.Pos)); len(nodes) > 0 {
-
-			// happy smart path: already know the def(s) or def-arg the current name points to
-			if irnodes := kit.AstNodeIrFunFor(tlc.Id(), nodes[0]); len(irnodes) > 0 {
-				switch irnode := irnodes[0].(type) {
-				case *atmolang_irfun.AstDefArg:
-					if tok := irnode.OrigToks().First(nil); tok != nil {
-						locs.Add(tlc.SrcFile.SrcFilePath, &tok.Meta.Position)
+			// HAPPY SMART PATH: already know the def(s) or def-arg the current name points to
+			addfromtok := func(node atmolang_irfun.IAstNode) {
+				tok := node.OrigToks().First(nil)
+				if def := node.IsDef(); def != nil {
+					if t := def.Name.OrigToks().First(nil); t != nil {
+						tok = t
 					}
-				case *atmolang_irfun.AstIdentName:
-					for _, node := range irnode.Anns.ResolvesTo {
-						tok := node.OrigToks().First(nil)
-						if def := node.IsDef(); def != nil {
-							if t := def.Name.OrigToks().First(nil); t != nil {
-								tok = t
-							}
-						}
-						if tok != nil {
-							locs.Add(tlc.SrcFile.SrcFilePath, &tok.Meta.Position)
-						}
-					}
-					// default:
-					// 	z.SendNotificationMessageToClient(2, fmt.Sprintf("%T", irnode))
+				}
+				if tok != nil {
+					locs.Add(tlc.SrcFile.SrcFilePath, &tok.Meta.Position)
 				}
 			}
-			return
+			if irnodes := kit.AstNodeIrFunFor(tlc.Id(), nodes[0]); len(irnodes) > 0 {
+				if ident, _ := irnodes[0].(*atmolang_irfun.AstIdentName); ident == nil {
+					addfromtok(irnodes[0])
+				} else {
+					for _, node := range ident.Anns.ResolvesTo {
+						addfromtok(node)
+					}
+				}
+			}
+			return // TODO when the above is done: move this 1 ln up
 
-			// fall-back dumb path: traversal along the original src AST
+			// FALL-BACK DUMB PATH: traversal along the original src AST
 			if ident, _ := nodes[0].(*atmolang.AstIdent); ident != nil && ident.IsName(true) {
 				// points to parent def-arg or def-in-scope?
 				for i := 1; i < len(nodes); i++ {
