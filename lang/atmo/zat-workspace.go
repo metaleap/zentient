@@ -41,6 +41,10 @@ func (*atmoWorkspace) onBeforeChanges(workspaceChanges *z.WorkspaceChanges, fres
 		}
 	}
 	Ctx.KitsEnsureLoaded(false, newpotentialkitsimppaths...)
+
+	if len(workspaceChanges.WrittenFiles) > 0 {
+		Ctx.CatchUp(true)
+	}
 }
 
 func (me *atmoWorkspace) onPreInit() {
