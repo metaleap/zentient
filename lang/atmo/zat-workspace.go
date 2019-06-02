@@ -4,7 +4,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/go-leap/str"
 	"github.com/metaleap/atmo"
 	"github.com/metaleap/zentient"
 )
@@ -23,13 +22,7 @@ type atmoWorkspace struct {
 }
 
 func (*atmoWorkspace) onBeforeChanges(workspaceChanges *z.WorkspaceChanges, freshFiles []string, willAutoLint bool) {
-	newpotentialkitsimppaths := make([]string, 0, 2)
-	ondir := func(dirpath string) {
-		if kit := Ctx.KitByDirPath(dirpath, true); kit != nil && !ustr.In(kit.ImpPath, newpotentialkitsimppaths...) {
-			newpotentialkitsimppaths = append(newpotentialkitsimppaths, kit.ImpPath)
-		}
-	}
-
+	ondir := func(dirpath string) { Ctx.KitByDirPath(dirpath, true) }
 	for _, dirpath := range workspaceChanges.AddedDirs {
 		ondir(dirpath)
 	}
@@ -40,13 +33,12 @@ func (*atmoWorkspace) onBeforeChanges(workspaceChanges *z.WorkspaceChanges, fres
 			}
 		}
 	}
-	Ctx.KitsEnsureLoaded(false, newpotentialkitsimppaths...)
+}
 
-	if len(workspaceChanges.WrittenFiles) > 0 {
-		Ctx.CatchUp(true)
-	}
+func (*atmoWorkspace) onAfterChanges(*z.WorkspaceChanges) {
+	Ctx.CatchUp(true)
 }
 
 func (me *atmoWorkspace) onPreInit() {
-	me.OnBeforeChanges = me.onBeforeChanges
+	me.OnBeforeChanges, me.OnAfterChanges = me.onBeforeChanges, me.onAfterChanges
 }
