@@ -7,6 +7,7 @@ import (
 	"github.com/go-leap/str"
 	"github.com/metaleap/atmo/lang"
 	"github.com/metaleap/atmo/lang/irfun"
+	"github.com/metaleap/atmo/session"
 	"github.com/metaleap/zentient"
 )
 
@@ -20,35 +21,9 @@ func init() {
 	srcIntel.Impl, z.Lang.SrcIntel = &srcIntel, &srcIntel
 }
 
-func (me *atmoSrcIntel) References(srcLens *z.SrcLens, includeDeclaration bool) (locs z.SrcLocs) {
-	if kit := Ctx.KitByDirPath(filepath.Dir(srcLens.FilePath), true); kit != nil {
-		if exc := Ctx.WithInMemFileMod(srcLens.FilePath, srcLens.Txt, func() {
-			Ctx.KitEnsureLoaded(kit)
-			if _, nodes := kit.AstNodeAt(srcLens.FilePath, srcLens.ByteOffsetForPos(srcLens.Pos)); len(nodes) > 0 {
-				var refs map[*atmolang_irfun.AstDefTop][]atmolang_irfun.IAstExpr
-				if ident, _ := nodes[0].(*atmolang.AstIdent); ident != nil {
-					refs = Ctx.KitsCollectReferences(true, ident.Val)
-				} else if atom, _ := nodes[0].(atmolang.IAstExprAtomic); atom != nil {
-					refs = Ctx.KitsCollectReferences(true, atom.String())
-				}
-				for tld, nodes := range refs {
-					for _, node := range nodes {
-						if tok := node.OrigToks().First(nil); tok != nil {
-							locs.Add(tld.OrigTopLevelChunk.SrcFile.SrcFilePath, &tok.Meta.Position)
-						}
-					}
-				}
-			}
-		}); exc != nil {
-			panic(exc)
-		}
-	}
-	return
-}
-
 func (me *atmoSrcIntel) DefSym(srcLens *z.SrcLens) (locs z.SrcLocs) {
 	if kit := Ctx.KitByDirPath(filepath.Dir(srcLens.FilePath), true); kit != nil {
-		if exc := Ctx.WithInMemFileMod(srcLens.FilePath, srcLens.Txt, func() {
+		if panicked := Ctx.WithInMemFileMod(srcLens.FilePath, srcLens.Txt, func() {
 			Ctx.KitEnsureLoaded(kit)
 			if tlc, nodes := kit.AstNodeAt(srcLens.FilePath, srcLens.ByteOffsetForPos(srcLens.Pos)); len(nodes) > 0 {
 				// HAPPY SMART PATH: already know the def(s) or def-arg the current name points to
@@ -100,25 +75,94 @@ func (me *atmoSrcIntel) DefSym(srcLens *z.SrcLens) (locs z.SrcLocs) {
 					}
 				}
 			}
-		}); exc != nil {
-			panic(exc)
+		}); panicked != nil {
+			panic(panicked)
 		}
 	}
 	return
 }
 
-func (me *atmoSrcIntel) addLocFromToks(locs *z.SrcLocs, srcFilePath string, toks udevlex.Tokens) {
-	if tok := toks.First(nil); tok != nil {
-		locs.Add(srcFilePath, &tok.Meta.Position)
+func (me *atmoSrcIntel) References(srcLens *z.SrcLens, includeDeclaration bool) (locs z.SrcLocs) {
+	if kit := Ctx.KitByDirPath(filepath.Dir(srcLens.FilePath), true); kit != nil {
+		if panicked := Ctx.WithInMemFileMod(srcLens.FilePath, srcLens.Txt, func() {
+			Ctx.KitEnsureLoaded(kit)
+			if _, nodes := kit.AstNodeAt(srcLens.FilePath, srcLens.ByteOffsetForPos(srcLens.Pos)); len(nodes) > 0 {
+				var refs map[*atmolang_irfun.AstDefTop][]atmolang_irfun.IAstExpr
+				if ident, _ := nodes[0].(*atmolang.AstIdent); ident != nil {
+					refs = Ctx.KitsCollectReferences(true, ident.Val)
+				} else if atom, _ := nodes[0].(atmolang.IAstExprAtomic); atom != nil {
+					refs = Ctx.KitsCollectReferences(true, atom.String())
+				}
+				for tld, nodes := range refs {
+					for _, node := range nodes {
+						if tok := node.OrigToks().First(nil); tok != nil {
+							locs.Add(tld.OrigTopLevelChunk.SrcFile.SrcFilePath, &tok.Meta.Position)
+						}
+					}
+				}
+			}
+		}); panicked != nil {
+			panic(panicked)
+		}
 	}
+	return
 }
 
-func (me *atmoSrcIntel) addLocFromNode(locs *z.SrcLocs, srcFilePath string, node atmolang_irfun.IAstNode) {
+func (me *atmoSrcIntel) Symbols(srcLens *z.SrcLens, query string, curFileOnly bool) (allsyms z.SrcLenses) {
+	query = ustr.Lo(query)
+	var kits atmosess.Kits
+	if kit := Ctx.KitByDirPath(filepath.Dir(srcLens.FilePath), true); !curFileOnly {
+		kits = Ctx.Kits.All
+	} else if kit != nil {
+		kits = atmosess.Kits{kit}
+		Ctx.KitEnsureLoaded(kit)
+	}
+	if panicked := Ctx.WithInMemFileMod(srcLens.FilePath, srcLens.Txt, func() {
+		for _, kit := range kits {
+			for _, srcfile := range kit.SrcFiles {
+				if srcfile.SrcFilePath == srcLens.FilePath || !curFileOnly {
+					for i := range srcfile.TopLevel {
+						if def := srcfile.TopLevel[i].Ast.Def.Orig; def != nil {
+							if len(query) == 0 || ustr.Has(ustr.Lo(def.Name.Val), query) {
+								allsyms = append(allsyms, &z.SrcLens{Str: def.Name.Val, Txt: "(description later)", SrcLoc: z.SrcLoc{
+									FilePath: srcfile.SrcFilePath, Flag: int(z.SYM_FUNCTION), Range: toksToRange(def.Tokens)}})
+							}
+						}
+					}
+				}
+			}
+		}
+	}); panicked != nil {
+		panic(panicked)
+	}
+	return
+}
+
+func (me *atmoSrcIntel) addLocFromToks(locs *z.SrcLocs, srcFilePath string, toks udevlex.Tokens) *z.SrcLoc {
+	if tok := toks.First(nil); tok != nil {
+		return locs.Add(srcFilePath, &tok.Meta.Position)
+	}
+	return nil
+}
+
+func (me *atmoSrcIntel) addLocFromNode(locs *z.SrcLocs, srcFilePath string, node atmolang_irfun.IAstNode) *z.SrcLoc {
 	toks := node.OrigToks()
 	if def := node.IsDef(); def != nil {
 		if ts := def.Name.OrigToks(); len(ts) > 0 {
 			toks = ts
 		}
 	}
-	me.addLocFromToks(locs, srcFilePath, toks)
+	return me.addLocFromToks(locs, srcFilePath, toks)
+}
+
+func tokToPos(tok *udevlex.Token) *z.SrcPos {
+	return &z.SrcPos{Off: tok.Meta.Offset + 1, Ln: tok.Meta.Line, Col: tok.Meta.Column}
+}
+
+func toksToRange(toks udevlex.Tokens) (sr *z.SrcRange) {
+	sr = &z.SrcRange{Start: *tokToPos(toks.First(nil))}
+	tok := toks.Last(nil)
+	l := len(tok.Meta.Orig)
+	sr.End.Off, sr.End.Ln, sr.End.Col = tok.Meta.Offset+l, tok.Meta.Line, tok.Meta.Column+l
+	return
 }

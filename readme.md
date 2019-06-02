@@ -1404,7 +1404,7 @@ type SrcLocs []*SrcLoc
 #### func (*SrcLocs) Add
 
 ```go
-func (me *SrcLocs) Add(srcFilePath string, pos *scanner.Position)
+func (me *SrcLocs) Add(srcFilePath string, pos *scanner.Position) (loc *SrcLoc)
 ```
 
 #### func (*SrcLocs) AddFrom

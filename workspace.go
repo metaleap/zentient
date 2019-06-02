@@ -312,7 +312,7 @@ func (me *WorkspaceBase) ObjSnap(string) interface{} { return me.Impl }
 func (*WorkspaceBase) ObjSnapPrefix() string { return Lang.ID + ".proj." }
 
 func (me *WorkspaceBase) pollFileEventsForever() {
-	interval := 1234 * time.Millisecond
+	interval := 789 * time.Millisecond
 	msgraw, _ := json.Marshal(&ipcResp{IpcID: IPCID_PROJ_POLLEVTS})
 	msgraw = append(msgraw, '\n')
 	for {

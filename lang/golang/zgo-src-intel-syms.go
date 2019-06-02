@@ -214,7 +214,7 @@ func (*goSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (all z.SrcLocs
 	return
 }
 
-func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (allsyms z.SrcLenses) {
+func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (allSyms z.SrcLenses) {
 	onerr := func(label string, detail string) z.SrcLenses {
 		return z.SrcLenses{&z.SrcLens{Str: label, Txt: detail,
 			SrcLoc: z.SrcLoc{FilePath: sL.FilePath, Flag: int(z.SYM_EVENT), Pos: sL.Pos, Range: sL.Range}}}
@@ -228,7 +228,7 @@ func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (al
 	gd, err := udevgo.QueryDesc_Guru(sL.FilePath, sL.Txt, ustr.Int(bytepos))
 	if err != nil {
 		return onerr("Error running guru:", err.Error())
-	} else if gd.Package == nil {
+	} else if gd.Package == nil && curFileOnly {
 		return onerr("Error running guru:", "not in a Go package")
 	}
 
@@ -237,7 +237,7 @@ func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (al
 		sort.Sort(gd) // sort doesn't seem to help improve vsc's ctrl+t ux for now, but maybe in some future vsc release..
 	}
 	anyfilegoes, curpkgdir, numpms := !curFileOnly, filepath.Dir(sL.FilePath), len(gd.Package.Members)
-	query, allsyms = strings.ToLower(query), make(z.SrcLenses, 0, numpms) // numpms will never be a 'good' cap in any of these, but hey any number beats the default cap of 0..
+	query, allSyms = strings.ToLower(query), make(z.SrcLenses, 0, numpms) // numpms will never be a 'good' cap in any of these, but hey any number beats the default cap of 0..
 	for _, pm := range gd.Package.Members {
 		ispmlisted := false
 		if srcref := udev.SrcMsgFromLn(pm.Pos); srcref != nil && (anyfilegoes || srcref.Ref == sL.FilePath) && (query == "" || gd.Matches(pm, query)) {
@@ -296,7 +296,7 @@ func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (al
 			default:
 				z.BadPanic("guru.DescribeMember.Kind", pm.Kind)
 			}
-			allsyms = append(allsyms, sym)
+			allSyms = append(allSyms, sym)
 		}
 		for _, method := range pm.Methods {
 			if isok := ispmlisted || !strings.HasPrefix(pm.Type, "interface{"); isok && (query == "" || strings.Contains(strings.ToLower(method.Name), query)) {
@@ -314,7 +314,7 @@ func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (al
 							continue
 						}
 					}
-					lens := allsyms.AddFrom(srcref, nil)
+					lens := allSyms.AddFrom(srcref, nil)
 					lens.Flag, lens.Str = int(z.SYM_METHOD), "▶  "+methodtitle
 					// if !ispmlisted { // if method's receiver type not in the symbols listing, prepend it's name to the pretend-indentation
 					lens.Str = methodtype + "  " + lens.Str

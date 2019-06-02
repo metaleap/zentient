@@ -70,8 +70,10 @@ func (me *SrcRange) overlapsWith(sr *SrcRange) bool {
 
 type SrcLocs []*SrcLoc
 
-func (me *SrcLocs) Add(srcFilePath string, pos *scanner.Position) {
-	*me = append(*me, &SrcLoc{FilePath: srcFilePath, Pos: &SrcPos{Ln: pos.Line, Col: pos.Column}})
+func (me *SrcLocs) Add(srcFilePath string, pos *scanner.Position) (loc *SrcLoc) {
+	loc = &SrcLoc{FilePath: srcFilePath, Pos: &SrcPos{Ln: pos.Line, Col: pos.Column}}
+	*me = append(*me, loc)
+	return
 }
 
 func (me *SrcLocs) AddFrom(srcRefLoc *udev.SrcMsg, fallbackFilePath func() string) (loc *SrcLoc) {
