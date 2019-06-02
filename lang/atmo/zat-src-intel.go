@@ -22,7 +22,7 @@ func init() {
 
 func (me *atmoSrcIntel) References(srcLens *z.SrcLens, includeDeclaration bool) (locs z.SrcLocs) {
 	if kit := Ctx.KitByDirPath(filepath.Dir(srcLens.FilePath), true); kit != nil {
-		Ctx.WithInMemFileMod(srcLens.FilePath, srcLens.Txt, func() {
+		if exc := Ctx.WithInMemFileMod(srcLens.FilePath, srcLens.Txt, func() {
 			Ctx.KitEnsureLoaded(kit)
 			if _, nodes := kit.AstNodeAt(srcLens.FilePath, srcLens.ByteOffsetForPos(srcLens.Pos)); len(nodes) > 0 {
 				var refs map[*atmolang_irfun.AstDefTop][]atmolang_irfun.IAstExpr
@@ -39,14 +39,16 @@ func (me *atmoSrcIntel) References(srcLens *z.SrcLens, includeDeclaration bool) 
 					}
 				}
 			}
-		})
+		}); exc != nil {
+			panic(exc)
+		}
 	}
 	return
 }
 
 func (me *atmoSrcIntel) DefSym(srcLens *z.SrcLens) (locs z.SrcLocs) {
 	if kit := Ctx.KitByDirPath(filepath.Dir(srcLens.FilePath), true); kit != nil {
-		Ctx.WithInMemFileMod(srcLens.FilePath, srcLens.Txt, func() {
+		if exc := Ctx.WithInMemFileMod(srcLens.FilePath, srcLens.Txt, func() {
 			Ctx.KitEnsureLoaded(kit)
 			if tlc, nodes := kit.AstNodeAt(srcLens.FilePath, srcLens.ByteOffsetForPos(srcLens.Pos)); len(nodes) > 0 {
 				// HAPPY SMART PATH: already know the def(s) or def-arg the current name points to
@@ -98,7 +100,9 @@ func (me *atmoSrcIntel) DefSym(srcLens *z.SrcLens) (locs z.SrcLocs) {
 					}
 				}
 			}
-		})
+		}); exc != nil {
+			panic(exc)
+		}
 	}
 	return
 }

@@ -35,8 +35,17 @@ func (*atmoWorkspace) onBeforeChanges(workspaceChanges *z.WorkspaceChanges, fres
 	}
 }
 
-func (*atmoWorkspace) onAfterChanges(*z.WorkspaceChanges) {
+func (*atmoWorkspace) onAfterChanges(workspaceChanges *z.WorkspaceChanges) {
 	Ctx.CatchUp(true)
+	// if  len(workspaceChanges.OpenedFiles) > 0 {
+	// 	var kitstoload []string
+	// 	for _, srcfilepath := range workspaceChanges.OpenedFiles {
+	// 		if kit := Ctx.KitByDirPath(filepath.Dir(srcfilepath), true); kit != nil && !ustr.In(kit.ImpPath, kitstoload...) {
+	// 			kitstoload = append(kitstoload, kit.ImpPath)
+	// 		}
+	// 	}
+	// 	Ctx.KitsEnsureLoaded(false, kitstoload...)
+	// }
 }
 
 func (me *atmoWorkspace) onPreInit() {
