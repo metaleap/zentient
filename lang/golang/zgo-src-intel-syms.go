@@ -222,14 +222,19 @@ func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (al
 	if !tools.guru.Installed {
 		return onerr(z.ToolsMsgGone("guru"), z.ToolsMsgMore("guru"))
 	}
+
 	sL.EnsureSrcFull()
 	srclns := strings.Split(sL.Txt, "\n")
 	bytepos := 8 + sL.ByteOffsetForFirstLineBeginningWith("package ")
 	gd, err := udevgo.QueryDesc_Guru(sL.FilePath, sL.Txt, ustr.Int(bytepos))
 	if err != nil {
 		return onerr("Error running guru:", err.Error())
-	} else if gd.Package == nil && curFileOnly {
-		return onerr("Error running guru:", "not in a Go package")
+	} else if gd.Package == nil {
+		if curFileOnly {
+			return onerr("Error running guru:", "not in a Go package")
+		} else {
+			return nil
+		}
 	}
 
 	// no more early-returns, now get busy
