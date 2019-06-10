@@ -13,11 +13,17 @@ import (
 type SrcPos struct {
 	Ln  int `json:"l,omitempty"`
 	Col int `json:"c,omitempty"`
+	// rune1 not byte0 offset!
 	Off int `json:"o,omitempty"`
 
 	// if & when this is computed, it'll be 0-based
 	byteOff int
 	byteoff bool
+}
+
+func (me *SrcPos) SetRune1OffFromByte0Off(byte0Off int, src string) {
+	me.byteOff, me.byteoff = byte0Off, true
+	me.Off = 1 + ustr.NumRunes(src[:byte0Off])
 }
 
 func (me *SrcPos) isBetween(sr *SrcRange) bool {

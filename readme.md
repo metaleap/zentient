@@ -314,10 +314,16 @@ func (me *DiagBase) MenuCategory() string
 func (me *DiagBase) NewDiagItemFrom(srcRef *udev.SrcMsg, toolName string, fallbackFilePath func() string) (di *DiagItem)
 ```
 
+#### func (*DiagBase) ShouldOnFileOpen
+
+```go
+func (*DiagBase) ShouldOnFileOpen() bool
+```
+
 #### func (*DiagBase) UpdateBuildDiagsAsNeeded
 
 ```go
-func (me *DiagBase) UpdateBuildDiagsAsNeeded(workspaceFiles WorkspaceFiles, writtenFiles []string)
+func (me *DiagBase) UpdateBuildDiagsAsNeeded(workspaceFiles WorkspaceFiles, writtenFiles []string, openedFiles []string)
 ```
 
 #### func (*DiagBase) UpdateLintDiagsIfAndAsNeeded
@@ -361,6 +367,7 @@ type DiagItem struct {
 	SrcActions  []EditorAction `json:",omitempty"`
 	StickyForce bool           `json:"-"`
 	StickyAuto  bool           `json:"Sticky,omitempty"`
+	Tags        []int          `json:"Tags,omitempty"`
 }
 ```
 
@@ -393,6 +400,7 @@ func (me *DiagJob) String() string
 ```go
 type DiagJobBuild struct {
 	DiagJob
+	Misc      interface{}
 	TargetCmp func(IDiagJobTarget, IDiagJobTarget) bool
 	Succeeded bool
 }
@@ -540,9 +548,10 @@ type IDiag interface {
 ```go
 type IDiagBuild interface {
 	FixerUppers() []FixerUpper
-	OnUpdateBuildDiags([]string) DiagBuildJobs
+	OnUpdateBuildDiags([]string, []string) DiagBuildJobs
 	RunBuildJobs(DiagBuildJobs, WorkspaceFiles) DiagItems
-	UpdateBuildDiagsAsNeeded(WorkspaceFiles, []string)
+	ShouldOnFileOpen() bool
+	UpdateBuildDiagsAsNeeded(WorkspaceFiles, []string, []string)
 }
 ```
 
@@ -1507,11 +1516,18 @@ func (me SrcModEdits) Swap(i int, j int)
 type SrcPos struct {
 	Ln  int `json:"l,omitempty"`
 	Col int `json:"c,omitempty"`
+	// rune1 not byte0 offset!
 	Off int `json:"o,omitempty"`
 }
 ```
 
 All public fields are 1-based (so 0 means 'missing') and rune-not-byte-based
+
+#### func (*SrcPos) SetRune1OffFromByte0Off
+
+```go
+func (me *SrcPos) SetRune1OffFromByte0Off(byte0Off int, src string)
+```
 
 #### func (*SrcPos) String
 
@@ -1688,8 +1704,10 @@ type TreeViewItem struct {
 type WorkspaceBase struct {
 	Impl IWorkspace `json:"-"`
 
+	// raised before updating zentient-internal workspaceFolders/openedFiles and then requesting new diags
 	OnBeforeChanges WorkspaceChangesBefore `json:"-"`
-	OnAfterChanges  WorkspaceChangesAfter  `json:"-"`
+	// raised after updating zentient-internal workspaceFolders/openedFiles and then requesting new diags
+	OnAfterChanges WorkspaceChangesAfter `json:"-"`
 }
 ```
 
@@ -1819,8 +1837,20 @@ type WorkspaceFiles map[string]*WorkspaceFile
 ```
 
 
+#### func (WorkspaceFiles) Has
+
+```go
+func (me WorkspaceFiles) Has(fpath string) bool
+```
+
 #### func (WorkspaceFiles) HasBuildDiags
 
 ```go
 func (me WorkspaceFiles) HasBuildDiags(filePath string) (has bool)
+```
+
+#### func (WorkspaceFiles) IsOpen
+
+```go
+func (me WorkspaceFiles) IsOpen(fpath string) bool
 ```

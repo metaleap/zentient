@@ -63,10 +63,10 @@ func Serve() (err error) {
 
 	// we don't directly wire up a json.Decoder to stdin but read individual lines in as strings first:
 	// - this enforces our line-delimited (rather than 'json-delimited') protocol
-	// - allows json-decoding in separate go-routine
+	// - edit: dropped for now /* was: "allows json-decoding in separate go-routine" */
 	// - bad lines are simply reported to client without having a single 'global' decoder in confused/error state / without needing to exit
 	for Prog.pipeIO.stdinReadLn.Scan() {
-		go serveIncomingReq(Prog.pipeIO.stdinReadLn.Text())
+		/*go*/ serveIncomingReq(Prog.pipeIO.stdinReadLn.Text())
 	}
 	err = Prog.pipeIO.stdinReadLn.Err()
 	return

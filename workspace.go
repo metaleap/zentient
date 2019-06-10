@@ -69,6 +69,13 @@ func (me WorkspaceFiles) ensure(fpath string) (file *WorkspaceFile) {
 	return
 }
 
+func (me WorkspaceFiles) Has(fpath string) bool { return me[fpath] != nil }
+
+func (me WorkspaceFiles) IsOpen(fpath string) bool {
+	f := me[fpath]
+	return f != nil && f.IsOpen
+}
+
 type diagsSummary struct {
 	numBuild int
 	numLint  int
@@ -178,8 +185,10 @@ type WorkspaceBase struct {
 	mutex sync.Mutex
 	Impl  IWorkspace `json:"-"`
 
+	// raised before updating zentient-internal workspaceFolders/openedFiles and then requesting new diags
 	OnBeforeChanges WorkspaceChangesBefore `json:"-"`
-	OnAfterChanges  WorkspaceChangesAfter  `json:"-"`
+	// raised after updating zentient-internal workspaceFolders/openedFiles and then requesting new diags
+	OnAfterChanges WorkspaceChangesAfter `json:"-"`
 
 	dirs  WorkspaceDirs
 	files WorkspaceFiles
@@ -289,8 +298,8 @@ func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 			files.ensure(modfilepath).resetDiags()
 		}
 		if Lang.Diag != nil {
-			if len(upd.WrittenFiles) > 0 {
-				Lang.Diag.UpdateBuildDiagsAsNeeded(files, upd.WrittenFiles)
+			if len(upd.WrittenFiles) > 0 || (len(upd.OpenedFiles) > 0 && Lang.Diag.ShouldOnFileOpen()) {
+				Lang.Diag.UpdateBuildDiagsAsNeeded(files, upd.WrittenFiles, upd.OpenedFiles)
 			}
 			if needsfreshautolints {
 				Lang.Diag.UpdateLintDiagsIfAndAsNeeded(files, true)
