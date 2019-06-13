@@ -5,8 +5,8 @@ import (
 
 	"github.com/go-leap/dev/lex"
 	"github.com/go-leap/str"
+	"github.com/metaleap/atmo/il"
 	"github.com/metaleap/atmo/lang"
-	"github.com/metaleap/atmo/lang/irfun"
 	"github.com/metaleap/atmo/session"
 	"github.com/metaleap/zentient"
 )
@@ -28,9 +28,9 @@ func (me *atmoSrcIntel) DefSym(srcLens *z.SrcLens) (locs z.SrcLocs) {
 			if curtlc, nodes := kit.AstNodeAt(srcLens.FilePath, srcLens.ByteOffsetForPos(srcLens.Pos)); len(nodes) > 0 {
 				// HAPPY SMART PATH: already know the def(s) or def-arg the current name points to
 				if curtld, irnodes := kit.AstNodeIrFunFor(curtlc.Id(), nodes[0]); len(irnodes) > 0 {
-					if ident, _ := irnodes[0].(*atmolang_irfun.AstIdentName); ident != nil {
+					if ident, _ := irnodes[0].(*atmoil.AstIdentName); ident != nil {
 						for _, node := range ident.Anns.ResolvesTo {
-							tld, _ := node.(*atmolang_irfun.AstDefTop)
+							tld, _ := node.(*atmoil.AstDefTop)
 							if tld == nil {
 								tld = curtld
 								if adr, ok := node.(atmosess.AstDefRef); ok {
@@ -94,7 +94,7 @@ func (me *atmoSrcIntel) References(srcLens *z.SrcLens, includeDeclaration bool) 
 		if panicked := Ctx.WithInMemFileMod(srcLens.FilePath, srcLens.Txt, func() {
 			Ctx.KitEnsureLoaded(kit)
 			if _, nodes := kit.AstNodeAt(srcLens.FilePath, srcLens.ByteOffsetForPos(srcLens.Pos)); len(nodes) > 0 {
-				var refs map[*atmolang_irfun.AstDefTop][]atmolang_irfun.IAstExpr
+				var refs map[*atmoil.AstDefTop][]atmoil.IAstExpr
 				if ident, _ := nodes[0].(*atmolang.AstIdent); ident != nil {
 					refs = Ctx.KitsCollectReferences(true, ident.Val)
 				} else if atom, _ := nodes[0].(atmolang.IAstExprAtomic); atom != nil {
@@ -153,7 +153,7 @@ func (me *atmoSrcIntel) addLocFromToks(tlc *atmolang.SrcTopChunk, locs *z.SrcLoc
 	return nil
 }
 
-func (me *atmoSrcIntel) addLocFromNode(tlc *atmolang.SrcTopChunk, locs *z.SrcLocs, srcFilePath string, tld *atmolang_irfun.AstDefTop, node atmolang_irfun.IAstNode) *z.SrcLoc {
+func (me *atmoSrcIntel) addLocFromNode(tlc *atmolang.SrcTopChunk, locs *z.SrcLocs, srcFilePath string, tld *atmoil.AstDefTop, node atmoil.IAstNode) *z.SrcLoc {
 	toks := tld.OrigToks(node)
 	if def := node.IsDef(); def != nil {
 		if ts := tld.OrigToks(&def.Name); len(ts) > 0 {
