@@ -689,6 +689,7 @@ type ISortable interface {
 
 ```go
 type ISrcIntel interface {
+	CanIntel(*SrcIntelLex) bool
 	ComplDetails(*SrcLens, string) *SrcIntelCompl
 	ComplItems(*SrcLens) SrcIntelCompls
 	ComplItemsShouldSort(*SrcLens) bool
@@ -1170,6 +1171,12 @@ type SrcIntelBase struct {
 ```
 
 
+#### func (*SrcIntelBase) CanIntel
+
+```go
+func (*SrcIntelBase) CanIntel(*SrcIntelLex) bool
+```
+
 #### func (*SrcIntelBase) ComplDetails
 
 ```go
@@ -1290,6 +1297,21 @@ func (me SrcIntelCompls) Swap(i int, j int)
 type SrcIntelDoc struct {
 	Value     string `json:"value,omitempty"`
 	IsTrusted bool   `json:"isTrusted,omitempty"`
+}
+```
+
+
+#### type SrcIntelLex
+
+```go
+type SrcIntelLex struct {
+	Ident   string
+	Int     string
+	Float   string
+	Char    string
+	String  string
+	Comment string
+	Other   string
 }
 ```
 

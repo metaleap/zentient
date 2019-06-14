@@ -12,6 +12,7 @@ import (
 type ISrcIntel interface {
 	iDispatcher
 
+	CanIntel(*SrcIntelLex) bool
 	ComplDetails(*SrcLens, string) *SrcIntelCompl
 	ComplItems(*SrcLens) SrcIntelCompls
 	ComplItemsShouldSort(*SrcLens) bool
@@ -49,7 +50,7 @@ type SrcIntelCompl struct {
 	SortPrio int `json:"-"`
 }
 
-type srcIntelLex struct {
+type SrcIntelLex struct {
 	Ident   string
 	Int     string
 	Float   string
@@ -58,8 +59,6 @@ type srcIntelLex struct {
 	Comment string
 	Other   string
 }
-
-func (me *srcIntelLex) canIntel() bool { return me == nil || me.Ident != "" || me.Other != "" }
 
 type SrcIntelCompls []*SrcIntelCompl
 
@@ -125,7 +124,7 @@ func (me *SrcIntelBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 }
 
 func (me *SrcIntelBase) onCmplItems(req *ipcReq, resp *ipcResp) {
-	if lex := me.posLex(req.SrcLens); lex.canIntel() {
+	if lex := me.posLex(req.SrcLens); me.Impl.CanIntel(lex) {
 		resp.SrcIntel.Cmpl = me.Impl.ComplItems(req.SrcLens)
 		if me.Impl.ComplItemsShouldSort(req.SrcLens) {
 			for _, c := range resp.SrcIntel.Cmpl {
@@ -156,46 +155,47 @@ func (me *SrcIntelBase) onHighlights(req *ipcReq, resp *ipcResp) {
 }
 
 func (me *SrcIntelBase) onHover(req *ipcReq, resp *ipcResp) {
-	if lex := me.posLex(req.SrcLens); lex.canIntel() {
+	lex := me.posLex(req.SrcLens)
+	if me.Impl.CanIntel(lex) {
 		resp.SrcIntel.Info = me.Impl.Hovers(req.SrcLens)
-	} else {
-		var hov InfoTip
-		if lex.Char != "" {
-			hov.Value = Strf("`%s` — byte length %d", lex.Char, len(lex.Char[:len(lex.Char)-1][1:]))
-		} else if lex.Int != "" || lex.Float != "" {
-			if i, ui, f := ustr.ToI64(lex.Int, 0, 0), ustr.ToUi64(lex.Int, 0, 0), ustr.ToF64(lex.Float, 0); ui != 0 || i != 0 || f != 0 {
-				const strf = "`%s` — `%s`\n\n"
-				formats := []string{"%v", "%d", "%x", "%X", "%o", "%b", "%c", "%U", "%q"}
-				if i == 0 && ui == 0 {
-					formats = []string{"%v", "%g", "%G", "%f", "%0f", "%.f", "%9.6f", "%b", "%e", "%E"}
-				}
-				for _, format := range formats {
-					if ui > 0 {
-						hov.Value += Strf(strf, format, Strf(format, ui))
-					} else if i != 0 {
-						hov.Value += Strf(strf, format, Strf(format, i))
-					} else {
-						hov.Value += Strf(strf, format, Strf(format, f))
-					}
-				}
+	}
+
+	var hov InfoTip
+	if lex.Char != "" {
+		hov.Value = Strf("`%s` — byte length %d", lex.Char, len(lex.Char[:len(lex.Char)-1][1:]))
+	} else if lex.Int != "" || lex.Float != "" {
+		if i, ui, f := ustr.ToI64(lex.Int, 0, 0), ustr.ToUi64(lex.Int, 0, 0), ustr.ToF64(lex.Float, 0); ui != 0 || i != 0 || f != 0 {
+			const strf = "`%s` — `%s`\n\n"
+			formats := []string{"%v", "%d", "%x", "%X", "%o", "%b", "%c", "%U", "%q"}
+			if i == 0 && ui == 0 {
+				formats = []string{"%v", "%g", "%G", "%f", "%0f", "%.f", "%9.6f", "%b", "%e", "%E"}
 			}
-		} else if lex.String != "" {
-			var str string
-			if n, e := fmt.Sscanf(lex.String, "%q", &str); e != nil {
-				hov.Value = e.Error()
-			} else if n > 0 && str != "" {
-				hov.Value = Strf("Byte-length: %d — rune count: %d\n\n---------------------------------------\n\n%s", len(str), utf8.RuneCountInString(str), str)
-			}
-		} else if lex.Comment != "" {
-			if ustr.Pref(lex.Comment, "//") {
-				hov.Value = ustr.Trim(ustr.TrimPref(lex.Comment, "//"))
-			} else {
-				hov.Value = ustr.TrimSuff(ustr.TrimPref(lex.Comment, "/*"), "*/")
+			for _, format := range formats {
+				if ui > 0 {
+					hov.Value += Strf(strf, format, Strf(format, ui))
+				} else if i != 0 {
+					hov.Value += Strf(strf, format, Strf(format, i))
+				} else {
+					hov.Value += Strf(strf, format, Strf(format, f))
+				}
 			}
 		}
-		if hov.Value != "" {
-			resp.SrcIntel.Info = []InfoTip{hov}
+	} else if lex.String != "" {
+		var str string
+		if n, e := fmt.Sscanf(lex.String, "%q", &str); e != nil {
+			hov.Value = e.Error()
+		} else if n > 0 && str != "" {
+			hov.Value = Strf("Byte-length: %d — rune count: %d\n\n---------------------------------------\n\n%s", len(str), utf8.RuneCountInString(str), str)
 		}
+	} else if lex.Comment != "" {
+		if ustr.Pref(lex.Comment, "//") {
+			hov.Value = ustr.Trim(ustr.TrimPref(lex.Comment, "//"))
+		} else {
+			hov.Value = ustr.TrimSuff(ustr.TrimPref(lex.Comment, "/*"), "*/")
+		}
+	}
+	if hov.Value != "" {
+		resp.SrcIntel.Info = append(resp.SrcIntel.Info, hov)
 	}
 }
 
@@ -227,7 +227,7 @@ func (me *SrcIntelBase) onSyms(req *ipcReq, resp *ipcResp) {
 	resp.SrcIntel.Syms = me.Impl.Symbols(req.SrcLens, query, req.IpcID == IPCID_SRCINTEL_SYMS_FILE)
 }
 
-func (me *SrcIntelBase) posLex(srcLens *SrcLens) (poslex *srcIntelLex) {
+func (me *SrcIntelBase) posLex(srcLens *SrcLens) (posLex *SrcIntelLex) {
 	if srcLens.EnsureSrcFull(); srcLens.Txt != "" {
 		var scan scanner.Scanner
 		scan.Init(ustr.Reader(srcLens.Txt)).Filename = srcLens.FilePath
@@ -243,24 +243,24 @@ func (me *SrcIntelBase) posLex(srcLens *SrcLens) (poslex *srcIntelLex) {
 			}
 		}
 		if ls != "" {
-			poslex = &srcIntelLex{}
+			posLex = &SrcIntelLex{}
 			switch lr {
 			case scanner.Ident:
-				poslex.Ident = ls
+				posLex.Ident = ls
 			case scanner.Int:
-				poslex.Int = ls
+				posLex.Int = ls
 			case scanner.Float:
-				poslex.Float = ls
+				posLex.Float = ls
 			case scanner.Char:
-				poslex.Char = ls
+				posLex.Char = ls
 			case scanner.String:
-				poslex.String = ls
+				posLex.String = ls
 			case scanner.RawString:
-				poslex.String = ls
+				posLex.String = ls
 			case scanner.Comment:
-				poslex.Comment = ls
+				posLex.Comment = ls
 			default:
-				poslex.Other = ls
+				posLex.Other = ls
 			}
 		}
 	}
@@ -268,6 +268,7 @@ func (me *SrcIntelBase) posLex(srcLens *SrcLens) (poslex *srcIntelLex) {
 }
 
 func (*SrcIntelBase) posLexErrNoOp(*scanner.Scanner, string)       {}
+func (*SrcIntelBase) CanIntel(*SrcIntelLex) bool                   { return true }
 func (*SrcIntelBase) ComplItems(*SrcLens) SrcIntelCompls           { return nil }
 func (*SrcIntelBase) ComplDetails(*SrcLens, string) *SrcIntelCompl { return nil }
 func (*SrcIntelBase) ComplItemsShouldSort(*SrcLens) bool           { return false }
