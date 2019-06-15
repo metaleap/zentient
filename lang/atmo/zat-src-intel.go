@@ -104,13 +104,11 @@ func (me *atmoSrcIntel) Hovers(srcLens *z.SrcLens) (infoTips []z.InfoTip) {
 				)
 
 				if _, ilnodes := kit.AstNodeIrFunFor(tlc.Id(), nodes[0]); len(ilnodes) > 0 {
-					nodetypenames = ""
 					for _, n := range ilnodes {
-						nodetypenames += z.Strf("— %T ", n)
+						infoTips = append(infoTips,
+							z.InfoTip{Value: z.Strf("%T:\n%s", n, n.Facts().Description()), Language: "plain"},
+						)
 					}
-					infoTips = append(infoTips,
-						z.InfoTip{Value: nodetypenames[4:]},
-					)
 				}
 			}
 		}); panicked != nil {
