@@ -44,7 +44,7 @@ func (me *atmoSrcIntel) DefSym(srcLens *z.SrcLens) (locs z.SrcLocs) {
 					}
 					return
 				}
-				return
+
 				// FALL-BACK DUMB PATH: merely lexical (traversal up the original src AST, collect any & all defs/def-args technically-in-scope and goal-named)
 				if ident, _ := nodes[0].(*atmolang.AstIdent); ident != nil && ident.IsName(true) {
 					// points to parent def-arg or def-in-scope?
@@ -105,6 +105,9 @@ func (me *atmoSrcIntel) Hovers(srcLens *z.SrcLens) (infoTips []z.InfoTip) {
 
 				if _, ilnodes := kit.AstNodeIrFunFor(tlc.Id(), nodes[0]); len(ilnodes) > 0 {
 					for _, n := range ilnodes {
+						if nid, _ := n.(*atmoil.AstIdentName); nid != nil {
+							infoTips = append(infoTips, z.InfoTip{Value: z.Strf("(resolves to %v candidate/s)", len(nid.Anns.ResolvesTo))})
+						}
 						infoTips = append(infoTips,
 							z.InfoTip{Value: z.Strf("%T:\n%s", n, n.Facts().Description()), Language: "plain"},
 						)
