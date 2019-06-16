@@ -2,6 +2,7 @@ package z
 
 import (
 	"encoding/json"
+	"runtime/debug"
 	"strings"
 )
 
@@ -76,10 +77,8 @@ func (me *ipcResp) postProcess() {
 }
 
 func (me *ipcResp) onResponseReady() {
-	// if 1 > 0 {
-	// 	return
-	// }
 	if except := recover(); except != nil {
+		debug.PrintStack()
 		me.ErrMsg = Strf("%v", except)
 	}
 	if me.ErrMsg != "" {

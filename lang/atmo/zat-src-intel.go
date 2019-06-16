@@ -29,7 +29,7 @@ func (me *atmoSrcIntel) DefSym(srcLens *z.SrcLens) (locs z.SrcLocs) {
 				// HAPPY SMART PATH: already know the def(s) or def-arg the current name points to
 				if curtld, irnodes := kit.AstNodeIrFunFor(curtlc.Id(), nodes[0]); len(irnodes) > 0 {
 					if ident, _ := irnodes[0].(*atmoil.AstIdentName); ident != nil {
-						for _, node := range ident.Anns.ResolvesTo {
+						for _, node := range ident.Anns.Candidates {
 							tld, _ := node.(*atmoil.AstDefTop)
 							if tld == nil {
 								tld = curtld
@@ -106,7 +106,7 @@ func (me *atmoSrcIntel) Hovers(srcLens *z.SrcLens) (infoTips []z.InfoTip) {
 				if _, ilnodes := kit.AstNodeIrFunFor(tlc.Id(), nodes[0]); len(ilnodes) > 0 {
 					for _, n := range ilnodes {
 						if nid, _ := n.(*atmoil.AstIdentName); nid != nil {
-							infoTips = append(infoTips, z.InfoTip{Value: z.Strf("(resolves to %v candidate/s)", len(nid.Anns.ResolvesTo))})
+							infoTips = append(infoTips, z.InfoTip{Value: z.Strf("(resolves to %v candidate/s)", len(nid.Anns.Candidates))})
 						}
 						infoTips = append(infoTips,
 							z.InfoTip{Value: z.Strf("%T:\n%s", n, n.Facts().Description()), Language: "plain"},

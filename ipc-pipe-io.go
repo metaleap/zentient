@@ -2,6 +2,7 @@ package z
 
 import (
 	"fmt"
+	"runtime/debug"
 
 	"github.com/go-leap/run"
 )
@@ -31,11 +32,9 @@ func sendRaw(jsonResp []byte) (err error) {
 }
 
 func catch(set *error) {
-	// if 1 > 0 {
-	// 	return
-	// }
 	Prog.pipeIO.stdinReadLn, Prog.pipeIO.stdoutWriter, Prog.pipeIO.stdoutEncoder = nil, nil, nil
 	if except := recover(); except != nil {
+		debug.PrintStack()
 		if err, _ := except.(error); err != nil {
 			*set = err
 		} else {
