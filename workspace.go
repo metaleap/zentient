@@ -150,6 +150,7 @@ type WorkspaceChanges struct {
 	OpenedFiles  []string
 	ClosedFiles  []string
 	WrittenFiles []string
+	LiveFiles    map[string]string
 }
 
 func (me *WorkspaceChanges) hasChanges() bool {
