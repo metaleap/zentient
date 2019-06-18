@@ -1,4 +1,4 @@
-package zps
+package zex
 
 import (
 	"github.com/metaleap/zentient"
@@ -6,7 +6,7 @@ import (
 
 func OnPreInit() {
 	l := &z.Lang
-	l.ID, l.Title = "purescript", "PureScript"
+	l.ID, l.Title = "examplelang", "ExampleLang"
 }
 
 func OnPostInit() {
