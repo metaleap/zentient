@@ -21,10 +21,22 @@ func init() {
 	srcIntel.Impl, z.Lang.SrcIntel = &srcIntel, &srcIntel
 }
 
+func (me *atmoSrcIntel) withInMemFileMod(srcLens *z.SrcLens, kit *atmosess.Kit, do func()) {
+	Ctx.KitEnsureLoaded(kit)
+	if liveMode {
+		if srcfile := kit.SrcFiles.ByFilePath(srcLens.FilePath); srcfile != nil {
+			srcfile.Options.TmpAltSrc = []byte(srcLens.Txt)
+			Ctx.CatchUpOnFileMods(srcfile)
+		}
+		do()
+	} else if panicked := Ctx.WithInMemFileMod(srcLens.FilePath, srcLens.Txt, do); panicked != nil {
+		panic(panicked)
+	}
+}
+
 func (me *atmoSrcIntel) DefSym(srcLens *z.SrcLens) (locs z.SrcLocs) {
 	if kit := Ctx.KitByDirPath(filepath.Dir(srcLens.FilePath), true); kit != nil {
-		if panicked := Ctx.WithInMemFileMod(srcLens.FilePath, srcLens.Txt, func() {
-			Ctx.KitEnsureLoaded(kit)
+		me.withInMemFileMod(srcLens, kit, func() {
 			if curtlc, nodes := me.astAt(kit, srcLens); len(nodes) > 0 {
 				// HAPPY SMART PATH: already know the def(s) or def-arg the current name points to
 				if curtld, irnodes := kit.AstNodeIrFunFor(curtlc.Id(), nodes[0]); len(irnodes) > 0 {
@@ -82,17 +94,14 @@ func (me *atmoSrcIntel) DefSym(srcLens *z.SrcLens) (locs z.SrcLocs) {
 					}
 				}
 			}
-		}); panicked != nil {
-			panic(panicked)
-		}
+		})
 	}
 	return
 }
 
 func (me *atmoSrcIntel) Hovers(srcLens *z.SrcLens) (infoTips []z.InfoTip) {
 	if kit := Ctx.KitByDirPath(filepath.Dir(srcLens.FilePath), true); kit != nil {
-		if panicked := Ctx.WithInMemFileMod(srcLens.FilePath, srcLens.Txt, func() {
-			Ctx.KitEnsureLoaded(kit)
+		me.withInMemFileMod(srcLens, kit, func() {
 			if tlc, nodes := me.astAt(kit, srcLens); len(nodes) > 0 {
 				var nodetypenames string
 				for _, n := range nodes {
@@ -114,17 +123,14 @@ func (me *atmoSrcIntel) Hovers(srcLens *z.SrcLens) (infoTips []z.InfoTip) {
 					}
 				}
 			}
-		}); panicked != nil {
-			panic(panicked)
-		}
+		})
 	}
 	return
 }
 
 func (me *atmoSrcIntel) References(srcLens *z.SrcLens, includeDeclaration bool) (locs z.SrcLocs) {
 	if kit := Ctx.KitByDirPath(filepath.Dir(srcLens.FilePath), true); kit != nil {
-		if panicked := Ctx.WithInMemFileMod(srcLens.FilePath, srcLens.Txt, func() {
-			Ctx.KitEnsureLoaded(kit)
+		me.withInMemFileMod(srcLens, kit, func() {
 			if _, nodes := me.astAt(kit, srcLens); len(nodes) > 0 {
 				var refs map[*atmoil.AstDefTop][]atmoil.IAstExpr
 				if ident, _ := nodes[0].(*atmolang.AstIdent); ident != nil {
@@ -140,9 +146,7 @@ func (me *atmoSrcIntel) References(srcLens *z.SrcLens, includeDeclaration bool) 
 					}
 				}
 			}
-		}); panicked != nil {
-			panic(panicked)
-		}
+		})
 	}
 	return
 }
@@ -150,30 +154,30 @@ func (me *atmoSrcIntel) References(srcLens *z.SrcLens, includeDeclaration bool) 
 func (me *atmoSrcIntel) Symbols(srcLens *z.SrcLens, query string, curFileOnly bool) (allsyms z.SrcLenses) {
 	query = ustr.Lo(query)
 	var kits atmosess.Kits
-	if kit := Ctx.KitByDirPath(filepath.Dir(srcLens.FilePath), true); !curFileOnly {
+	curkit := Ctx.KitByDirPath(filepath.Dir(srcLens.FilePath), true)
+	if !curFileOnly {
 		kits = Ctx.Kits.All
-	} else if kit != nil {
-		kits = atmosess.Kits{kit}
-		Ctx.KitEnsureLoaded(kit)
+	} else if curkit != nil {
+		kits = atmosess.Kits{curkit}
 	}
-	if panicked := Ctx.WithInMemFileMod(srcLens.FilePath, srcLens.Txt, func() {
-		for _, kit := range kits {
-			for _, srcfile := range kit.SrcFiles {
-				if srcfile.SrcFilePath == srcLens.FilePath || !curFileOnly {
-					for i := range srcfile.TopLevel {
-						tlc := &srcfile.TopLevel[i]
-						if def := tlc.Ast.Def.Orig; def != nil {
-							if len(query) == 0 || ustr.Has(ustr.Lo(def.Name.Val), query) {
-								allsyms = append(allsyms, &z.SrcLens{Str: def.Name.Val, Txt: "(description later)", SrcLoc: z.SrcLoc{
-									FilePath: srcfile.SrcFilePath, Flag: int(z.SYM_FUNCTION), Range: toksToRange(tlc, def.Tokens)}})
+	if len(kits) > 0 && curkit != nil {
+		me.withInMemFileMod(srcLens, curkit, func() {
+			for _, kit := range kits {
+				for _, srcfile := range kit.SrcFiles {
+					if srcfile.SrcFilePath == srcLens.FilePath || !curFileOnly {
+						for i := range srcfile.TopLevel {
+							tlc := &srcfile.TopLevel[i]
+							if def := tlc.Ast.Def.Orig; def != nil {
+								if len(query) == 0 || ustr.Has(ustr.Lo(def.Name.Val), query) {
+									allsyms = append(allsyms, &z.SrcLens{Str: def.Name.Val, Txt: "(description later)", SrcLoc: z.SrcLoc{
+										FilePath: srcfile.SrcFilePath, Flag: int(z.SYM_FUNCTION), Range: toksToRange(tlc, def.Tokens)}})
+								}
 							}
 						}
 					}
 				}
 			}
-		}
-	}); panicked != nil {
-		panic(panicked)
+		})
 	}
 	return
 }

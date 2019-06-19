@@ -5,11 +5,13 @@ import (
 	"github.com/metaleap/zentient"
 )
 
+const liveMode = true
+
 var Ctx *atmosess.Ctx
 
 func OnPreInit() {
 	l := &z.Lang
-	l.ID, l.Title, l.Enabled = "atmo", "atmo", true
+	l.ID, l.Title, l.Enabled, l.Live = "atmo", "atmo", true, liveMode
 	var ctx atmosess.Ctx
 	if err := ctx.Init(false, ""); err == nil {
 		Ctx = &ctx

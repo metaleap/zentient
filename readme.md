@@ -12,6 +12,7 @@ var (
 		Enabled   bool
 		ID        string
 		Title     string
+		Live      bool
 		SrcMod    ISrcMod
 		SrcIntel  ISrcIntel
 		Diag      IDiag
