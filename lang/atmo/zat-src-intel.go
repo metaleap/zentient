@@ -23,7 +23,9 @@ func init() {
 
 func (me *atmoSrcIntel) withInMemFileMod(srcLens *z.SrcLens, kit *atmosess.Kit, do func()) {
 	Ctx.KitEnsureLoaded(kit)
-	if liveMode {
+	if srcLens.Txt == "" {
+		do()
+	} else if liveMode {
 		if srcfile := kit.SrcFiles.ByFilePath(srcLens.FilePath); srcfile != nil {
 			srcfile.Options.TmpAltSrc = []byte(srcLens.Txt)
 			Ctx.CatchUpOnFileMods(srcfile)
@@ -155,9 +157,7 @@ func (me *atmoSrcIntel) Symbols(srcLens *z.SrcLens, query string, curFileOnly bo
 	query = ustr.Lo(query)
 	var kits atmosess.Kits
 	curkit := Ctx.KitByDirPath(filepath.Dir(srcLens.FilePath), true)
-	if !curFileOnly {
-		kits = Ctx.Kits.All
-	} else if curkit != nil {
+	if kits = Ctx.Kits.All; curFileOnly {
 		kits = atmosess.Kits{curkit}
 	}
 	if len(kits) > 0 && curkit != nil {

@@ -154,7 +154,7 @@ type WorkspaceChanges struct {
 }
 
 func (me *WorkspaceChanges) hasChanges() bool {
-	return me.HasDirChanges() || me.hasFileChanges()
+	return me.HasDirChanges() || me.hasFileChanges() || (Lang.Live && len(me.LiveFiles) > 0)
 }
 
 func (me *WorkspaceChanges) HasDirChanges() bool {
@@ -254,8 +254,9 @@ func (*WorkspaceBase) analyzeChanges(files WorkspaceFiles, upd *WorkspaceChanges
 func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 	if upd != nil && upd.hasChanges() {
 		dirs, files := me.dirs, me.files
+		livefiles := Lang.Live && len(upd.LiveFiles) > 0
 		freshfiles, hasfreshfiles, hasdiedfiles, dirschanged, needsfreshautolints := me.analyzeChanges(files, upd)
-		if needsfreshautolints || hasfreshfiles || hasdiedfiles || dirschanged {
+		if needsfreshautolints = needsfreshautolints || livefiles; needsfreshautolints || hasfreshfiles || hasdiedfiles || dirschanged {
 			me.Lock()
 			defer me.Unlock()
 		}
@@ -298,8 +299,13 @@ func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 		for _, modfilepath := range upd.WrittenFiles {
 			files.ensure(modfilepath).resetDiags()
 		}
+		if livefiles {
+			for srcfilepath := range upd.LiveFiles {
+				files.ensure(srcfilepath).resetDiags()
+			}
+		}
 		if Lang.Diag != nil {
-			if len(upd.WrittenFiles) > 0 || (len(upd.OpenedFiles) > 0 && Lang.Diag.ShouldOnFileOpen()) {
+			if len(upd.WrittenFiles) > 0 || (len(upd.OpenedFiles) > 0 && Lang.Diag.ShouldOnFileOpen()) || livefiles {
 				Lang.Diag.UpdateBuildDiagsAsNeeded(files, upd.WrittenFiles, upd.OpenedFiles)
 			}
 			if needsfreshautolints {
