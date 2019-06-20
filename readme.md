@@ -324,7 +324,7 @@ func (*DiagBase) ShouldOnFileOpen() bool
 #### func (*DiagBase) UpdateBuildDiagsAsNeeded
 
 ```go
-func (me *DiagBase) UpdateBuildDiagsAsNeeded(workspaceFiles WorkspaceFiles, writtenFiles []string, openedFiles []string)
+func (me *DiagBase) UpdateBuildDiagsAsNeeded(workspaceFiles WorkspaceFiles, writtenFiles []string)
 ```
 
 #### func (*DiagBase) UpdateLintDiagsIfAndAsNeeded
@@ -369,6 +369,7 @@ type DiagItem struct {
 	StickyForce bool           `json:"-"`
 	StickyAuto  bool           `json:"Sticky,omitempty"`
 	Tags        []int          `json:"Tags,omitempty"`
+	Misc        []interface{}  `json:"-"`
 }
 ```
 
@@ -548,10 +549,10 @@ type IDiag interface {
 ```go
 type IDiagBuild interface {
 	FixerUppers() []FixerUpper
-	OnUpdateBuildDiags([]string, []string) DiagBuildJobs
+	OnUpdateBuildDiags(WorkspaceFiles, []string) DiagBuildJobs
 	RunBuildJobs(DiagBuildJobs, WorkspaceFiles) DiagItems
 	ShouldOnFileOpen() bool
-	UpdateBuildDiagsAsNeeded(WorkspaceFiles, []string, []string)
+	UpdateBuildDiagsAsNeeded(WorkspaceFiles, []string)
 }
 ```
 
@@ -1876,4 +1877,10 @@ func (me WorkspaceFiles) HasBuildDiags(filePath string) (has bool)
 
 ```go
 func (me WorkspaceFiles) IsOpen(fpath string) bool
+```
+
+#### func (WorkspaceFiles) OrFromCurImplIfNil
+
+```go
+func (me WorkspaceFiles) OrFromCurImplIfNil() (ret WorkspaceFiles)
 ```

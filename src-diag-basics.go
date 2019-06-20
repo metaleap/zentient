@@ -43,6 +43,7 @@ type DiagItem struct {
 	StickyForce bool           `json:"-"`
 	StickyAuto  bool           `json:"Sticky,omitempty"`
 	Tags        []int          `json:"Tags,omitempty"`
+	Misc        []interface{}  `json:"-"`
 }
 
 func (me *DiagItem) resetAndInferSrcActions(maybeOrigSrcRef *udev.SrcMsg) {

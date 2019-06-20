@@ -25,10 +25,10 @@ type fixUps struct {
 
 type IDiagBuild interface {
 	FixerUppers() []FixerUpper
-	OnUpdateBuildDiags([]string, []string) DiagBuildJobs
+	OnUpdateBuildDiags(WorkspaceFiles, []string) DiagBuildJobs
 	RunBuildJobs(DiagBuildJobs, WorkspaceFiles) DiagItems
 	ShouldOnFileOpen() bool
-	UpdateBuildDiagsAsNeeded(WorkspaceFiles, []string, []string)
+	UpdateBuildDiagsAsNeeded(WorkspaceFiles, []string)
 }
 
 type DiagBuildJobs []*DiagJobBuild
@@ -131,8 +131,8 @@ func (me *DiagBase) fixUps(diags DiagItems) {
 
 func (*DiagBase) ShouldOnFileOpen() bool { return false }
 
-func (me *DiagBase) UpdateBuildDiagsAsNeeded(workspaceFiles WorkspaceFiles, writtenFiles []string, openedFiles []string) {
-	if jobs := me.Impl.OnUpdateBuildDiags(writtenFiles, openedFiles).withoutDuplicates(); len(jobs) > 0 {
+func (me *DiagBase) UpdateBuildDiagsAsNeeded(workspaceFiles WorkspaceFiles, writtenFiles []string) {
+	if jobs := me.Impl.OnUpdateBuildDiags(workspaceFiles, writtenFiles).withoutDuplicates(); len(jobs) > 0 {
 		sort.Sort(jobs)
 		for _, job := range jobs {
 			job.forgetPrevDiags(nil, false, workspaceFiles)

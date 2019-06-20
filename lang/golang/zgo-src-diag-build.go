@@ -13,7 +13,7 @@ func ensureBuildOrder(dis z.IDiagJobTarget, dat z.IDiagJobTarget) bool {
 	return dis.(*udevgo.Pkg).IsSortedPriorToByDeps(dat.(*udevgo.Pkg))
 }
 
-func (me *goDiag) OnUpdateBuildDiags(writtenFilePaths []string, openedFilePaths []string) (jobs z.DiagBuildJobs) {
+func (me *goDiag) OnUpdateBuildDiags(workspaceFiles z.WorkspaceFiles, writtenFilePaths []string) (jobs z.DiagBuildJobs) {
 	if pkgjobs, pkgsbyimp := me.onUpdateDiagsPrepPkgJobs(writtenFilePaths), udevgo.PkgsByImP; len(pkgjobs) > 0 && pkgsbyimp != nil {
 		for _, pj := range pkgjobs {
 			job := &z.DiagJobBuild{DiagJob: pj, TargetCmp: ensureBuildOrder}

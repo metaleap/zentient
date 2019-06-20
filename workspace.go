@@ -71,6 +71,13 @@ func (me WorkspaceFiles) ensure(fpath string) (file *WorkspaceFile) {
 
 func (me WorkspaceFiles) Has(fpath string) bool { return me[fpath] != nil }
 
+func (me WorkspaceFiles) OrFromCurImplIfNil() (ret WorkspaceFiles) {
+	if ret = me; ret == nil {
+		ret = Lang.Workspace.Files()
+	}
+	return
+}
+
 func (me WorkspaceFiles) IsOpen(fpath string) bool {
 	f := me[fpath]
 	return f != nil && f.IsOpen
@@ -311,7 +318,7 @@ func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 				}
 			}
 			if bd {
-				Lang.Diag.UpdateBuildDiagsAsNeeded(files, upd.WrittenFiles, upd.OpenedFiles)
+				Lang.Diag.UpdateBuildDiagsAsNeeded(files, upd.WrittenFiles)
 			}
 			if needsfreshautolints {
 				Lang.Diag.UpdateLintDiagsIfAndAsNeeded(files, true)
