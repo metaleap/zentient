@@ -16,7 +16,9 @@ func OnPreInit() {
 	if err := ctx.Init(false, ""); err == nil {
 		Ctx = &ctx
 		workspace.onPreInit()
-		Ctx.Kits.OnSomeReprocessed = diag.onSomeKitsReprocessed
+		Ctx.Kits.OnFreshErrs = diag.updateFromErrs
+		Ctx.Kits.OnSomeReprocessed = diag.updateFromErrs
+		diag.updateFromErrs()
 	}
 }
 

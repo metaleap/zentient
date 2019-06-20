@@ -16,7 +16,7 @@ type atDiag struct {
 	errDiags z.DiagItems
 }
 
-func (me *atDiag) onSomeKitsReprocessed() {
+func (me *atDiag) updateFromErrs() {
 	var diags z.DiagItems
 	for _, kit := range Ctx.Kits.All {
 		errs2srcs := make(map[error][]byte, 4)
