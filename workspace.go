@@ -259,6 +259,7 @@ func (*WorkspaceBase) analyzeChanges(files WorkspaceFiles, upd *WorkspaceChanges
 }
 
 func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
+	println(time.Now().String())
 	if upd != nil && upd.hasChanges() {
 		dirs, files := me.dirs, me.files
 		haslivefiles := Lang.Live && len(upd.LiveFiles) > 0
