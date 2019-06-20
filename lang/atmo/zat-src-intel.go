@@ -199,8 +199,11 @@ func (me *atmoSrcIntel) addLocFromNode(tlc *atmolang.SrcTopChunk, locs *z.SrcLoc
 	return me.addLocFromToks(tlc, locs, srcFilePath, toks)
 }
 
-func (me *atmoSrcIntel) astAt(kit *atmosess.Kit, srcLens *z.SrcLens) (*atmolang.SrcTopChunk, []atmolang.IAstNode) {
-	return kit.AstNodeAt(srcLens.FilePath, srcLens.ByteOffsetForPos(srcLens.Pos))
+func (me *atmoSrcIntel) astAt(kit *atmosess.Kit, srcLens *z.SrcLens) (topLevelChunk *atmolang.SrcTopChunk, theNodeAndItsAncestors []atmolang.IAstNode) {
+	if topLevelChunk, theNodeAndItsAncestors = kit.AstNodeAt(srcLens.FilePath, srcLens.ByteOffsetForPos(srcLens.Pos)); topLevelChunk != nil && topLevelChunk.Ast.Def.Orig == nil {
+		theNodeAndItsAncestors = nil
+	}
+	return
 }
 
 func tokToPos(tlc *atmolang.SrcTopChunk, tok *udevlex.Token) *z.SrcPos {
