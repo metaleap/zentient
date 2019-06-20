@@ -16,6 +16,7 @@ func OnPreInit() {
 	if err := ctx.Init(false, ""); err == nil {
 		Ctx = &ctx
 		workspace.onPreInit()
+		Ctx.Kits.OnSomeReprocessed = diag.onSomeKitsReprocessed
 	}
 }
 

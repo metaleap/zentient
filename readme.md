@@ -401,7 +401,6 @@ func (me *DiagJob) String() string
 ```go
 type DiagJobBuild struct {
 	DiagJob
-	Misc      interface{}
 	TargetCmp func(IDiagJobTarget, IDiagJobTarget) bool
 	Succeeded bool
 }

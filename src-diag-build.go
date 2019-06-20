@@ -38,6 +38,9 @@ func (me DiagBuildJobs) Swap(i int, j int)      { me[i], me[j] = me[j], me[i] }
 func (me DiagBuildJobs) Less(i int, j int) bool { return me[i].IsSortedPriorTo(me[j]) }
 
 func (me DiagBuildJobs) withoutDuplicates() (nu DiagBuildJobs) {
+	if len(me) == 1 {
+		return me
+	}
 	nu = make(DiagBuildJobs, 0, len(me))
 	done := make(map[string]bool, len(me))
 	for _, job := range me {
@@ -50,7 +53,6 @@ func (me DiagBuildJobs) withoutDuplicates() (nu DiagBuildJobs) {
 
 type DiagJobBuild struct {
 	DiagJob
-	Misc      interface{}
 	TargetCmp func(IDiagJobTarget, IDiagJobTarget) bool
 	Succeeded bool
 }
