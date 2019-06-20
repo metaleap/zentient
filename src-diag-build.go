@@ -27,7 +27,6 @@ type IDiagBuild interface {
 	FixerUppers() []FixerUpper
 	OnUpdateBuildDiags(WorkspaceFiles, []string) DiagBuildJobs
 	RunBuildJobs(DiagBuildJobs, WorkspaceFiles) DiagItems
-	ShouldOnFileOpen() bool
 	UpdateBuildDiagsAsNeeded(WorkspaceFiles, []string)
 }
 
@@ -128,8 +127,6 @@ func (me *DiagBase) fixUps(diags DiagItems) {
 		send(&ipcResp{IpcID: IPCID_SRCDIAG_PUB, SrcDiags: dr})
 	}
 }
-
-func (*DiagBase) ShouldOnFileOpen() bool { return false }
 
 func (me *DiagBase) UpdateBuildDiagsAsNeeded(workspaceFiles WorkspaceFiles, writtenFiles []string) {
 	if jobs := me.Impl.OnUpdateBuildDiags(workspaceFiles, writtenFiles).withoutDuplicates(); len(jobs) > 0 {

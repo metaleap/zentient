@@ -51,8 +51,6 @@ func (*atDiag) KnownLinters() z.Tools {
 	return nil
 }
 
-func (*atDiag) ShouldOnFileOpen() bool { return true }
-
 func (me *atDiag) OnUpdateBuildDiags(workspaceFiles z.WorkspaceFiles, writtenFilePaths []string) z.DiagBuildJobs {
 	var job z.DiagJobBuild
 	job.AffectedFilePaths = Ctx.Kits.All.SrcFilePaths()

@@ -160,10 +160,6 @@ type WorkspaceChanges struct {
 	LiveFiles    map[string]string
 }
 
-func (me *WorkspaceChanges) hasChanges() bool {
-	return me.HasDirChanges() || me.hasFileChanges() || (Lang.Live && len(me.LiveFiles) > 0)
-}
-
 func (me *WorkspaceChanges) HasDirChanges() bool {
 	return len(me.AddedDirs) > 0 || len(me.RemovedDirs) > 0
 }
@@ -183,7 +179,7 @@ func (me *WorkspaceChanges) hasFileIn(filePath string, slices ...[]string) bool 
 }
 
 func (me *WorkspaceChanges) hasFileChanges() bool {
-	return len(me.OpenedFiles) > 0 || len(me.ClosedFiles) > 0 || len(me.WrittenFiles) > 0
+	return len(me.OpenedFiles) > 0 || len(me.ClosedFiles) > 0 || len(me.WrittenFiles) > 0 || (Lang.Live && len(me.LiveFiles) > 0)
 }
 
 type WorkspaceChangesBefore func(upd *WorkspaceChanges, freshFiles []string, willAutoLint bool)
@@ -246,6 +242,11 @@ func (*WorkspaceBase) analyzeChanges(files WorkspaceFiles, upd *WorkspaceChanges
 			}
 		}
 	}
+	for fpath := range upd.LiveFiles {
+		if !files.exists(fpath) {
+			freshFiles = append(freshFiles, fpath)
+		}
+	}
 	for _, file := range files { // we really only check all-known-files for changes seemingly-somewhat-redudantly here to cover changes outside the editor (from code-gens etc)
 		if haschanged := file.updateModTime(); !file.existsAtLastCheck {
 			hasDiedFiles = true
@@ -259,8 +260,7 @@ func (*WorkspaceBase) analyzeChanges(files WorkspaceFiles, upd *WorkspaceChanges
 }
 
 func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
-	println(time.Now().String())
-	if upd != nil && upd.hasChanges() {
+	if upd != nil && (upd.HasDirChanges() || upd.hasFileChanges()) {
 		dirs, files := me.dirs, me.files
 		haslivefiles := Lang.Live && len(upd.LiveFiles) > 0
 		freshfiles, hasfreshfiles, hasdiedfiles, dirschanged, needsfreshautolints := me.analyzeChanges(files, upd)
@@ -305,20 +305,16 @@ func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 			files.ensure(freshfilepath).IsOpen = true
 		}
 		for _, modfilepath := range upd.WrittenFiles {
-			files.ensure(modfilepath)
+			files.ensure(modfilepath).resetDiags()
 		}
-		for srcfilepath := range upd.LiveFiles {
-			files.ensure(srcfilepath)
+		if Lang.Live {
+			for srcfilepath := range upd.LiveFiles {
+				files.ensure(srcfilepath).resetDiags()
+			}
 		}
 
 		if Lang.Diag != nil {
-			bd := (len(upd.WrittenFiles) > 0 || (len(upd.OpenedFiles) > 0 && Lang.Diag.ShouldOnFileOpen()) || haslivefiles)
-			if bd || needsfreshautolints {
-				for _, f := range files {
-					f.resetDiags()
-				}
-			}
-			if bd {
+			if len(upd.WrittenFiles) > 0 || haslivefiles {
 				Lang.Diag.UpdateBuildDiagsAsNeeded(files, upd.WrittenFiles)
 			}
 			if needsfreshautolints {

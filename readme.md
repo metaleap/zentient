@@ -315,12 +315,6 @@ func (me *DiagBase) MenuCategory() string
 func (me *DiagBase) NewDiagItemFrom(srcRef *udev.SrcMsg, toolName string, fallbackFilePath func() string) (di *DiagItem)
 ```
 
-#### func (*DiagBase) ShouldOnFileOpen
-
-```go
-func (*DiagBase) ShouldOnFileOpen() bool
-```
-
 #### func (*DiagBase) UpdateBuildDiagsAsNeeded
 
 ```go
@@ -551,7 +545,6 @@ type IDiagBuild interface {
 	FixerUppers() []FixerUpper
 	OnUpdateBuildDiags(WorkspaceFiles, []string) DiagBuildJobs
 	RunBuildJobs(DiagBuildJobs, WorkspaceFiles) DiagItems
-	ShouldOnFileOpen() bool
 	UpdateBuildDiagsAsNeeded(WorkspaceFiles, []string)
 }
 ```
