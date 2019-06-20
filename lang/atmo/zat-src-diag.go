@@ -1,8 +1,6 @@
 package zat
 
 import (
-	"text/scanner"
-
 	"github.com/metaleap/atmo"
 	"github.com/metaleap/zentient"
 )
@@ -21,7 +19,7 @@ type atDiag struct {
 func (me *atDiag) onSomeKitsReprocessed() {
 	var diags z.DiagItems
 	for _, kit := range Ctx.Kits.All {
-		errs2srcs := make(map[error][]byte, 2)
+		errs2srcs := make(map[error][]byte, 4)
 		for _, err := range kit.Errors(errs2srcs) {
 			errdiag := &z.DiagItem{Msg: err.Error()}
 			if e, _ := err.(*atmo.Error); e != nil {
@@ -30,14 +28,16 @@ func (me *atDiag) onSomeKitsReprocessed() {
 					errdiag.Tags = []int{1}
 				}
 				if pos, src := e.Pos(), string(errs2srcs[err]); pos != nil {
-					if errlen := e.Len(); errlen > 1 && len(src) > 0 {
-						errdiag.Misc = []interface{}{pos, src, errlen}
-					}
 					errdiag.Loc.FilePath, errdiag.Loc.Pos = pos.Filename, &z.SrcPos{}
 					if errdiag.Loc.Pos.Ln, errdiag.Loc.Pos.Col = pos.Line, pos.Column; len(src) > 0 {
 						errdiag.Loc.Pos.SetRune1OffFromByte0Off(pos.Offset, src)
 					} else if pos.Line < 1 || pos.Column < 1 {
 						errdiag.Loc.Pos.Off = 1 + pos.Offset
+					}
+					if errlen := e.Len(); errlen > 1 && len(src) > 0 {
+						errdiag.Loc.Range = &z.SrcRange{}
+						errdiag.Loc.Range.Start.SetRune1OffFromByte0Off(pos.Offset, src)
+						errdiag.Loc.Range.End.SetRune1OffFromByte0Off(pos.Offset+errlen, src)
 					}
 				}
 			}
@@ -58,16 +58,6 @@ func (me *atDiag) OnUpdateBuildDiags(workspaceFiles z.WorkspaceFiles, writtenFil
 }
 
 func (me *atDiag) RunBuildJobs(jobs z.DiagBuildJobs, workspaceFiles z.WorkspaceFiles) z.DiagItems {
-	for _, errdiag := range me.errDiags {
-		if errdiag.Loc.Range == nil && errdiag.Loc.Pos != nil && errdiag.Misc != nil {
-			pos, src, errlen := errdiag.Misc[0].(*scanner.Position), errdiag.Misc[1].(string), errdiag.Misc[2].(int)
-			if workspaceFiles.IsOpen(pos.Filename) {
-				errdiag.Loc.Range = &z.SrcRange{}
-				errdiag.Loc.Range.Start.SetRune1OffFromByte0Off(pos.Offset, src)
-				errdiag.Loc.Range.End.SetRune1OffFromByte0Off(pos.Offset+errlen, src)
-			}
-		}
-	}
 	return me.errDiags
 }
 

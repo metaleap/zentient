@@ -314,7 +314,7 @@ func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 		}
 
 		if Lang.Diag != nil {
-			if len(upd.WrittenFiles) > 0 || haslivefiles {
+			if len(upd.WrittenFiles) > 0 || (Lang.Live && needsfreshautolints) {
 				Lang.Diag.UpdateBuildDiagsAsNeeded(files, upd.WrittenFiles)
 			}
 			if needsfreshautolints {
