@@ -16,7 +16,6 @@ func OnPreInit() (err error) {
 			&ctx, true, "atmo", "atmo", liveMode
 		workspace.onPreInit()
 		Ctx.Kits.OnFreshErrs = diag.updateFromErrs
-		Ctx.Kits.OnSomeReprocessed = diag.updateFromErrs
 		diag.updateFromErrs()
 	}
 	return
