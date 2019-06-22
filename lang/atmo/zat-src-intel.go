@@ -86,34 +86,6 @@ func (me *atmoSrcIntel) DefSym(srcLens *z.SrcLens) (ret z.SrcLocs) {
 	return
 }
 
-func (me *atmoSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (ret z.SrcLocs) {
-	if kit := Ctx.KitByDirPath(filepath.Dir(srcLens.FilePath), true); kit != nil {
-		me.withInMemFileMod(srcLens, kit, func() {
-			if tlc, astnodes := me.astAt(kit, srcLens); len(astnodes) > 0 {
-				switch astnode := astnodes[0].(type) {
-				case *atmolang.AstComment:
-				case *atmolang.AstExprLet:
-				case *atmolang.AstTopLevel:
-				case *atmolang.AstDef:
-				case *atmolang.AstExprAppl:
-				case *atmolang.AstExprCases:
-				default:
-					if tld, ilnodes := kit.IrNodeOfAstNode(tlc.Id(), astnode); len(ilnodes) > 0 {
-						switch ilnode := ilnodes[0].(type) {
-						case *atmoil.IrDefArg:
-						case *atmoil.IrIdentDecl:
-						case *atmoil.IrIdentName:
-						default:
-							me.addLocFromNode(tlc, &ret, srcLens.FilePath, tld, ilnode)
-						}
-					}
-				}
-			}
-		})
-	}
-	return
-}
-
 func (me *atmoSrcIntel) Hovers(srcLens *z.SrcLens) (ret []z.InfoTip) {
 	if kit := Ctx.KitByDirPath(filepath.Dir(srcLens.FilePath), true); kit != nil {
 		me.withInMemFileMod(srcLens, kit, func() {
