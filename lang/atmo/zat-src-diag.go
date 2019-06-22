@@ -7,20 +7,20 @@ import (
 	"github.com/metaleap/zentient"
 )
 
-var diag atDiag
+var diag atmoDiag
 
 func init() {
 	diag.Impl, z.Lang.Diag = &diag, &diag
 }
 
-type atDiag struct {
+type atmoDiag struct {
 	z.DiagBase
 	sync.Mutex
 
 	errDiags z.DiagItems
 }
 
-func (me *atDiag) updateFromErrs(_ bool) {
+func (me *atmoDiag) updateFromErrs(_ bool) {
 	var errdiags z.DiagItems
 	for _, kit := range Ctx.Kits.All {
 		errs2srcs := make(map[error][]byte, 4)
@@ -53,26 +53,23 @@ func (me *atDiag) updateFromErrs(_ bool) {
 	me.Unlock()
 }
 
-func (*atDiag) KnownLinters() z.Tools {
-	return nil
-}
+func (*atmoDiag) KnownLinters() z.Tools { return nil }
 
-func (me *atDiag) PrepIssueJobs(workspaceFiles z.WorkspaceFiles, writtenFilePaths []string) z.DiagBuildJobs {
+func (me *atmoDiag) PrepIssueJobs(workspaceFiles z.WorkspaceFiles, writtenFilePaths []string) z.DiagBuildJobs {
 	var job z.DiagJobBuild
 	job.AffectedFilePaths = Ctx.Kits.All.SrcFilePaths()
 	return z.DiagBuildJobs{&job}
 }
 
-func (me *atDiag) RunIssueJobs(jobs z.DiagBuildJobs, workspaceFiles z.WorkspaceFiles) (errdiags z.DiagItems) {
+func (me *atmoDiag) RunIssueJobs(jobs z.DiagBuildJobs, workspaceFiles z.WorkspaceFiles) (errdiags z.DiagItems) {
 	me.Lock()
 	errdiags = me.errDiags
 	me.Unlock()
 	return
 }
 
-func (*atDiag) PrepLintJobs(workspaceFiles z.WorkspaceFiles, diagTools z.Tools, filePaths []string) (jobs z.DiagLintJobs) {
+func (*atmoDiag) PrepLintJobs(workspaceFiles z.WorkspaceFiles, diagTools z.Tools, filePaths []string) (jobs z.DiagLintJobs) {
 	return
 }
 
-func (*atDiag) RunLintJob(job *z.DiagJobLint, workspaceFiles z.WorkspaceFiles) {
-}
+func (*atmoDiag) RunLintJob(job *z.DiagJobLint, workspaceFiles z.WorkspaceFiles) {}
