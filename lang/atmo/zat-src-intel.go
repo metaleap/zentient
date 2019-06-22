@@ -108,20 +108,29 @@ func (me *atmoSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (ret z.Sr
 							// TODO: handle astarg.Affix or non-name astarg.NameOrConstVal
 						}
 					}
-					if _, ilnodes := kit.IrNodeOfAstNode(tlc.Id(), astnode); len(ilnodes) > 0 {
+					if tld, ilnodes := kit.IrNodeOfAstNode(tlc.Id(), astnode); len(ilnodes) > 0 {
+						curfileonly := func(t *atmoil.IrDefTop) bool { return t.OrigTopLevelChunk.SrcFile.SrcFilePath == srcLens.FilePath }
+						var nodematches map[atmoil.INode]*atmoil.IrDefTop
 						switch ilnode := ilnodes[0].(type) {
-						case *atmoil.IrDefArg:
 						case *atmoil.IrIdentDecl:
+							nodematches = kit.SelectNodes(curfileonly, func(na []atmoil.INode, n atmoil.INode, nd []atmoil.INode) (ismatch bool, dontdescend bool, donetld bool, doneall bool) {
+								if nid, _ := n.(*atmoil.IrIdentName); nid != nil {
+									ismatch = nid.ResolvesToPotentially(ilnodes[1])
+								}
+								return
+							})
+							if len(nodematches) > 0 {
+								nodematches[ilnode] = tld
+							}
 						case *atmoil.IrIdentName:
 						default:
-							nodematches := kit.SelectNodes(func(tld *atmoil.IrDefTop) bool {
-								return tld.OrigTopLevelChunk.SrcFile.SrcFilePath == srcLens.FilePath
-							}, func(na []atmoil.INode, n atmoil.INode, nd []atmoil.INode) (ismatch bool, descend bool, donetld bool, doneall bool) {
-								return ilnode == n || ilnode.EquivTo(n), true, false, false
+							nodematches = kit.SelectNodes(curfileonly, func(na []atmoil.INode, n atmoil.INode, nd []atmoil.INode) (ismatch bool, dontdescend bool, donetld bool, doneall bool) {
+								ismatch = (ilnode == n || ilnode.EquivTo(n))
+								return
 							})
-							for mnode, tld := range nodematches {
-								me.addLocFromNode(tld, &ret, mnode)
-							}
+						}
+						for mnode, mtld := range nodematches {
+							me.addLocFromNode(mtld, &ret, mnode)
 						}
 					}
 				}
