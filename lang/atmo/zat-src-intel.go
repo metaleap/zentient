@@ -115,12 +115,28 @@ func (me *atmoSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (ret z.Sr
 						case *atmoil.IrIdentDecl:
 							nodematches = kit.SelectNodes(curfileonly, func(na []atmoil.INode, n atmoil.INode, nd []atmoil.INode) (ismatch bool, dontdescend bool, donetld bool, doneall bool) {
 								if nid, _ := n.(*atmoil.IrIdentName); nid != nil {
-									ismatch = nid.ResolvesToPotentially(ilnodes[1])
+									ismatch = nid.ResolvesTo(ilnodes[1])
 								}
 								return
 							})
 							nodematches[ilnode] = tld
 						case *atmoil.IrIdentName:
+							nodematches = kit.SelectNodes(curfileonly, func(na []atmoil.INode, n atmoil.INode, nd []atmoil.INode) (ismatch bool, dontdescend bool, donetld bool, doneall bool) {
+								for _, cand := range ilnode.Anns.Candidates {
+									if ismatch = (cand == n); ismatch {
+										break
+									}
+								}
+								if nid, _ := n.(*atmoil.IrIdentName); nid != nil && !ismatch {
+									for _, cand := range ilnode.Anns.Candidates {
+										if ismatch = nid.ResolvesTo(cand); ismatch {
+											break
+										}
+									}
+								}
+								return
+							})
+							nodematches[ilnode] = tld
 						default:
 							nodematches = kit.SelectNodes(curfileonly, func(na []atmoil.INode, n atmoil.INode, nd []atmoil.INode) (ismatch bool, dontdescend bool, donetld bool, doneall bool) {
 								ismatch = (ilnode == n || ilnode.EquivTo(n))
@@ -197,19 +213,38 @@ func (me *atmoSrcIntel) Symbols(srcLens *z.SrcLens, query string, curFileOnly bo
 	if kits = Ctx.Kits.All; curFileOnly {
 		kits = atmosess.Kits{curkit}
 	}
+	symbolForTopLevelDef := func(tlc *atmolang.SrcTopChunk) {
+		var name string
+		var toks udevlex.Tokens
+		flag := z.SYM_FUNCTION
+		if tld := tlc.Ast.Def.Orig; tld != nil {
+			if len(query) == 0 || ustr.Has(ustr.Lo(tld.Name.Val), query) {
+				name, toks = tld.Name.Val, tld.Tokens
+				if len(tld.Args) == 0 {
+					flag = z.SYM_FIELD
+				} else if tld.Name.IsOpish {
+					flag = z.SYM_OPERATOR
+				}
+			}
+		} else if tlc.Ast.Def.NameIfErr != "" {
+			name, toks, flag =
+				tlc.Ast.Def.NameIfErr, tlc.Ast.Tokens, z.SYM_EVENT
+		}
+		if name != "" && len(toks) > 0 {
+			ret = append(ret, &z.SrcLens{Str: name,
+				Txt: "(description later)", SrcLoc: z.SrcLoc{
+					FilePath: tlc.SrcFile.SrcFilePath,
+					Flag:     int(flag),
+					Range:    toksToRange(tlc, toks)}})
+		}
+	}
 	if len(kits) > 0 && curkit != nil {
 		me.withInMemFileMod(srcLens, curkit, func() {
 			for _, kit := range kits {
 				for _, srcfile := range kit.SrcFiles {
-					if srcfile.SrcFilePath == srcLens.FilePath || !curFileOnly {
+					if (!curFileOnly) || srcfile.SrcFilePath == srcLens.FilePath {
 						for i := range srcfile.TopLevel {
-							tlc := &srcfile.TopLevel[i]
-							if def := tlc.Ast.Def.Orig; def != nil {
-								if len(query) == 0 || ustr.Has(ustr.Lo(def.Name.Val), query) {
-									ret = append(ret, &z.SrcLens{Str: def.Name.Val, Txt: "(description later)", SrcLoc: z.SrcLoc{
-										FilePath: srcfile.SrcFilePath, Flag: int(z.SYM_FUNCTION), Range: toksToRange(tlc, def.Tokens)}})
-								}
-							}
+							symbolForTopLevelDef(&srcfile.TopLevel[i])
 						}
 					}
 				}
