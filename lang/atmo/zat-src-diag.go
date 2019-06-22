@@ -1,6 +1,8 @@
 package zat
 
 import (
+	"sync"
+
 	"github.com/metaleap/atmo"
 	"github.com/metaleap/zentient"
 )
@@ -13,11 +15,13 @@ func init() {
 
 type atDiag struct {
 	z.DiagBase
+	sync.Mutex
+
 	errDiags z.DiagItems
 }
 
 func (me *atDiag) updateFromErrs(_ bool) {
-	var diags z.DiagItems
+	var errdiags z.DiagItems
 	for _, kit := range Ctx.Kits.All {
 		errs2srcs := make(map[error][]byte, 4)
 		for _, err := range kit.Errors(errs2srcs) {
@@ -41,10 +45,12 @@ func (me *atDiag) updateFromErrs(_ bool) {
 					}
 				}
 			}
-			diags = append(diags, errdiag)
+			errdiags = append(errdiags, errdiag)
 		}
 	}
-	me.errDiags = diags
+	me.Lock()
+	me.errDiags = errdiags
+	me.Unlock()
 }
 
 func (*atDiag) KnownLinters() z.Tools {
@@ -57,12 +63,14 @@ func (me *atDiag) OnUpdateBuildDiags(workspaceFiles z.WorkspaceFiles, writtenFil
 	return z.DiagBuildJobs{&job}
 }
 
-func (me *atDiag) RunBuildJobs(jobs z.DiagBuildJobs, workspaceFiles z.WorkspaceFiles) z.DiagItems {
-	return me.errDiags
+func (me *atDiag) RunBuildJobs(jobs z.DiagBuildJobs, workspaceFiles z.WorkspaceFiles) (errdiags z.DiagItems) {
+	me.Lock()
+	errdiags = me.errDiags
+	me.Unlock()
+	return
 }
 
 func (*atDiag) OnUpdateLintDiags(workspaceFiles z.WorkspaceFiles, diagTools z.Tools, filePaths []string) (jobs z.DiagLintJobs) {
-
 	return
 }
 
