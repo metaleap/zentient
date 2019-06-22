@@ -69,13 +69,13 @@ func Init() (err error)
 #### func  InitAndServe
 
 ```go
-func InitAndServe(onPreInit func(), onPostInit func()) (err error)
+func InitAndServe(onPreInit func() error, onPostInit func()) (err error)
 ```
 
 #### func  InitAndServeOrPanic
 
 ```go
-func InitAndServeOrPanic(onPreInit func(), onPostInit func())
+func InitAndServeOrPanic(onPreInit func() error, onPostInit func())
 ```
 
 #### func  PrettifyPathsIn

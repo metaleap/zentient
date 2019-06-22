@@ -144,17 +144,17 @@ func Init() (err error) {
 	return
 }
 
-func InitAndServe(onPreInit func(), onPostInit func()) (err error) {
-	// note to self: don't ADD any further logic in here, do it only in either Init() or Serve()
-	onPreInit()
-	if err = Init(); err == nil {
-		onPostInit()
-		err = Serve()
+func InitAndServe(onPreInit func() error, onPostInit func()) (err error) {
+	if err = onPreInit(); err == nil {
+		if err = Init(); err == nil {
+			onPostInit()
+			err = Serve()
+		}
 	}
 	return
 }
 
-func InitAndServeOrPanic(onPreInit func(), onPostInit func()) {
+func InitAndServeOrPanic(onPreInit func() error, onPostInit func()) {
 	if err := InitAndServe(onPreInit, onPostInit); err != nil {
 		panic(err)
 	}

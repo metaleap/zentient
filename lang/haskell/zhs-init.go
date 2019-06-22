@@ -1,18 +1,22 @@
 package zhs
 
 import (
+	"errors"
+
 	"github.com/go-leap/dev/hs"
 	"github.com/metaleap/zentient"
 )
 
-func OnPreInit() {
-	l := &z.Lang
-	l.ID, l.Title = "haskell", "Haskell"
-	if l.Enabled = udevhs.HasHsDevEnv(); l.Enabled {
+func OnPreInit() (err error) {
+	if !udevhs.HasHsDevEnv() {
+		err = errors.New("Haskell `stack` does not appear to be installed.")
+	} else {
+		z.Lang.Enabled, z.Lang.ID, z.Lang.Title = true, "haskell", "Haskell"
 		tools.onPreInit()
 		diag.onPreInit()
 		srcMod.onPreInit()
 	}
+	return
 }
 
 func OnPostInit() {

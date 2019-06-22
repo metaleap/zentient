@@ -31,7 +31,7 @@ func ipcDecodeReqAndRespond(jsonreq string) *ipcResp {
 	if err := json.NewDecoder(strings.NewReader(jsonreq)).Decode(&req); err != nil {
 		resp.ErrMsg = err.Error()
 	} else if !Lang.Enabled {
-		resp.ErrMsg = Strf("%s does not appear to be installed on this machine.", Lang.Title)
+		resp.ErrMsg = Strf("%s does not appear to be installed on this machine. Install it or disable `"+Prog.Name+"` in your editor config to avoid repeats of this message.", Lang.Title)
 	} else if Prog.Cfg.err != nil {
 		resp.ErrMsg = Strf("Your %s is currently broken: either fix it or delete it, then reload Zentient.", Prog.Cfg.filePath)
 	} else if req.IpcID == IPCID_OBJ_SNAPSHOT {
