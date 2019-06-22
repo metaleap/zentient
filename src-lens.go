@@ -100,6 +100,12 @@ type SrcLoc struct {
 
 type SrcLenses []*SrcLens
 
+func (me SrcLenses) Len() int          { return len(me) }
+func (me SrcLenses) Swap(i int, j int) { me[i], me[j] = me[j], me[i] }
+func (me SrcLenses) Less(i int, j int) bool {
+	return !me[i].Pos.isSameOrGreaterThan(me[j].Pos)
+}
+
 func (me *SrcLenses) AddFrom(srcRefLoc *udev.SrcMsg, fallbackFilePath func() string) (lens *SrcLens) {
 	if srcRefLoc != nil {
 		lens = &SrcLens{}

@@ -320,10 +320,7 @@ func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (al
 						}
 					}
 					lens := allSyms.AddFrom(srcref, nil)
-					lens.Flag, lens.Str = int(z.SYM_METHOD), "▶  "+methodtitle
-					// if !ispmlisted { // if method's receiver type not in the symbols listing, prepend it's name to the pretend-indentation
-					lens.Str = methodtype + "  " + lens.Str
-					// }
+					lens.Flag, lens.Str = int(z.SYM_METHOD), methodtype+"."+methodtitle
 					lens.Str, lens.Txt = me.symFuncSigBreak(lens.Str)
 					lens.Str, lens.Txt = udevgo.PkgImpPathsToNamesInLn(lens.Str, curpkgdir), udevgo.PkgImpPathsToNamesInLn(lens.Txt, curpkgdir)
 					if i := strings.Index(lens.Str, "("); i > 0 { // insert some spacing between name and args
@@ -332,26 +329,27 @@ func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (al
 				}
 			}
 		}
+		if curFileOnly {
+			sort.Sort(allSyms)
+			il := len(allSyms) - 1
+			for i, sym := range allSyms {
+				if i > 0 {
+					prev := allSyms[i-1]
+					prev.Range = &z.SrcRange{Start: *prev.Pos, End: z.SrcPos{Col: 1, Ln: sym.Pos.Ln - 1}}
+				}
+				if i == il {
+					sym.Range = &z.SrcRange{Start: *sym.Pos, End: z.SrcPos{Col: 1, Ln: len(srclns)}}
+				}
+			}
+		}
 	}
 	return
 }
 
-func (*goSrcIntel) symFuncSigBreak(fnsig string) (fnargs string, fnret string) {
-	fnargs, fnret = fnsig, " "
-	co, cc, pos := 0, 0, 0
-	for i, r := range fnsig {
-		if r == '(' {
-			co++
-		} else if r == ')' {
-			cc++
-		}
-		if cc > 0 && co > 0 && cc == co {
-			pos = i
-			break
-		}
-	}
-	if pos > 0 && pos < len(fnsig)-1 {
-		fnargs, fnret = fnsig[:pos+1], fnsig[pos+2:]
+func (*goSrcIntel) symFuncSigBreak(fnSig string) (fnName string, fnArgsRets string) {
+	fnName, fnArgsRets = fnSig, " "
+	if pos := ustr.IdxB(fnSig, '('); pos > 0 {
+		fnName, fnArgsRets = fnSig[:pos], fnSig[pos:]
 	}
 	return
 }

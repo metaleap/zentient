@@ -1401,6 +1401,24 @@ type SrcLenses []*SrcLens
 func (me *SrcLenses) AddFrom(srcRefLoc *udev.SrcMsg, fallbackFilePath func() string) (lens *SrcLens)
 ```
 
+#### func (SrcLenses) Len
+
+```go
+func (me SrcLenses) Len() int
+```
+
+#### func (SrcLenses) Less
+
+```go
+func (me SrcLenses) Less(i int, j int) bool
+```
+
+#### func (SrcLenses) Swap
+
+```go
+func (me SrcLenses) Swap(i int, j int)
+```
+
 #### type SrcLoc
 
 ```go
