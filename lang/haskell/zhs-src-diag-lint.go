@@ -9,7 +9,7 @@ func (me *hsDiag) KnownLinters() z.Tools {
 	return me.knownTools
 }
 
-func (me *hsDiag) OnUpdateLintDiags(workspaceFiles z.WorkspaceFiles, diagTools z.Tools, filePaths []string) (jobs z.DiagLintJobs) {
+func (me *hsDiag) PrepLintJobs(workspaceFiles z.WorkspaceFiles, diagTools z.Tools, filePaths []string) (jobs z.DiagLintJobs) {
 	for _, dt := range diagTools {
 		jobs = append(jobs, &z.DiagJobLint{
 			DiagJob: z.DiagJob{AffectedFilePaths: filePaths, Target: filePaths},

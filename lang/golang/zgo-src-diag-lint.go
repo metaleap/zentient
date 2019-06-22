@@ -10,7 +10,7 @@ func (me *goDiag) KnownLinters() z.Tools {
 	return me.knownTools
 }
 
-func (me *goDiag) OnUpdateLintDiags(workspaceFiles z.WorkspaceFiles, diagTools z.Tools, filePaths []string) (jobs z.DiagLintJobs) {
+func (me *goDiag) PrepLintJobs(workspaceFiles z.WorkspaceFiles, diagTools z.Tools, filePaths []string) (jobs z.DiagLintJobs) {
 	if pkgjobs := me.onUpdateDiagsPrepPkgJobs(filePaths); len(pkgjobs) > 0 {
 		for _, pj := range pkgjobs {
 			skippkg := false

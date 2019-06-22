@@ -315,10 +315,10 @@ func (me *DiagBase) MenuCategory() string
 func (me *DiagBase) NewDiagItemFrom(srcRef *udev.SrcMsg, toolName string, fallbackFilePath func() string) (di *DiagItem)
 ```
 
-#### func (*DiagBase) UpdateBuildDiagsAsNeeded
+#### func (*DiagBase) UpdateIssueDiagsAsNeeded
 
 ```go
-func (me *DiagBase) UpdateBuildDiagsAsNeeded(workspaceFiles WorkspaceFiles, writtenFiles []string)
+func (me *DiagBase) UpdateIssueDiagsAsNeeded(workspaceFiles WorkspaceFiles, writtenFiles []string)
 ```
 
 #### func (*DiagBase) UpdateLintDiagsIfAndAsNeeded
@@ -543,9 +543,9 @@ type IDiag interface {
 ```go
 type IDiagBuild interface {
 	FixerUppers() []FixerUpper
-	OnUpdateBuildDiags(WorkspaceFiles, []string) DiagBuildJobs
-	RunBuildJobs(DiagBuildJobs, WorkspaceFiles) DiagItems
-	UpdateBuildDiagsAsNeeded(WorkspaceFiles, []string)
+	PrepIssueJobs(WorkspaceFiles, []string) DiagBuildJobs
+	RunIssueJobs(DiagBuildJobs, WorkspaceFiles) DiagItems
+	UpdateIssueDiagsAsNeeded(WorkspaceFiles, []string)
 }
 ```
 
@@ -563,7 +563,7 @@ type IDiagJobTarget interface {
 ```go
 type IDiagLint interface {
 	KnownLinters() Tools
-	OnUpdateLintDiags(WorkspaceFiles, Tools, []string) DiagLintJobs
+	PrepLintJobs(WorkspaceFiles, Tools, []string) DiagLintJobs
 	RunLintJob(*DiagJobLint, WorkspaceFiles)
 	UpdateLintDiagsIfAndAsNeeded(WorkspaceFiles, bool, ...string)
 }

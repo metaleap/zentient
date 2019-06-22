@@ -11,7 +11,7 @@ import (
 	"github.com/metaleap/zentient"
 )
 
-func (me *hsDiag) OnUpdateBuildDiags(workspaceFiles z.WorkspaceFiles, writtenFilePaths []string) (jobs z.DiagBuildJobs) {
+func (me *hsDiag) PrepIssueJobs(workspaceFiles z.WorkspaceFiles, writtenFilePaths []string) (jobs z.DiagBuildJobs) {
 	stackyamlfilepaths := map[string]bool{}
 	for _, fp := range writtenFilePaths {
 		if stackyamlfilepath := ufs.Locate(fp, "stack.yaml"); stackyamlfilepath != "" {
@@ -27,7 +27,7 @@ func (me *hsDiag) OnUpdateBuildDiags(workspaceFiles z.WorkspaceFiles, writtenFil
 	return
 }
 
-func (me *hsDiag) RunBuildJobs(jobs z.DiagBuildJobs, workspaceFiles z.WorkspaceFiles) (diags z.DiagItems) {
+func (me *hsDiag) RunIssueJobs(jobs z.DiagBuildJobs, workspaceFiles z.WorkspaceFiles) (diags z.DiagItems) {
 	progress := z.NewBuildProgress(len(jobs))
 	for i := 0; i < progress.NumJobs; i++ {
 		progress.AddPkgName(jobs[i].Target.(string))

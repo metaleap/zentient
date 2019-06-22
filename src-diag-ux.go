@@ -33,7 +33,7 @@ func (me *DiagBase) Init() {
 }
 
 func (me *DiagBase) MenuCategory() string {
-	return "Linting"
+	return "Diagnostics"
 }
 
 func (me *DiagBase) menuItems(srcLens *SrcLens) (menu MenuItems) {

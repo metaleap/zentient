@@ -12,7 +12,7 @@ var (
 
 type IDiagLint interface {
 	KnownLinters() Tools
-	OnUpdateLintDiags(WorkspaceFiles, Tools, []string) DiagLintJobs
+	PrepLintJobs(WorkspaceFiles, Tools, []string) DiagLintJobs
 	RunLintJob(*DiagJobLint, WorkspaceFiles)
 	UpdateLintDiagsIfAndAsNeeded(WorkspaceFiles, bool, ...string)
 }
@@ -87,7 +87,7 @@ func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(workspaceFiles WorkspaceFiles, 
 }
 
 func (me *DiagBase) updateLintDiags(workspaceFiles WorkspaceFiles, diagTools Tools, autos bool, filePaths []string) (diagitems DiagItems) {
-	jobs := me.Impl.OnUpdateLintDiags(workspaceFiles, diagTools, filePaths)
+	jobs := me.Impl.PrepLintJobs(workspaceFiles, diagTools, filePaths)
 	if numjobs, nonautos := len(jobs), !autos; numjobs > 0 {
 		numdone, await, descs := 0, make(chan *DiagItem), make([]string, numjobs)
 		for _, job := range jobs { // separate loop from the go-routines below to prevent concurrent-map-read+write as forgetPrevDiags() calls workspaceFiles.ensure()

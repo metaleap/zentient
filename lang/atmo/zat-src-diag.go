@@ -57,20 +57,20 @@ func (*atDiag) KnownLinters() z.Tools {
 	return nil
 }
 
-func (me *atDiag) OnUpdateBuildDiags(workspaceFiles z.WorkspaceFiles, writtenFilePaths []string) z.DiagBuildJobs {
+func (me *atDiag) PrepIssueJobs(workspaceFiles z.WorkspaceFiles, writtenFilePaths []string) z.DiagBuildJobs {
 	var job z.DiagJobBuild
 	job.AffectedFilePaths = Ctx.Kits.All.SrcFilePaths()
 	return z.DiagBuildJobs{&job}
 }
 
-func (me *atDiag) RunBuildJobs(jobs z.DiagBuildJobs, workspaceFiles z.WorkspaceFiles) (errdiags z.DiagItems) {
+func (me *atDiag) RunIssueJobs(jobs z.DiagBuildJobs, workspaceFiles z.WorkspaceFiles) (errdiags z.DiagItems) {
 	me.Lock()
 	errdiags = me.errDiags
 	me.Unlock()
 	return
 }
 
-func (*atDiag) OnUpdateLintDiags(workspaceFiles z.WorkspaceFiles, diagTools z.Tools, filePaths []string) (jobs z.DiagLintJobs) {
+func (*atDiag) PrepLintJobs(workspaceFiles z.WorkspaceFiles, diagTools z.Tools, filePaths []string) (jobs z.DiagLintJobs) {
 	return
 }
 

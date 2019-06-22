@@ -25,9 +25,9 @@ type fixUps struct {
 
 type IDiagBuild interface {
 	FixerUppers() []FixerUpper
-	OnUpdateBuildDiags(WorkspaceFiles, []string) DiagBuildJobs
-	RunBuildJobs(DiagBuildJobs, WorkspaceFiles) DiagItems
-	UpdateBuildDiagsAsNeeded(WorkspaceFiles, []string)
+	PrepIssueJobs(WorkspaceFiles, []string) DiagBuildJobs
+	RunIssueJobs(DiagBuildJobs, WorkspaceFiles) DiagItems
+	UpdateIssueDiagsAsNeeded(WorkspaceFiles, []string)
 }
 
 type DiagBuildJobs []*DiagJobBuild
@@ -128,14 +128,14 @@ func (me *DiagBase) fixUps(diags DiagItems) {
 	}
 }
 
-func (me *DiagBase) UpdateBuildDiagsAsNeeded(workspaceFiles WorkspaceFiles, writtenFiles []string) {
-	if jobs := me.Impl.OnUpdateBuildDiags(workspaceFiles, writtenFiles).withoutDuplicates(); len(jobs) > 0 {
+func (me *DiagBase) UpdateIssueDiagsAsNeeded(workspaceFiles WorkspaceFiles, writtenFiles []string) {
+	if jobs := me.Impl.PrepIssueJobs(workspaceFiles, writtenFiles).withoutDuplicates(); len(jobs) > 0 {
 		sort.Sort(jobs)
 		for _, job := range jobs {
 			job.forgetPrevDiags(nil, false, workspaceFiles)
 		}
 		go me.send(workspaceFiles, true)
-		diagitems := me.Impl.RunBuildJobs(jobs, workspaceFiles)
+		diagitems := me.Impl.RunIssueJobs(jobs, workspaceFiles)
 		diagitems.propagate(false, true, workspaceFiles)
 		if len(diagitems) > 0 {
 			go me.fixUps(diagitems)
