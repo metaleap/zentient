@@ -119,9 +119,7 @@ func (me *atmoSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (ret z.Sr
 								}
 								return
 							})
-							if len(nodematches) > 0 {
-								nodematches[ilnode] = tld
-							}
+							nodematches[ilnode] = tld
 						case *atmoil.IrIdentName:
 						default:
 							nodematches = kit.SelectNodes(curfileonly, func(na []atmoil.INode, n atmoil.INode, nd []atmoil.INode) (ismatch bool, dontdescend bool, donetld bool, doneall bool) {
