@@ -16,7 +16,7 @@ type atDiag struct {
 	errDiags z.DiagItems
 }
 
-func (me *atDiag) updateFromErrs() {
+func (me *atDiag) updateFromErrs(_ bool) {
 	var diags z.DiagItems
 	for _, kit := range Ctx.Kits.All {
 		errs2srcs := make(map[error][]byte, 4)

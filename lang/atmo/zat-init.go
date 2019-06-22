@@ -15,8 +15,8 @@ func OnPreInit() (err error) {
 		Ctx, z.Lang.Enabled, z.Lang.ID, z.Lang.Title, z.Lang.Live =
 			&ctx, true, "atmo", "atmo", liveMode
 		workspace.onPreInit()
-		Ctx.Kits.OnFreshErrs = diag.updateFromErrs
-		diag.updateFromErrs()
+		Ctx.Kits.OnRefreshed = diag.updateFromErrs
+		diag.updateFromErrs(true)
 	}
 	return
 }
