@@ -215,11 +215,10 @@ func (me *atmoSrcIntel) Symbols(srcLens *z.SrcLens, query string, curFileOnly bo
 	}
 	symbolForTopLevelDef := func(tlc *atmolang.SrcTopChunk) {
 		var name string
-		var toks udevlex.Tokens
 		flag := z.SYM_FUNCTION
 		if tld := tlc.Ast.Def.Orig; tld != nil {
 			if len(query) == 0 || ustr.Has(ustr.Lo(tld.Name.Val), query) {
-				name, toks = tld.Name.Val, tld.Tokens
+				name = tld.Name.Val
 				if len(tld.Args) == 0 {
 					flag = z.SYM_FIELD
 				} else if tld.Name.IsOpish {
@@ -227,15 +226,15 @@ func (me *atmoSrcIntel) Symbols(srcLens *z.SrcLens, query string, curFileOnly bo
 				}
 			}
 		} else if tlc.Ast.Def.NameIfErr != "" {
-			name, toks, flag =
-				tlc.Ast.Def.NameIfErr, tlc.Ast.Tokens, z.SYM_EVENT
+			name, flag =
+				tlc.Ast.Def.NameIfErr, z.SYM_EVENT
 		}
-		if name != "" && len(toks) > 0 {
+		if name != "" {
 			ret = append(ret, &z.SrcLens{Str: name,
 				Txt: "(description later)", SrcLoc: z.SrcLoc{
 					FilePath: tlc.SrcFile.SrcFilePath,
 					Flag:     int(flag),
-					Range:    toksToRange(tlc, toks)}})
+					Range:    toksToRange(tlc, tlc.Ast.Tokens)}})
 		}
 	}
 	if len(kits) > 0 && curkit != nil {
