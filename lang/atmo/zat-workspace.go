@@ -40,7 +40,7 @@ func (*atmoWorkspace) onBeforeChanges(workspaceChanges *z.WorkspaceChanges, fres
 	gatherkits2refresh(workspaceChanges.WrittenFiles...)
 	gatherkits2refresh(workspaceChanges.OpenedFiles...)
 
-	var livesrcfilepaths []*atmolang.AstFile
+	var livesrcfiles []*atmolang.AstFile
 	if liveMode {
 		updatesrcfile := func(srcfilepath string, srctxt []byte) {
 			if kit := gatherkits2refresh(srcfilepath); kit != nil {
@@ -51,7 +51,7 @@ func (*atmoWorkspace) onBeforeChanges(workspaceChanges *z.WorkspaceChanges, fres
 				}
 				if srcfile != nil {
 					srcfile.Options.TmpAltSrc = srctxt
-					livesrcfilepaths = append(livesrcfilepaths, srcfile)
+					livesrcfiles = append(livesrcfiles, srcfile)
 				}
 			}
 		}
@@ -62,10 +62,9 @@ func (*atmoWorkspace) onBeforeChanges(workspaceChanges *z.WorkspaceChanges, fres
 			updatesrcfile(srcfilepath, []byte(srctxt))
 		}
 	}
-	Ctx.CatchUpOnFileMods(livesrcfilepaths...)
+	Ctx.CatchUpOnFileMods(livesrcfiles...)
 	Ctx.KitsEnsureLoaded(false, kitimppaths...)
 }
-
 func (*atmoWorkspace) onAfterChanges(workspaceChanges *z.WorkspaceChanges) {
 }
 
