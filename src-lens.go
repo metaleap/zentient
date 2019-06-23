@@ -22,7 +22,12 @@ type SrcPos struct {
 }
 
 func (me *SrcPos) SetRune1OffFromByte0Off(byte0Off int, src string) {
-	me.byteOff, me.byteoff = byte0Off, true
+	if byte0Off > len(src) {
+		byte0Off = len(src)
+	} else {
+		me.byteoff = true
+	}
+	me.byteOff = byte0Off
 	me.Off = 1 + ustr.NumRunes(src[:byte0Off])
 }
 

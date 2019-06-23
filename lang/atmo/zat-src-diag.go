@@ -33,7 +33,7 @@ func (me *atmoDiag) updateFromErrs(_ bool) {
 				}
 				if pos, src := e.Pos(), string(errs2srcs[err]); pos != nil {
 					errdiag.Loc.FilePath, errdiag.Loc.Pos = pos.Filename, &z.SrcPos{}
-					if errdiag.Loc.Pos.Ln, errdiag.Loc.Pos.Col = pos.Line, pos.Column; len(src) > 0 && pos.Offset <= len(src) {
+					if errdiag.Loc.Pos.Ln, errdiag.Loc.Pos.Col = pos.Line, pos.Column; len(src) > 0 {
 						errdiag.Loc.Pos.SetRune1OffFromByte0Off(pos.Offset, src)
 					} else if pos.Line < 1 || pos.Column < 1 {
 						errdiag.Loc.Pos.Off = 1 + pos.Offset
