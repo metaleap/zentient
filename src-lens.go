@@ -2,9 +2,10 @@ package z
 
 import (
 	"path/filepath"
-	"text/scanner"
+	"unicode/utf8"
 
 	"github.com/go-leap/dev"
+	"github.com/go-leap/dev/lex"
 	"github.com/go-leap/fs"
 	"github.com/go-leap/str"
 )
@@ -21,14 +22,14 @@ type SrcPos struct {
 	byteoff bool
 }
 
-func (me *SrcPos) SetRune1OffFromByte0Off(byte0Off int, src string) {
+func (me *SrcPos) SetRune1OffFromByte0Off(byte0Off int, src []byte) {
 	if byte0Off > len(src) {
 		byte0Off = len(src)
 	} else {
 		me.byteoff = true
 	}
 	me.byteOff = byte0Off
-	me.Off = 1 + ustr.NumRunes(src[:byte0Off])
+	me.Off = 1 + utf8.RuneCount(src[:byte0Off])
 }
 
 func (me *SrcPos) isBetween(sr *SrcRange) bool {
@@ -81,8 +82,8 @@ func (me *SrcRange) overlapsWith(sr *SrcRange) bool {
 
 type SrcLocs []*SrcLoc
 
-func (me *SrcLocs) Add(srcFilePath string, pos *scanner.Position) (loc *SrcLoc) {
-	loc = &SrcLoc{FilePath: srcFilePath, Pos: &SrcPos{Ln: pos.Line, Col: pos.Column}}
+func (me *SrcLocs) Add(srcFilePath string, pos *udevlex.Pos) (loc *SrcLoc) {
+	loc = &SrcLoc{FilePath: srcFilePath, Pos: &SrcPos{Ln: pos.Ln1, Col: pos.Col1}}
 	*me = append(*me, loc)
 	return
 }
@@ -180,14 +181,7 @@ func (me *SrcLens) ByteOffsetForFirstLineBeginningWith(prefix string) int {
 }
 
 func (me *SrcLens) Rune1OffsetForByte0Offset(byte0off int) (rune1off int) {
-	return 1 + ustr.NumRunes(me.Txt[:byte0off])
-	// for byteoff := range me.Txt {
-	// 	rune1off++
-	// 	if byteoff >= byte0off {
-	// 		return
-	// 	}
-	// }
-	// return
+	return 1 + utf8.RuneCountInString(me.Txt[:byte0off])
 }
 
 func (me *SrcLoc) SetFilePathAndPosOrRangeFrom(srcRef *udev.SrcMsg, fallbackFilePath func() string) {

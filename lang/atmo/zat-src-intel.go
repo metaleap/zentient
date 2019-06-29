@@ -277,16 +277,18 @@ func (me *atmoSrcIntel) astAt(kit *atmosess.Kit, srcLens *z.SrcLens) (topLevelCh
 	return
 }
 
-func tokToPos(tlc *atmolang.SrcTopChunk, tok *udevlex.Token) *z.SrcPos {
+func tokToPos(tlc *atmolang.SrcTopChunk, tok *udevlex.Token) (ret *z.SrcPos) {
 	pos := tok.Pos(tlc.PosOffsetLine(), tlc.PosOffsetByte())
-	return &z.SrcPos{Off: pos.Offset + 1, Ln: pos.Line, Col: pos.Column}
+	ret = &z.SrcPos{Ln: pos.Ln1, Col: pos.Col1}
+	ret.SetRune1OffFromByte0Off(pos.Off0, tlc.SrcFile.LastLoad.Src)
+	return
 }
 
 func toksToRange(tlc *atmolang.SrcTopChunk, toks udevlex.Tokens) (sr *z.SrcRange) {
 	sr = &z.SrcRange{Start: *tokToPos(tlc, toks.First(nil))}
 	tok := toks.Last(nil)
 	l, pos := len(tok.Meta.Orig), tok.Pos(tlc.PosOffsetLine(), tlc.PosOffsetByte())
-	sr.End.Off, sr.End.Ln, sr.End.Col = pos.Offset+l, pos.Line, pos.Column+l
+	sr.End.Off, sr.End.Ln, sr.End.Col = pos.Off0+l, pos.Ln1, pos.Col1+l
 	return
 }
 

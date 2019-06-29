@@ -31,17 +31,17 @@ func (me *atmoDiag) updateFromErrs(_ bool) {
 				if e.Cat() == atmo.ErrCatUnreachable {
 					errdiag.Tags = []int{1}
 				}
-				if pos, src := e.Pos(), string(errs2srcs[err]); pos != nil {
-					errdiag.Loc.FilePath, errdiag.Loc.Pos = pos.Filename, &z.SrcPos{}
-					if errdiag.Loc.Pos.Ln, errdiag.Loc.Pos.Col = pos.Line, pos.Column; len(src) > 0 {
-						errdiag.Loc.Pos.SetRune1OffFromByte0Off(pos.Offset, src)
-					} else if pos.Line < 1 || pos.Column < 1 {
-						errdiag.Loc.Pos.Off = 1 + pos.Offset
+				if pos, src := e.Pos(), errs2srcs[err]; pos != nil {
+					errdiag.Loc.FilePath, errdiag.Loc.Pos = pos.FilePath, &z.SrcPos{}
+					if errdiag.Loc.Pos.Ln, errdiag.Loc.Pos.Col = pos.Ln1, pos.Col1; len(src) > 0 {
+						errdiag.Loc.Pos.SetRune1OffFromByte0Off(pos.Off0, src)
+					} else if pos.Ln1 < 1 || pos.Col1 < 1 {
+						errdiag.Loc.Pos.Off = 1 + pos.Off0
 					}
 					if errlen := e.Len(); errlen > 1 && len(src) > 0 {
 						errdiag.Loc.Range = &z.SrcRange{}
-						errdiag.Loc.Range.Start.SetRune1OffFromByte0Off(pos.Offset, src)
-						errdiag.Loc.Range.End.SetRune1OffFromByte0Off(pos.Offset+errlen, src)
+						errdiag.Loc.Range.Start.SetRune1OffFromByte0Off(pos.Off0, src)
+						errdiag.Loc.Range.End.SetRune1OffFromByte0Off(pos.Off0+errlen, src)
 					}
 				}
 			}

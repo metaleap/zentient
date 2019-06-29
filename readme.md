@@ -1447,7 +1447,7 @@ type SrcLocs []*SrcLoc
 #### func (*SrcLocs) Add
 
 ```go
-func (me *SrcLocs) Add(srcFilePath string, pos *scanner.Position) (loc *SrcLoc)
+func (me *SrcLocs) Add(srcFilePath string, pos *udevlex.Pos) (loc *SrcLoc)
 ```
 
 #### func (*SrcLocs) AddFrom
@@ -1560,7 +1560,7 @@ All public fields are 1-based (so 0 means 'missing') and rune-not-byte-based
 #### func (*SrcPos) SetRune1OffFromByte0Off
 
 ```go
-func (me *SrcPos) SetRune1OffFromByte0Off(byte0Off int, src string)
+func (me *SrcPos) SetRune1OffFromByte0Off(byte0Off int, src []byte)
 ```
 
 #### func (*SrcPos) String
