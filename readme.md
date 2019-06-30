@@ -1347,8 +1347,8 @@ type SrcIntelSigParam struct {
 
 ```go
 type SrcIntels struct {
-	Info []InfoTip `json:",omitempty"`
-	Refs SrcLocs   `json:",omitempty"`
+	InfoTips []InfoTip `json:",omitempty"`
+	Refs     SrcLocs   `json:",omitempty"`
 }
 ```
 

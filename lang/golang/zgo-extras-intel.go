@@ -174,7 +174,7 @@ func (me *goExtras) runIntel_Guru(guruCmd string, srcLens *z.SrcLens, arg string
 		} else {
 			resp.Warns = append(resp.Warns, err.Error())
 		}
-	} else if len(resp.Info) == 0 && resp.Items == nil && len(resp.Warns) == 0 && len(resp.Refs) == 0 {
+	} else if len(resp.InfoTips) == 0 && resp.Items == nil && len(resp.Warns) == 0 && len(resp.Refs) == 0 {
 		resp.Items = []*z.ExtrasItem{}
 	}
 }

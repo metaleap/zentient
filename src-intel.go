@@ -27,8 +27,8 @@ type ISrcIntel interface {
 }
 
 type SrcIntels struct {
-	Info []InfoTip `json:",omitempty"`
-	Refs SrcLocs   `json:",omitempty"`
+	InfoTips []InfoTip `json:",omitempty"`
+	Refs     SrcLocs   `json:",omitempty"`
 }
 
 type srcIntelResp struct {
@@ -157,7 +157,7 @@ func (me *SrcIntelBase) onHighlights(req *ipcReq, resp *ipcResp) {
 func (me *SrcIntelBase) onHover(req *ipcReq, resp *ipcResp) {
 	lex := me.posLex(req.SrcLens)
 	if me.Impl.CanIntel(lex) {
-		resp.SrcIntel.Info = me.Impl.Hovers(req.SrcLens)
+		resp.SrcIntel.InfoTips = me.Impl.Hovers(req.SrcLens)
 	}
 
 	var hov InfoTip
@@ -195,7 +195,7 @@ func (me *SrcIntelBase) onHover(req *ipcReq, resp *ipcResp) {
 		}
 	}
 	if hov.Value != "" {
-		resp.SrcIntel.Info = append(resp.SrcIntel.Info, hov)
+		resp.SrcIntel.InfoTips = append(resp.SrcIntel.InfoTips, hov)
 	}
 }
 
