@@ -114,7 +114,9 @@ func (me *ipcResp) withMenu() *menuResp {
 }
 
 func (me *ipcResp) withSrcIntel() *ipcResp {
-	me.SrcIntel = &srcIntelResp{}
+	if me.SrcIntel == nil {
+		me.SrcIntel = &srcIntelResp{}
+	}
 	return me
 }
 

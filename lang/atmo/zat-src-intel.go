@@ -183,6 +183,14 @@ func (me *atmoSrcIntel) Hovers(srcLens *z.SrcLens) (ret []z.InfoTip) {
 	return
 }
 
+func (me *atmoSrcIntel) InfoBits(srcLens *z.SrcLens) (ret []*z.SrcIntelInfoBit) {
+	ret = append(ret, &z.SrcIntelInfoBit{
+		Title: "Foo Bar Baz", Desc: "It's yet another lens test",
+		Range: z.SrcRange{Start: z.SrcPos{Ln: 8, Col: 1}, End: z.SrcPos{Ln: 8, Col: 8}},
+	})
+	return
+}
+
 func (me *atmoSrcIntel) References(srcLens *z.SrcLens, includeDeclaration bool) (ret z.SrcLocs) {
 	if kit := Ctx.KitByDirPath(filepath.Dir(srcLens.FilePath), true); kit != nil {
 		me.withInMemFileMod(srcLens, kit, func() {
@@ -230,9 +238,6 @@ func (me *atmoSrcIntel) Symbols(srcLens *z.SrcLens, query string, curFileOnly bo
 				tlc.Ast.Def.NameIfErr, z.SYM_EVENT
 		}
 		if name != "" {
-			if name == "fn" {
-				println(tlc.Ast.Tokens)
-			}
 			ret = append(ret, &z.SrcLens{Str: name,
 				Txt: "(description later)", SrcLoc: z.SrcLoc{
 					FilePath: tlc.SrcFile.SrcFilePath,

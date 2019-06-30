@@ -692,6 +692,7 @@ type ISrcIntel interface {
 	DefImpl(*SrcLens) SrcLocs
 	Highlights(*SrcLens, string) SrcLocs
 	Hovers(*SrcLens) []InfoTip
+	InfoBits(*SrcLens) []*SrcIntelInfoBit
 	References(*SrcLens, bool) SrcLocs
 	Signature(*SrcLens) *SrcIntelSigHelp
 	Symbols(*SrcLens, string, bool) SrcLenses
@@ -1220,6 +1221,12 @@ func (*SrcIntelBase) Highlights(*SrcLens, string) SrcLocs
 func (*SrcIntelBase) Hovers(*SrcLens) []InfoTip
 ```
 
+#### func (*SrcIntelBase) InfoBits
+
+```go
+func (*SrcIntelBase) InfoBits(*SrcLens) []*SrcIntelInfoBit
+```
+
 #### func (*SrcIntelBase) Init
 
 ```go
@@ -1303,7 +1310,7 @@ type SrcIntelInfoBit struct {
 	Range   SrcRange
 	Title   string
 	Desc    string `json:",omitempty"`
-	CmdName string `json:",omitempty"`
+	CmdName string
 }
 ```
 
