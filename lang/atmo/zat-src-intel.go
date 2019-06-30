@@ -203,7 +203,7 @@ func (me *atmoSrcIntel) References(srcLens *z.SrcLens, includeDeclaration bool) 
 				}
 				for tld, ilnodes := range refs {
 					for _, node := range ilnodes {
-						if tok := tld.OrigToks(node).First(nil); tok != nil {
+						if tok := tld.OrigToks(node).First1(); tok != nil {
 							ret.Add(tld.OrigTopLevelChunk.SrcFile.SrcFilePath, tok.OffPos(tld.OrigTopLevelChunk.PosOffsetLine(), tld.OrigTopLevelChunk.PosOffsetByte()))
 						}
 					}
@@ -261,21 +261,22 @@ func (me *atmoSrcIntel) Symbols(srcLens *z.SrcLens, query string, curFileOnly bo
 	return
 }
 
-func (me *atmoSrcIntel) addLocFromToks(tlc *atmolang.SrcTopChunk, locs *z.SrcLocs, toks udevlex.Tokens) *z.SrcLoc {
-	if tok := toks.First(nil); tok != nil {
-		return locs.Add(tlc.SrcFile.SrcFilePath, tok.OffPos(tlc.PosOffsetLine(), tlc.PosOffsetByte()))
+func (me *atmoSrcIntel) addLocFromToks(tlc *atmolang.SrcTopChunk, dst *z.SrcLocs, toks udevlex.Tokens) *z.SrcLoc {
+	if tok := toks.First1(); tok != nil {
+		pos := tok.OffPos(tlc.PosOffsetLine(), tlc.PosOffsetByte())
+		return dst.Add(tlc.SrcFile.SrcFilePath, pos)
 	}
 	return nil
 }
 
-func (me *atmoSrcIntel) addLocFromNode(tld *atmoil.IrDefTop, locs *z.SrcLocs, node atmoil.INode) *z.SrcLoc {
+func (me *atmoSrcIntel) addLocFromNode(tld *atmoil.IrDefTop, dst *z.SrcLocs, node atmoil.INode) *z.SrcLoc {
 	toks := tld.OrigToks(node)
 	if def := node.IsDef(); def != nil {
 		if ts := tld.OrigToks(&def.Name); len(ts) > 0 {
 			toks = ts
 		}
 	}
-	return me.addLocFromToks(tld.OrigTopLevelChunk, locs, toks)
+	return me.addLocFromToks(tld.OrigTopLevelChunk, dst, toks)
 }
 
 func (me *atmoSrcIntel) astAt(kit *atmosess.Kit, srcLens *z.SrcLens) (topLevelChunk *atmolang.SrcTopChunk, theNodeAndItsAncestors []atmolang.IAstNode) {
