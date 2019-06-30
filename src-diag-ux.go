@@ -151,7 +151,7 @@ func (me *DiagBase) onForgetAll() {
 	for _, f := range workspacefiles {
 		f.resetDiags()
 	}
-	go me.send(workspacefiles, false)
+	me.send(workspacefiles, false)
 }
 
 var onRunManuallyInfoNoteAlreadyShownOnceInThisSession, onRunManuallyAlreadyCurrentlyRunning = false, false

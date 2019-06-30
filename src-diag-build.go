@@ -134,12 +134,12 @@ func (me *DiagBase) UpdateIssueDiagsAsNeeded(workspaceFiles WorkspaceFiles, writ
 		for _, job := range jobs {
 			job.forgetPrevDiags(nil, false, workspaceFiles)
 		}
-		go me.send(workspaceFiles, true)
+		me.send(workspaceFiles, true)
 		diagitems := me.Impl.RunIssueJobs(jobs, workspaceFiles)
 		diagitems.propagate(false, true, workspaceFiles)
 		if len(diagitems) > 0 {
 			go me.fixUps(diagitems)
 		}
 	}
-	go me.send(workspaceFiles, false)
+	me.send(workspaceFiles, false)
 }

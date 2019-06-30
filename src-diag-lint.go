@@ -83,7 +83,7 @@ func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(workspaceFiles WorkspaceFiles, 
 			me.updateLintDiags(workspaceFiles, diagtools, autos, filepaths).propagate(true, nonautos, workspaceFiles)
 		}
 	}
-	go me.send(workspaceFiles, false)
+	me.send(workspaceFiles, false)
 }
 
 func (me *DiagBase) updateLintDiags(workspaceFiles WorkspaceFiles, diagTools Tools, autos bool, filePaths []string) (diagitems DiagItems) {
@@ -93,7 +93,7 @@ func (me *DiagBase) updateLintDiags(workspaceFiles WorkspaceFiles, diagTools Too
 		for _, job := range jobs { // separate loop from the go-routines below to prevent concurrent-map-read+write as forgetPrevDiags() calls workspaceFiles.ensure()
 			job.forgetPrevDiags(diagTools, autos, workspaceFiles)
 		}
-		go me.send(workspaceFiles, false)
+		me.send(workspaceFiles, false)
 		if nonautos {
 			onRunManuallyAlreadyCurrentlyRunning = true
 		}
