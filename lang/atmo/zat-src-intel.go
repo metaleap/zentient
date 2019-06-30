@@ -295,12 +295,13 @@ func tokToPos(tlc *atmolang.SrcTopChunk, tok *udevlex.Token) (ret *z.SrcPos) {
 
 func toksToRange(tlc *atmolang.SrcTopChunk, toks udevlex.Tokens) *z.SrcRange {
 	var sr z.SrcRange
+	tlcoffl, tlcoffb := tlc.PosOffsetLine(), tlc.PosOffsetByte()
 
-	pos := toks.First1().OffPos(tlc.PosOffsetLine(), tlc.PosOffsetByte())
+	pos := toks.First1().OffPos(tlcoffl, tlcoffb)
 	sr.Start.Col, sr.Start.Ln = pos.Col1, pos.Ln1
 	sr.Start.SetRune1OffFromByte0Off(pos.Off0, tlc.SrcFile.LastLoad.Src)
 
-	pos = toks.Last1().OffPosEnd(tlc.PosOffsetLine(), tlc.PosOffsetByte())
+	pos = toks.Last1().OffPosEnd(tlcoffl, tlcoffb)
 	sr.End.Col, sr.End.Ln = pos.Col1, pos.Ln1
 	sr.End.SetRune1OffFromByte0Off(pos.Off0, tlc.SrcFile.LastLoad.Src)
 
