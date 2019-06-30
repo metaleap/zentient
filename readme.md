@@ -1296,6 +1296,18 @@ type SrcIntelDoc struct {
 ```
 
 
+#### type SrcIntelInfoBit
+
+```go
+type SrcIntelInfoBit struct {
+	Range   SrcRange
+	Title   string
+	Desc    string `json:",omitempty"`
+	CmdName string `json:",omitempty"`
+}
+```
+
+
 #### type SrcIntelLex
 
 ```go

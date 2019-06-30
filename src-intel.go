@@ -33,9 +33,17 @@ type SrcIntels struct {
 
 type srcIntelResp struct {
 	SrcIntels
-	Sig  *SrcIntelSigHelp `json:",omitempty"`
-	Cmpl SrcIntelCompls   `json:",omitempty"`
-	Syms SrcLenses        `json:",omitempty"`
+	Sig      *SrcIntelSigHelp   `json:",omitempty"`
+	Cmpl     SrcIntelCompls     `json:",omitempty"`
+	Syms     SrcLenses          `json:",omitempty"`
+	InfoBits []*SrcIntelInfoBit `json:",omitempty"`
+}
+
+type SrcIntelInfoBit struct {
+	Range   SrcRange
+	Title   string
+	Desc    string `json:",omitempty"`
+	CmdName string `json:",omitempty"`
 }
 
 type SrcIntelCompl struct {
