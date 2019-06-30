@@ -196,7 +196,7 @@ func (me *atmoSrcIntel) References(srcLens *z.SrcLens, includeDeclaration bool) 
 				for tld, ilnodes := range refs {
 					for _, node := range ilnodes {
 						if tok := tld.OrigToks(node).First(nil); tok != nil {
-							ret.Add(tld.OrigTopLevelChunk.SrcFile.SrcFilePath, tok.Pos(tld.OrigTopLevelChunk.PosOffsetLine(), tld.OrigTopLevelChunk.PosOffsetByte()))
+							ret.Add(tld.OrigTopLevelChunk.SrcFile.SrcFilePath, tok.OffPos(tld.OrigTopLevelChunk.PosOffsetLine(), tld.OrigTopLevelChunk.PosOffsetByte()))
 						}
 					}
 				}
@@ -255,7 +255,7 @@ func (me *atmoSrcIntel) Symbols(srcLens *z.SrcLens, query string, curFileOnly bo
 
 func (me *atmoSrcIntel) addLocFromToks(tlc *atmolang.SrcTopChunk, locs *z.SrcLocs, toks udevlex.Tokens) *z.SrcLoc {
 	if tok := toks.First(nil); tok != nil {
-		return locs.Add(tlc.SrcFile.SrcFilePath, tok.Pos(tlc.PosOffsetLine(), tlc.PosOffsetByte()))
+		return locs.Add(tlc.SrcFile.SrcFilePath, tok.OffPos(tlc.PosOffsetLine(), tlc.PosOffsetByte()))
 	}
 	return nil
 }
@@ -278,7 +278,7 @@ func (me *atmoSrcIntel) astAt(kit *atmosess.Kit, srcLens *z.SrcLens) (topLevelCh
 }
 
 func tokToPos(tlc *atmolang.SrcTopChunk, tok *udevlex.Token) (ret *z.SrcPos) {
-	pos := tok.Pos(tlc.PosOffsetLine(), tlc.PosOffsetByte())
+	pos := tok.OffPos(tlc.PosOffsetLine(), tlc.PosOffsetByte())
 	ret = &z.SrcPos{Ln: pos.Ln1, Col: pos.Col1}
 	ret.SetRune1OffFromByte0Off(pos.Off0, tlc.SrcFile.LastLoad.Src)
 	return
@@ -287,7 +287,7 @@ func tokToPos(tlc *atmolang.SrcTopChunk, tok *udevlex.Token) (ret *z.SrcPos) {
 func toksToRange(tlc *atmolang.SrcTopChunk, toks udevlex.Tokens) (sr *z.SrcRange) {
 	sr = &z.SrcRange{Start: *tokToPos(tlc, toks.First(nil))}
 	tok := toks.Last(nil)
-	l, pos := len(tok.Meta.Orig), tok.Pos(tlc.PosOffsetLine(), tlc.PosOffsetByte())
+	l, pos := len(tok.Lexeme), tok.OffPos(tlc.PosOffsetLine(), tlc.PosOffsetByte())
 	sr.End.Off, sr.End.Ln, sr.End.Col = pos.Off0+l, pos.Ln1, pos.Col1+l
 	return
 }
