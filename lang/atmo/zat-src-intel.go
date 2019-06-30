@@ -230,6 +230,9 @@ func (me *atmoSrcIntel) Symbols(srcLens *z.SrcLens, query string, curFileOnly bo
 				tlc.Ast.Def.NameIfErr, z.SYM_EVENT
 		}
 		if name != "" {
+			if name == "fn" {
+				println(tlc.Ast.Tokens)
+			}
 			ret = append(ret, &z.SrcLens{Str: name,
 				Txt: "(description later)", SrcLoc: z.SrcLoc{
 					FilePath: tlc.SrcFile.SrcFilePath,
@@ -284,12 +287,18 @@ func tokToPos(tlc *atmolang.SrcTopChunk, tok *udevlex.Token) (ret *z.SrcPos) {
 	return
 }
 
-func toksToRange(tlc *atmolang.SrcTopChunk, toks udevlex.Tokens) (sr *z.SrcRange) {
-	sr = &z.SrcRange{Start: *tokToPos(tlc, toks.First(nil))}
-	tok := toks.Last(nil)
-	l, pos := len(tok.Lexeme), tok.OffPos(tlc.PosOffsetLine(), tlc.PosOffsetByte())
-	sr.End.Off, sr.End.Ln, sr.End.Col = pos.Off0+l, pos.Ln1, pos.Col1+l
-	return
+func toksToRange(tlc *atmolang.SrcTopChunk, toks udevlex.Tokens) *z.SrcRange {
+	var sr z.SrcRange
+
+	pos := toks.First1().OffPos(tlc.PosOffsetLine(), tlc.PosOffsetByte())
+	sr.Start.Col, sr.Start.Ln = pos.Col1, pos.Ln1
+	sr.Start.SetRune1OffFromByte0Off(pos.Off0, tlc.SrcFile.LastLoad.Src)
+
+	pos = toks.Last1().OffPosEnd(tlc.PosOffsetLine(), tlc.PosOffsetByte())
+	sr.End.Col, sr.End.Ln = pos.Col1, pos.Ln1
+	sr.End.SetRune1OffFromByte0Off(pos.Off0, tlc.SrcFile.LastLoad.Src)
+
+	return &sr
 }
 
 func (me *atmoSrcIntel) withInMemFileMod(srcLens *z.SrcLens, kit *atmosess.Kit, do func()) {
