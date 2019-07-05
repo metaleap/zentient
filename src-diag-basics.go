@@ -33,19 +33,6 @@ func (me *diags) forget(onlyFor Tools) {
 	}
 }
 
-type diagItemsBy map[string]DiagItems
-
-type DiagItem struct {
-	Cat         string `json:",omitempty"`
-	Loc         SrcLoc
-	Msg         string
-	SrcActions  []EditorAction `json:",omitempty"`
-	StickyForce bool           `json:"-"`
-	StickyAuto  bool           `json:"Sticky,omitempty"`
-	Tags        []int          `json:"Tags,omitempty"`
-	Misc        []interface{}  `json:"-"`
-}
-
 func (me *DiagItem) resetAndInferSrcActions(maybeOrigSrcRef *udev.SrcMsg) {
 	me.SrcActions = nil
 	if ilastcolon := ustr.Last(me.Msg, ":"); ilastcolon > 0 {
@@ -92,8 +79,6 @@ func (me *DiagItem) resetAndInferSrcActions(maybeOrigSrcRef *udev.SrcMsg) {
 		}
 	}
 }
-
-type DiagItems []*DiagItem
 
 func (me DiagItems) propagate(lintDiags bool, diagsSticky bool, workspaceFiles WorkspaceFiles) {
 	for _, diag := range me {
@@ -146,12 +131,6 @@ func (me *DiagJob) String() string {
 		return str.String()
 	}
 	return Strf("%v", me.Target)
-}
-
-type diagResp struct {
-	All    diagItemsBy
-	FixUps []*fixUps
-	LangID string
 }
 
 func (me *DiagBase) NewDiagItemFrom(srcRef *udev.SrcMsg, toolName string, fallbackFilePath func() string) (di *DiagItem) {

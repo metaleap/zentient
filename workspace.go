@@ -151,15 +151,6 @@ func (me WorkspaceFiles) numDirs(incl func(*WorkspaceFile) bool) int {
 	return len(filedirs)
 }
 
-type WorkspaceChanges struct {
-	AddedDirs    []string
-	RemovedDirs  []string
-	OpenedFiles  []string
-	ClosedFiles  []string
-	WrittenFiles []string
-	LiveFiles    map[string]string
-}
-
 func (me *WorkspaceChanges) HasDirChanges() bool {
 	return len(me.AddedDirs) > 0 || len(me.RemovedDirs) > 0
 }

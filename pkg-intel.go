@@ -66,7 +66,7 @@ func (me *PkgIntelBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 		if filterid != "" {
 			filters = ListFilters{filter: true}
 		}
-		resp.Menu = &menuResp{
+		resp.Menu = &ipcRespMenu{
 			SubMenu: me.Impl.listItemsSubMenu(filter.Title, filter.Desc, filters),
 		}
 	default:

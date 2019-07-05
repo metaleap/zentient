@@ -21,42 +21,10 @@ type ISrcIntel interface {
 	DefImpl(*SrcLens) SrcLocs
 	Highlights(*SrcLens, string) SrcLocs
 	Hovers(*SrcLens) []InfoTip
-	InfoBits(*SrcLens) []*SrcIntelInfoBit
+	InfoBits(*SrcLens) []*SrcIntelAnnotaction
 	References(*SrcLens, bool) SrcLocs
 	Signature(*SrcLens) *SrcIntelSigHelp
 	Symbols(*SrcLens, string, bool) SrcLenses
-}
-
-type SrcIntels struct {
-	InfoTips []InfoTip `json:",omitempty"`
-	Refs     SrcLocs   `json:",omitempty"`
-}
-
-type srcIntelResp struct {
-	SrcIntels
-	Sig      *SrcIntelSigHelp   `json:",omitempty"`
-	Cmpl     SrcIntelCompls     `json:",omitempty"`
-	Syms     SrcLenses          `json:",omitempty"`
-	InfoBits []*SrcIntelInfoBit `json:",omitempty"`
-}
-
-type SrcIntelInfoBit struct {
-	Range   SrcRange
-	Title   string
-	Desc    string `json:",omitempty"`
-	CmdName string
-}
-
-type SrcIntelCompl struct {
-	Kind          Completion   `json:"kind,omitempty"`
-	Label         string       `json:"label"`
-	Documentation *SrcIntelDoc `json:"documentation,omitempty"`
-	Detail        string       `json:"detail,omitempty"`
-	SortText      string       `json:"sortText,omitempty"`
-	// FilterText    string       `json:"filterText,omitempty"`
-	// InsertText    string       `json:"insertText,omitempty"`
-	// CommitChars   []string     `json:"commitCharacters,omitempty"` // basically in all languages always operator/separator/punctuation (that is, "non-identifier") chars --- no need to send them for each item, for each language --- the client-side will do it
-	SortPrio int `json:"-"`
 }
 
 type SrcIntelLex struct {
@@ -69,33 +37,9 @@ type SrcIntelLex struct {
 	Other   string
 }
 
-type SrcIntelCompls []*SrcIntelCompl
-
 func (me SrcIntelCompls) Len() int               { return len(me) }
 func (me SrcIntelCompls) Swap(i int, j int)      { me[i], me[j] = me[j], me[i] }
 func (me SrcIntelCompls) Less(i int, j int) bool { return me[i].SortText < me[j].SortText }
-
-type SrcIntelDoc struct {
-	Value     string `json:"value,omitempty"`
-	IsTrusted bool   `json:"isTrusted,omitempty"`
-}
-
-type SrcIntelSigHelp struct {
-	ActiveSignature int               `json:"activeSignature"`
-	ActiveParameter int               `json:"activeParameter,omitempty"`
-	Signatures      []SrcIntelSigInfo `json:"signatures,omitempty"`
-}
-
-type SrcIntelSigInfo struct {
-	Label         string             `json:"label"`
-	Documentation SrcIntelDoc        `json:"documentation,omitempty"`
-	Parameters    []SrcIntelSigParam `json:"parameters"`
-}
-
-type SrcIntelSigParam struct {
-	Label         string      `json:"label"`
-	Documentation SrcIntelDoc `json:"documentation,omitempty"`
-}
 
 type SrcIntelBase struct {
 	Impl ISrcIntel
@@ -292,7 +236,7 @@ func (*SrcIntelBase) DefSym(*SrcLens) SrcLocs                      { return nil 
 func (*SrcIntelBase) DefType(*SrcLens) SrcLocs                     { return nil }
 func (*SrcIntelBase) Highlights(*SrcLens, string) SrcLocs          { return nil }
 func (*SrcIntelBase) Hovers(*SrcLens) []InfoTip                    { return nil }
-func (*SrcIntelBase) InfoBits(*SrcLens) []*SrcIntelInfoBit         { return nil }
+func (*SrcIntelBase) InfoBits(*SrcLens) []*SrcIntelAnnotaction     { return nil }
 func (*SrcIntelBase) References(*SrcLens, bool) SrcLocs            { return nil }
 func (*SrcIntelBase) Signature(*SrcLens) *SrcIntelSigHelp          { return nil }
 func (*SrcIntelBase) Symbols(*SrcLens, string, bool) SrcLenses     { return nil }

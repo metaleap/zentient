@@ -16,15 +16,6 @@ type IObjSnap interface {
 	ObjSnap(string) interface{}
 }
 
-type ipcReq struct {
-	ReqID   int64       `json:"ri"`
-	IpcID   IpcIDs      `json:"ii"`
-	IpcArgs interface{} `json:"ia"`
-
-	ProjUpd *WorkspaceChanges `json:"projUpd"`
-	SrcLens *SrcLens          `json:"srcLens"`
-}
-
 func ipcDecodeReqAndRespond(jsonreq string) *ipcResp {
 	var req ipcReq
 	var resp ipcResp
@@ -53,20 +44,6 @@ func ipcDecodeReqAndRespond(jsonreq string) *ipcResp {
 		resp.IpcID = req.IpcID
 	}
 	return &resp
-}
-
-type ipcResp struct {
-	IpcID       IpcIDs         `json:"ii,omitempty"`
-	ReqID       int64          `json:"ri,omitempty"`
-	ErrMsg      string         `json:"err,omitempty"`
-	SrcIntel    *srcIntelResp  `json:"sI,omitempty"`
-	SrcDiags    *diagResp      `json:"srcDiags,omitempty"`
-	SrcMods     SrcLenses      `json:"srcMods,omitempty"`
-	SrcActions  []EditorAction `json:"srcActions,omitempty"`
-	Extras      *ExtrasResp    `json:"extras,omitempty"`
-	Menu        *menuResp      `json:"menu,omitempty"`
-	CaddyUpdate *Caddy         `json:"caddy,omitempty"`
-	Val         interface{}    `json:"val,omitempty"`
 }
 
 func (me *ipcResp) postProcess() {
@@ -104,32 +81,18 @@ func (me *ipcResp) to(req *ipcReq) {
 }
 
 func (me *ipcResp) withExtras() *ipcResp {
-	me.Extras = &ExtrasResp{}
+	me.Extras = &IpcRespExtras{}
 	return me
 }
 
-func (me *ipcResp) withMenu() *menuResp {
-	me.Menu = &menuResp{}
+func (me *ipcResp) withMenu() *ipcRespMenu {
+	me.Menu = &ipcRespMenu{}
 	return me.Menu
 }
 
 func (me *ipcResp) withSrcIntel() *ipcResp {
 	if me.SrcIntel == nil {
-		me.SrcIntel = &srcIntelResp{}
+		me.SrcIntel = &ipcRespSrcIntel{}
 	}
 	return me
-}
-
-type EditorAction struct {
-	Title     string        `json:"title"`
-	Cmd       string        `json:"command"`
-	Hint      string        `json:"tooltip,omitempty"`
-	Arguments []interface{} `json:"arguments,omitempty"`
-}
-
-type InfoTip struct {
-	Value string `json:"value"`
-
-	// If empty, clients default to 'markdown'
-	Language string `json:"language,omitempty"`
 }

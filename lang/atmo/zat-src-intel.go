@@ -183,8 +183,8 @@ func (me *atmoSrcIntel) Hovers(srcLens *z.SrcLens) (ret []z.InfoTip) {
 	return
 }
 
-func (me *atmoSrcIntel) InfoBits(srcLens *z.SrcLens) (ret []*z.SrcIntelInfoBit) {
-	ret = append(ret, &z.SrcIntelInfoBit{
+func (me *atmoSrcIntel) InfoBits(srcLens *z.SrcLens) (ret []*z.SrcIntelAnnotaction) {
+	ret = append(ret, &z.SrcIntelAnnotaction{
 		Title: "Foo Bar Baz", Desc: "It's yet another lens test",
 		Range: z.SrcRange{Start: z.SrcPos{Ln: 8, Col: 1}, End: z.SrcPos{Ln: 8, Col: 8}},
 	})

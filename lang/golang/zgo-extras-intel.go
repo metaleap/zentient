@@ -28,7 +28,7 @@ var (
 		Detail: "For this `<-` operator's channel ➜ find associated allocations, sends, receives and closes."}
 )
 
-func (me *goExtras) runIntel_Guru(guruCmd string, srcLens *z.SrcLens, arg string, resp *z.ExtrasResp) {
+func (me *goExtras) runIntel_Guru(guruCmd string, srcLens *z.SrcLens, arg string, resp *z.IpcRespExtras) {
 	if !tools.guru.Installed {
 		z.ToolGonePanic("guru")
 	}

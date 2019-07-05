@@ -73,7 +73,7 @@ func (me *ToolingBase) Init() {
 func (me *ToolingBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	switch req.IpcID {
 	case IPCID_MENUS_TOOLS:
-		resp.Menu = &menuResp{SubMenu: &Menu{Desc: me.cmdListAll.Desc, Items: me.onListAllTools()}}
+		resp.Menu = &ipcRespMenu{SubMenu: &Menu{Desc: me.cmdListAll.Desc, Items: me.onListAllTools()}}
 	default:
 		return false
 	}

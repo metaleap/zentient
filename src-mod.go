@@ -16,8 +16,6 @@ type ISrcMod interface {
 	RunFormatter(*Tool, string, *SrcFormattingClientPrefs, string, string) (string, string)
 }
 
-type SrcModEdits []srcModEdit
-
 func (me *SrcModEdits) dropConflictingEdits() (droppedOffenders []srcModEdit) {
 	all := *me
 	for i := 0; i < len(all); i++ {
@@ -64,11 +62,6 @@ func (me *SrcModEdits) AddInsert(srcFilePath string, atPos func(*SrcLens, *SrcPo
 		edit.Val = ins
 		*me = append(*me, edit)
 	}
-}
-
-type srcModEdit struct {
-	At  *SrcRange
-	Val string // if not empty: inserts if At is pos, replaces if At is range. if empty: deletes if At range is range, errors if At is pos.
 }
 
 type SrcModBase struct {
@@ -208,7 +201,7 @@ func (me *SrcModBase) onRunFormatter(req *ipcReq, resp *ipcResp) {
 			}
 		}
 	} else {
-		resp.Menu = &menuResp{}
+		resp.Menu = &ipcRespMenu{}
 	}
 
 	formatter := me.Impl.KnownFormatters().byName(Prog.Cfg.FormatterName)
@@ -276,7 +269,7 @@ func (me *SrcModBase) onSetDefMenu(req *ipcReq, resp *ipcResp) {
 		cmd.Hint += "· " + kf.Website
 		m.Items = append(m.Items, &cmd)
 	}
-	resp.Menu = &menuResp{SubMenu: &m}
+	resp.Menu = &ipcRespMenu{SubMenu: &m}
 }
 
 func (me *SrcModBase) onSetDefPick(req *ipcReq, resp *ipcResp) {
@@ -288,7 +281,7 @@ func (me *SrcModBase) onSetDefPick(req *ipcReq, resp *ipcResp) {
 	if err := Prog.Cfg.Save(); err != nil {
 		resp.ErrMsg = err.Error()
 	} else {
-		resp.Menu = &menuResp{}
+		resp.Menu = &ipcRespMenu{}
 		resp.Menu.NoteInfo = Strf("Default %s formatter changed to '%s'", Lang.Title, Prog.Cfg.FormatterName)
 		if me.isFormatterCustom() {
 			resp.Menu.NoteInfo += Strf("-compatible equivalent '%s'", Prog.Cfg.FormatterProg)

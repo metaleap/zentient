@@ -10,18 +10,6 @@ import (
 	"github.com/go-leap/str"
 )
 
-// All public fields are 1-based (so 0 means 'missing') and rune-not-byte-based
-type SrcPos struct {
-	Ln  int `json:"l,omitempty"`
-	Col int `json:"c,omitempty"`
-	// rune1 not byte0 offset!
-	Off int `json:"o,omitempty"`
-
-	// if & when this is computed, it'll be 0-based
-	byteOff int
-	byteoff bool
-}
-
 func (me *SrcPos) SetRune1OffFromByte0Off(byte0Off int, src []byte) {
 	if byte0Off > len(src) {
 		byte0Off = len(src)
@@ -59,11 +47,6 @@ func (me *SrcPos) String() string {
 	return Strf("#%d", me.Off-1)
 }
 
-type SrcRange struct {
-	Start SrcPos `json:"s"`
-	End   SrcPos `json:"e,omitempty"`
-}
-
 func (me *SrcRange) isEmpty() bool {
 	return me.Start.isEquivTo(&me.End) || (me.End.Col == 0 && me.End.Ln == 0 && me.End.Off == 0)
 }
@@ -80,8 +63,6 @@ func (me *SrcRange) overlapsWith(sr *SrcRange) bool {
 		(me.Start.isBetween(sr) || me.End.isBetween(sr) || sr.Start.isBetween(me) || sr.End.isBetween(me))
 }
 
-type SrcLocs []*SrcLoc
-
 func (me *SrcLocs) Add(srcFilePath string, pos *udevlex.Pos) (loc *SrcLoc) {
 	loc = &SrcLoc{FilePath: srcFilePath, Pos: &SrcPos{Ln: pos.Ln1, Col: pos.Col1}}
 	*me = append(*me, loc)
@@ -97,15 +78,6 @@ func (me *SrcLocs) AddFrom(srcRefLoc *udev.SrcMsg, fallbackFilePath func() strin
 	return
 }
 
-type SrcLoc struct {
-	Flag     int       `json:"e"` // don't omitempty
-	FilePath string    `json:"f,omitempty"`
-	Pos      *SrcPos   `json:"p,omitempty"`
-	Range    *SrcRange `json:"r,omitempty"`
-}
-
-type SrcLenses []*SrcLens
-
 func (me SrcLenses) Len() int          { return len(me) }
 func (me SrcLenses) Swap(i int, j int) { me[i], me[j] = me[j], me[i] }
 func (me SrcLenses) Less(i int, j int) bool {
@@ -119,13 +91,6 @@ func (me *SrcLenses) AddFrom(srcRefLoc *udev.SrcMsg, fallbackFilePath func() str
 		*me = append(*me, lens)
 	}
 	return
-}
-
-type SrcLens struct {
-	SrcLoc
-	Txt  string `json:"t,omitempty"`
-	Str  string `json:"s,omitempty"`
-	CrLf bool   `json:"l,omitempty"`
 }
 
 func (me *SrcLens) EnsureSrcFull() {

@@ -1,6 +1,6 @@
 package z
 
-// DO NOT EDIT: code generated with `zentient-codegen` using `github.com/metaleap/go-gent`
+// TO MOT EDIT: code generated with `zentient-codegen` using `github.com/metaleap/go-gent`
 
 import (
 	pkg__github_com_go_leap_str "github.com/go-leap/str"
@@ -394,14 +394,14 @@ func (me *fooResp) StructFieldsSet(name string, v interface{}) (okName bool, okT
 		}
 	case "SrcIntel":
 		okName = true
-		t, ok := v.(*srcIntelResp)
+		t, ok := v.(*ipcRespSrcIntel)
 		if ok {
 			okType = true
 			me.SrcIntel = t
 		}
 	case "SrcDiags":
 		okName = true
-		t, ok := v.(*diagResp)
+		t, ok := v.(*ipcRespDiag)
 		if ok {
 			okType = true
 			me.SrcDiags = t
@@ -436,7 +436,7 @@ func (me *fooResp) StructFieldsSet(name string, v interface{}) (okName bool, okT
 		}
 	case "Extras":
 		okName = true
-		t, ok := v.(*ExtrasResp)
+		t, ok := v.(*IpcRespExtras)
 		if ok {
 			okType = true
 			me.Extras = t
@@ -457,7 +457,7 @@ func (me *fooResp) StructFieldsSet(name string, v interface{}) (okName bool, okT
 		}
 	case "Menu":
 		okName = true
-		t, ok := v.(*menuResp)
+		t, ok := v.(*ipcRespMenu)
 		if ok {
 			okType = true
 			me.Menu = t

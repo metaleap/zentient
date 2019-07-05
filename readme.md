@@ -495,19 +495,6 @@ type ExtrasItem struct {
 ```
 
 
-#### type ExtrasResp
-
-```go
-type ExtrasResp struct {
-	SrcIntels
-	Items []*ExtrasItem
-	Warns []string `json:",omitempty"`
-	Desc  string   `json:",omitempty"`
-	Url   string   `json:",omitempty"`
-}
-```
-
-
 #### type FixUp
 
 ```go
@@ -576,8 +563,8 @@ type IDiagLint interface {
 type IExtras interface {
 	ListIntelExtras() []*ExtrasItem
 	ListQueryExtras() []*ExtrasItem
-	RunIntelExtra(*SrcLens, string, string, *ExtrasResp)
-	RunQueryExtra(*SrcLens, string, string, *ExtrasResp)
+	RunIntelExtra(*SrcLens, string, string, *IpcRespExtras)
+	RunQueryExtra(*SrcLens, string, string, *IpcRespExtras)
 	// contains filtered or unexported methods
 }
 ```
@@ -692,7 +679,7 @@ type ISrcIntel interface {
 	DefImpl(*SrcLens) SrcLocs
 	Highlights(*SrcLens, string) SrcLocs
 	Hovers(*SrcLens) []InfoTip
-	InfoBits(*SrcLens) []*SrcIntelInfoBit
+	InfoBits(*SrcLens) []*SrcIntelAnnotaction
 	References(*SrcLens, bool) SrcLocs
 	Signature(*SrcLens) *SrcIntelSigHelp
 	Symbols(*SrcLens, string, bool) SrcLenses
@@ -839,6 +826,19 @@ func (me IpcIDs) Valid() (r bool)
 ```
 Valid returns whether the value of this `IpcIDs` is between `IPCID_MENUS_MAIN`
 (inclusive) and `IPCID_EXTRAS_QUERY_RUN` (inclusive).
+
+#### type IpcRespExtras
+
+```go
+type IpcRespExtras struct {
+	SrcIntels
+	Items []*ExtrasItem
+	Warns []string `json:",omitempty"`
+	Desc  string   `json:",omitempty"`
+	Url   string   `json:",omitempty"`
+}
+```
+
 
 #### type ListBase
 
@@ -1158,6 +1158,18 @@ type SrcFormattingClientPrefs struct {
 ```
 
 
+#### type SrcIntelAnnotaction
+
+```go
+type SrcIntelAnnotaction struct {
+	Range   SrcRange
+	Title   string
+	Desc    string `json:",omitempty"`
+	CmdName string
+}
+```
+
+
 #### type SrcIntelBase
 
 ```go
@@ -1224,7 +1236,7 @@ func (*SrcIntelBase) Hovers(*SrcLens) []InfoTip
 #### func (*SrcIntelBase) InfoBits
 
 ```go
-func (*SrcIntelBase) InfoBits(*SrcLens) []*SrcIntelInfoBit
+func (*SrcIntelBase) InfoBits(*SrcLens) []*SrcIntelAnnotaction
 ```
 
 #### func (*SrcIntelBase) Init
@@ -1299,18 +1311,6 @@ func (me SrcIntelCompls) Swap(i int, j int)
 type SrcIntelDoc struct {
 	Value     string `json:"value,omitempty"`
 	IsTrusted bool   `json:"isTrusted,omitempty"`
-}
-```
-
-
-#### type SrcIntelInfoBit
-
-```go
-type SrcIntelInfoBit struct {
-	Range   SrcRange
-	Title   string
-	Desc    string `json:",omitempty"`
-	CmdName string
 }
 ```
 

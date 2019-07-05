@@ -16,13 +16,6 @@ type FixUp struct {
 	Edits SrcModEdits
 }
 
-type fixUps struct {
-	FilePath string
-	Desc     map[string][]string
-	Edits    SrcModEdits
-	Dropped  []srcModEdit
-}
-
 type IDiagBuild interface {
 	FixerUppers() []FixerUpper
 	PrepIssueJobs(WorkspaceFiles, []string) DiagBuildJobs
@@ -111,7 +104,7 @@ func (me *DiagBase) fixUps(diags DiagItems) {
 		}
 	}
 	if len(fixupsbyfile) > 0 {
-		dr := &diagResp{LangID: Lang.ID, FixUps: make([]*fixUps, 0, len(fixupsbyfile))}
+		dr := &ipcRespDiag{LangID: Lang.ID, FixUps: make([]*fixUps, 0, len(fixupsbyfile))}
 		for filepath, filefixups := range fixupsbyfile {
 			fixups := &fixUps{FilePath: filepath, Desc: map[string][]string{}}
 			for _, fixup := range filefixups {

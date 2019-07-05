@@ -11,39 +11,10 @@ type IMenuItems interface {
 	MenuCategory() string
 }
 
-type Menu struct {
-	Desc     string    `json:"desc,omitempty"`
-	TopLevel bool      `json:"topLevel,omitempty"`
-	Items    MenuItems `json:"items"`
-}
-
-type MenuItems []*MenuItem
-
-type MenuItem struct {
-	IpcID    IpcIDs      `json:"ii,omitempty"`
-	IpcArgs  interface{} `json:"ia,omitempty"`
-	Category string      `json:"c,omitempty"`
-	Title    string      `json:"t"`
-	Desc     string      `json:"d,omitempty"`
-	Hint     string      `json:"h,omitempty"`
-	Confirm  string      `json:"q,omitempty"`
-
-	tag string
-}
-
 type menuItemIpcArgPrompt struct {
 	Prompt      string `json:"prompt,omitempty"`
 	Placeholder string `json:"placeHolder,omitempty"`
 	Value       string `json:"value,omitempty"`
-}
-
-type menuResp struct {
-	SubMenu       *Menu   `json:",omitempty"`
-	WebsiteURL    string  `json:",omitempty"`
-	NoteInfo      string  `json:",omitempty"`
-	NoteWarn      string  `json:",omitempty"`
-	UxActionLabel string  `json:",omitempty"`
-	Refs          SrcLocs `json:",omitempty"`
 }
 
 type mainMenu struct {
@@ -77,7 +48,7 @@ func (*mainMenu) onMainMenu(req *ipcReq, resp *ipcResp) {
 		}
 	}
 	m.Desc += ustr.Join(cats, "  ·  ")
-	resp.Menu = &menuResp{SubMenu: &m}
+	resp.Menu = &ipcRespMenu{SubMenu: &m}
 }
 
 func (*mainMenu) Init() {

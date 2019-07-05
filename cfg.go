@@ -230,7 +230,7 @@ func (me *SettingsBase) KnownSettings() Settings {
 	return Settings{cfgLintStickiness}
 }
 
-func (me *SettingsBase) onSet(cfgId string, cfgVal string, menu *menuResp) {
+func (me *SettingsBase) onSet(cfgId string, cfgVal string, menu *ipcRespMenu) {
 	info, setting := "changed", me.Impl.KnownSettings().byId(cfgId)
 	if setting == nil {
 		BadPanic("setting ID", cfgId)
@@ -273,7 +273,7 @@ func (me *SettingsBase) onSet(cfgId string, cfgVal string, menu *menuResp) {
 	}
 }
 
-func (me *SettingsBase) onListAll(menu *menuResp) {
+func (me *SettingsBase) onListAll(menu *ipcRespMenu) {
 	menu.SubMenu = &Menu{Desc: Strf("%s — %s:", me.MenuCategory(), me.cmdListAll.Title)}
 	for _, ks := range me.Impl.KnownSettings() {
 		svdef, svcur := "(empty)", "(default)"

@@ -5,25 +5,8 @@ type IExtras interface {
 
 	ListIntelExtras() []*ExtrasItem
 	ListQueryExtras() []*ExtrasItem
-	RunIntelExtra(*SrcLens, string, string, *ExtrasResp)
-	RunQueryExtra(*SrcLens, string, string, *ExtrasResp)
-}
-
-type ExtrasItem struct {
-	ID       string `json:"id"`
-	Label    string `json:"label"`
-	Desc     string `json:"description"`
-	Detail   string `json:"detail,omitempty"`
-	QueryArg string `json:"arg,omitempty"`
-	FilePos  string `json:"fPos,omitempty"`
-}
-
-type ExtrasResp struct {
-	SrcIntels
-	Items []*ExtrasItem
-	Warns []string `json:",omitempty"`
-	Desc  string   `json:",omitempty"`
-	Url   string   `json:",omitempty"`
+	RunIntelExtra(*SrcLens, string, string, *IpcRespExtras)
+	RunQueryExtra(*SrcLens, string, string, *IpcRespExtras)
 }
 
 type ExtrasBase struct {
