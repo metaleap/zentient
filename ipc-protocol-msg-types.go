@@ -253,13 +253,6 @@ type ExtrasItem struct {
 	FilePos  string `json:"fPos,omitempty"`
 }
 
-type SrcInfoTip struct {
-	Value string `json:"value"`
-
-	// If empty, clients default to 'markdown'
-	Language string `json:"language,omitempty"`
-}
-
 type Menu struct {
 	Desc     string    `json:"desc,omitempty"`
 	TopLevel bool      `json:"topLevel,omitempty"`
@@ -285,6 +278,13 @@ type SrcAnnotaction struct {
 	Title   string
 	Desc    string `json:",omitempty"`
 	CmdName string
+}
+
+type SrcInfoTip struct {
+	Value string `json:"value"`
+
+	// If empty, clients default to 'markdown'
+	Language string `json:"language,omitempty"`
 }
 
 type SrcIntelCompl struct {
@@ -348,7 +348,7 @@ type SrcLocs []*SrcLoc
 
 type srcModEdit struct {
 	At  *SrcRange
-	Val string // if not empty: inserts if At is pos, replaces if At is range. if empty: deletes if At range is range, errors if At is pos.
+	Val string // if not empty: inserts if At is pos, replaces if At is range. if empty: deletes if At is range, errors if At is pos.
 }
 
 type SrcModEdits []srcModEdit
