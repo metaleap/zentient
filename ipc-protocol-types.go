@@ -190,10 +190,10 @@ type ipcRespMenu struct {
 
 type ipcRespSrcIntel struct {
 	SrcIntels
-	Sig      *SrcIntelSigHelp       `json:",omitempty"`
-	Cmpl     SrcIntelCompls         `json:",omitempty"`
-	Syms     SrcLenses              `json:",omitempty"`
-	InfoBits []*SrcIntelAnnotaction `json:",omitempty"`
+	Sig  *SrcIntelSigHelp  `json:",omitempty"`
+	Cmpl SrcIntelCompls    `json:",omitempty"`
+	Syms SrcLenses         `json:",omitempty"`
+	Anns []*SrcAnnotaction `json:",omitempty"`
 }
 
 type Caddy struct {
@@ -213,6 +213,13 @@ type Caddy struct {
 	ready bool
 
 	OnReady func() `json:"-"`
+}
+
+type diagFixUps struct {
+	FilePath string
+	Desc     map[string][]string
+	Edits    SrcModEdits
+	Dropped  []srcModEdit
 }
 
 type DiagItem struct {
@@ -246,14 +253,7 @@ type ExtrasItem struct {
 	FilePos  string `json:"fPos,omitempty"`
 }
 
-type fixUps struct {
-	FilePath string
-	Desc     map[string][]string
-	Edits    SrcModEdits
-	Dropped  []srcModEdit
-}
-
-type InfoTip struct {
+type SrcInfoTip struct {
 	Value string `json:"value"`
 
 	// If empty, clients default to 'markdown'
@@ -280,7 +280,7 @@ type MenuItem struct {
 	tag string
 }
 
-type SrcIntelAnnotaction struct {
+type SrcAnnotaction struct {
 	Range   SrcRange
 	Title   string
 	Desc    string `json:",omitempty"`
