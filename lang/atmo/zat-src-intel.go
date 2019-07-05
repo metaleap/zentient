@@ -154,7 +154,7 @@ func (me *atmoSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (ret z.Sr
 	return
 }
 
-func (me *atmoSrcIntel) Hovers(srcLens *z.SrcLens) (ret []z.InfoTip) {
+func (me *atmoSrcIntel) Hovers(srcLens *z.SrcLens) (ret []z.SrcInfoTip) {
 	if kit := Ctx.KitByDirPath(filepath.Dir(srcLens.FilePath), true); kit != nil {
 		me.withInMemFileMod(srcLens, kit, func() {
 			if tlc, astnodes := me.astAt(kit, srcLens); len(astnodes) > 0 {
@@ -163,17 +163,17 @@ func (me *atmoSrcIntel) Hovers(srcLens *z.SrcLens) (ret []z.InfoTip) {
 					nodetypenames += z.Strf("— %T ", n)
 				}
 				ret = append(ret,
-					z.InfoTip{Value: tlc.Ast.Def.Orig.Name.Val},
-					z.InfoTip{Value: nodetypenames[4:]},
+					z.SrcInfoTip{Value: tlc.Ast.Def.Orig.Name.Val},
+					z.SrcInfoTip{Value: nodetypenames[4:]},
 				)
 
 				if _, ilnodes := kit.IrNodeOfAstNode(tlc.Id(), astnodes[0]); len(ilnodes) > 0 {
 					for _, n := range ilnodes {
 						if nid, _ := n.(*atmoil.IrIdentName); nid != nil {
-							ret = append(ret, z.InfoTip{Value: z.Strf("(resolves to %v candidate/s)", len(nid.Anns.Candidates))})
+							ret = append(ret, z.SrcInfoTip{Value: z.Strf("(resolves to %v candidate/s)", len(nid.Anns.Candidates))})
 						}
 						ret = append(ret,
-							z.InfoTip{Value: z.Strf("%T:\n%s", n, n.Facts().Description()), Language: "plain"},
+							z.SrcInfoTip{Value: z.Strf("%T:\n%s", n, n.Facts().Description()), Language: "plain"},
 						)
 					}
 				}
@@ -183,8 +183,8 @@ func (me *atmoSrcIntel) Hovers(srcLens *z.SrcLens) (ret []z.InfoTip) {
 	return
 }
 
-func (me *atmoSrcIntel) InfoBits(srcLens *z.SrcLens) (ret []*z.SrcIntelAnnotaction) {
-	ret = append(ret, &z.SrcIntelAnnotaction{
+func (me *atmoSrcIntel) Annotactions(srcLens *z.SrcLens) (ret []*z.SrcAnnotaction) {
+	ret = append(ret, &z.SrcAnnotaction{
 		Title: "Foo Bar Baz", Desc: "It's yet another lens test",
 		Range: z.SrcRange{Start: z.SrcPos{Ln: 8, Col: 1}, End: z.SrcPos{Ln: 8, Col: 8}},
 	})

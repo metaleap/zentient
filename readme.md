@@ -678,8 +678,8 @@ type ISrcIntel interface {
 	DefType(*SrcLens) SrcLocs
 	DefImpl(*SrcLens) SrcLocs
 	Highlights(*SrcLens, string) SrcLocs
-	Hovers(*SrcLens) []InfoTip
-	InfoBits(*SrcLens) []*SrcIntelAnnotaction
+	Hovers(*SrcLens) []SrcInfoTip
+	Annotactions(*SrcLens) []*SrcAnnotaction
 	References(*SrcLens, bool) SrcLocs
 	Signature(*SrcLens) *SrcIntelSigHelp
 	Symbols(*SrcLens, string, bool) SrcLenses
@@ -728,18 +728,6 @@ type IWorkspace interface {
 	Files() WorkspaceFiles
 	PrettyPath(string, ...string) string
 	// contains filtered or unexported methods
-}
-```
-
-
-#### type InfoTip
-
-```go
-type InfoTip struct {
-	Value string `json:"value"`
-
-	// If empty, clients default to 'markdown'
-	Language string `json:"language,omitempty"`
 }
 ```
 
@@ -798,7 +786,7 @@ const (
 	IPCID_SRCINTEL_CMPL_ITEMS
 	IPCID_SRCINTEL_CMPL_DETAILS
 	IPCID_SRCINTEL_HIGHLIGHTS
-	IPCID_SRCINTEL_INFOBITS
+	IPCID_SRCINTEL_ANNS
 	IPCID_SRCINTEL_SIGNATURE
 	IPCID_SRCINTEL_REFERENCES
 	IPCID_SRCINTEL_DEFSYM
@@ -1148,6 +1136,18 @@ func (me *SettingsBase) KnownSettings() Settings
 func (*SettingsBase) MenuCategory() string
 ```
 
+#### type SrcAnnotaction
+
+```go
+type SrcAnnotaction struct {
+	Range   SrcRange
+	Title   string
+	Desc    string `json:",omitempty"`
+	CmdName string
+}
+```
+
+
 #### type SrcFormattingClientPrefs
 
 ```go
@@ -1158,14 +1158,14 @@ type SrcFormattingClientPrefs struct {
 ```
 
 
-#### type SrcIntelAnnotaction
+#### type SrcInfoTip
 
 ```go
-type SrcIntelAnnotaction struct {
-	Range   SrcRange
-	Title   string
-	Desc    string `json:",omitempty"`
-	CmdName string
+type SrcInfoTip struct {
+	Value string `json:"value"`
+
+	// If empty, clients default to 'markdown'
+	Language string `json:"language,omitempty"`
 }
 ```
 
@@ -1178,6 +1178,12 @@ type SrcIntelBase struct {
 }
 ```
 
+
+#### func (*SrcIntelBase) Annotactions
+
+```go
+func (*SrcIntelBase) Annotactions(*SrcLens) []*SrcAnnotaction
+```
 
 #### func (*SrcIntelBase) CanIntel
 
@@ -1230,13 +1236,7 @@ func (*SrcIntelBase) Highlights(*SrcLens, string) SrcLocs
 #### func (*SrcIntelBase) Hovers
 
 ```go
-func (*SrcIntelBase) Hovers(*SrcLens) []InfoTip
-```
-
-#### func (*SrcIntelBase) InfoBits
-
-```go
-func (*SrcIntelBase) InfoBits(*SrcLens) []*SrcIntelAnnotaction
+func (*SrcIntelBase) Hovers(*SrcLens) []SrcInfoTip
 ```
 
 #### func (*SrcIntelBase) Init
@@ -1366,8 +1366,8 @@ type SrcIntelSigParam struct {
 
 ```go
 type SrcIntels struct {
-	InfoTips []InfoTip `json:",omitempty"`
-	Refs     SrcLocs   `json:",omitempty"`
+	InfoTips []SrcInfoTip `json:",omitempty"`
+	Refs     SrcLocs      `json:",omitempty"`
 }
 ```
 

@@ -92,7 +92,7 @@ func (*goExtras) runQuery_GoDoc(srcLens *z.SrcLens, arg string, resp *z.IpcRespE
 	resp.Desc = z.Strf("Results of `go doc %s`:", ustr.Join(cmd, " "))
 	resp.Warns = ustr.Filter(ustr.Map(ustr.Split(cmderr, "\n"), ustr.Trim),
 		func(s string) bool { return !ustr.Pref(s, "exit status ") })
-	resp.InfoTips = append(resp.InfoTips, z.InfoTip{Value: ustr.Trim(cmdout)})
+	resp.InfoTips = append(resp.InfoTips, z.SrcInfoTip{Value: ustr.Trim(cmdout)})
 }
 
 func (*goExtras) runQuery_GoRun(srcLens *z.SrcLens, arg string, resp *z.IpcRespExtras) {
@@ -101,7 +101,7 @@ func (*goExtras) runQuery_GoRun(srcLens *z.SrcLens, arg string, resp *z.IpcRespE
 		panic(err)
 	}
 	for _, ln := range ustr.Split(strings.TrimSpace(evaloutandstderr), "\n") {
-		resp.InfoTips = append(resp.InfoTips, z.InfoTip{Value: ln})
+		resp.InfoTips = append(resp.InfoTips, z.SrcInfoTip{Value: ln})
 	}
 	resp.Warns = ustr.Split(otherstdout, "\n")
 }

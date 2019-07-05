@@ -155,27 +155,27 @@ func (me *goSrcIntel) CanIntel(lex *z.SrcIntelLex) bool {
 	return lex == nil || lex.Ident != "" || lex.Other != ""
 }
 
-func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
+func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.SrcInfoTip) {
 	var ggd *udevgo.Gogetdoc
-	var decl *z.InfoTip
+	var decl *z.SrcInfoTip
 	offset := z.Strf("%d", srcLens.ByteOffsetForPos(srcLens.Pos))
 
 	if !tools.gogetdoc.Installed {
-		hovs = append(hovs, z.InfoTip{Value: tools.gogetdoc.NotInstalledMessage()})
+		hovs = append(hovs, z.SrcInfoTip{Value: tools.gogetdoc.NotInstalledMessage()})
 	} else {
 		if ggd = udevgo.Query_Gogetdoc(srcLens.FilePath, srcLens.Txt, offset, false, true); ggd != nil {
 			curpkgdir := filepath.Dir(srcLens.FilePath)
 			ispkglocal := strings.HasPrefix(ggd.Pos, curpkgdir)
 			if ggd.Err != "" {
-				hovs = append(hovs, z.InfoTip{Language: "plaintext", Value: ggd.Err})
+				hovs = append(hovs, z.SrcInfoTip{Language: "plaintext", Value: ggd.Err})
 			}
 			// if ggd.ErrMsgs != "" {
 			// 	// typically uninteresting here, ie. parse errors from transient editing state
-			// 	hovs = append(hovs, z.InfoTip{Language: "plaintext", Value: ggd.ErrMsgs})
+			// 	hovs = append(hovs, z.SrcInfoTip{Language: "plaintext", Value: ggd.ErrMsgs})
 			// }
 			if headline := ggd.ImpN; false && headline != "" && !ispkglocal {
 				headline = udevgo.PkgImpPathsToNamesInLn(headline, curpkgdir)
-				hovs = append(hovs, z.InfoTip{Value: "### " + headline})
+				hovs = append(hovs, z.SrcInfoTip{Value: "### " + headline})
 			}
 			if ggd.Decl = me.goFuncDeclLineBreaks(ggd.Decl, 42); ggd.Decl != "" {
 				if ggd.ImpP != "" {
@@ -185,7 +185,7 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 				if strings.HasPrefix(ggd.Decl, "field ") { // ensure syntax-highlighting:
 					ggd.Decl = z.Strf("//ℤ/ struct field:\n{ %s }\n//ℤ/ field context (tags etc.) not shown", ggd.Decl[6:])
 				}
-				decl = &z.InfoTip{Language: z.Lang.ID, Value: ggd.Decl}
+				decl = &z.SrcInfoTip{Language: z.Lang.ID, Value: ggd.Decl}
 			}
 			if impdoc := ggd.ImpP; ggd.Doc != "" || impdoc != "" {
 				if ispkglocal {
@@ -199,20 +199,20 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.InfoTip) {
 					docuri := "zentient://" + z.Lang.ID + "/godoc/pkg/" + ggd.DocUrl
 					impdoc = z.Strf("[%s](%s)", impdoc, pages.linkifyUri(docuri))
 				}
-				hovs = append(hovs, z.InfoTip{Value: ustr.Combine(impdoc, "\n\n", ggd.Doc)})
+				hovs = append(hovs, z.SrcInfoTip{Value: ustr.Combine(impdoc, "\n\n", ggd.Doc)})
 			}
 		}
 	}
 	if decl == nil && tools.godef.Installed {
 		if defdecl := udevgo.QueryDefDecl_GoDef(srcLens.FilePath, srcLens.Txt, offset); defdecl != "" {
-			decl = &z.InfoTip{Language: z.Lang.ID, Value: me.goFuncDeclLineBreaks(defdecl, 42)}
+			decl = &z.SrcInfoTip{Language: z.Lang.ID, Value: me.goFuncDeclLineBreaks(defdecl, 42)}
 		}
 	}
 	if decl != nil {
 		if strings.Count(decl.Value, "\n") > 3 {
 			hovs = append(hovs, *decl)
 		} else {
-			hovs = append([]z.InfoTip{*decl}, hovs...)
+			hovs = append([]z.SrcInfoTip{*decl}, hovs...)
 		}
 	}
 	return

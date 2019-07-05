@@ -50,7 +50,7 @@ const (
 	IPCID_SRCINTEL_CMPL_ITEMS
 	IPCID_SRCINTEL_CMPL_DETAILS
 	IPCID_SRCINTEL_HIGHLIGHTS
-	IPCID_SRCINTEL_INFOBITS
+	IPCID_SRCINTEL_ANNS
 	IPCID_SRCINTEL_SIGNATURE
 	IPCID_SRCINTEL_REFERENCES
 	IPCID_SRCINTEL_DEFSYM
@@ -167,7 +167,7 @@ type ipcResp struct {
 
 type ipcRespDiag struct {
 	All    diagItemsBy
-	FixUps []*fixUps
+	FixUps []*diagFixUps
 	LangID string
 }
 
@@ -302,8 +302,8 @@ type SrcIntelCompl struct {
 type SrcIntelCompls []*SrcIntelCompl
 
 type SrcIntels struct {
-	InfoTips []InfoTip `json:",omitempty"`
-	Refs     SrcLocs   `json:",omitempty"`
+	InfoTips []SrcInfoTip `json:",omitempty"`
+	Refs     SrcLocs      `json:",omitempty"`
 }
 
 type SrcIntelDoc struct {

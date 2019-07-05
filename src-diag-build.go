@@ -104,9 +104,9 @@ func (me *DiagBase) fixUps(diags DiagItems) {
 		}
 	}
 	if len(fixupsbyfile) > 0 {
-		dr := &ipcRespDiag{LangID: Lang.ID, FixUps: make([]*fixUps, 0, len(fixupsbyfile))}
+		dr := &ipcRespDiag{LangID: Lang.ID, FixUps: make([]*diagFixUps, 0, len(fixupsbyfile))}
 		for filepath, filefixups := range fixupsbyfile {
-			fixups := &fixUps{FilePath: filepath, Desc: map[string][]string{}}
+			fixups := &diagFixUps{FilePath: filepath, Desc: map[string][]string{}}
 			for _, fixup := range filefixups {
 				fixups.Desc[fixup.Name] = append(fixups.Desc[fixup.Name], fixup.Items...)
 				fixups.Edits = append(fixups.Edits, fixup.Edits...)

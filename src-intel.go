@@ -20,8 +20,8 @@ type ISrcIntel interface {
 	DefType(*SrcLens) SrcLocs
 	DefImpl(*SrcLens) SrcLocs
 	Highlights(*SrcLens, string) SrcLocs
-	Hovers(*SrcLens) []InfoTip
-	InfoBits(*SrcLens) []*SrcIntelAnnotaction
+	Hovers(*SrcLens) []SrcInfoTip
+	Annotactions(*SrcLens) []*SrcAnnotaction
 	References(*SrcLens, bool) SrcLocs
 	Signature(*SrcLens) *SrcIntelSigHelp
 	Symbols(*SrcLens, string, bool) SrcLenses
@@ -52,8 +52,8 @@ func (me *SrcIntelBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	switch req.IpcID {
 	case IPCID_SRCINTEL_HOVER:
 		me.onHover(req, resp.withSrcIntel())
-	case IPCID_SRCINTEL_INFOBITS:
-		me.onInfoBits(req, resp.withSrcIntel())
+	case IPCID_SRCINTEL_ANNS:
+		me.onAnnotactions(req, resp.withSrcIntel())
 	case IPCID_SRCINTEL_SYMS_FILE, IPCID_SRCINTEL_SYMS_PROJ:
 		me.onSyms(req, resp.withSrcIntel())
 	case IPCID_SRCINTEL_CMPL_ITEMS:
@@ -109,8 +109,8 @@ func (me *SrcIntelBase) onHighlights(req *ipcReq, resp *ipcResp) {
 	resp.SrcIntel.Refs = me.Impl.Highlights(req.SrcLens, curword)
 }
 
-func (me *SrcIntelBase) onInfoBits(req *ipcReq, resp *ipcResp) {
-	resp.SrcIntel.InfoBits = me.Impl.InfoBits(req.SrcLens)
+func (me *SrcIntelBase) onAnnotactions(req *ipcReq, resp *ipcResp) {
+	resp.SrcIntel.Anns = me.Impl.Annotactions(req.SrcLens)
 }
 
 func (me *SrcIntelBase) onHover(req *ipcReq, resp *ipcResp) {
@@ -119,7 +119,7 @@ func (me *SrcIntelBase) onHover(req *ipcReq, resp *ipcResp) {
 		resp.SrcIntel.InfoTips = me.Impl.Hovers(req.SrcLens)
 	}
 
-	var hov InfoTip
+	var hov SrcInfoTip
 	if lex.Char != "" {
 		hov.Value = Strf("`%s` — byte length %d", lex.Char, len(lex.Char[:len(lex.Char)-1][1:]))
 	} else if lex.Int != "" || lex.Float != "" {
@@ -235,8 +235,8 @@ func (*SrcIntelBase) DefImpl(*SrcLens) SrcLocs                     { return nil 
 func (*SrcIntelBase) DefSym(*SrcLens) SrcLocs                      { return nil }
 func (*SrcIntelBase) DefType(*SrcLens) SrcLocs                     { return nil }
 func (*SrcIntelBase) Highlights(*SrcLens, string) SrcLocs          { return nil }
-func (*SrcIntelBase) Hovers(*SrcLens) []InfoTip                    { return nil }
-func (*SrcIntelBase) InfoBits(*SrcLens) []*SrcIntelAnnotaction     { return nil }
+func (*SrcIntelBase) Hovers(*SrcLens) []SrcInfoTip                 { return nil }
+func (*SrcIntelBase) Annotactions(*SrcLens) []*SrcAnnotaction      { return nil }
 func (*SrcIntelBase) References(*SrcLens, bool) SrcLocs            { return nil }
 func (*SrcIntelBase) Signature(*SrcLens) *SrcIntelSigHelp          { return nil }
 func (*SrcIntelBase) Symbols(*SrcLens, string, bool) SrcLenses     { return nil }
