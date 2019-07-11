@@ -57,7 +57,7 @@ func (*atmoDiag) KnownLinters() z.Tools { return nil }
 
 func (me *atmoDiag) PrepIssueJobs(workspaceFiles z.WorkspaceFiles, writtenFilePaths []string) z.DiagBuildJobs {
 	var job z.DiagJobBuild
-	job.AffectedFilePaths = Ctx.Kits.All.SrcFilePaths()
+	Ctx.Locked(func() { job.AffectedFilePaths = Ctx.Kits.All.SrcFilePaths() })
 	return z.DiagBuildJobs{&job}
 }
 

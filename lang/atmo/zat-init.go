@@ -29,8 +29,10 @@ func OnPostInit() {
 }
 
 func onNewBackgroundMessages() {
-	msgs := Ctx.BackgroundMessages(true)
-	for i := range msgs {
-		println(msgs[i].Time.Format("15:04:05") + "\t" + ustr.Join(msgs[i].Lines, "\n\t"))
-	}
+	Ctx.Locked(func() {
+		msgs := Ctx.BackgroundMessages(true)
+		for i := range msgs {
+			println(msgs[i].Time.Format("15:04:05") + "\t" + ustr.Join(msgs[i].Lines, "\n\t"))
+		}
+	})
 }

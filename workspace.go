@@ -255,7 +255,8 @@ func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 		dirs, files := me.dirs, me.files
 		haslivefiles := Lang.Live && len(upd.LiveFiles) > 0
 		freshfiles, hasfreshfiles, hasdiedfiles, dirschanged, needsfreshautolints := me.analyzeChanges(files, upd)
-		if needsfreshautolints = needsfreshautolints || haslivefiles; needsfreshautolints || hasfreshfiles || hasdiedfiles || dirschanged {
+		needsfreshautolints = needsfreshautolints || haslivefiles
+		if needsfreshautolints || hasfreshfiles || hasdiedfiles || dirschanged || me.OnBeforeChanges != nil || me.OnAfterChanges != nil {
 			me.Lock()
 			defer me.Unlock()
 		}

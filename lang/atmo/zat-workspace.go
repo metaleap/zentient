@@ -24,47 +24,50 @@ type atmoWorkspace struct {
 }
 
 func (*atmoWorkspace) onBeforeChanges(workspaceChanges *z.WorkspaceChanges, freshFiles []string, willAutoLint bool) {
-	var kitimppaths []string
-	gatherkits2refresh := func(ffps ...string) (lastkit *atmosess.Kit) {
-		for _, ffp := range ffps {
-			if filepath.Ext(ffp) == atmo.SrcFileExt {
-				dirpath := filepath.Dir(ffp)
-				if lastkit = Ctx.KitByDirPath(dirpath, true); lastkit != nil && !ustr.In(lastkit.ImpPath, kitimppaths...) {
-					kitimppaths = append(kitimppaths, lastkit.ImpPath)
+	Ctx.Locked(func() {
+		var kitimppaths []string
+		gatherkits2refresh := func(ffps ...string) (lastkit *atmosess.Kit) {
+			for _, ffp := range ffps {
+				if filepath.Ext(ffp) == atmo.SrcFileExt {
+					dirpath := filepath.Dir(ffp)
+					if lastkit = Ctx.KitByDirPath(dirpath, true); lastkit != nil && !ustr.In(lastkit.ImpPath, kitimppaths...) {
+						kitimppaths = append(kitimppaths, lastkit.ImpPath)
+					}
 				}
 			}
+			return
 		}
-		return
-	}
-	gatherkits2refresh(freshFiles...)
-	gatherkits2refresh(workspaceChanges.WrittenFiles...)
-	gatherkits2refresh(workspaceChanges.OpenedFiles...)
+		gatherkits2refresh(freshFiles...)
+		gatherkits2refresh(workspaceChanges.WrittenFiles...)
+		gatherkits2refresh(workspaceChanges.OpenedFiles...)
 
-	var livesrcfiles []*atmolang.AstFile
-	if liveMode {
-		updatesrcfile := func(srcfilepath string, srctxt []byte) {
-			if kit := gatherkits2refresh(srcfilepath); kit != nil {
-				srcfile := kit.SrcFiles.ByFilePath(srcfilepath)
-				if srcfile == nil {
-					Ctx.KitEnsureLoaded(kit)
-					srcfile = kit.SrcFiles.ByFilePath(srcfilepath)
-				}
-				if srcfile != nil {
-					srcfile.Options.TmpAltSrc = srctxt
-					livesrcfiles = append(livesrcfiles, srcfile)
+		var livesrcfiles []*atmolang.AstFile
+		if liveMode {
+			updatesrcfile := func(srcfilepath string, srctxt []byte) {
+				if kit := gatherkits2refresh(srcfilepath); kit != nil {
+					srcfile := kit.SrcFiles.ByFilePath(srcfilepath)
+					if srcfile == nil {
+						Ctx.KitEnsureLoaded(kit)
+						srcfile = kit.SrcFiles.ByFilePath(srcfilepath)
+					}
+					if srcfile != nil {
+						srcfile.Options.TmpAltSrc = srctxt
+						livesrcfiles = append(livesrcfiles, srcfile)
+					}
 				}
 			}
+			for _, srcfilepath := range workspaceChanges.WrittenFiles {
+				updatesrcfile(srcfilepath, nil)
+			}
+			for srcfilepath, srctxt := range workspaceChanges.LiveFiles {
+				updatesrcfile(srcfilepath, []byte(srctxt))
+			}
 		}
-		for _, srcfilepath := range workspaceChanges.WrittenFiles {
-			updatesrcfile(srcfilepath, nil)
-		}
-		for srcfilepath, srctxt := range workspaceChanges.LiveFiles {
-			updatesrcfile(srcfilepath, []byte(srctxt))
-		}
-	}
-	Ctx.CatchUpOnFileMods(livesrcfiles...)
-	Ctx.KitsEnsureLoaded(false, kitimppaths...)
+		Ctx.CatchUpOnFileMods(livesrcfiles...)
+		Ctx.KitsEnsureLoaded(false, kitimppaths...)
+	})
 }
+
 func (*atmoWorkspace) onAfterChanges(workspaceChanges *z.WorkspaceChanges) {
 }
 
