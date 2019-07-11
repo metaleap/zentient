@@ -1,31 +1,11 @@
 package z
 
-// TO MOT EDIT: code generated with `zentient-codegen` using `github.com/metaleap/go-gent`
+// DON'T EDIT: code gen'd with `zentient-codegen` using `github.com/metaleap/go-gent`
 
 import (
 	pkg__github_com_go_leap_str "github.com/go-leap/str"
 	pkg__strconv "strconv"
 )
-
-// String implements the Go standard library's `fmt.Stringer` interface.
-func (me CaddyStatus) String() (r string) {
-	switch me {
-	case CADDY_PENDING:
-		r = "CADDY_PENDING"
-	case CADDY_ERROR:
-		r = "CADDY_ERROR"
-	case CADDY_BUSY:
-		r = "CADDY_BUSY"
-	case CADDY_GOOD:
-		r = "CADDY_GOOD"
-	default:
-		goto formatNum
-	}
-	return
-formatNum:
-	r = pkg__strconv.FormatUint((uint64)(me), 10)
-	return
-}
 
 // Valid returns whether the value of this `IpcIDs` is between `IPCID_MENUS_MAIN` (inclusive) and `IPCID_EXTRAS_QUERY_RUN` (inclusive).
 func (me IpcIDs) Valid() (r bool) {
@@ -291,6 +271,26 @@ formatNum:
 	return
 }
 
+// String implements the Go standard library's `fmt.Stringer` interface.
+func (me CaddyStatus) String() (r string) {
+	switch me {
+	case CADDY_PENDING:
+		r = "CADDY_PENDING"
+	case CADDY_ERROR:
+		r = "CADDY_ERROR"
+	case CADDY_BUSY:
+		r = "CADDY_BUSY"
+	case CADDY_GOOD:
+		r = "CADDY_GOOD"
+	default:
+		goto formatNum
+	}
+	return
+formatNum:
+	r = pkg__strconv.FormatUint((uint64)(me), 10)
+	return
+}
+
 // MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
 func (me *fooResp) MarshalJSON() (r []byte, err error) { return }
 
@@ -304,7 +304,7 @@ func (me *fooResp) StructFieldsTraverse(on func(name string, ptr interface{}, is
 	on("ErrMsg", &me.ErrMsg, true, false)
 	on("SrcIntel", &me.SrcIntel, true, false)
 	on("SrcDiags", &me.SrcDiags, true, false)
-	on("ipcReq", &me.IpcReq, false, true)
+	on("IpcReq", &me.IpcReq, true, true)
 	on("SrcMods", &me.SrcMods, true, false)
 	on("muhPrivate", &me.muhPrivate, false, false)
 	on("SrcActions", &me.SrcActions, true, false)
@@ -333,7 +333,7 @@ func (me *fooResp) StructFieldsGet(name string, v interface{}) (r interface{}, o
 	case "SrcDiags":
 		r = me.SrcDiags
 		ok = true
-	case "ipcReq":
+	case "IpcReq":
 		r = me.IpcReq
 		ok = true
 	case "SrcMods":
@@ -406,7 +406,7 @@ func (me *fooResp) StructFieldsSet(name string, v interface{}) (okName bool, okT
 			okType = true
 			me.SrcDiags = t
 		}
-	case "ipcReq":
+	case "IpcReq":
 		okName = true
 		t, ok := v.(*IpcReq)
 		if ok {
