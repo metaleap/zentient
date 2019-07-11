@@ -20,7 +20,7 @@ type menuItemIpcArgPrompt struct {
 type mainMenu struct {
 }
 
-func (me *mainMenu) dispatch(req *ipcReq, resp *ipcResp) bool {
+func (me *mainMenu) dispatch(req *IpcReq, resp *IpcResp) bool {
 	switch req.IpcID {
 	case IPCID_MENUS_MAIN:
 		me.onMainMenu(req, resp)
@@ -30,7 +30,7 @@ func (me *mainMenu) dispatch(req *ipcReq, resp *ipcResp) bool {
 	return true
 }
 
-func (*mainMenu) onMainMenu(req *ipcReq, resp *ipcResp) {
+func (*mainMenu) onMainMenu(req *IpcReq, resp *IpcResp) {
 	var cats []string
 	catfilter, _ := req.IpcArgs.(string)
 	m := Menu{Desc: "Categories:  ", TopLevel: true}
@@ -48,7 +48,7 @@ func (*mainMenu) onMainMenu(req *ipcReq, resp *ipcResp) {
 		}
 	}
 	m.Desc += ustr.Join(cats, "  ·  ")
-	resp.Menu = &ipcRespMenu{SubMenu: &m}
+	resp.Menu = &MenuResponse{SubMenu: &m}
 }
 
 func (*mainMenu) Init() {

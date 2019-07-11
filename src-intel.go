@@ -48,7 +48,7 @@ type SrcIntelBase struct {
 func (*SrcIntelBase) Init() {
 }
 
-func (me *SrcIntelBase) dispatch(req *ipcReq, resp *ipcResp) bool {
+func (me *SrcIntelBase) dispatch(req *IpcReq, resp *IpcResp) bool {
 	switch req.IpcID {
 	case IPCID_SRCINTEL_HOVER:
 		me.onHover(req, resp.withSrcIntel())
@@ -78,7 +78,7 @@ func (me *SrcIntelBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	return true
 }
 
-func (me *SrcIntelBase) onCmplItems(req *ipcReq, resp *ipcResp) {
+func (me *SrcIntelBase) onCmplItems(req *IpcReq, resp *IpcResp) {
 	if lex := me.posLex(req.SrcLens); me.Impl.CanIntel(lex) {
 		resp.SrcIntel.Cmpl = me.Impl.ComplItems(req.SrcLens)
 		if me.Impl.ComplItemsShouldSort(req.SrcLens) {
@@ -93,27 +93,27 @@ func (me *SrcIntelBase) onCmplItems(req *ipcReq, resp *ipcResp) {
 	}
 }
 
-func (me *SrcIntelBase) onCmplDetails(req *ipcReq, resp *ipcResp) {
+func (me *SrcIntelBase) onCmplDetails(req *IpcReq, resp *IpcResp) {
 	itemtext, _ := req.IpcArgs.(string)
 	if cmpl := me.Impl.ComplDetails(req.SrcLens, itemtext); cmpl != nil {
 		resp.SrcIntel.Cmpl = SrcIntelCompls{cmpl}
 	}
 }
 
-func (*SrcIntelBase) onDefinition(req *ipcReq, resp *ipcResp, def func(*SrcLens) SrcLocs) {
+func (*SrcIntelBase) onDefinition(req *IpcReq, resp *IpcResp, def func(*SrcLens) SrcLocs) {
 	resp.SrcIntel.Refs = def(req.SrcLens)
 }
 
-func (me *SrcIntelBase) onHighlights(req *ipcReq, resp *ipcResp) {
+func (me *SrcIntelBase) onHighlights(req *IpcReq, resp *IpcResp) {
 	curword, _ := req.IpcArgs.(string)
 	resp.SrcIntel.Refs = me.Impl.Highlights(req.SrcLens, curword)
 }
 
-func (me *SrcIntelBase) onAnnotactions(req *ipcReq, resp *ipcResp) {
+func (me *SrcIntelBase) onAnnotactions(req *IpcReq, resp *IpcResp) {
 	resp.SrcIntel.Anns = me.Impl.Annotactions(req.SrcLens)
 }
 
-func (me *SrcIntelBase) onHover(req *ipcReq, resp *ipcResp) {
+func (me *SrcIntelBase) onHover(req *IpcReq, resp *IpcResp) {
 	lex := me.posLex(req.SrcLens)
 	if me.Impl.CanIntel(lex) {
 		resp.SrcIntel.InfoTips = me.Impl.Hovers(req.SrcLens)
@@ -158,7 +158,7 @@ func (me *SrcIntelBase) onHover(req *ipcReq, resp *ipcResp) {
 	}
 }
 
-func (me *SrcIntelBase) onReferences(req *ipcReq, resp *ipcResp) {
+func (me *SrcIntelBase) onReferences(req *IpcReq, resp *IpcResp) {
 	includeDeclaration := false
 	if ctx, _ := req.IpcArgs.(map[string]interface{}); ctx != nil {
 		if incldecl, ok := ctx["includeDeclaration"]; ok {
@@ -168,7 +168,7 @@ func (me *SrcIntelBase) onReferences(req *ipcReq, resp *ipcResp) {
 	resp.SrcIntel.Refs = me.Impl.References(req.SrcLens, includeDeclaration)
 }
 
-func (me *SrcIntelBase) onSignature(req *ipcReq, resp *ipcResp) {
+func (me *SrcIntelBase) onSignature(req *IpcReq, resp *IpcResp) {
 	if resp.SrcIntel.Sig = me.Impl.Signature(req.SrcLens); resp.SrcIntel.Sig != nil {
 		for i := range resp.SrcIntel.Sig.Signatures { // vsc can't handle `null` for `parameters` but can handle `[]`
 			if resp.SrcIntel.Sig.Signatures[i].Documentation.IsTrusted = true; resp.SrcIntel.Sig.Signatures[i].Parameters == nil {
@@ -178,7 +178,7 @@ func (me *SrcIntelBase) onSignature(req *ipcReq, resp *ipcResp) {
 	}
 }
 
-func (me *SrcIntelBase) onSyms(req *ipcReq, resp *ipcResp) {
+func (me *SrcIntelBase) onSyms(req *IpcReq, resp *IpcResp) {
 	var query string
 	if req.IpcID == IPCID_SRCINTEL_SYMS_PROJ {
 		query, _ = req.IpcArgs.(string)

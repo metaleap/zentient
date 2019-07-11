@@ -142,7 +142,7 @@ const (
 	CADDY_GOOD
 )
 
-type ipcReq struct {
+type IpcReq struct {
 	ReqID   int64       `json:"ri"`
 	IpcID   IpcIDs      `json:"ii"`
 	IpcArgs interface{} `json:"ia"`
@@ -151,27 +151,27 @@ type ipcReq struct {
 	SrcLens *SrcLens          `json:"srcLens"`
 }
 
-type ipcResp struct {
-	IpcID       IpcIDs           `json:"ii,omitempty"`
-	ReqID       int64            `json:"ri,omitempty"`
-	ErrMsg      string           `json:"err,omitempty"`
-	SrcIntel    *ipcRespSrcIntel `json:"sI,omitempty"`
-	SrcDiags    *ipcRespDiag     `json:"srcDiags,omitempty"`
-	SrcMods     SrcLenses        `json:"srcMods,omitempty"`
-	SrcActions  []EditorAction   `json:"srcActions,omitempty"`
-	Extras      *IpcRespExtras   `json:"extras,omitempty"`
-	Menu        *ipcRespMenu     `json:"menu,omitempty"`
-	CaddyUpdate *Caddy           `json:"caddy,omitempty"`
-	Val         interface{}      `json:"val,omitempty"`
+type IpcResp struct {
+	IpcID       IpcIDs         `json:"ii,omitempty"`
+	ReqID       int64          `json:"ri,omitempty"`
+	ErrMsg      string         `json:"err,omitempty"`
+	SrcIntel    *SrcIntel      `json:"sI,omitempty"`
+	SrcDiags    *Diags         `json:"srcDiags,omitempty"`
+	SrcMods     SrcLenses      `json:"srcMods,omitempty"`
+	SrcActions  []EditorAction `json:"srcActions,omitempty"`
+	Extras      *Extras        `json:"extras,omitempty"`
+	Menu        *MenuResponse  `json:"menu,omitempty"`
+	CaddyUpdate *Caddy         `json:"caddy,omitempty"`
+	Val         interface{}    `json:"val,omitempty"`
 }
 
-type ipcRespDiag struct {
-	All    diagItemsBy
-	FixUps []*diagFixUps
+type Diags struct {
+	All    DiagItemsBy
+	FixUps []*DiagFixUps
 	LangID string
 }
 
-type IpcRespExtras struct {
+type Extras struct {
 	SrcIntels
 	Items []*ExtrasItem
 	Warns []string `json:",omitempty"`
@@ -179,7 +179,7 @@ type IpcRespExtras struct {
 	Url   string   `json:",omitempty"`
 }
 
-type ipcRespMenu struct {
+type MenuResponse struct {
 	SubMenu       *Menu   `json:",omitempty"`
 	WebsiteURL    string  `json:",omitempty"`
 	NoteInfo      string  `json:",omitempty"`
@@ -188,7 +188,7 @@ type ipcRespMenu struct {
 	Refs          SrcLocs `json:",omitempty"`
 }
 
-type ipcRespSrcIntel struct {
+type SrcIntel struct {
 	SrcIntels
 	Sig  *SrcIntelSigHelp  `json:",omitempty"`
 	Cmpl SrcIntelCompls    `json:",omitempty"`
@@ -215,11 +215,11 @@ type Caddy struct {
 	OnReady func() `json:"-"`
 }
 
-type diagFixUps struct {
+type DiagFixUps struct {
 	FilePath string
 	Desc     map[string][]string
 	Edits    SrcModEdits
-	Dropped  []srcModEdit
+	Dropped  []SrcModEdit
 }
 
 type DiagItem struct {
@@ -235,7 +235,7 @@ type DiagItem struct {
 
 type DiagItems []*DiagItem
 
-type diagItemsBy map[string]DiagItems
+type DiagItemsBy map[string]DiagItems
 
 type EditorAction struct {
 	Title     string        `json:"title"`
@@ -295,7 +295,7 @@ type SrcIntelCompl struct {
 	SortText      string       `json:"sortText,omitempty"`
 	// FilterText    string       `json:"filterText,omitempty"`
 	// InsertText    string       `json:"insertText,omitempty"`
-	// CommitChars   []string     `json:"commitCharacters,omitempty"` // basically in all languages always operator/separator/punctuation (that is, "non-identifier") chars --- no need to send them for each item, for each language --- the client-side will do it
+	// CommitChars   []string     `json:"commitCharacters,omitempty"` // basically in all languages always operator/separator/punctuation (that is, "non-identifier") chars -- no need to send them for each item, for each language -- the client-side will do it
 	SortPrio int `json:"-"`
 }
 
@@ -346,12 +346,12 @@ type SrcLoc struct {
 
 type SrcLocs []*SrcLoc
 
-type srcModEdit struct {
+type SrcModEdit struct {
 	At  *SrcRange
 	Val string // if not empty: inserts if At is pos, replaces if At is range. if empty: deletes if At is range, errors if At is pos.
 }
 
-type SrcModEdits []srcModEdit
+type SrcModEdits []SrcModEdit
 
 // All public fields are 1-based (so 0 means 'missing') and rune-not-byte-based
 type SrcPos struct {

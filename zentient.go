@@ -16,7 +16,7 @@ import (
 var (
 	Strf = fmt.Sprintf
 	Lang struct {
-		Enabled   bool
+		InitErr   error
 		ID        string
 		Title     string
 		Live      bool
@@ -55,6 +55,10 @@ var (
 	}
 )
 
+func init() {
+	Prog.Name = os.Args[0]
+}
+
 func BadMsg(what string, which string) string {
 	return Strf("%s: invalid %s %s '%s'", Prog.Name, Lang.Title, what, which)
 }
@@ -87,10 +91,9 @@ func SendNotificationMessageToClient(level DiagSeverity, message string) (err er
 	} else if level == DIAG_SEV_WARN {
 		ipcid = IPCID_NOTIFY_WARN
 	}
-	err = send(&ipcResp{IpcID: ipcid, Val: message})
+	err = send(&IpcResp{IpcID: ipcid, Val: message})
 	return
 }
-
 func ToolsMsgGone(missingToolName string) string {
 	return "Not installed: " + missingToolName
 }
@@ -104,7 +107,6 @@ func ToolGonePanic(missingToolName string) {
 }
 
 func Init() (err error) {
-	Prog.Name = os.Args[0]
 	Prog.Dir.Config = filepath.Join(usys.UserDataDirPath(false), Prog.Name)
 	Prog.Dir.Cache = filepath.Join(usys.UserDataDirPath(true), Prog.Name)
 	if err = ufs.EnsureDir(Prog.Dir.Config); err != nil {
@@ -144,18 +146,12 @@ func Init() (err error) {
 	return
 }
 
-func InitAndServe(onPreInit func() error, onPostInit func()) (err error) {
-	if err = onPreInit(); err == nil {
-		if err = Init(); err == nil {
+func InitAndServe(onPreInit func() error, onPostInit func()) {
+	if Lang.InitErr = onPreInit(); Lang.InitErr == nil {
+		if Lang.InitErr = Init(); Lang.InitErr == nil {
 			onPostInit()
-			err = Serve()
 		}
 	}
+	Serve()
 	return
-}
-
-func InitAndServeOrPanic(onPreInit func() error, onPostInit func()) {
-	if err := InitAndServe(onPreInit, onPostInit); err != nil {
-		panic(err)
-	}
 }

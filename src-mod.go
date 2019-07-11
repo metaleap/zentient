@@ -16,7 +16,7 @@ type ISrcMod interface {
 	RunFormatter(*Tool, string, *SrcFormattingClientPrefs, string, string) (string, string)
 }
 
-func (me *SrcModEdits) dropConflictingEdits() (droppedOffenders []srcModEdit) {
+func (me *SrcModEdits) dropConflictingEdits() (droppedOffenders []SrcModEdit) {
 	all := *me
 	for i := 0; i < len(all); i++ {
 		for disedit, j := all[i], i+1; j < len(all); j++ {
@@ -46,7 +46,7 @@ func (*SrcModEdits) lensForNewEdit(srcFilePath string) *SrcLens {
 func (me *SrcModEdits) AddDeleteLine(srcFilePath string, lineAt *SrcPos) {
 	lens := me.lensForNewEdit(srcFilePath)
 	lens.Pos = lineAt
-	edit := srcModEdit{At: &SrcRange{}}
+	edit := SrcModEdit{At: &SrcRange{}}
 	bo := lens.ByteOffsetForPos(lens.Pos)
 	bo = strings.LastIndex(lens.Txt[:bo], "\n") + 1
 	edit.At.Start.Off = lens.Rune1OffsetForByte0Offset(bo)
@@ -57,7 +57,7 @@ func (me *SrcModEdits) AddDeleteLine(srcFilePath string, lineAt *SrcPos) {
 
 func (me *SrcModEdits) AddInsert(srcFilePath string, atPos func(*SrcLens, *SrcPos) string) {
 	lens := me.lensForNewEdit(srcFilePath)
-	edit := srcModEdit{At: &SrcRange{}}
+	edit := SrcModEdit{At: &SrcRange{}}
 	if ins := atPos(lens, &edit.At.Start); ins != "" {
 		edit.Val = ins
 		*me = append(*me, edit)
@@ -155,7 +155,7 @@ func (*SrcModBase) isFormatterCustom() bool {
 	return Prog.Cfg.FormatterProg != "" && Prog.Cfg.FormatterProg != Prog.Cfg.FormatterName
 }
 
-func (me *SrcModBase) dispatch(req *ipcReq, resp *ipcResp) bool {
+func (me *SrcModBase) dispatch(req *IpcReq, resp *IpcResp) bool {
 	switch req.IpcID {
 	case IPCID_SRCMOD_FMT_SETDEFMENU:
 		me.onSetDefMenu(req, resp)
@@ -173,11 +173,11 @@ func (me *SrcModBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	return true
 }
 
-func (me *SrcModBase) onActions(req *ipcReq, resp *ipcResp) {
+func (me *SrcModBase) onActions(req *IpcReq, resp *IpcResp) {
 	resp.SrcActions = me.Impl.CodeActions(req.SrcLens)
 }
 
-func (me *SrcModBase) onRename(req *ipcReq, resp *ipcResp) {
+func (me *SrcModBase) onRename(req *IpcReq, resp *IpcResp) {
 	newname, _ := req.IpcArgs.(string)
 	if newname == "" {
 		resp.ErrMsg = "Rename: missing new-name"
@@ -186,7 +186,7 @@ func (me *SrcModBase) onRename(req *ipcReq, resp *ipcResp) {
 	}
 }
 
-func (me *SrcModBase) onRunFormatter(req *ipcReq, resp *ipcResp) {
+func (me *SrcModBase) onRunFormatter(req *IpcReq, resp *IpcResp) {
 	optraw, _ := req.IpcArgs.(map[string]interface{})
 	var prefs *SrcFormattingClientPrefs
 	if optraw != nil {
@@ -201,7 +201,7 @@ func (me *SrcModBase) onRunFormatter(req *ipcReq, resp *ipcResp) {
 			}
 		}
 	} else {
-		resp.Menu = &ipcRespMenu{}
+		resp.Menu = &MenuResponse{}
 	}
 
 	formatter := me.Impl.KnownFormatters().byName(Prog.Cfg.FormatterName)
@@ -249,7 +249,7 @@ func (me *SrcModBase) onRunFormatter(req *ipcReq, resp *ipcResp) {
 	}
 }
 
-func (me *SrcModBase) onSetDefMenu(req *ipcReq, resp *ipcResp) {
+func (me *SrcModBase) onSetDefMenu(req *IpcReq, resp *IpcResp) {
 	m := Menu{Desc: "First pick a known formatter, then optionally specify a custom tool name:"}
 	for _, kf := range me.Impl.KnownFormatters() {
 		var cmd = MenuItem{Title: kf.Name, IpcID: IPCID_SRCMOD_FMT_SETDEFPICK}
@@ -269,10 +269,10 @@ func (me *SrcModBase) onSetDefMenu(req *ipcReq, resp *ipcResp) {
 		cmd.Hint += "· " + kf.Website
 		m.Items = append(m.Items, &cmd)
 	}
-	resp.Menu = &ipcRespMenu{SubMenu: &m}
+	resp.Menu = &MenuResponse{SubMenu: &m}
 }
 
-func (me *SrcModBase) onSetDefPick(req *ipcReq, resp *ipcResp) {
+func (me *SrcModBase) onSetDefPick(req *IpcReq, resp *IpcResp) {
 	m := req.IpcArgs.(map[string]interface{})
 	Prog.Cfg.FormatterName = m["fn"].(string)
 	if Prog.Cfg.FormatterProg = m["fp"].(string); Prog.Cfg.FormatterProg == Prog.Cfg.FormatterName {
@@ -281,7 +281,7 @@ func (me *SrcModBase) onSetDefPick(req *ipcReq, resp *ipcResp) {
 	if err := Prog.Cfg.Save(); err != nil {
 		resp.ErrMsg = err.Error()
 	} else {
-		resp.Menu = &ipcRespMenu{}
+		resp.Menu = &MenuResponse{}
 		resp.Menu.NoteInfo = Strf("Default %s formatter changed to '%s'", Lang.Title, Prog.Cfg.FormatterName)
 		if me.isFormatterCustom() {
 			resp.Menu.NoteInfo += Strf("-compatible equivalent '%s'", Prog.Cfg.FormatterProg)

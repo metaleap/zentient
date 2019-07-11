@@ -57,7 +57,7 @@ func (me *PkgIntelBase) ObjSnapPrefix() string {
 	return Lang.ID + ".pkgIntel."
 }
 
-func (me *PkgIntelBase) dispatch(req *ipcReq, resp *ipcResp) bool {
+func (me *PkgIntelBase) dispatch(req *IpcReq, resp *IpcResp) bool {
 	switch req.IpcID {
 	case IPCID_MENUS_PKGS:
 		filterid, _ := req.IpcArgs.(string)
@@ -66,7 +66,7 @@ func (me *PkgIntelBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 		if filterid != "" {
 			filters = ListFilters{filter: true}
 		}
-		resp.Menu = &ipcRespMenu{
+		resp.Menu = &MenuResponse{
 			SubMenu: me.Impl.listItemsSubMenu(filter.Title, filter.Desc, filters),
 		}
 	default:

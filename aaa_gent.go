@@ -304,7 +304,7 @@ func (me *fooResp) StructFieldsTraverse(on func(name string, ptr interface{}, is
 	on("ErrMsg", &me.ErrMsg, true, false)
 	on("SrcIntel", &me.SrcIntel, true, false)
 	on("SrcDiags", &me.SrcDiags, true, false)
-	on("ipcReq", &me.ipcReq, false, true)
+	on("ipcReq", &me.IpcReq, false, true)
 	on("SrcMods", &me.SrcMods, true, false)
 	on("muhPrivate", &me.muhPrivate, false, false)
 	on("SrcActions", &me.SrcActions, true, false)
@@ -334,7 +334,7 @@ func (me *fooResp) StructFieldsGet(name string, v interface{}) (r interface{}, o
 		r = me.SrcDiags
 		ok = true
 	case "ipcReq":
-		r = me.ipcReq
+		r = me.IpcReq
 		ok = true
 	case "SrcMods":
 		r = me.SrcMods
@@ -394,24 +394,24 @@ func (me *fooResp) StructFieldsSet(name string, v interface{}) (okName bool, okT
 		}
 	case "SrcIntel":
 		okName = true
-		t, ok := v.(*ipcRespSrcIntel)
+		t, ok := v.(*SrcIntel)
 		if ok {
 			okType = true
 			me.SrcIntel = t
 		}
 	case "SrcDiags":
 		okName = true
-		t, ok := v.(*ipcRespDiag)
+		t, ok := v.(*Diags)
 		if ok {
 			okType = true
 			me.SrcDiags = t
 		}
 	case "ipcReq":
 		okName = true
-		t, ok := v.(*ipcReq)
+		t, ok := v.(*IpcReq)
 		if ok {
 			okType = true
-			me.ipcReq = t
+			me.IpcReq = t
 		}
 	case "SrcMods":
 		okName = true
@@ -436,7 +436,7 @@ func (me *fooResp) StructFieldsSet(name string, v interface{}) (okName bool, okT
 		}
 	case "Extras":
 		okName = true
-		t, ok := v.(*IpcRespExtras)
+		t, ok := v.(*Extras)
 		if ok {
 			okType = true
 			me.Extras = t
@@ -457,7 +457,7 @@ func (me *fooResp) StructFieldsSet(name string, v interface{}) (okName bool, okT
 		}
 	case "Menu":
 		okName = true
-		t, ok := v.(*ipcRespMenu)
+		t, ok := v.(*MenuResponse)
 		if ok {
 			okType = true
 			me.Menu = t

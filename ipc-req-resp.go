@@ -7,7 +7,7 @@ import (
 )
 
 type iDispatcher interface {
-	dispatch(*ipcReq, *ipcResp) bool
+	dispatch(*IpcReq, *IpcResp) bool
 	Init()
 }
 
@@ -16,13 +16,13 @@ type IObjSnap interface {
 	ObjSnap(string) interface{}
 }
 
-func ipcDecodeReqAndRespond(jsonreq string) *ipcResp {
-	var req ipcReq
-	var resp ipcResp
+func ipcDecodeReqAndRespond(jsonreq string) *IpcResp {
+	var req IpcReq
+	var resp IpcResp
 	if err := json.NewDecoder(strings.NewReader(jsonreq)).Decode(&req); err != nil {
 		resp.ErrMsg = err.Error()
-	} else if !Lang.Enabled {
-		resp.ErrMsg = Strf("%s does not appear to be installed on this machine. Install it or disable `"+Prog.Name+"` in your editor config to avoid repeats of this message.", Lang.Title)
+	} else if Lang.InitErr != nil {
+		resp.ErrMsg = Strf("%s does not appear to be installed correctly on this machine. (Re-)Install it or disable `"+Prog.Name+"` in your editor config to avoid repeats of this message. Init-time error message was:\n\n%s", Lang.Title, Lang.InitErr)
 	} else if Prog.Cfg.err != nil {
 		resp.ErrMsg = Strf("Your %s is currently broken: either fix it or delete it, then reload Zentient.", Prog.Cfg.filePath)
 	} else if req.IpcID == IPCID_OBJ_SNAPSHOT {
@@ -46,14 +46,14 @@ func ipcDecodeReqAndRespond(jsonreq string) *ipcResp {
 	return &resp
 }
 
-func (me *ipcResp) postProcess() {
+func (me *IpcResp) postProcess() {
 	if me.Menu != nil && me.Menu.SubMenu != nil && me.Menu.SubMenu.Items == nil {
-		// handles better on the client-side (and UX-wise) --- instead of a "silent nothing", show an empty menu ("nothing to choose from")
+		// handles better on the client-side (and UX-wise) -- instead of a "silent nothing", show an empty menu ("nothing to choose from")
 		me.Menu.SubMenu.Items = MenuItems{}
 	}
 }
 
-func (me *ipcResp) onResponseReady() {
+func (me *IpcResp) onResponseReady() {
 	if except := recover(); except != nil {
 		debug.PrintStack()
 		me.ErrMsg = Strf("%v", except)
@@ -61,11 +61,11 @@ func (me *ipcResp) onResponseReady() {
 	if me.ErrMsg != "" {
 		me.ErrMsg = Strf("[%s] %s", Prog.Name, strings.TrimPrefix(me.ErrMsg, Prog.Name+": "))
 		//	zero out almost-everything for a leaner response. req-ID is only added in afterwards anyways
-		*me = ipcResp{ErrMsg: me.ErrMsg}
+		*me = IpcResp{ErrMsg: me.ErrMsg}
 	}
 }
 
-func (me *ipcResp) to(req *ipcReq) {
+func (me *IpcResp) to(req *IpcReq) {
 	defer me.onResponseReady()
 	for _, disp := range Prog.dispatchers {
 		if disp.dispatch(req, me) {
@@ -80,19 +80,17 @@ func (me *ipcResp) to(req *ipcReq) {
 	}
 }
 
-func (me *ipcResp) withExtras() *ipcResp {
-	me.Extras = &IpcRespExtras{}
+func (me *IpcResp) withExtras() *IpcResp {
+	me.Extras = &Extras{}
 	return me
 }
-
-func (me *ipcResp) withMenu() *ipcRespMenu {
-	me.Menu = &ipcRespMenu{}
+func (me *IpcResp) withMenu() *MenuResponse {
+	me.Menu = &MenuResponse{}
 	return me.Menu
 }
-
-func (me *ipcResp) withSrcIntel() *ipcResp {
+func (me *IpcResp) withSrcIntel() *IpcResp {
 	if me.SrcIntel == nil {
-		me.SrcIntel = &ipcRespSrcIntel{}
+		me.SrcIntel = &SrcIntel{}
 	}
 	return me
 }

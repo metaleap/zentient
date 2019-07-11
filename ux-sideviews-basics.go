@@ -41,7 +41,7 @@ func (me *sideViews) Init() {
 	me.treeDataProviders = []iTreeDataProvider{&me.treeDataProviderPkgDeps}
 }
 
-func (me *sideViews) dispatch(req *ipcReq, resp *ipcResp) bool {
+func (me *sideViews) dispatch(req *IpcReq, resp *IpcResp) bool {
 	if reqtreeitem, reqchildren := req.IpcID == IPCID_TREEVIEW_GETITEM, req.IpcID == IPCID_TREEVIEW_CHILDREN; reqtreeitem || reqchildren {
 		var dataprovider iTreeDataProvider
 		ipcargs := req.IpcArgs.([]interface{})
@@ -76,9 +76,9 @@ func (me *sideViews) dispatch(req *ipcReq, resp *ipcResp) bool {
 
 func (me *sideViews) sendOnChanged(treeViewId string, item sideViewTreeItem) {
 	if treeViewId != "" {
-		_ = send(&ipcResp{IpcID: IPCID_TREEVIEW_CHANGED, Val: []string{treeViewId, item.String()}})
+		_ = send(&IpcResp{IpcID: IPCID_TREEVIEW_CHANGED, Val: []string{treeViewId, item.String()}})
 	} else {
-		_ = send(&ipcResp{IpcID: IPCID_TREEVIEW_CHANGED, Val: []string{me.treeDataProviderPkgDeps.treeViewId, item.String()}})
+		_ = send(&IpcResp{IpcID: IPCID_TREEVIEW_CHANGED, Val: []string{me.treeDataProviderPkgDeps.treeViewId, item.String()}})
 	}
 }
 

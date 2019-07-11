@@ -8,10 +8,9 @@ import (
 )
 
 func OnPreInit() (err error) {
-	if !udevhs.HasHsDevEnv() {
+	if z.Lang.ID, z.Lang.Title = "haskell", "Haskell"; !udevhs.HasHsDevEnv() {
 		err = errors.New("Haskell `stack` does not appear to be installed.")
 	} else {
-		z.Lang.Enabled, z.Lang.ID, z.Lang.Title = true, "haskell", "Haskell"
 		tools.onPreInit()
 		diag.onPreInit()
 		srcMod.onPreInit()

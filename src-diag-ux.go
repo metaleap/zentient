@@ -106,7 +106,7 @@ func (me *DiagBase) menuItemsUpdateHint(diags Tools, item *MenuItem) {
 	}
 }
 
-func (me *DiagBase) dispatch(req *ipcReq, resp *ipcResp) bool {
+func (me *DiagBase) dispatch(req *IpcReq, resp *IpcResp) bool {
 	switch req.IpcID {
 	case IPCID_SRCDIAG_LIST:
 		me.onListAll(resp)
@@ -132,7 +132,7 @@ func (me *DiagBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	return true
 }
 
-func (me *DiagBase) onPeekHidden(approxNum int, resp *ipcRespMenu) {
+func (me *DiagBase) onPeekHidden(approxNum int, resp *MenuResponse) {
 	workspacefiles := Lang.Workspace.Files()
 	resp.Refs = make(SrcLocs, 0, approxNum)
 	for _, f := range workspacefiles {
@@ -156,9 +156,9 @@ func (me *DiagBase) onForgetAll() {
 
 var onRunManuallyInfoNoteAlreadyShownOnceInThisSession, onRunManuallyAlreadyCurrentlyRunning = false, false
 
-func (me *DiagBase) onRunManually(filePaths []string, resp *ipcResp) {
+func (me *DiagBase) onRunManually(filePaths []string, resp *IpcResp) {
 	if onRunManuallyAlreadyCurrentlyRunning {
-		resp.Menu = &ipcRespMenu{NoteWarn: "Declined: previous batch of lintish jobs still running, please wait until those have finished."}
+		resp.Menu = &MenuResponse{NoteWarn: "Declined: previous batch of lintish jobs still running, please wait until those have finished."}
 	} else {
 		workspacefiles := Lang.Workspace.Files()
 		if filePaths == nil {
@@ -167,17 +167,17 @@ func (me *DiagBase) onRunManually(filePaths []string, resp *ipcResp) {
 			filePaths = workspacefiles.filePathsKnown()
 		}
 		if workspacefiles.haveAnyDiags(true, false) {
-			resp.Menu = &ipcRespMenu{NoteWarn: "Any lintish findings will not display as long as the currently shown build problems remain unresolved in the workspace."}
+			resp.Menu = &MenuResponse{NoteWarn: "Any lintish findings will not display as long as the currently shown build problems remain unresolved in the workspace."}
 		} else if !onRunManuallyInfoNoteAlreadyShownOnceInThisSession {
 			onRunManuallyInfoNoteAlreadyShownOnceInThisSession = true
-			resp.Menu = &ipcRespMenu{NoteInfo: Strf("All lintish findings (if any) will show up shortly and remain visible until invalidated.")}
+			resp.Menu = &MenuResponse{NoteInfo: Strf("All lintish findings (if any) will show up shortly and remain visible until invalidated.")}
 		}
 		go me.Impl.UpdateLintDiagsIfAndAsNeeded(workspacefiles, false, filePaths...)
 	}
 }
 
-func (me *DiagBase) onListAll(resp *ipcResp) {
-	resp.Menu = &ipcRespMenu{SubMenu: &Menu{Desc: me.cmdListDiags.Desc}}
+func (me *DiagBase) onListAll(resp *IpcResp) {
+	resp.Menu = &MenuResponse{SubMenu: &Menu{Desc: me.cmdListDiags.Desc}}
 	knowndiagsauto, knowndiagsmanual := me.knownLinters(true), me.knownLinters(false)
 	itemdesc := "WILL run automatically on file open/save. ➜ Pick to turn me off."
 	for _, knowndiags := range []Tools{knowndiagsauto, knowndiagsmanual} {
@@ -211,7 +211,7 @@ func (me *DiagBase) onListAll(resp *ipcResp) {
 	}
 }
 
-func (me *DiagBase) onToggleAll(enableAll bool, resp *ipcResp) {
+func (me *DiagBase) onToggleAll(enableAll bool, resp *IpcResp) {
 	me.cmdRunDiagsOnCurFile.Hint, me.cmdListDiags.Hint = "", ""
 	if Prog.Cfg.AutoDiags = nil; enableAll {
 		for _, diagtool := range me.Impl.KnownLinters() {
@@ -225,20 +225,20 @@ func (me *DiagBase) onToggleAll(enableAll bool, resp *ipcResp) {
 	if enableAll {
 		s = "all"
 	}
-	resp.Menu = &ipcRespMenu{NoteInfo: Strf("From now on, %s known-and-installed %s lintish tools will run automatically on file open/save.", s, Lang.Title)}
+	resp.Menu = &MenuResponse{NoteInfo: Strf("From now on, %s known-and-installed %s lintish tools will run automatically on file open/save.", s, Lang.Title)}
 	go me.onToggled()
 }
 
-func (me *DiagBase) onToggle(toolName string, resp *ipcResp) {
+func (me *DiagBase) onToggle(toolName string, resp *IpcResp) {
 	me.cmdRunDiagsOnCurFile.Hint, me.cmdListDiags.Hint = "", ""
 	if diagtool := me.Impl.KnownLinters().byName(toolName); diagtool == nil {
 		resp.ErrMsg = BadMsg(Lang.Title+" lintish tool name", toolName)
 	} else if err := diagtool.toggleInAutoDiags(); err != nil {
 		resp.ErrMsg = err.Error()
 	} else if diagtool.isInAutoDiags() {
-		resp.Menu = &ipcRespMenu{NoteInfo: Strf("The %s lintish tool `%s` will run automatically on file open/save.", Lang.Title, toolName)}
+		resp.Menu = &MenuResponse{NoteInfo: Strf("The %s lintish tool `%s` will run automatically on file open/save.", Lang.Title, toolName)}
 	} else {
-		resp.Menu = &ipcRespMenu{NoteInfo: Strf("The %s lintish tool `%s` won't run automatically on file open/save.", Lang.Title, toolName)}
+		resp.Menu = &MenuResponse{NoteInfo: Strf("The %s lintish tool `%s` won't run automatically on file open/save.", Lang.Title, toolName)}
 	}
 	go me.onToggled()
 }
@@ -255,7 +255,7 @@ func (me *DiagBase) onToggled() {
 }
 
 func (me *DiagBase) send(workspaceFiles WorkspaceFiles, onlyBuildDiags bool) {
-	resp := &ipcRespDiag{LangID: Lang.ID, All: make(diagItemsBy, len(workspaceFiles))}
+	resp := &Diags{LangID: Lang.ID, All: make(DiagItemsBy, len(workspaceFiles))}
 	onlyBuildDiags = onlyBuildDiags || workspaceFiles.haveAnyDiags(true, false)
 	for _, f := range workspaceFiles {
 		fdiagitems := f.Diags.Lint.Items
@@ -264,5 +264,5 @@ func (me *DiagBase) send(workspaceFiles WorkspaceFiles, onlyBuildDiags bool) {
 		}
 		resp.All[f.Path] = fdiagitems
 	}
-	send(&ipcResp{IpcID: IPCID_SRCDIAG_PUB, SrcDiags: resp})
+	send(&IpcResp{IpcID: IPCID_SRCDIAG_PUB, SrcDiags: resp})
 }

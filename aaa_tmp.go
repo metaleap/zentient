@@ -8,21 +8,21 @@ import (
 )
 
 type fooResp struct {
-	IpcID    IpcIDs           `json:"ii,omitempty"`
-	ReqID    int64            `json:"ri,omitempty"`
-	ErrMsg   string           `json:"err,omitempty"`
-	SrcIntel *ipcRespSrcIntel `json:"sI,omitempty"`
-	SrcDiags *ipcRespDiag     `json:"srcDiags,omitempty"`
-	*ipcReq
+	IpcID    IpcIDs    `json:"ii,omitempty"`
+	ReqID    int64     `json:"ri,omitempty"`
+	ErrMsg   string    `json:"err,omitempty"`
+	SrcIntel *SrcIntel `json:"sI,omitempty"`
+	SrcDiags *Diags    `json:"srcDiags,omitempty"`
+	*IpcReq
 	SrcMods    SrcLenses `json:"srcMods,omitempty"`
 	muhPrivate int
 	SrcActions []EditorAction `json:"srcActions,omitempty"`
-	Extras     *IpcRespExtras `json:"extras,omitempty"`
+	Extras     *Extras        `json:"extras,omitempty"`
 	*SrcLens
 	ustr.Pats
-	Menu        *ipcRespMenu `json:"menu,omitempty"`
-	CaddyUpdate *Caddy       `json:"caddy,omitempty"`
-	Val         interface{}  `json:"val,omitempty"`
+	Menu        *MenuResponse `json:"menu,omitempty"`
+	CaddyUpdate *Caddy        `json:"caddy,omitempty"`
+	Val         interface{}   `json:"val,omitempty"`
 }
 
 // func (me *fooResp) tmp() {

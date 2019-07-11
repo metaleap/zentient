@@ -5,8 +5,8 @@ type IExtras interface {
 
 	ListIntelExtras() []*ExtrasItem
 	ListQueryExtras() []*ExtrasItem
-	RunIntelExtra(*SrcLens, string, string, *IpcRespExtras)
-	RunQueryExtra(*SrcLens, string, string, *IpcRespExtras)
+	RunIntelExtra(*SrcLens, string, string, *Extras)
+	RunQueryExtra(*SrcLens, string, string, *Extras)
 }
 
 type ExtrasBase struct {
@@ -16,7 +16,7 @@ type ExtrasBase struct {
 func (*ExtrasBase) Init() {
 }
 
-func (me *ExtrasBase) dispatch(req *ipcReq, resp *ipcResp) bool {
+func (me *ExtrasBase) dispatch(req *IpcReq, resp *IpcResp) bool {
 	switch req.IpcID {
 	case IPCID_EXTRAS_INTEL_LIST:
 		me.onList(req, resp.withExtras(), false)
@@ -33,7 +33,7 @@ func (me *ExtrasBase) dispatch(req *ipcReq, resp *ipcResp) bool {
 	return true
 }
 
-func (me *ExtrasBase) onList(req *ipcReq, resp *ipcResp, isQuery bool) {
+func (me *ExtrasBase) onList(req *IpcReq, resp *IpcResp, isQuery bool) {
 	list := me.Impl.ListIntelExtras
 	if isQuery {
 		list = me.Impl.ListQueryExtras
@@ -53,7 +53,7 @@ func (me *ExtrasBase) onList(req *ipcReq, resp *ipcResp, isQuery bool) {
 	}
 }
 
-func (me *ExtrasBase) onRun(req *ipcReq, resp *ipcResp, isQuery bool) {
+func (me *ExtrasBase) onRun(req *IpcReq, resp *IpcResp, isQuery bool) {
 	ipcargs := req.IpcArgs.([]interface{})
 	id, _ := ipcargs[0].(string)
 	arg, _ := ipcargs[1].(string)

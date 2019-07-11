@@ -204,7 +204,7 @@ func (me *SettingsBase) Init() {
 	}
 }
 
-func (me *SettingsBase) dispatch(req *ipcReq, resp *ipcResp) bool {
+func (me *SettingsBase) dispatch(req *IpcReq, resp *IpcResp) bool {
 	switch req.IpcID {
 	case IPCID_CFG_LIST:
 		me.onListAll(resp.withMenu())
@@ -230,7 +230,7 @@ func (me *SettingsBase) KnownSettings() Settings {
 	return Settings{cfgLintStickiness}
 }
 
-func (me *SettingsBase) onSet(cfgId string, cfgVal string, menu *ipcRespMenu) {
+func (me *SettingsBase) onSet(cfgId string, cfgVal string, menu *MenuResponse) {
 	info, setting := "changed", me.Impl.KnownSettings().byId(cfgId)
 	if setting == nil {
 		BadPanic("setting ID", cfgId)
@@ -273,7 +273,7 @@ func (me *SettingsBase) onSet(cfgId string, cfgVal string, menu *ipcRespMenu) {
 	}
 }
 
-func (me *SettingsBase) onListAll(menu *ipcRespMenu) {
+func (me *SettingsBase) onListAll(menu *MenuResponse) {
 	menu.SubMenu = &Menu{Desc: Strf("%s — %s:", me.MenuCategory(), me.cmdListAll.Title)}
 	for _, ks := range me.Impl.KnownSettings() {
 		svdef, svcur := "(empty)", "(default)"

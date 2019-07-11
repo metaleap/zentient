@@ -17,7 +17,7 @@ type PagesBase struct {
 
 func (*PagesBase) Init() {}
 
-func (me *PagesBase) dispatch(req *ipcReq, resp *ipcResp) bool {
+func (me *PagesBase) dispatch(req *IpcReq, resp *IpcResp) bool {
 	switch req.IpcID {
 	case IPCID_PAGE_HTML:
 		resp.IpcID = req.IpcID

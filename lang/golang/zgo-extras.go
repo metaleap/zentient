@@ -28,7 +28,7 @@ func (*goExtras) ListQueryExtras() (all []*z.ExtrasItem) {
 	return
 }
 
-func (me *goExtras) RunIntelExtra(srcLens *z.SrcLens, id string, arg string, resp *z.IpcRespExtras) {
+func (me *goExtras) RunIntelExtra(srcLens *z.SrcLens, id string, arg string, resp *z.Extras) {
 	if strings.HasPrefix(id, "guru.") {
 		me.runIntel_Guru(id[5:], srcLens, strings.TrimSpace(arg), resp)
 	} else {
@@ -36,8 +36,8 @@ func (me *goExtras) RunIntelExtra(srcLens *z.SrcLens, id string, arg string, res
 	}
 }
 
-func (me *goExtras) RunQueryExtra(srcLens *z.SrcLens, id string, arg string, resp *z.IpcRespExtras) {
-	var runner func(srcLens *z.SrcLens, arg string, resp *z.IpcRespExtras)
+func (me *goExtras) RunQueryExtra(srcLens *z.SrcLens, id string, arg string, resp *z.Extras) {
+	var runner func(srcLens *z.SrcLens, arg string, resp *z.Extras)
 	switch id {
 	case xQuerierGoRun.ID:
 		runner = me.runQuery_GoRun

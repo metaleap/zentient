@@ -102,7 +102,7 @@ func (me *DiagBase) updateLintDiags(workspaceFiles WorkspaceFiles, diagTools Too
 			go me.runLintJob(job, workspaceFiles)
 			descs[i] = job.Tool.Name + " ➜ " + job.String()
 		}
-		send(&ipcResp{IpcID: IPCID_SRCDIAG_STARTED, Val: descs})
+		send(&IpcResp{IpcID: IPCID_SRCDIAG_STARTED, Val: descs})
 		for diagitem := range await {
 			if diagitem != nil {
 				diagitems = append(diagitems, diagitem)
@@ -113,7 +113,7 @@ func (me *DiagBase) updateLintDiags(workspaceFiles WorkspaceFiles, diagTools Too
 		for i, job := range jobs {
 			descs[i] += Strf(" \n\t\t%s", job.timeTaken)
 		}
-		go send(&ipcResp{IpcID: IPCID_SRCDIAG_FINISHED, Val: descs})
+		go send(&IpcResp{IpcID: IPCID_SRCDIAG_FINISHED, Val: descs})
 		if nonautos {
 			onRunManuallyAlreadyCurrentlyRunning = false
 		}

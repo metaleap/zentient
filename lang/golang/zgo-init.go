@@ -8,10 +8,9 @@ import (
 )
 
 func OnPreInit() (err error) {
-	if !udevgo.HasGoDevEnv() {
+	if z.Lang.ID, z.Lang.Title = "go", "Go"; !udevgo.HasGoDevEnv() {
 		err = errors.New("Go does not appear to be installed.")
 	} else {
-		z.Lang.ID, z.Lang.Title, z.Lang.Enabled = "go", "Go", true
 		settings.onPreInit()
 		workspace.onPreInit()
 		tools.onPreInit()

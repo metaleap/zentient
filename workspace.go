@@ -215,7 +215,7 @@ func (me *WorkspaceBase) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&obj)
 }
 
-func (me *WorkspaceBase) dispatch(req *ipcReq, resp *ipcResp) bool {
+func (me *WorkspaceBase) dispatch(req *IpcReq, resp *IpcResp) bool {
 	switch req.IpcID {
 	case IPCID_PROJ_CHANGED:
 		me.onChanges(req.ProjUpd)
@@ -329,7 +329,7 @@ func (*WorkspaceBase) ObjSnapPrefix() string { return Lang.ID + ".proj." }
 
 func (me *WorkspaceBase) pollFileEventsForever() {
 	interval := 321 * time.Millisecond
-	msgraw, _ := json.Marshal(&ipcResp{IpcID: IPCID_PROJ_POLLEVTS})
+	msgraw, _ := json.Marshal(&IpcResp{IpcID: IPCID_PROJ_POLLEVTS})
 	msgraw = append(msgraw, '\n')
 	for {
 		if time.Sleep(interval); !me.pollingPaused {

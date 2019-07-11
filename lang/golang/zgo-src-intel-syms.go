@@ -83,7 +83,7 @@ func (me *goSrcIntel) DefType(srcLens *z.SrcLens) (defs z.SrcLocs) {
 			}
 		}
 		if refloc == nil && gd.Value != nil && len(gd.Value.Type) > 0 {
-			// some hackery to adequately service 98+% of cases --- otherwise, no-go-to-type-def-for-you, not the end of the world
+			// some hackery to adequately service 98+% of cases -- otherwise, no-go-to-type-def-for-you, not the end of the world
 			for {
 				if strings.HasPrefix(gd.Value.Type, "[]") {
 					gd.Value.Type = gd.Value.Type[2:]
@@ -315,7 +315,7 @@ func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (al
 					}
 					if curFileOnly && srcref.Ref == sL.FilePath && strings.HasPrefix(pm.Type, "struct{") && srcref.Pos1Ln > 0 && srcref.Pos1Ln <= len(srclns) {
 						if srcln := srclns[srcref.Pos1Ln-1]; !strings.Contains(srcln, methodtype+") "+methodname+"(") {
-							// guru reports an embedded struct's methods redundantly for each embedder, all pointing to the embeddee's original loc. we skip these --- at least in "file symbols" mode
+							// guru reports an embedded struct's methods redundantly for each embedder, all pointing to the embeddee's original loc. we skip these -- at least in "file symbols" mode
 							continue
 						}
 					}

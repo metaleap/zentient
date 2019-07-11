@@ -13,7 +13,7 @@ func (me *Caddy) onInit() {
 }
 
 func (me *Caddy) OnStatusChanged() {
-	go send(&ipcResp{CaddyUpdate: me})
+	go send(&IpcResp{CaddyUpdate: me})
 }
 
 func (me *Caddy) IsPendingOrBusy() bool {

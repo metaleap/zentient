@@ -102,11 +102,11 @@ func (me *goPkgIntel) onSrcLens(lf *z.ListFilter, srcLens *z.SrcLens) {
 				lf.Pred = func(p z.IListItem) bool {
 					return ustr.In(p.(*udevgo.Pkg).ImportPath, curpkg.Deps...)
 				}
-			} else if isimpd { // d meaning 'direct' (vs. 'indirect') --- not 'dependant' (vs 'importer')
+			} else if isimpd { // d meaning 'direct' (vs. 'indirect') -- not 'dependant' (vs 'importer')
 				lf.Pred = func(p z.IListItem) bool {
 					return ustr.In(p.(*udevgo.Pkg).ImportPath, curpkg.Importers()...)
 				}
-			} else if isimpi { // i meaning 'indirect' (vs. 'direct') --- not 'importer' (vs 'dependant')
+			} else if isimpi { // i meaning 'indirect' (vs. 'direct') -- not 'importer' (vs 'dependant')
 				lf.Pred = func(p z.IListItem) bool {
 					return ustr.In(p.(*udevgo.Pkg).ImportPath, curpkg.Dependants()...)
 				}

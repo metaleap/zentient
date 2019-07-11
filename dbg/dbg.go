@@ -74,7 +74,7 @@ func (me *Dbg) Start(stdout io.Writer, stdin io.Reader, stderr io.Writer) (err e
 
 func (me *Dbg) Wait() (err error) {
 	if me.cmd != nil && me.cmd.Process != nil {
-		_, err = me.cmd.Process.Wait() // cmd.Wait() hung forever in this specific scenario --- impairing 'restart' functionality
+		_, err = me.cmd.Process.Wait() // cmd.Wait() hung forever in this specific scenario -- impairing 'restart' functionality
 		me.cmd = nil
 	}
 	return

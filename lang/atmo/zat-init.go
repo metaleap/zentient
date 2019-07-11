@@ -11,10 +11,11 @@ const liveMode = true
 var Ctx *atmosess.Ctx
 
 func OnPreInit() (err error) {
+	z.Lang.ID, z.Lang.Title = "atmo", "atmo"
 	var ctx atmosess.Ctx
 	if err = ctx.Init(false, ""); err == nil {
-		Ctx, z.Lang.Enabled, z.Lang.ID, z.Lang.Title, z.Lang.Live =
-			&ctx, true, "atmo", "atmo", liveMode
+		Ctx, z.Lang.Live =
+			&ctx, liveMode
 		workspace.onPreInit()
 		Ctx.On.SomeKitsRefreshed = diag.updateFromErrs
 		Ctx.On.NewBackgroundMessages = onNewBackgroundMessages

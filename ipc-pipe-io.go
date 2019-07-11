@@ -11,7 +11,7 @@ func canSend() bool {
 	return Prog.pipeIO.stdoutEncoder != nil && Prog.pipeIO.stdoutWriter != nil
 }
 
-func send(resp *ipcResp) (err error) {
+func send(resp *IpcResp) (err error) {
 	Prog.pipeIO.mutex.Lock()
 	defer Prog.pipeIO.mutex.Unlock()
 
@@ -52,7 +52,7 @@ func Serve() (err error) {
 
 	// announce each caddy's existence
 	for _, c := range Lang.Caddies {
-		send(&ipcResp{CaddyUpdate: c})
+		send(&IpcResp{CaddyUpdate: c})
 	}
 	// only now are the caddies notified that their status changes may now be broadcast
 	for _, c := range Lang.Caddies {
@@ -65,7 +65,7 @@ func Serve() (err error) {
 	// - edit: dropped for now /* was: "allows json-decoding in separate go-routine" */
 	// - bad lines are simply reported to client without having a single 'global' decoder in confused/error state / without needing to exit
 	for Prog.pipeIO.stdinReadLn.Scan() {
-		/*go*/ serveIncomingReq(Prog.pipeIO.stdinReadLn.Text())
+		go serveIncomingReq(Prog.pipeIO.stdinReadLn.Text())
 	}
 	err = Prog.pipeIO.stdinReadLn.Err()
 	return
@@ -76,7 +76,7 @@ func serveIncomingReq(jsonreq string) {
 	resp := ipcDecodeReqAndRespond(jsonreq)
 
 	// err only covers: either resp couldn't be json-encoded, or stdout write/flush problem:
-	// both would indicate bigger problems --- still recover()ed in Serve(), but program-ending.
+	// both would indicate bigger problems -- still recover()ed in Serve(), but program-ending.
 	// any other kind of error, above ipcDecodeReqAndRespond call will record into resp.ErrMsg to report it back to the client and the program stays running
 	if err := send(resp); err != nil {
 		panic(err)

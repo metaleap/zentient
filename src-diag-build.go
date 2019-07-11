@@ -104,23 +104,22 @@ func (me *DiagBase) fixUps(diags DiagItems) {
 		}
 	}
 	if len(fixupsbyfile) > 0 {
-		dr := &ipcRespDiag{LangID: Lang.ID, FixUps: make([]*diagFixUps, 0, len(fixupsbyfile))}
+		dr := &Diags{LangID: Lang.ID, FixUps: make([]*DiagFixUps, 0, len(fixupsbyfile))}
 		for filepath, filefixups := range fixupsbyfile {
-			fixups := &diagFixUps{FilePath: filepath, Desc: map[string][]string{}}
+			fixups := &DiagFixUps{FilePath: filepath, Desc: map[string][]string{}}
 			for _, fixup := range filefixups {
 				fixups.Desc[fixup.Name] = append(fixups.Desc[fixup.Name], fixup.Items...)
 				fixups.Edits = append(fixups.Edits, fixup.Edits...)
 			}
 			if fixups.Dropped = fixups.Edits.dropConflictingEdits(); fixups.Dropped == nil { // be nice to the client-side here..
-				fixups.Dropped = []srcModEdit{}
+				fixups.Dropped = []SrcModEdit{}
 			}
 			sort.Sort(fixups.Edits)
 			dr.FixUps = append(dr.FixUps, fixups)
 		}
-		send(&ipcResp{IpcID: IPCID_SRCDIAG_PUB, SrcDiags: dr})
+		send(&IpcResp{IpcID: IPCID_SRCDIAG_PUB, SrcDiags: dr})
 	}
 }
-
 func (me *DiagBase) UpdateIssueDiagsAsNeeded(workspaceFiles WorkspaceFiles, writtenFiles []string) {
 	if jobs := me.Impl.PrepIssueJobs(workspaceFiles, writtenFiles).withoutDuplicates(); len(jobs) > 0 {
 		sort.Sort(jobs)

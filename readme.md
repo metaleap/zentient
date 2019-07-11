@@ -9,7 +9,7 @@
 var (
 	Strf = fmt.Sprintf
 	Lang struct {
-		Enabled   bool
+		InitErr   error
 		ID        string
 		Title     string
 		Live      bool
@@ -69,13 +69,7 @@ func Init() (err error)
 #### func  InitAndServe
 
 ```go
-func InitAndServe(onPreInit func() error, onPostInit func()) (err error)
-```
-
-#### func  InitAndServeOrPanic
-
-```go
-func InitAndServeOrPanic(onPreInit func() error, onPostInit func())
+func InitAndServe(onPreInit func() error, onPostInit func())
 ```
 
 #### func  PrettifyPathsIn
@@ -352,6 +346,18 @@ func (me DiagBuildJobs) Less(i int, j int) bool
 func (me DiagBuildJobs) Swap(i int, j int)
 ```
 
+#### type DiagFixUps
+
+```go
+type DiagFixUps struct {
+	FilePath string
+	Desc     map[string][]string
+	Edits    SrcModEdits
+	Dropped  []SrcModEdit
+}
+```
+
+
 #### type DiagItem
 
 ```go
@@ -372,6 +378,13 @@ type DiagItem struct {
 
 ```go
 type DiagItems []*DiagItem
+```
+
+
+#### type DiagItemsBy
+
+```go
+type DiagItemsBy map[string]DiagItems
 ```
 
 
@@ -454,6 +467,17 @@ func (me DiagSeverity) String() (r string)
 ```
 String implements the Go standard library's `fmt.Stringer` interface.
 
+#### type Diags
+
+```go
+type Diags struct {
+	All    DiagItemsBy
+	FixUps []*DiagFixUps
+	LangID string
+}
+```
+
+
 #### type EditorAction
 
 ```go
@@ -462,6 +486,19 @@ type EditorAction struct {
 	Cmd       string        `json:"command"`
 	Hint      string        `json:"tooltip,omitempty"`
 	Arguments []interface{} `json:"arguments,omitempty"`
+}
+```
+
+
+#### type Extras
+
+```go
+type Extras struct {
+	SrcIntels
+	Items []*ExtrasItem
+	Warns []string `json:",omitempty"`
+	Desc  string   `json:",omitempty"`
+	Url   string   `json:",omitempty"`
 }
 ```
 
@@ -563,8 +600,8 @@ type IDiagLint interface {
 type IExtras interface {
 	ListIntelExtras() []*ExtrasItem
 	ListQueryExtras() []*ExtrasItem
-	RunIntelExtra(*SrcLens, string, string, *IpcRespExtras)
-	RunQueryExtra(*SrcLens, string, string, *IpcRespExtras)
+	RunIntelExtra(*SrcLens, string, string, *Extras)
+	RunQueryExtra(*SrcLens, string, string, *Extras)
 	// contains filtered or unexported methods
 }
 ```
@@ -815,15 +852,35 @@ func (me IpcIDs) Valid() (r bool)
 Valid returns whether the value of this `IpcIDs` is between `IPCID_MENUS_MAIN`
 (inclusive) and `IPCID_EXTRAS_QUERY_RUN` (inclusive).
 
-#### type IpcRespExtras
+#### type IpcReq
 
 ```go
-type IpcRespExtras struct {
-	SrcIntels
-	Items []*ExtrasItem
-	Warns []string `json:",omitempty"`
-	Desc  string   `json:",omitempty"`
-	Url   string   `json:",omitempty"`
+type IpcReq struct {
+	ReqID   int64       `json:"ri"`
+	IpcID   IpcIDs      `json:"ii"`
+	IpcArgs interface{} `json:"ia"`
+
+	ProjUpd *WorkspaceChanges `json:"projUpd"`
+	SrcLens *SrcLens          `json:"srcLens"`
+}
+```
+
+
+#### type IpcResp
+
+```go
+type IpcResp struct {
+	IpcID       IpcIDs         `json:"ii,omitempty"`
+	ReqID       int64          `json:"ri,omitempty"`
+	ErrMsg      string         `json:"err,omitempty"`
+	SrcIntel    *SrcIntel      `json:"sI,omitempty"`
+	SrcDiags    *Diags         `json:"srcDiags,omitempty"`
+	SrcMods     SrcLenses      `json:"srcMods,omitempty"`
+	SrcActions  []EditorAction `json:"srcActions,omitempty"`
+	Extras      *Extras        `json:"extras,omitempty"`
+	Menu        *MenuResponse  `json:"menu,omitempty"`
+	CaddyUpdate *Caddy         `json:"caddy,omitempty"`
+	Val         interface{}    `json:"val,omitempty"`
 }
 ```
 
@@ -946,6 +1003,20 @@ type MenuItem struct {
 
 ```go
 type MenuItems []*MenuItem
+```
+
+
+#### type MenuResponse
+
+```go
+type MenuResponse struct {
+	SubMenu       *Menu   `json:",omitempty"`
+	WebsiteURL    string  `json:",omitempty"`
+	NoteInfo      string  `json:",omitempty"`
+	NoteWarn      string  `json:",omitempty"`
+	UxActionLabel string  `json:",omitempty"`
+	Refs          SrcLocs `json:",omitempty"`
+}
 ```
 
 
@@ -1170,6 +1241,19 @@ type SrcInfoTip struct {
 ```
 
 
+#### type SrcIntel
+
+```go
+type SrcIntel struct {
+	SrcIntels
+	Sig  *SrcIntelSigHelp  `json:",omitempty"`
+	Cmpl SrcIntelCompls    `json:",omitempty"`
+	Syms SrcLenses         `json:",omitempty"`
+	Anns []*SrcAnnotaction `json:",omitempty"`
+}
+```
+
+
 #### type SrcIntelBase
 
 ```go
@@ -1274,7 +1358,7 @@ type SrcIntelCompl struct {
 	SortText      string       `json:"sortText,omitempty"`
 	// FilterText    string       `json:"filterText,omitempty"`
 	// InsertText    string       `json:"insertText,omitempty"`
-	// CommitChars   []string     `json:"commitCharacters,omitempty"` // basically in all languages always operator/separator/punctuation (that is, "non-identifier") chars --- no need to send them for each item, for each language --- the client-side will do it
+	// CommitChars   []string     `json:"commitCharacters,omitempty"` // basically in all languages always operator/separator/punctuation (that is, "non-identifier") chars -- no need to send them for each item, for each language -- the client-side will do it
 	SortPrio int `json:"-"`
 }
 ```
@@ -1527,10 +1611,20 @@ func (*SrcModBase) RunFormatter(*Tool, string, *SrcFormattingClientPrefs, string
 func (*SrcModBase) RunRenamer(srcLens *SrcLens, newName string) (all SrcLenses)
 ```
 
+#### type SrcModEdit
+
+```go
+type SrcModEdit struct {
+	At  *SrcRange
+	Val string // if not empty: inserts if At is pos, replaces if At is range. if empty: deletes if At is range, errors if At is pos.
+}
+```
+
+
 #### type SrcModEdits
 
 ```go
-type SrcModEdits []srcModEdit
+type SrcModEdits []SrcModEdit
 ```
 
 

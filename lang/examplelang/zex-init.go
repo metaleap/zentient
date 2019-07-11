@@ -5,8 +5,8 @@ import (
 )
 
 func OnPreInit() error {
-	z.Lang.ID, z.Lang.Title, z.Lang.Enabled =
-		"examplelang", "ExampleLang", false // need true when your code has verified that your lang is installed on the user's machine, else also return an err:
+	z.Lang.ID, z.Lang.Title =
+		"examplelang", "ExampleLang" // need true when your code has verified that your lang is installed on the user's machine, else also return an err:
 	return nil
 }
 
