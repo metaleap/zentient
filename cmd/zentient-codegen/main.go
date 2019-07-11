@@ -11,7 +11,7 @@ import (
 func main() {
 	udevgogen.Self.Name = "me"
 	pkgs := gent.MustLoadPkgs(map[string]string{
-		"github.com/metaleap/zentient": "°_gent.go",
+		"github.com/metaleap/zentient": "°gent.go",
 	})
 
 	gents := gent.Gents{
