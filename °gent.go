@@ -3,6 +3,7 @@ package z
 // DON'T EDIT: code gen'd with `zentient-codegen` using `github.com/metaleap/go-gent`
 
 import (
+	pkg__encoding_json "encoding/json"
 	pkg__github_com_go_leap_str "github.com/go-leap/str"
 	pkg__strconv "strconv"
 )
@@ -291,13 +292,7 @@ formatNum:
 	return
 }
 
-// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me *fooResp) preview_MarshalJSON() (r []byte, err error) { return }
-
-// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *fooResp) preview_UnmarshalJSON(v []byte) (err error) { return }
-
-// StructFieldsTraverse calls `on` 15x: once for each field in this `fooResp` with its name, its pointer, `true` if name (or embed name) begins in upper-case (else `false`), and `true` if field is an embed (else `false`).
+// StructFieldsTraverse calls `on` 18x: once for each field in this `fooResp` with its name, its pointer, `true` if name (or embed name) begins in upper-case (else `false`), and `true` if field is an embed (else `false`).
 func (me *fooResp) StructFieldsTraverse(on func(name string, ptr interface{}, isNameUpperCase bool, isEmbed bool)) {
 	on("IpcID", &me.IpcID, true, false)
 	on("ReqID", &me.ReqID, true, false)
@@ -310,8 +305,11 @@ func (me *fooResp) StructFieldsTraverse(on func(name string, ptr interface{}, is
 	on("SrcActions", &me.SrcActions, true, false)
 	on("Extras", &me.Extras, true, false)
 	on("SrcLens", &me.SrcLens, true, true)
+	on("Fn", &me.Fn, true, false)
+	on("Ch", &me.Ch, true, false)
 	on("Pats", &me.Pats, true, true)
 	on("Menu", &me.Menu, true, false)
+	on("Nope", &me.Nope, true, false)
 	on("CaddyUpdate", &me.CaddyUpdate, true, false)
 	on("Val", &me.Val, true, false)
 }
@@ -351,11 +349,20 @@ func (me *fooResp) StructFieldsGet(name string, v interface{}) (r interface{}, o
 	case "SrcLens":
 		r = me.SrcLens
 		ok = true
+	case "Fn":
+		r = me.Fn
+		ok = true
+	case "Ch":
+		r = me.Ch
+		ok = true
 	case "Pats":
 		r = me.Pats
 		ok = true
 	case "Menu":
 		r = me.Menu
+		ok = true
+	case "Nope":
+		r = me.Nope
 		ok = true
 	case "CaddyUpdate":
 		r = me.CaddyUpdate
@@ -448,6 +455,20 @@ func (me *fooResp) StructFieldsSet(name string, v interface{}) (okName bool, okT
 			okType = true
 			me.SrcLens = t
 		}
+	case "Fn":
+		okName = true
+		t, ok := v.(func())
+		if ok {
+			okType = true
+			me.Fn = t
+		}
+	case "Ch":
+		okName = true
+		t, ok := v.(chan bool)
+		if ok {
+			okType = true
+			me.Ch = t
+		}
 	case "Pats":
 		okName = true
 		t, ok := v.(pkg__github_com_go_leap_str.Pats)
@@ -461,6 +482,13 @@ func (me *fooResp) StructFieldsSet(name string, v interface{}) (okName bool, okT
 		if ok {
 			okType = true
 			me.Menu = t
+		}
+	case "Nope":
+		okName = true
+		t, ok := v.(string)
+		if ok {
+			okType = true
+			me.Nope = t
 		}
 	case "CaddyUpdate":
 		okName = true
@@ -479,3 +507,47 @@ func (me *fooResp) StructFieldsSet(name string, v interface{}) (okName bool, okT
 	}
 	return
 }
+
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
+	r = make([]byte, 1, 128)
+	r[0] = 123
+	r = append(r, "\"ii\":"...)
+	r = append(r, "null"...)
+	r = append(r, ",\"ri\":"...)
+	r = append(r, "null"...)
+	r = append(r, ",\"err\":"...)
+	r = append(r, "null"...)
+	r = append(r, ",\"sI\":"...)
+	r = append(r, "null"...)
+	r = append(r, ",\"srcDiags\":"...)
+	r = append(r, "null"...)
+	r = append(r, ",\"srcMods\":"...)
+	r = append(r, "null"...)
+	r = append(r, ",\"srcActions\":"...)
+	r = append(r, "[]"...)
+	r = append(r, ",\"extras\":"...)
+	r = append(r, "null"...)
+	r = append(r, ",\"menu\":"...)
+	r = append(r, "null"...)
+	r = append(r, ",\"caddy\":"...)
+	r = append(r, "null"...)
+	r = append(r, ",\"val\":"...)
+	{
+		j, ok := me.Val.(pkg__encoding_json.Marshaler)
+		if ok && (j != nil) {
+			sl, e := j.MarshalJSON()
+			if e == nil {
+				r = append(r, sl...)
+			} else {
+				err = e
+				return
+			}
+		}
+	}
+	r = append(r, 125)
+	return
+}
+
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *fooResp) preview_UnmarshalJSON(v []byte) (err error) { return }

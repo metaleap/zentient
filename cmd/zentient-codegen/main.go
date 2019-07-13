@@ -17,9 +17,9 @@ func main() {
 	gents := gent.Gents{
 		&gentenums.Gents.IsValid,
 		&gentenums.Gents.Stringers,
-		&gentjson.Gents.Structs,
 		&gentstructs.Gents.StructFieldsTrav,
 		&gentstructs.Gents.StructFieldsGetSet,
+		&gentjson.Gents.Structs,
 	}
 	gentenums.Gents.IsValid.RunOnlyForTypes.Named = []string{"IpcIDs"}
 	gentenums.Gents.Stringers.RunNeverForTypes.Named = []string{"ToolCats"}

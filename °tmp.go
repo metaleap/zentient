@@ -19,8 +19,11 @@ type fooResp struct {
 	SrcActions []EditorAction `json:"srcActions,omitempty"`
 	Extras     *Extras        `json:"extras,omitempty"`
 	*SrcLens
+	Fn func()
+	Ch chan bool
 	ustr.Pats
 	Menu        *MenuResponse `json:"menu,omitempty"`
+	Nope        string        `json:"-"`
 	CaddyUpdate *Caddy        `json:"caddy,omitempty"`
 	Val         interface{}   `json:"val,omitempty"`
 }
