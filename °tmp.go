@@ -8,8 +8,9 @@ import (
 )
 
 type fooResp struct {
-	IpcID    IpcIDs    `json:"ii,omitempty"`
-	ReqID    int64     `json:"ri,omitempty"`
+	IpcID    IpcIDs `json:"ii,omitempty"`
+	ReqID    int64  `json:"ri,omitempty"`
+	Flag     bool
 	ErrMsg   string    `json:"err,omitempty"`
 	SrcIntel *SrcIntel `json:"sI,omitempty"`
 	SrcDiags *Diags    `json:"srcDiags,omitempty"`
@@ -19,13 +20,14 @@ type fooResp struct {
 	SrcActions []EditorAction `json:"srcActions,omitempty"`
 	Extras     *Extras        `json:"extras,omitempty"`
 	*SrcLens
-	Fn func()
-	Ch chan bool
+	Fn   func()
+	Link *fooResp
+	Ch   chan bool
 	ustr.Pats
 	Menu        *MenuResponse `json:"menu,omitempty"`
 	Nope        string        `json:"-"`
 	CaddyUpdate *Caddy        `json:"caddy,omitempty"`
-	Val         interface{}   `json:"val,omitempty"`
+	Val         interface{}   `json:"valya"`
 }
 
 // func (me *fooResp) tmp() {

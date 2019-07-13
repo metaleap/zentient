@@ -292,7 +292,7 @@ formatNum:
 	return
 }
 
-// StructFieldsTraverse calls `on` 18x: once for each field in this `fooResp` with its name, its pointer, `true` if name (or embed name) begins in upper-case (else `false`), and `true` if field is an embed (else `false`).
+// StructFieldsTraverse calls `on` 19x: once for each field in this `fooResp` with its name, its pointer, `true` if name (or embed name) begins in upper-case (else `false`), and `true` if field is an embed (else `false`).
 func (me *fooResp) StructFieldsTraverse(on func(name string, ptr interface{}, isNameUpperCase bool, isEmbed bool)) {
 	on("IpcID", &me.IpcID, true, false)
 	on("ReqID", &me.ReqID, true, false)
@@ -306,6 +306,7 @@ func (me *fooResp) StructFieldsTraverse(on func(name string, ptr interface{}, is
 	on("Extras", &me.Extras, true, false)
 	on("SrcLens", &me.SrcLens, true, true)
 	on("Fn", &me.Fn, true, false)
+	on("Link", &me.Link, true, false)
 	on("Ch", &me.Ch, true, false)
 	on("Pats", &me.Pats, true, true)
 	on("Menu", &me.Menu, true, false)
@@ -351,6 +352,9 @@ func (me *fooResp) StructFieldsGet(name string, v interface{}) (r interface{}, o
 		ok = true
 	case "Fn":
 		r = me.Fn
+		ok = true
+	case "Link":
+		r = me.Link
 		ok = true
 	case "Ch":
 		r = me.Ch
@@ -462,6 +466,13 @@ func (me *fooResp) StructFieldsSet(name string, v interface{}) (okName bool, okT
 			okType = true
 			me.Fn = t
 		}
+	case "Link":
+		okName = true
+		t, ok := v.(*fooResp)
+		if ok {
+			okType = true
+			me.Link = t
+		}
 	case "Ch":
 		okName = true
 		t, ok := v.(chan bool)
@@ -528,22 +539,31 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 	r = append(r, "[]"...)
 	r = append(r, ",\"extras\":"...)
 	r = append(r, "null"...)
+	r = append(r, ",\"Link\":"...)
+	r = append(r, "null"...)
 	r = append(r, ",\"menu\":"...)
 	r = append(r, "null"...)
 	r = append(r, ",\"caddy\":"...)
 	r = append(r, "null"...)
-	r = append(r, ",\"val\":"...)
-	{
+	if me.Val != nil {
+		r = append(r, ",\"valya\":"...)
+		var e error
+		var sl []byte
 		j, ok := me.Val.(pkg__encoding_json.Marshaler)
 		if ok && (j != nil) {
-			sl, e := j.MarshalJSON()
-			if e == nil {
-				r = append(r, sl...)
-			} else {
-				err = e
-				return
-			}
+			sl, e = j.MarshalJSON()
+		} else {
+			sl, e = pkg__encoding_json.Marshal(me.Val)
 		}
+		if e == nil {
+			r = append(r, sl...)
+		} else {
+			err = e
+			return
+		}
+	} else {
+		r = append(r, ",\"valya\":"...)
+		r = append(r, "null"...)
 	}
 	r = append(r, 125)
 	return
