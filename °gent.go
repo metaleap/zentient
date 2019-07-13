@@ -530,40 +530,105 @@ func (me *fooResp) StructFieldsSet(name string, v interface{}) (okName bool, okT
 	return
 }
 
-// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
 func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
-	r = make([]byte, 1, 128)
-	r[0] = 123
-	r = append(r, "\"ii\":"...)
-	r = append(r, "null"...)
-	if false || (me.ReqID != 0) {
+	r = make([]byte, 0, 128)
+	r = append(r, 123)
+	if true {
+		r = append(r, "\"ii\":"...)
+		r = append(r, pkg__strconv.FormatInt((int64)(me.IpcID), 10)...)
+	}
+	if me.ReqID != 0 {
 		r = append(r, ",\"ri\":"...)
 		r = append(r, pkg__strconv.FormatInt((int64)(me.ReqID), 10)...)
 	}
-	if true || me.Flag {
+	if true {
 		r = append(r, ",\"Flag\":"...)
 		r = append(r, pkg__strconv.FormatBool(me.Flag)...)
 	}
-	if false || (len(me.ErrMsg) != 0) {
+	if len(me.ErrMsg) != 0 {
 		r = append(r, ",\"err\":"...)
 		r = append(r, pkg__strconv.Quote(me.ErrMsg)...)
 	}
 	r = append(r, ",\"sI\":"...)
-	r = append(r, "null"...)
+	r = append(r, "*null"...)
 	r = append(r, ",\"srcDiags\":"...)
-	r = append(r, "null"...)
-	r = append(r, ",\"srcMods\":"...)
-	r = append(r, "null"...)
-	r = append(r, ",\"srcActions\":"...)
-	r = append(r, "[]"...)
+	r = append(r, "*null"...)
+	r = append(r, ",\"IpcReq\":"...)
+	r = append(r, "*null"...)
+	if len(me.SrcActions) != 0 {
+		r = append(r, ",\"srcActions\":"...)
+		r = append(r, 91)
+		for i := range me.SrcActions {
+			r = append(r, 123)
+			if true {
+				r = append(r, "\"title\":"...)
+				r = append(r, pkg__strconv.Quote(me.SrcActions[i].Title)...)
+			}
+			if true {
+				r = append(r, ",\"command\":"...)
+				r = append(r, pkg__strconv.Quote(me.SrcActions[i].Cmd)...)
+			}
+			if len(me.SrcActions[i].Hint) != 0 {
+				r = append(r, ",\"tooltip\":"...)
+				r = append(r, pkg__strconv.Quote(me.SrcActions[i].Hint)...)
+			}
+			if len(me.SrcActions[i].Arguments) != 0 {
+				r = append(r, ",\"arguments\":"...)
+				r = append(r, 91)
+				for i := range me.SrcActions[i].Arguments {
+					if me.SrcActions[i].Arguments[i] != nil {
+						r = append(r, 44)
+						var e error
+						var sl []byte
+						j, ok := me.SrcActions[i].Arguments[i].(pkg__encoding_json.Marshaler)
+						if ok && (j != nil) {
+							sl, e = j.MarshalJSON()
+						} else {
+							sl, e = pkg__encoding_json.Marshal(me.SrcActions[i].Arguments[i])
+						}
+						if e == nil {
+							r = append(r, sl...)
+						} else {
+							err = e
+							return
+						}
+					} else {
+						r = append(r, 44)
+						r = append(r, "null"...)
+					}
+				}
+				r = append(r, 93)
+			}
+			r = append(r, 125)
+		}
+		r = append(r, 93)
+	}
 	r = append(r, ",\"extras\":"...)
-	r = append(r, "null"...)
+	r = append(r, "*null"...)
+	r = append(r, ",\"SrcLens\":"...)
+	r = append(r, "*null"...)
 	r = append(r, ",\"Link\":"...)
-	r = append(r, "null"...)
+	r = append(r, "*null"...)
+	if me.Pats != nil {
+		r = append(r, ",\"Pats\":"...)
+		var e error
+		var sl []byte
+		sl, e = pkg__encoding_json.Marshal(me.Pats)
+		if e == nil {
+			r = append(r, sl...)
+		} else {
+			err = e
+			return
+		}
+	} else {
+		r = append(r, ",\"Pats\":"...)
+		r = append(r, "null"...)
+	}
 	r = append(r, ",\"menu\":"...)
-	r = append(r, "null"...)
+	r = append(r, "*null"...)
 	r = append(r, ",\"caddy\":"...)
-	r = append(r, "null"...)
+	r = append(r, "*null"...)
 	if me.Val != nil {
 		r = append(r, ",\"valya\":"...)
 		var e error
@@ -588,5 +653,5 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
 func (me *fooResp) preview_UnmarshalJSON(v []byte) (err error) { return }

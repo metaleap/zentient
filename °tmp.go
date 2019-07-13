@@ -8,7 +8,7 @@ import (
 )
 
 type fooResp struct {
-	IpcID    IpcIDs `json:"ii,omitempty"`
+	IpcID    IpcIDs `json:"ii"`
 	ReqID    int64  `json:"ri,omitempty"`
 	Flag     bool
 	ErrMsg   string    `json:"err,omitempty"`
