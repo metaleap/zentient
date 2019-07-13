@@ -292,10 +292,11 @@ formatNum:
 	return
 }
 
-// StructFieldsTraverse calls `on` 19x: once for each field in this `fooResp` with its name, its pointer, `true` if name (or embed name) begins in upper-case (else `false`), and `true` if field is an embed (else `false`).
+// StructFieldsTraverse calls `on` 20x: once for each field in this `fooResp` with its name, its pointer, `true` if name (or embed name) begins in upper-case (else `false`), and `true` if field is an embed (else `false`).
 func (me *fooResp) StructFieldsTraverse(on func(name string, ptr interface{}, isNameUpperCase bool, isEmbed bool)) {
 	on("IpcID", &me.IpcID, true, false)
 	on("ReqID", &me.ReqID, true, false)
+	on("Flag", &me.Flag, true, false)
 	on("ErrMsg", &me.ErrMsg, true, false)
 	on("SrcIntel", &me.SrcIntel, true, false)
 	on("SrcDiags", &me.SrcDiags, true, false)
@@ -322,6 +323,9 @@ func (me *fooResp) StructFieldsGet(name string, v interface{}) (r interface{}, o
 		ok = true
 	case "ReqID":
 		r = me.ReqID
+		ok = true
+	case "Flag":
+		r = me.Flag
 		ok = true
 	case "ErrMsg":
 		r = me.ErrMsg
@@ -395,6 +399,13 @@ func (me *fooResp) StructFieldsSet(name string, v interface{}) (okName bool, okT
 		if ok {
 			okType = true
 			me.ReqID = t
+		}
+	case "Flag":
+		okName = true
+		t, ok := v.(bool)
+		if ok {
+			okType = true
+			me.Flag = t
 		}
 	case "ErrMsg":
 		okName = true
@@ -525,10 +536,18 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 	r[0] = 123
 	r = append(r, "\"ii\":"...)
 	r = append(r, "null"...)
-	r = append(r, ",\"ri\":"...)
-	r = append(r, "null"...)
-	r = append(r, ",\"err\":"...)
-	r = append(r, "null"...)
+	if false || (me.ReqID != 0) {
+		r = append(r, ",\"ri\":"...)
+		r = append(r, pkg__strconv.FormatInt((int64)(me.ReqID), 10)...)
+	}
+	if true || me.Flag {
+		r = append(r, ",\"Flag\":"...)
+		r = append(r, pkg__strconv.FormatBool(me.Flag)...)
+	}
+	if false || (len(me.ErrMsg) != 0) {
+		r = append(r, ",\"err\":"...)
+		r = append(r, pkg__strconv.Quote(me.ErrMsg)...)
+	}
 	r = append(r, ",\"sI\":"...)
 	r = append(r, "null"...)
 	r = append(r, ",\"srcDiags\":"...)
