@@ -292,10 +292,10 @@ formatNum:
 }
 
 // MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me *fooResp) MarshalJSON() (r []byte, err error) { return }
+func (me *fooResp) preview_MarshalJSON() (r []byte, err error) { return }
 
 // UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *fooResp) UnmarshalJSON(v []byte) (err error) { return }
+func (me *fooResp) preview_UnmarshalJSON(v []byte) (err error) { return }
 
 // StructFieldsTraverse calls `on` 15x: once for each field in this `fooResp` with its name, its pointer, `true` if name (or embed name) begins in upper-case (else `false`), and `true` if field is an embed (else `false`).
 func (me *fooResp) StructFieldsTraverse(on func(name string, ptr interface{}, isNameUpperCase bool, isEmbed bool)) {

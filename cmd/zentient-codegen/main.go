@@ -26,6 +26,7 @@ func main() {
 	gentenums.Gents.Stringers.All[0].SkipEarlyChecks = true
 
 	// temporaries..
+	gentjson.Gents.Structs.Marshal.MethodName, gentjson.Gents.Structs.Unmarshal.MethodName = "preview_"+gentjson.Gents.Structs.Marshal.MethodName, "preview_"+gentjson.Gents.Structs.Unmarshal.MethodName
 	gentjson.Gents.Structs.RunOnlyForTypes.Named = []string{"fooResp"}
 	gentstructs.Gents.StructFieldsTrav.RunOnlyForTypes.Named = []string{"fooResp"}
 	gentstructs.Gents.StructFieldsGetSet.RunOnlyForTypes.Named = []string{"fooResp"}
