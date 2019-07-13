@@ -296,7 +296,7 @@ formatNum:
 func (me *fooResp) StructFieldsTraverse(on func(name string, ptr interface{}, isNameUpperCase bool, isEmbed bool)) {
 	on("IpcID", &me.IpcID, true, false)
 	on("ReqID", &me.ReqID, true, false)
-	on("Flag", &me.Flag, true, false)
+	on("Flagg", &me.Flagg, true, false)
 	on("ErrMsg", &me.ErrMsg, true, false)
 	on("SrcIntel", &me.SrcIntel, true, false)
 	on("SrcDiags", &me.SrcDiags, true, false)
@@ -324,8 +324,8 @@ func (me *fooResp) StructFieldsGet(name string, v interface{}) (r interface{}, o
 	case "ReqID":
 		r = me.ReqID
 		ok = true
-	case "Flag":
-		r = me.Flag
+	case "Flagg":
+		r = me.Flagg
 		ok = true
 	case "ErrMsg":
 		r = me.ErrMsg
@@ -400,12 +400,12 @@ func (me *fooResp) StructFieldsSet(name string, v interface{}) (okName bool, okT
 			okType = true
 			me.ReqID = t
 		}
-	case "Flag":
+	case "Flagg":
 		okName = true
 		t, ok := v.(bool)
 		if ok {
 			okType = true
-			me.Flag = t
+			me.Flagg = t
 		}
 	case "ErrMsg":
 		okName = true
@@ -543,8 +543,8 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, pkg__strconv.FormatInt((int64)(me.ReqID), 10)...)
 	}
 	{
-		r = append(r, ",\"Flag\":"...)
-		r = append(r, pkg__strconv.FormatBool(me.Flag)...)
+		r = append(r, ",\"Flagg\":"...)
+		r = append(r, pkg__strconv.FormatBool(me.Flagg)...)
 	}
 	if len(me.ErrMsg) != 0 {
 		r = append(r, ",\"err\":"...)
@@ -553,96 +553,94 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 	if nil != me.SrcIntel {
 		r = append(r, ",\"sI\":"...)
 		r = append(r, 123)
-		r = append(r, "\"SrcIntels\":"...)
-		r = append(r, 123)
-		if len(me.SrcIntel.SrcIntels.InfoTips) != 0 {
-			r = append(r, "\"InfoTips\":"...)
+		if len(me.SrcIntel.InfoTips) != 0 {
+			r = append(r, ",\"InfoTips\":"...)
 			r = append(r, 91)
-			for i1 := range me.SrcIntel.SrcIntels.InfoTips {
+			for i1 := range me.SrcIntel.InfoTips {
 				if i1 != 0 {
 					r = append(r, 44)
 				}
 				r = append(r, 123)
 				{
 					r = append(r, "\"value\":"...)
-					r = append(r, pkg__strconv.Quote(me.SrcIntel.SrcIntels.InfoTips[i1].Value)...)
+					r = append(r, pkg__strconv.Quote(me.SrcIntel.InfoTips[i1].Value)...)
 				}
-				if len(me.SrcIntel.SrcIntels.InfoTips[i1].Language) != 0 {
+				if len(me.SrcIntel.InfoTips[i1].Language) != 0 {
 					r = append(r, ",\"language\":"...)
-					r = append(r, pkg__strconv.Quote(me.SrcIntel.SrcIntels.InfoTips[i1].Language)...)
+					r = append(r, pkg__strconv.Quote(me.SrcIntel.InfoTips[i1].Language)...)
 				}
 				r = append(r, 125)
 			}
 			r = append(r, 93)
 		}
-		if len(me.SrcIntel.SrcIntels.Refs) != 0 {
+		if len(me.SrcIntel.Refs) != 0 {
 			r = append(r, ",\"Refs\":"...)
 			r = append(r, 91)
-			for i2 := range me.SrcIntel.SrcIntels.Refs {
-				if nil != me.SrcIntel.SrcIntels.Refs[i2] {
+			for i2 := range me.SrcIntel.Refs {
+				if nil != me.SrcIntel.Refs[i2] {
 					if i2 != 0 {
 						r = append(r, 44)
 					}
 					r = append(r, 123)
 					{
 						r = append(r, "\"e\":"...)
-						r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.SrcIntels.Refs[i2].Flag), 10)...)
+						r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.Refs[i2].Flag), 10)...)
 					}
-					if len(me.SrcIntel.SrcIntels.Refs[i2].FilePath) != 0 {
+					if len(me.SrcIntel.Refs[i2].FilePath) != 0 {
 						r = append(r, ",\"f\":"...)
-						r = append(r, pkg__strconv.Quote(me.SrcIntel.SrcIntels.Refs[i2].FilePath)...)
+						r = append(r, pkg__strconv.Quote(me.SrcIntel.Refs[i2].FilePath)...)
 					}
-					if nil != me.SrcIntel.SrcIntels.Refs[i2].Pos {
+					if nil != me.SrcIntel.Refs[i2].Pos {
 						r = append(r, ",\"p\":"...)
 						r = append(r, 123)
-						if me.SrcIntel.SrcIntels.Refs[i2].Pos.Ln != 0 {
+						if me.SrcIntel.Refs[i2].Pos.Ln != 0 {
 							r = append(r, "\"l\":"...)
-							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.SrcIntels.Refs[i2].Pos.Ln), 10)...)
+							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.Refs[i2].Pos.Ln), 10)...)
 						}
-						if me.SrcIntel.SrcIntels.Refs[i2].Pos.Col != 0 {
+						if me.SrcIntel.Refs[i2].Pos.Col != 0 {
 							r = append(r, ",\"c\":"...)
-							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.SrcIntels.Refs[i2].Pos.Col), 10)...)
+							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.Refs[i2].Pos.Col), 10)...)
 						}
-						if me.SrcIntel.SrcIntels.Refs[i2].Pos.Off != 0 {
+						if me.SrcIntel.Refs[i2].Pos.Off != 0 {
 							r = append(r, ",\"o\":"...)
-							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.SrcIntels.Refs[i2].Pos.Off), 10)...)
+							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.Refs[i2].Pos.Off), 10)...)
 						}
 						r = append(r, 125)
 					} else if false {
 						r = append(r, ",\"p\":"...)
 						r = append(r, "null"...)
 					}
-					if nil != me.SrcIntel.SrcIntels.Refs[i2].Range {
+					if nil != me.SrcIntel.Refs[i2].Range {
 						r = append(r, ",\"r\":"...)
 						r = append(r, 123)
 						r = append(r, "\"s\":"...)
 						r = append(r, 123)
-						if me.SrcIntel.SrcIntels.Refs[i2].Range.Start.Ln != 0 {
+						if me.SrcIntel.Refs[i2].Range.Start.Ln != 0 {
 							r = append(r, "\"l\":"...)
-							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.SrcIntels.Refs[i2].Range.Start.Ln), 10)...)
+							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.Refs[i2].Range.Start.Ln), 10)...)
 						}
-						if me.SrcIntel.SrcIntels.Refs[i2].Range.Start.Col != 0 {
+						if me.SrcIntel.Refs[i2].Range.Start.Col != 0 {
 							r = append(r, ",\"c\":"...)
-							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.SrcIntels.Refs[i2].Range.Start.Col), 10)...)
+							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.Refs[i2].Range.Start.Col), 10)...)
 						}
-						if me.SrcIntel.SrcIntels.Refs[i2].Range.Start.Off != 0 {
+						if me.SrcIntel.Refs[i2].Range.Start.Off != 0 {
 							r = append(r, ",\"o\":"...)
-							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.SrcIntels.Refs[i2].Range.Start.Off), 10)...)
+							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.Refs[i2].Range.Start.Off), 10)...)
 						}
 						r = append(r, 125)
 						r = append(r, ",\"e\":"...)
 						r = append(r, 123)
-						if me.SrcIntel.SrcIntels.Refs[i2].Range.End.Ln != 0 {
+						if me.SrcIntel.Refs[i2].Range.End.Ln != 0 {
 							r = append(r, "\"l\":"...)
-							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.SrcIntels.Refs[i2].Range.End.Ln), 10)...)
+							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.Refs[i2].Range.End.Ln), 10)...)
 						}
-						if me.SrcIntel.SrcIntels.Refs[i2].Range.End.Col != 0 {
+						if me.SrcIntel.Refs[i2].Range.End.Col != 0 {
 							r = append(r, ",\"c\":"...)
-							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.SrcIntels.Refs[i2].Range.End.Col), 10)...)
+							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.Refs[i2].Range.End.Col), 10)...)
 						}
-						if me.SrcIntel.SrcIntels.Refs[i2].Range.End.Off != 0 {
+						if me.SrcIntel.Refs[i2].Range.End.Off != 0 {
 							r = append(r, ",\"o\":"...)
-							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.SrcIntels.Refs[i2].Range.End.Off), 10)...)
+							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.Refs[i2].Range.End.Off), 10)...)
 						}
 						r = append(r, 125)
 						r = append(r, 125)
@@ -660,7 +658,6 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 			}
 			r = append(r, 93)
 		}
-		r = append(r, 125)
 		if nil != me.SrcIntel.Sig {
 			r = append(r, ",\"Sig\":"...)
 			r = append(r, 123)
@@ -791,67 +788,65 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 						r = append(r, 44)
 					}
 					r = append(r, 123)
-					r = append(r, "\"SrcLoc\":"...)
-					r = append(r, 123)
 					{
-						r = append(r, "\"e\":"...)
-						r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.Syms[i6].SrcLoc.Flag), 10)...)
+						r = append(r, ",\"e\":"...)
+						r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.Syms[i6].Flag), 10)...)
 					}
-					if len(me.SrcIntel.Syms[i6].SrcLoc.FilePath) != 0 {
+					if len(me.SrcIntel.Syms[i6].FilePath) != 0 {
 						r = append(r, ",\"f\":"...)
-						r = append(r, pkg__strconv.Quote(me.SrcIntel.Syms[i6].SrcLoc.FilePath)...)
+						r = append(r, pkg__strconv.Quote(me.SrcIntel.Syms[i6].FilePath)...)
 					}
-					if nil != me.SrcIntel.Syms[i6].SrcLoc.Pos {
+					if nil != me.SrcIntel.Syms[i6].Pos {
 						r = append(r, ",\"p\":"...)
 						r = append(r, 123)
-						if me.SrcIntel.Syms[i6].SrcLoc.Pos.Ln != 0 {
+						if me.SrcIntel.Syms[i6].Pos.Ln != 0 {
 							r = append(r, "\"l\":"...)
-							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.Syms[i6].SrcLoc.Pos.Ln), 10)...)
+							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.Syms[i6].Pos.Ln), 10)...)
 						}
-						if me.SrcIntel.Syms[i6].SrcLoc.Pos.Col != 0 {
+						if me.SrcIntel.Syms[i6].Pos.Col != 0 {
 							r = append(r, ",\"c\":"...)
-							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.Syms[i6].SrcLoc.Pos.Col), 10)...)
+							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.Syms[i6].Pos.Col), 10)...)
 						}
-						if me.SrcIntel.Syms[i6].SrcLoc.Pos.Off != 0 {
+						if me.SrcIntel.Syms[i6].Pos.Off != 0 {
 							r = append(r, ",\"o\":"...)
-							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.Syms[i6].SrcLoc.Pos.Off), 10)...)
+							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.Syms[i6].Pos.Off), 10)...)
 						}
 						r = append(r, 125)
 					} else if false {
 						r = append(r, ",\"p\":"...)
 						r = append(r, "null"...)
 					}
-					if nil != me.SrcIntel.Syms[i6].SrcLoc.Range {
+					if nil != me.SrcIntel.Syms[i6].Range {
 						r = append(r, ",\"r\":"...)
 						r = append(r, 123)
 						r = append(r, "\"s\":"...)
 						r = append(r, 123)
-						if me.SrcIntel.Syms[i6].SrcLoc.Range.Start.Ln != 0 {
+						if me.SrcIntel.Syms[i6].Range.Start.Ln != 0 {
 							r = append(r, "\"l\":"...)
-							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.Syms[i6].SrcLoc.Range.Start.Ln), 10)...)
+							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.Syms[i6].Range.Start.Ln), 10)...)
 						}
-						if me.SrcIntel.Syms[i6].SrcLoc.Range.Start.Col != 0 {
+						if me.SrcIntel.Syms[i6].Range.Start.Col != 0 {
 							r = append(r, ",\"c\":"...)
-							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.Syms[i6].SrcLoc.Range.Start.Col), 10)...)
+							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.Syms[i6].Range.Start.Col), 10)...)
 						}
-						if me.SrcIntel.Syms[i6].SrcLoc.Range.Start.Off != 0 {
+						if me.SrcIntel.Syms[i6].Range.Start.Off != 0 {
 							r = append(r, ",\"o\":"...)
-							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.Syms[i6].SrcLoc.Range.Start.Off), 10)...)
+							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.Syms[i6].Range.Start.Off), 10)...)
 						}
 						r = append(r, 125)
 						r = append(r, ",\"e\":"...)
 						r = append(r, 123)
-						if me.SrcIntel.Syms[i6].SrcLoc.Range.End.Ln != 0 {
+						if me.SrcIntel.Syms[i6].Range.End.Ln != 0 {
 							r = append(r, "\"l\":"...)
-							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.Syms[i6].SrcLoc.Range.End.Ln), 10)...)
+							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.Syms[i6].Range.End.Ln), 10)...)
 						}
-						if me.SrcIntel.Syms[i6].SrcLoc.Range.End.Col != 0 {
+						if me.SrcIntel.Syms[i6].Range.End.Col != 0 {
 							r = append(r, ",\"c\":"...)
-							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.Syms[i6].SrcLoc.Range.End.Col), 10)...)
+							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.Syms[i6].Range.End.Col), 10)...)
 						}
-						if me.SrcIntel.Syms[i6].SrcLoc.Range.End.Off != 0 {
+						if me.SrcIntel.Syms[i6].Range.End.Off != 0 {
 							r = append(r, ",\"o\":"...)
-							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.Syms[i6].SrcLoc.Range.End.Off), 10)...)
+							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.Syms[i6].Range.End.Off), 10)...)
 						}
 						r = append(r, 125)
 						r = append(r, 125)
@@ -859,7 +854,6 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 						r = append(r, ",\"r\":"...)
 						r = append(r, "null"...)
 					}
-					r = append(r, 125)
 					if len(me.SrcIntel.Syms[i6].Txt) != 0 {
 						r = append(r, ",\"t\":"...)
 						r = append(r, pkg__strconv.Quote(me.SrcIntel.Syms[i6].Txt)...)
@@ -1098,204 +1092,193 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, ",\"srcDiags\":"...)
 		r = append(r, "null"...)
 	}
-	if nil != me.IpcReq {
-		r = append(r, ",\"IpcReq\":"...)
+	{
+		r = append(r, ",\"ri\":"...)
+		r = append(r, pkg__strconv.FormatInt((int64)(me.ReqID), 10)...)
+	}
+	{
+		r = append(r, ",\"ii\":"...)
+		r = append(r, pkg__strconv.FormatInt((int64)(me.IpcID), 10)...)
+	}
+	if me.IpcArgs != nil {
+		r = append(r, ",\"ia\":"...)
+		var e error
+		var sl []byte
+		j, ok := me.IpcArgs.(pkg__encoding_json.Marshaler)
+		if ok && (j != nil) {
+			sl, e = j.MarshalJSON()
+		} else {
+			sl, e = pkg__encoding_json.Marshal(me.IpcArgs)
+		}
+		if e == nil {
+			r = append(r, sl...)
+		} else {
+			err = e
+			return
+		}
+	} else {
+		r = append(r, ",\"ia\":"...)
+		r = append(r, "null"...)
+	}
+	if nil != me.ProjUpd {
+		r = append(r, ",\"projUpd\":"...)
 		r = append(r, 123)
 		{
-			r = append(r, "\"ri\":"...)
-			r = append(r, pkg__strconv.FormatInt((int64)(me.IpcReq.ReqID), 10)...)
+			r = append(r, "\"AddedDirs\":"...)
+			r = append(r, 91)
+			for i11 := range me.ProjUpd.AddedDirs {
+				{
+					if i11 != 0 {
+						r = append(r, 44)
+					}
+					r = append(r, pkg__strconv.Quote(me.ProjUpd.AddedDirs[i11])...)
+				}
+			}
+			r = append(r, 93)
 		}
 		{
-			r = append(r, ",\"ii\":"...)
-			r = append(r, pkg__strconv.FormatInt((int64)(me.IpcReq.IpcID), 10)...)
+			r = append(r, ",\"RemovedDirs\":"...)
+			r = append(r, 91)
+			for i12 := range me.ProjUpd.RemovedDirs {
+				{
+					if i12 != 0 {
+						r = append(r, 44)
+					}
+					r = append(r, pkg__strconv.Quote(me.ProjUpd.RemovedDirs[i12])...)
+				}
+			}
+			r = append(r, 93)
 		}
-		if me.IpcReq.IpcArgs != nil {
-			r = append(r, ",\"ia\":"...)
-			var e error
-			var sl []byte
-			j, ok := me.IpcReq.IpcArgs.(pkg__encoding_json.Marshaler)
-			if ok && (j != nil) {
-				sl, e = j.MarshalJSON()
-			} else {
-				sl, e = pkg__encoding_json.Marshal(me.IpcReq.IpcArgs)
+		{
+			r = append(r, ",\"OpenedFiles\":"...)
+			r = append(r, 91)
+			for i13 := range me.ProjUpd.OpenedFiles {
+				{
+					if i13 != 0 {
+						r = append(r, 44)
+					}
+					r = append(r, pkg__strconv.Quote(me.ProjUpd.OpenedFiles[i13])...)
+				}
 			}
-			if e == nil {
-				r = append(r, sl...)
-			} else {
-				err = e
-				return
-			}
-		} else {
-			r = append(r, ",\"ia\":"...)
-			r = append(r, "null"...)
+			r = append(r, 93)
 		}
-		if nil != me.IpcReq.ProjUpd {
-			r = append(r, ",\"projUpd\":"...)
-			r = append(r, 123)
-			{
-				r = append(r, "\"AddedDirs\":"...)
-				r = append(r, 91)
-				for i11 := range me.IpcReq.ProjUpd.AddedDirs {
-					{
-						if i11 != 0 {
-							r = append(r, 44)
-						}
-						r = append(r, pkg__strconv.Quote(me.IpcReq.ProjUpd.AddedDirs[i11])...)
+		{
+			r = append(r, ",\"ClosedFiles\":"...)
+			r = append(r, 91)
+			for i14 := range me.ProjUpd.ClosedFiles {
+				{
+					if i14 != 0 {
+						r = append(r, 44)
 					}
+					r = append(r, pkg__strconv.Quote(me.ProjUpd.ClosedFiles[i14])...)
 				}
-				r = append(r, 93)
 			}
-			{
-				r = append(r, ",\"RemovedDirs\":"...)
-				r = append(r, 91)
-				for i12 := range me.IpcReq.ProjUpd.RemovedDirs {
-					{
-						if i12 != 0 {
-							r = append(r, 44)
-						}
-						r = append(r, pkg__strconv.Quote(me.IpcReq.ProjUpd.RemovedDirs[i12])...)
-					}
-				}
-				r = append(r, 93)
-			}
-			{
-				r = append(r, ",\"OpenedFiles\":"...)
-				r = append(r, 91)
-				for i13 := range me.IpcReq.ProjUpd.OpenedFiles {
-					{
-						if i13 != 0 {
-							r = append(r, 44)
-						}
-						r = append(r, pkg__strconv.Quote(me.IpcReq.ProjUpd.OpenedFiles[i13])...)
-					}
-				}
-				r = append(r, 93)
-			}
-			{
-				r = append(r, ",\"ClosedFiles\":"...)
-				r = append(r, 91)
-				for i14 := range me.IpcReq.ProjUpd.ClosedFiles {
-					{
-						if i14 != 0 {
-							r = append(r, 44)
-						}
-						r = append(r, pkg__strconv.Quote(me.IpcReq.ProjUpd.ClosedFiles[i14])...)
-					}
-				}
-				r = append(r, 93)
-			}
-			{
-				r = append(r, ",\"WrittenFiles\":"...)
-				r = append(r, 91)
-				for i15 := range me.IpcReq.ProjUpd.WrittenFiles {
-					{
-						if i15 != 0 {
-							r = append(r, 44)
-						}
-						r = append(r, pkg__strconv.Quote(me.IpcReq.ProjUpd.WrittenFiles[i15])...)
-					}
-				}
-				r = append(r, 93)
-			}
-			r = append(r, ",\"LiveFiles\":"...)
-			r = append(r, "{}"...)
-			r = append(r, 125)
-		} else if true {
-			r = append(r, ",\"projUpd\":"...)
-			r = append(r, "null"...)
+			r = append(r, 93)
 		}
-		if nil != me.IpcReq.SrcLens {
-			r = append(r, ",\"srcLens\":"...)
+		{
+			r = append(r, ",\"WrittenFiles\":"...)
+			r = append(r, 91)
+			for i15 := range me.ProjUpd.WrittenFiles {
+				{
+					if i15 != 0 {
+						r = append(r, 44)
+					}
+					r = append(r, pkg__strconv.Quote(me.ProjUpd.WrittenFiles[i15])...)
+				}
+			}
+			r = append(r, 93)
+		}
+		r = append(r, ",\"LiveFiles\":"...)
+		r = append(r, "{}"...)
+		r = append(r, 125)
+	} else if true {
+		r = append(r, ",\"projUpd\":"...)
+		r = append(r, "null"...)
+	}
+	if nil != me.SrcLens {
+		r = append(r, ",\"srcLens\":"...)
+		r = append(r, 123)
+		{
+			r = append(r, ",\"e\":"...)
+			r = append(r, pkg__strconv.FormatInt((int64)(me.SrcLens.Flag), 10)...)
+		}
+		if len(me.SrcLens.FilePath) != 0 {
+			r = append(r, ",\"f\":"...)
+			r = append(r, pkg__strconv.Quote(me.SrcLens.FilePath)...)
+		}
+		if nil != me.SrcLens.Pos {
+			r = append(r, ",\"p\":"...)
 			r = append(r, 123)
-			r = append(r, "\"SrcLoc\":"...)
-			r = append(r, 123)
-			{
-				r = append(r, "\"e\":"...)
-				r = append(r, pkg__strconv.FormatInt((int64)(me.IpcReq.SrcLens.SrcLoc.Flag), 10)...)
+			if me.SrcLens.Pos.Ln != 0 {
+				r = append(r, "\"l\":"...)
+				r = append(r, pkg__strconv.FormatInt((int64)(me.SrcLens.Pos.Ln), 10)...)
 			}
-			if len(me.IpcReq.SrcLens.SrcLoc.FilePath) != 0 {
-				r = append(r, ",\"f\":"...)
-				r = append(r, pkg__strconv.Quote(me.IpcReq.SrcLens.SrcLoc.FilePath)...)
+			if me.SrcLens.Pos.Col != 0 {
+				r = append(r, ",\"c\":"...)
+				r = append(r, pkg__strconv.FormatInt((int64)(me.SrcLens.Pos.Col), 10)...)
 			}
-			if nil != me.IpcReq.SrcLens.SrcLoc.Pos {
-				r = append(r, ",\"p\":"...)
-				r = append(r, 123)
-				if me.IpcReq.SrcLens.SrcLoc.Pos.Ln != 0 {
-					r = append(r, "\"l\":"...)
-					r = append(r, pkg__strconv.FormatInt((int64)(me.IpcReq.SrcLens.SrcLoc.Pos.Ln), 10)...)
-				}
-				if me.IpcReq.SrcLens.SrcLoc.Pos.Col != 0 {
-					r = append(r, ",\"c\":"...)
-					r = append(r, pkg__strconv.FormatInt((int64)(me.IpcReq.SrcLens.SrcLoc.Pos.Col), 10)...)
-				}
-				if me.IpcReq.SrcLens.SrcLoc.Pos.Off != 0 {
-					r = append(r, ",\"o\":"...)
-					r = append(r, pkg__strconv.FormatInt((int64)(me.IpcReq.SrcLens.SrcLoc.Pos.Off), 10)...)
-				}
-				r = append(r, 125)
-			} else if false {
-				r = append(r, ",\"p\":"...)
-				r = append(r, "null"...)
-			}
-			if nil != me.IpcReq.SrcLens.SrcLoc.Range {
-				r = append(r, ",\"r\":"...)
-				r = append(r, 123)
-				r = append(r, "\"s\":"...)
-				r = append(r, 123)
-				if me.IpcReq.SrcLens.SrcLoc.Range.Start.Ln != 0 {
-					r = append(r, "\"l\":"...)
-					r = append(r, pkg__strconv.FormatInt((int64)(me.IpcReq.SrcLens.SrcLoc.Range.Start.Ln), 10)...)
-				}
-				if me.IpcReq.SrcLens.SrcLoc.Range.Start.Col != 0 {
-					r = append(r, ",\"c\":"...)
-					r = append(r, pkg__strconv.FormatInt((int64)(me.IpcReq.SrcLens.SrcLoc.Range.Start.Col), 10)...)
-				}
-				if me.IpcReq.SrcLens.SrcLoc.Range.Start.Off != 0 {
-					r = append(r, ",\"o\":"...)
-					r = append(r, pkg__strconv.FormatInt((int64)(me.IpcReq.SrcLens.SrcLoc.Range.Start.Off), 10)...)
-				}
-				r = append(r, 125)
-				r = append(r, ",\"e\":"...)
-				r = append(r, 123)
-				if me.IpcReq.SrcLens.SrcLoc.Range.End.Ln != 0 {
-					r = append(r, "\"l\":"...)
-					r = append(r, pkg__strconv.FormatInt((int64)(me.IpcReq.SrcLens.SrcLoc.Range.End.Ln), 10)...)
-				}
-				if me.IpcReq.SrcLens.SrcLoc.Range.End.Col != 0 {
-					r = append(r, ",\"c\":"...)
-					r = append(r, pkg__strconv.FormatInt((int64)(me.IpcReq.SrcLens.SrcLoc.Range.End.Col), 10)...)
-				}
-				if me.IpcReq.SrcLens.SrcLoc.Range.End.Off != 0 {
-					r = append(r, ",\"o\":"...)
-					r = append(r, pkg__strconv.FormatInt((int64)(me.IpcReq.SrcLens.SrcLoc.Range.End.Off), 10)...)
-				}
-				r = append(r, 125)
-				r = append(r, 125)
-			} else if false {
-				r = append(r, ",\"r\":"...)
-				r = append(r, "null"...)
+			if me.SrcLens.Pos.Off != 0 {
+				r = append(r, ",\"o\":"...)
+				r = append(r, pkg__strconv.FormatInt((int64)(me.SrcLens.Pos.Off), 10)...)
 			}
 			r = append(r, 125)
-			if len(me.IpcReq.SrcLens.Txt) != 0 {
-				r = append(r, ",\"t\":"...)
-				r = append(r, pkg__strconv.Quote(me.IpcReq.SrcLens.Txt)...)
+		} else if false {
+			r = append(r, ",\"p\":"...)
+			r = append(r, "null"...)
+		}
+		if nil != me.SrcLens.Range {
+			r = append(r, ",\"r\":"...)
+			r = append(r, 123)
+			r = append(r, "\"s\":"...)
+			r = append(r, 123)
+			if me.SrcLens.Range.Start.Ln != 0 {
+				r = append(r, "\"l\":"...)
+				r = append(r, pkg__strconv.FormatInt((int64)(me.SrcLens.Range.Start.Ln), 10)...)
 			}
-			if len(me.IpcReq.SrcLens.Str) != 0 {
-				r = append(r, ",\"s\":"...)
-				r = append(r, pkg__strconv.Quote(me.IpcReq.SrcLens.Str)...)
+			if me.SrcLens.Range.Start.Col != 0 {
+				r = append(r, ",\"c\":"...)
+				r = append(r, pkg__strconv.FormatInt((int64)(me.SrcLens.Range.Start.Col), 10)...)
 			}
-			if me.IpcReq.SrcLens.CrLf {
-				r = append(r, ",\"l\":"...)
-				r = append(r, pkg__strconv.FormatBool(me.IpcReq.SrcLens.CrLf)...)
+			if me.SrcLens.Range.Start.Off != 0 {
+				r = append(r, ",\"o\":"...)
+				r = append(r, pkg__strconv.FormatInt((int64)(me.SrcLens.Range.Start.Off), 10)...)
 			}
 			r = append(r, 125)
-		} else if true {
-			r = append(r, ",\"srcLens\":"...)
+			r = append(r, ",\"e\":"...)
+			r = append(r, 123)
+			if me.SrcLens.Range.End.Ln != 0 {
+				r = append(r, "\"l\":"...)
+				r = append(r, pkg__strconv.FormatInt((int64)(me.SrcLens.Range.End.Ln), 10)...)
+			}
+			if me.SrcLens.Range.End.Col != 0 {
+				r = append(r, ",\"c\":"...)
+				r = append(r, pkg__strconv.FormatInt((int64)(me.SrcLens.Range.End.Col), 10)...)
+			}
+			if me.SrcLens.Range.End.Off != 0 {
+				r = append(r, ",\"o\":"...)
+				r = append(r, pkg__strconv.FormatInt((int64)(me.SrcLens.Range.End.Off), 10)...)
+			}
+			r = append(r, 125)
+			r = append(r, 125)
+		} else if false {
+			r = append(r, ",\"r\":"...)
 			r = append(r, "null"...)
+		}
+		if len(me.SrcLens.Txt) != 0 {
+			r = append(r, ",\"t\":"...)
+			r = append(r, pkg__strconv.Quote(me.SrcLens.Txt)...)
+		}
+		if len(me.SrcLens.Str) != 0 {
+			r = append(r, ",\"s\":"...)
+			r = append(r, pkg__strconv.Quote(me.SrcLens.Str)...)
+		}
+		if me.SrcLens.CrLf {
+			r = append(r, ",\"l\":"...)
+			r = append(r, pkg__strconv.FormatBool(me.SrcLens.CrLf)...)
 		}
 		r = append(r, 125)
 	} else if true {
-		r = append(r, ",\"IpcReq\":"...)
+		r = append(r, ",\"srcLens\":"...)
 		r = append(r, "null"...)
 	}
 	if len(me.SrcMods) != 0 {
@@ -1307,67 +1290,65 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 					r = append(r, 44)
 				}
 				r = append(r, 123)
-				r = append(r, "\"SrcLoc\":"...)
-				r = append(r, 123)
 				{
-					r = append(r, "\"e\":"...)
-					r = append(r, pkg__strconv.FormatInt((int64)(me.SrcMods[i16].SrcLoc.Flag), 10)...)
+					r = append(r, ",\"e\":"...)
+					r = append(r, pkg__strconv.FormatInt((int64)(me.SrcMods[i16].Flag), 10)...)
 				}
-				if len(me.SrcMods[i16].SrcLoc.FilePath) != 0 {
+				if len(me.SrcMods[i16].FilePath) != 0 {
 					r = append(r, ",\"f\":"...)
-					r = append(r, pkg__strconv.Quote(me.SrcMods[i16].SrcLoc.FilePath)...)
+					r = append(r, pkg__strconv.Quote(me.SrcMods[i16].FilePath)...)
 				}
-				if nil != me.SrcMods[i16].SrcLoc.Pos {
+				if nil != me.SrcMods[i16].Pos {
 					r = append(r, ",\"p\":"...)
 					r = append(r, 123)
-					if me.SrcMods[i16].SrcLoc.Pos.Ln != 0 {
+					if me.SrcMods[i16].Pos.Ln != 0 {
 						r = append(r, "\"l\":"...)
-						r = append(r, pkg__strconv.FormatInt((int64)(me.SrcMods[i16].SrcLoc.Pos.Ln), 10)...)
+						r = append(r, pkg__strconv.FormatInt((int64)(me.SrcMods[i16].Pos.Ln), 10)...)
 					}
-					if me.SrcMods[i16].SrcLoc.Pos.Col != 0 {
+					if me.SrcMods[i16].Pos.Col != 0 {
 						r = append(r, ",\"c\":"...)
-						r = append(r, pkg__strconv.FormatInt((int64)(me.SrcMods[i16].SrcLoc.Pos.Col), 10)...)
+						r = append(r, pkg__strconv.FormatInt((int64)(me.SrcMods[i16].Pos.Col), 10)...)
 					}
-					if me.SrcMods[i16].SrcLoc.Pos.Off != 0 {
+					if me.SrcMods[i16].Pos.Off != 0 {
 						r = append(r, ",\"o\":"...)
-						r = append(r, pkg__strconv.FormatInt((int64)(me.SrcMods[i16].SrcLoc.Pos.Off), 10)...)
+						r = append(r, pkg__strconv.FormatInt((int64)(me.SrcMods[i16].Pos.Off), 10)...)
 					}
 					r = append(r, 125)
 				} else if false {
 					r = append(r, ",\"p\":"...)
 					r = append(r, "null"...)
 				}
-				if nil != me.SrcMods[i16].SrcLoc.Range {
+				if nil != me.SrcMods[i16].Range {
 					r = append(r, ",\"r\":"...)
 					r = append(r, 123)
 					r = append(r, "\"s\":"...)
 					r = append(r, 123)
-					if me.SrcMods[i16].SrcLoc.Range.Start.Ln != 0 {
+					if me.SrcMods[i16].Range.Start.Ln != 0 {
 						r = append(r, "\"l\":"...)
-						r = append(r, pkg__strconv.FormatInt((int64)(me.SrcMods[i16].SrcLoc.Range.Start.Ln), 10)...)
+						r = append(r, pkg__strconv.FormatInt((int64)(me.SrcMods[i16].Range.Start.Ln), 10)...)
 					}
-					if me.SrcMods[i16].SrcLoc.Range.Start.Col != 0 {
+					if me.SrcMods[i16].Range.Start.Col != 0 {
 						r = append(r, ",\"c\":"...)
-						r = append(r, pkg__strconv.FormatInt((int64)(me.SrcMods[i16].SrcLoc.Range.Start.Col), 10)...)
+						r = append(r, pkg__strconv.FormatInt((int64)(me.SrcMods[i16].Range.Start.Col), 10)...)
 					}
-					if me.SrcMods[i16].SrcLoc.Range.Start.Off != 0 {
+					if me.SrcMods[i16].Range.Start.Off != 0 {
 						r = append(r, ",\"o\":"...)
-						r = append(r, pkg__strconv.FormatInt((int64)(me.SrcMods[i16].SrcLoc.Range.Start.Off), 10)...)
+						r = append(r, pkg__strconv.FormatInt((int64)(me.SrcMods[i16].Range.Start.Off), 10)...)
 					}
 					r = append(r, 125)
 					r = append(r, ",\"e\":"...)
 					r = append(r, 123)
-					if me.SrcMods[i16].SrcLoc.Range.End.Ln != 0 {
+					if me.SrcMods[i16].Range.End.Ln != 0 {
 						r = append(r, "\"l\":"...)
-						r = append(r, pkg__strconv.FormatInt((int64)(me.SrcMods[i16].SrcLoc.Range.End.Ln), 10)...)
+						r = append(r, pkg__strconv.FormatInt((int64)(me.SrcMods[i16].Range.End.Ln), 10)...)
 					}
-					if me.SrcMods[i16].SrcLoc.Range.End.Col != 0 {
+					if me.SrcMods[i16].Range.End.Col != 0 {
 						r = append(r, ",\"c\":"...)
-						r = append(r, pkg__strconv.FormatInt((int64)(me.SrcMods[i16].SrcLoc.Range.End.Col), 10)...)
+						r = append(r, pkg__strconv.FormatInt((int64)(me.SrcMods[i16].Range.End.Col), 10)...)
 					}
-					if me.SrcMods[i16].SrcLoc.Range.End.Off != 0 {
+					if me.SrcMods[i16].Range.End.Off != 0 {
 						r = append(r, ",\"o\":"...)
-						r = append(r, pkg__strconv.FormatInt((int64)(me.SrcMods[i16].SrcLoc.Range.End.Off), 10)...)
+						r = append(r, pkg__strconv.FormatInt((int64)(me.SrcMods[i16].Range.End.Off), 10)...)
 					}
 					r = append(r, 125)
 					r = append(r, 125)
@@ -1375,7 +1356,6 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 					r = append(r, ",\"r\":"...)
 					r = append(r, "null"...)
 				}
-				r = append(r, 125)
 				if len(me.SrcMods[i16].Txt) != 0 {
 					r = append(r, ",\"t\":"...)
 					r = append(r, pkg__strconv.Quote(me.SrcMods[i16].Txt)...)
@@ -1456,96 +1436,94 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 	if nil != me.Extras {
 		r = append(r, ",\"extras\":"...)
 		r = append(r, 123)
-		r = append(r, "\"SrcIntels\":"...)
-		r = append(r, 123)
-		if len(me.Extras.SrcIntels.InfoTips) != 0 {
-			r = append(r, "\"InfoTips\":"...)
+		if len(me.Extras.InfoTips) != 0 {
+			r = append(r, ",\"InfoTips\":"...)
 			r = append(r, 91)
-			for i19 := range me.Extras.SrcIntels.InfoTips {
+			for i19 := range me.Extras.InfoTips {
 				if i19 != 0 {
 					r = append(r, 44)
 				}
 				r = append(r, 123)
 				{
 					r = append(r, "\"value\":"...)
-					r = append(r, pkg__strconv.Quote(me.Extras.SrcIntels.InfoTips[i19].Value)...)
+					r = append(r, pkg__strconv.Quote(me.Extras.InfoTips[i19].Value)...)
 				}
-				if len(me.Extras.SrcIntels.InfoTips[i19].Language) != 0 {
+				if len(me.Extras.InfoTips[i19].Language) != 0 {
 					r = append(r, ",\"language\":"...)
-					r = append(r, pkg__strconv.Quote(me.Extras.SrcIntels.InfoTips[i19].Language)...)
+					r = append(r, pkg__strconv.Quote(me.Extras.InfoTips[i19].Language)...)
 				}
 				r = append(r, 125)
 			}
 			r = append(r, 93)
 		}
-		if len(me.Extras.SrcIntels.Refs) != 0 {
+		if len(me.Extras.Refs) != 0 {
 			r = append(r, ",\"Refs\":"...)
 			r = append(r, 91)
-			for i20 := range me.Extras.SrcIntels.Refs {
-				if nil != me.Extras.SrcIntels.Refs[i20] {
+			for i20 := range me.Extras.Refs {
+				if nil != me.Extras.Refs[i20] {
 					if i20 != 0 {
 						r = append(r, 44)
 					}
 					r = append(r, 123)
 					{
 						r = append(r, "\"e\":"...)
-						r = append(r, pkg__strconv.FormatInt((int64)(me.Extras.SrcIntels.Refs[i20].Flag), 10)...)
+						r = append(r, pkg__strconv.FormatInt((int64)(me.Extras.Refs[i20].Flag), 10)...)
 					}
-					if len(me.Extras.SrcIntels.Refs[i20].FilePath) != 0 {
+					if len(me.Extras.Refs[i20].FilePath) != 0 {
 						r = append(r, ",\"f\":"...)
-						r = append(r, pkg__strconv.Quote(me.Extras.SrcIntels.Refs[i20].FilePath)...)
+						r = append(r, pkg__strconv.Quote(me.Extras.Refs[i20].FilePath)...)
 					}
-					if nil != me.Extras.SrcIntels.Refs[i20].Pos {
+					if nil != me.Extras.Refs[i20].Pos {
 						r = append(r, ",\"p\":"...)
 						r = append(r, 123)
-						if me.Extras.SrcIntels.Refs[i20].Pos.Ln != 0 {
+						if me.Extras.Refs[i20].Pos.Ln != 0 {
 							r = append(r, "\"l\":"...)
-							r = append(r, pkg__strconv.FormatInt((int64)(me.Extras.SrcIntels.Refs[i20].Pos.Ln), 10)...)
+							r = append(r, pkg__strconv.FormatInt((int64)(me.Extras.Refs[i20].Pos.Ln), 10)...)
 						}
-						if me.Extras.SrcIntels.Refs[i20].Pos.Col != 0 {
+						if me.Extras.Refs[i20].Pos.Col != 0 {
 							r = append(r, ",\"c\":"...)
-							r = append(r, pkg__strconv.FormatInt((int64)(me.Extras.SrcIntels.Refs[i20].Pos.Col), 10)...)
+							r = append(r, pkg__strconv.FormatInt((int64)(me.Extras.Refs[i20].Pos.Col), 10)...)
 						}
-						if me.Extras.SrcIntels.Refs[i20].Pos.Off != 0 {
+						if me.Extras.Refs[i20].Pos.Off != 0 {
 							r = append(r, ",\"o\":"...)
-							r = append(r, pkg__strconv.FormatInt((int64)(me.Extras.SrcIntels.Refs[i20].Pos.Off), 10)...)
+							r = append(r, pkg__strconv.FormatInt((int64)(me.Extras.Refs[i20].Pos.Off), 10)...)
 						}
 						r = append(r, 125)
 					} else if false {
 						r = append(r, ",\"p\":"...)
 						r = append(r, "null"...)
 					}
-					if nil != me.Extras.SrcIntels.Refs[i20].Range {
+					if nil != me.Extras.Refs[i20].Range {
 						r = append(r, ",\"r\":"...)
 						r = append(r, 123)
 						r = append(r, "\"s\":"...)
 						r = append(r, 123)
-						if me.Extras.SrcIntels.Refs[i20].Range.Start.Ln != 0 {
+						if me.Extras.Refs[i20].Range.Start.Ln != 0 {
 							r = append(r, "\"l\":"...)
-							r = append(r, pkg__strconv.FormatInt((int64)(me.Extras.SrcIntels.Refs[i20].Range.Start.Ln), 10)...)
+							r = append(r, pkg__strconv.FormatInt((int64)(me.Extras.Refs[i20].Range.Start.Ln), 10)...)
 						}
-						if me.Extras.SrcIntels.Refs[i20].Range.Start.Col != 0 {
+						if me.Extras.Refs[i20].Range.Start.Col != 0 {
 							r = append(r, ",\"c\":"...)
-							r = append(r, pkg__strconv.FormatInt((int64)(me.Extras.SrcIntels.Refs[i20].Range.Start.Col), 10)...)
+							r = append(r, pkg__strconv.FormatInt((int64)(me.Extras.Refs[i20].Range.Start.Col), 10)...)
 						}
-						if me.Extras.SrcIntels.Refs[i20].Range.Start.Off != 0 {
+						if me.Extras.Refs[i20].Range.Start.Off != 0 {
 							r = append(r, ",\"o\":"...)
-							r = append(r, pkg__strconv.FormatInt((int64)(me.Extras.SrcIntels.Refs[i20].Range.Start.Off), 10)...)
+							r = append(r, pkg__strconv.FormatInt((int64)(me.Extras.Refs[i20].Range.Start.Off), 10)...)
 						}
 						r = append(r, 125)
 						r = append(r, ",\"e\":"...)
 						r = append(r, 123)
-						if me.Extras.SrcIntels.Refs[i20].Range.End.Ln != 0 {
+						if me.Extras.Refs[i20].Range.End.Ln != 0 {
 							r = append(r, "\"l\":"...)
-							r = append(r, pkg__strconv.FormatInt((int64)(me.Extras.SrcIntels.Refs[i20].Range.End.Ln), 10)...)
+							r = append(r, pkg__strconv.FormatInt((int64)(me.Extras.Refs[i20].Range.End.Ln), 10)...)
 						}
-						if me.Extras.SrcIntels.Refs[i20].Range.End.Col != 0 {
+						if me.Extras.Refs[i20].Range.End.Col != 0 {
 							r = append(r, ",\"c\":"...)
-							r = append(r, pkg__strconv.FormatInt((int64)(me.Extras.SrcIntels.Refs[i20].Range.End.Col), 10)...)
+							r = append(r, pkg__strconv.FormatInt((int64)(me.Extras.Refs[i20].Range.End.Col), 10)...)
 						}
-						if me.Extras.SrcIntels.Refs[i20].Range.End.Off != 0 {
+						if me.Extras.Refs[i20].Range.End.Off != 0 {
 							r = append(r, ",\"o\":"...)
-							r = append(r, pkg__strconv.FormatInt((int64)(me.Extras.SrcIntels.Refs[i20].Range.End.Off), 10)...)
+							r = append(r, pkg__strconv.FormatInt((int64)(me.Extras.Refs[i20].Range.End.Off), 10)...)
 						}
 						r = append(r, 125)
 						r = append(r, 125)
@@ -1563,7 +1541,6 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 			}
 			r = append(r, 93)
 		}
-		r = append(r, 125)
 		{
 			r = append(r, ",\"Items\":"...)
 			r = append(r, 91)
@@ -1633,94 +1610,83 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, ",\"extras\":"...)
 		r = append(r, "null"...)
 	}
-	if nil != me.SrcLens {
-		r = append(r, ",\"SrcLens\":"...)
+	{
+		r = append(r, ",\"e\":"...)
+		r = append(r, pkg__strconv.FormatInt((int64)(me.Flag), 10)...)
+	}
+	if len(me.FilePath) != 0 {
+		r = append(r, ",\"f\":"...)
+		r = append(r, pkg__strconv.Quote(me.FilePath)...)
+	}
+	if nil != me.Pos {
+		r = append(r, ",\"p\":"...)
 		r = append(r, 123)
-		r = append(r, "\"SrcLoc\":"...)
-		r = append(r, 123)
-		{
-			r = append(r, "\"e\":"...)
-			r = append(r, pkg__strconv.FormatInt((int64)(me.SrcLens.SrcLoc.Flag), 10)...)
+		if me.Pos.Ln != 0 {
+			r = append(r, "\"l\":"...)
+			r = append(r, pkg__strconv.FormatInt((int64)(me.Pos.Ln), 10)...)
 		}
-		if len(me.SrcLens.SrcLoc.FilePath) != 0 {
-			r = append(r, ",\"f\":"...)
-			r = append(r, pkg__strconv.Quote(me.SrcLens.SrcLoc.FilePath)...)
+		if me.Pos.Col != 0 {
+			r = append(r, ",\"c\":"...)
+			r = append(r, pkg__strconv.FormatInt((int64)(me.Pos.Col), 10)...)
 		}
-		if nil != me.SrcLens.SrcLoc.Pos {
-			r = append(r, ",\"p\":"...)
-			r = append(r, 123)
-			if me.SrcLens.SrcLoc.Pos.Ln != 0 {
-				r = append(r, "\"l\":"...)
-				r = append(r, pkg__strconv.FormatInt((int64)(me.SrcLens.SrcLoc.Pos.Ln), 10)...)
-			}
-			if me.SrcLens.SrcLoc.Pos.Col != 0 {
-				r = append(r, ",\"c\":"...)
-				r = append(r, pkg__strconv.FormatInt((int64)(me.SrcLens.SrcLoc.Pos.Col), 10)...)
-			}
-			if me.SrcLens.SrcLoc.Pos.Off != 0 {
-				r = append(r, ",\"o\":"...)
-				r = append(r, pkg__strconv.FormatInt((int64)(me.SrcLens.SrcLoc.Pos.Off), 10)...)
-			}
-			r = append(r, 125)
-		} else if false {
-			r = append(r, ",\"p\":"...)
-			r = append(r, "null"...)
-		}
-		if nil != me.SrcLens.SrcLoc.Range {
-			r = append(r, ",\"r\":"...)
-			r = append(r, 123)
-			r = append(r, "\"s\":"...)
-			r = append(r, 123)
-			if me.SrcLens.SrcLoc.Range.Start.Ln != 0 {
-				r = append(r, "\"l\":"...)
-				r = append(r, pkg__strconv.FormatInt((int64)(me.SrcLens.SrcLoc.Range.Start.Ln), 10)...)
-			}
-			if me.SrcLens.SrcLoc.Range.Start.Col != 0 {
-				r = append(r, ",\"c\":"...)
-				r = append(r, pkg__strconv.FormatInt((int64)(me.SrcLens.SrcLoc.Range.Start.Col), 10)...)
-			}
-			if me.SrcLens.SrcLoc.Range.Start.Off != 0 {
-				r = append(r, ",\"o\":"...)
-				r = append(r, pkg__strconv.FormatInt((int64)(me.SrcLens.SrcLoc.Range.Start.Off), 10)...)
-			}
-			r = append(r, 125)
-			r = append(r, ",\"e\":"...)
-			r = append(r, 123)
-			if me.SrcLens.SrcLoc.Range.End.Ln != 0 {
-				r = append(r, "\"l\":"...)
-				r = append(r, pkg__strconv.FormatInt((int64)(me.SrcLens.SrcLoc.Range.End.Ln), 10)...)
-			}
-			if me.SrcLens.SrcLoc.Range.End.Col != 0 {
-				r = append(r, ",\"c\":"...)
-				r = append(r, pkg__strconv.FormatInt((int64)(me.SrcLens.SrcLoc.Range.End.Col), 10)...)
-			}
-			if me.SrcLens.SrcLoc.Range.End.Off != 0 {
-				r = append(r, ",\"o\":"...)
-				r = append(r, pkg__strconv.FormatInt((int64)(me.SrcLens.SrcLoc.Range.End.Off), 10)...)
-			}
-			r = append(r, 125)
-			r = append(r, 125)
-		} else if false {
-			r = append(r, ",\"r\":"...)
-			r = append(r, "null"...)
+		if me.Pos.Off != 0 {
+			r = append(r, ",\"o\":"...)
+			r = append(r, pkg__strconv.FormatInt((int64)(me.Pos.Off), 10)...)
 		}
 		r = append(r, 125)
-		if len(me.SrcLens.Txt) != 0 {
-			r = append(r, ",\"t\":"...)
-			r = append(r, pkg__strconv.Quote(me.SrcLens.Txt)...)
-		}
-		if len(me.SrcLens.Str) != 0 {
-			r = append(r, ",\"s\":"...)
-			r = append(r, pkg__strconv.Quote(me.SrcLens.Str)...)
-		}
-		if me.SrcLens.CrLf {
-			r = append(r, ",\"l\":"...)
-			r = append(r, pkg__strconv.FormatBool(me.SrcLens.CrLf)...)
-		}
-		r = append(r, 125)
-	} else if true {
-		r = append(r, ",\"SrcLens\":"...)
+	} else if false {
+		r = append(r, ",\"p\":"...)
 		r = append(r, "null"...)
+	}
+	if nil != me.Range {
+		r = append(r, ",\"r\":"...)
+		r = append(r, 123)
+		r = append(r, "\"s\":"...)
+		r = append(r, 123)
+		if me.Range.Start.Ln != 0 {
+			r = append(r, "\"l\":"...)
+			r = append(r, pkg__strconv.FormatInt((int64)(me.Range.Start.Ln), 10)...)
+		}
+		if me.Range.Start.Col != 0 {
+			r = append(r, ",\"c\":"...)
+			r = append(r, pkg__strconv.FormatInt((int64)(me.Range.Start.Col), 10)...)
+		}
+		if me.Range.Start.Off != 0 {
+			r = append(r, ",\"o\":"...)
+			r = append(r, pkg__strconv.FormatInt((int64)(me.Range.Start.Off), 10)...)
+		}
+		r = append(r, 125)
+		r = append(r, ",\"e\":"...)
+		r = append(r, 123)
+		if me.Range.End.Ln != 0 {
+			r = append(r, "\"l\":"...)
+			r = append(r, pkg__strconv.FormatInt((int64)(me.Range.End.Ln), 10)...)
+		}
+		if me.Range.End.Col != 0 {
+			r = append(r, ",\"c\":"...)
+			r = append(r, pkg__strconv.FormatInt((int64)(me.Range.End.Col), 10)...)
+		}
+		if me.Range.End.Off != 0 {
+			r = append(r, ",\"o\":"...)
+			r = append(r, pkg__strconv.FormatInt((int64)(me.Range.End.Off), 10)...)
+		}
+		r = append(r, 125)
+		r = append(r, 125)
+	} else if false {
+		r = append(r, ",\"r\":"...)
+		r = append(r, "null"...)
+	}
+	if len(me.Txt) != 0 {
+		r = append(r, ",\"t\":"...)
+		r = append(r, pkg__strconv.Quote(me.Txt)...)
+	}
+	if len(me.Str) != 0 {
+		r = append(r, ",\"s\":"...)
+		r = append(r, pkg__strconv.Quote(me.Str)...)
+	}
+	if me.CrLf {
+		r = append(r, ",\"l\":"...)
+		r = append(r, pkg__strconv.FormatBool(me.CrLf)...)
 	}
 	if nil != me.Link {
 		if me.Link != nil {

@@ -10,7 +10,7 @@ import (
 type fooResp struct {
 	IpcID    IpcIDs `json:"ii"`
 	ReqID    int64  `json:"ri,omitempty"`
-	Flag     bool
+	Flagg    bool
 	ErrMsg   string    `json:"err,omitempty"`
 	SrcIntel *SrcIntel `json:"sI,omitempty"`
 	SrcDiags *Diags    `json:"srcDiags,omitempty"`
