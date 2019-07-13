@@ -534,7 +534,7 @@ func (me *fooResp) StructFieldsSet(name string, v interface{}) (okName bool, okT
 func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 128)
 	r = append(r, 123)
-	if true {
+	{
 		r = append(r, "\"ii\":"...)
 		r = append(r, pkg__strconv.FormatInt((int64)(me.IpcID), 10)...)
 	}
@@ -542,7 +542,7 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, ",\"ri\":"...)
 		r = append(r, pkg__strconv.FormatInt((int64)(me.ReqID), 10)...)
 	}
-	if true {
+	{
 		r = append(r, ",\"Flag\":"...)
 		r = append(r, pkg__strconv.FormatBool(me.Flag)...)
 	}
@@ -556,36 +556,52 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 	r = append(r, "*null"...)
 	r = append(r, ",\"IpcReq\":"...)
 	r = append(r, "*null"...)
+	if len(me.SrcMods) != 0 {
+		r = append(r, ",\"srcMods\":"...)
+		r = append(r, 91)
+		for i1 := range me.SrcMods {
+			if i1 != 0 {
+				r = append(r, 44)
+			}
+			r = append(r, "*null"...)
+		}
+		r = append(r, 93)
+	}
 	if len(me.SrcActions) != 0 {
 		r = append(r, ",\"srcActions\":"...)
 		r = append(r, 91)
-		for i := range me.SrcActions {
+		for i2 := range me.SrcActions {
+			if i2 != 0 {
+				r = append(r, 44)
+			}
 			r = append(r, 123)
-			if true {
+			{
 				r = append(r, "\"title\":"...)
-				r = append(r, pkg__strconv.Quote(me.SrcActions[i].Title)...)
+				r = append(r, pkg__strconv.Quote(me.SrcActions[i2].Title)...)
 			}
-			if true {
+			{
 				r = append(r, ",\"command\":"...)
-				r = append(r, pkg__strconv.Quote(me.SrcActions[i].Cmd)...)
+				r = append(r, pkg__strconv.Quote(me.SrcActions[i2].Cmd)...)
 			}
-			if len(me.SrcActions[i].Hint) != 0 {
+			if len(me.SrcActions[i2].Hint) != 0 {
 				r = append(r, ",\"tooltip\":"...)
-				r = append(r, pkg__strconv.Quote(me.SrcActions[i].Hint)...)
+				r = append(r, pkg__strconv.Quote(me.SrcActions[i2].Hint)...)
 			}
-			if len(me.SrcActions[i].Arguments) != 0 {
+			if len(me.SrcActions[i2].Arguments) != 0 {
 				r = append(r, ",\"arguments\":"...)
 				r = append(r, 91)
-				for i := range me.SrcActions[i].Arguments {
-					if me.SrcActions[i].Arguments[i] != nil {
-						r = append(r, 44)
+				for i3 := range me.SrcActions[i2].Arguments {
+					if me.SrcActions[i2].Arguments[i3] != nil {
+						if i3 != 0 {
+							r = append(r, 44)
+						}
 						var e error
 						var sl []byte
-						j, ok := me.SrcActions[i].Arguments[i].(pkg__encoding_json.Marshaler)
+						j, ok := me.SrcActions[i2].Arguments[i3].(pkg__encoding_json.Marshaler)
 						if ok && (j != nil) {
 							sl, e = j.MarshalJSON()
 						} else {
-							sl, e = pkg__encoding_json.Marshal(me.SrcActions[i].Arguments[i])
+							sl, e = pkg__encoding_json.Marshal(me.SrcActions[i2].Arguments[i3])
 						}
 						if e == nil {
 							r = append(r, sl...)
@@ -594,7 +610,9 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 							return
 						}
 					} else {
-						r = append(r, 44)
+						if i3 != 0 {
+							r = append(r, 44)
+						}
 						r = append(r, "null"...)
 					}
 				}
