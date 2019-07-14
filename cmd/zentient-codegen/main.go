@@ -25,9 +25,12 @@ func main() {
 	// temporaries..
 	gentjson.Gents.Structs.Marshal.Name, gentjson.Gents.Structs.Unmarshal.Name = "preview_"+gentjson.Gents.Structs.Marshal.Name, "preview_"+gentjson.Gents.Structs.Unmarshal.Name
 	gentjson.Gents.Structs.RunOnlyForTypes.Named = []string{
-		"fooResp", "SrcPos", "SrcRange", "WorkspaceChanges", "SrcModEdit", "SrcLoc",
+		"SrcPos", "SrcRange", "WorkspaceChanges", "SrcModEdit", "SrcLoc",
 		"SrcLens", "SrcIntelSigHelp", "SrcIntelSigInfo", "SrcIntelSigParam",
-		"SrcIntelDoc", "SrcIntels", "SrcIntelCompl",
+		"SrcIntelDoc", "SrcIntel", "SrcIntels", "SrcIntelCompl", "SrcInfoTip",
+		"SrcAnnotaction", "MenuItem", "Menu", "ExtrasItem", "EditorAction",
+		"DiagItem", "DiagFixUps", "Caddy", "MenuResponse", "Extras", "Diags",
+		"IpcResp",
 	}
 
 	pkgs.MustRunGentsAndGenerateOutputFiles(nil, gents)
