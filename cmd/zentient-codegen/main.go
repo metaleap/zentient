@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/go-leap/dev/go/gen"
+	. "github.com/go-leap/dev/go/gen"
 	"github.com/go-leap/str"
 	"github.com/metaleap/go-gent"
 	"github.com/metaleap/go-gent/gents/enums"
@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	udevgogen.Self.Name = "me"
+	Self.Name = "me"
 	pkgs := gent.MustLoadPkgs(map[string]string{
 		"github.com/metaleap/zentient": "°gent.go",
 	})
@@ -25,7 +25,6 @@ func main() {
 	gentenums.Gents.Stringers.RunNeverForTypes.Named = []string{"ToolCats"}
 	gentenums.Gents.Stringers.All[0].SkipEarlyChecks = true
 
-	gentjson.Gents.OtherTypes.Marshal.ResliceInsteadOfWhitespace = false
 	gentjson.Gents.OtherTypes.Marshal.Name, gentjson.Gents.OtherTypes.Unmarshal.Name =
 		"preview_"+gentjson.Gents.OtherTypes.Marshal.Name, "preview_"+gentjson.Gents.OtherTypes.Unmarshal.Name
 	typeNames4Marshal := []string{
@@ -48,6 +47,14 @@ func main() {
 	}
 	gentjson.Gents.OtherTypes.RunOnlyForTypes.Named =
 		append(typeNames4Marshal, typeNames4Unmarshal...)
+	gentjson.Gents.OtherTypes.Marshal.ResliceInsteadOfWhitespace = true
+	gentjson.Gents.OtherTypes.Marshal.GenPanicImplsForOthers = true
+	gentjson.Gents.OtherTypes.Marshal.GenPrintlnOnStdlibFallbacks = true
+	gentjson.Gents.OtherTypes.Marshal.TryInterfaceTypesBeforeStdlib = []*TypeRef{
+		T.String,
+		T.SliceOf.Strings,
+		// TMap(T.String, T.Empty.Interface),
+	}
 
 	timetaken, _ := pkgs.MustRunGentsAndGenerateOutputFiles(nil, gents)
 	println(timetaken.String())

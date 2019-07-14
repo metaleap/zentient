@@ -1,8 +1,10 @@
 package z
 
 import (
+	"encoding/json"
 	"fmt"
 	"runtime/debug"
+	"strings"
 
 	"github.com/go-leap/run"
 )
@@ -17,16 +19,16 @@ func send(resp *IpcResp) (err error) {
 
 	if err = Prog.pipeIO.stdoutEncoder.Encode(resp); err == nil {
 		err = Prog.pipeIO.stdoutWriter.Flush()
-		// if resp.IpcID != 23 {
-		// 	b, _ := resp.preview_MarshalJSON()
-		// 	have := string(b)
-		// 	b, _ = json.Marshal(resp)
-		// 	want := string(b)
-		// 	if want != have {
-		// 		println("WANT:" + want)
-		// 		println("HAVE:" + have)
-		// 	}
-		// }
+		if resp.IpcID != 23 && len(resp.SrcMods) == 0 {
+			b, _ := resp.preview_MarshalJSON()
+			have := string(b)
+			b, _ = json.Marshal(resp)
+			want := string(b)
+			if want != have && strings.Index(want, `\u`) < 0 {
+				println("WANT:" + want)
+				println("HAVE:" + have)
+			}
+		}
 	}
 	return
 }
