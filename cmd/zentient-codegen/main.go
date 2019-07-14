@@ -27,23 +27,25 @@ func main() {
 
 	gentjson.Gents.OtherTypes.Marshal.Name, gentjson.Gents.OtherTypes.Unmarshal.Name =
 		"preview_"+gentjson.Gents.OtherTypes.Marshal.Name, "preview_"+gentjson.Gents.OtherTypes.Unmarshal.Name
-	marshalTypes, unmarshalTypes := []string{
+	typeNames4Marshal := []string{
 		"IpcResp", "SrcPos", "SrcRange", "SrcModEdit", "SrcLoc", "SrcLens",
 		"SrcIntelSigHelp", "SrcIntelSigInfo", "SrcIntelSigParam", "SrcIntelDoc",
 		"SrcIntel", "SrcIntels", "SrcIntelCompl", "SrcInfoTip", "SrcAnnotaction",
 		"MenuItem", "Menu", "ExtrasItem", "MenuResponse", "Extras",
 		"DiagItem", "DiagFixUps", "Caddy", "Diags", "EditorAction",
-	}, []string{
+	}
+	typeNames4Unmarshal := []string{
 		"IpcReq", "WorkspaceChanges", "SrcLens", "SrcLoc", "SrcPos", "SrcRange",
 	}
 	gentjson.Gents.OtherTypes.Marshal.MayGenFor = func(t *gent.Type) bool {
-		return ustr.In(t.Name, marshalTypes...)
+		return ustr.In(t.Name, typeNames4Marshal...)
 	}
 	gentjson.Gents.OtherTypes.Unmarshal.MayGenFor = func(t *gent.Type) bool {
-		return ustr.In(t.Name, unmarshalTypes...)
+		return ustr.In(t.Name, typeNames4Unmarshal...)
 	}
 	gentjson.Gents.OtherTypes.RunOnlyForTypes.Named =
-		append(marshalTypes, unmarshalTypes...)
+		append(typeNames4Marshal, typeNames4Unmarshal...)
 
-	pkgs.MustRunGentsAndGenerateOutputFiles(nil, gents)
+	timetaken, _ := pkgs.MustRunGentsAndGenerateOutputFiles(nil, gents)
+	println(timetaken.String())
 }
