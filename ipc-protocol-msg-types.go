@@ -273,6 +273,12 @@ type MenuItem struct {
 	tag string
 }
 
+type MenuItemArgPrompt struct {
+	Prompt      string `json:"prompt,omitempty"`
+	Placeholder string `json:"placeHolder,omitempty"`
+	Value       string `json:"value,omitempty"`
+}
+
 type SrcAnnotaction struct {
 	Range   SrcRange
 	Title   string

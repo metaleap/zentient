@@ -29,10 +29,10 @@ func main() {
 		"preview_"+gentjson.Gents.OtherTypes.Marshal.Name, "preview_"+gentjson.Gents.OtherTypes.Unmarshal.Name
 	typeNames4Marshal := []string{
 		"IpcResp", "SrcPos", "SrcRange", "SrcModEdit", "SrcModEdits",
-		"SrcLoc", "SrcLens", "SrcLenses", "SrcLocs",
+		"SrcLoc", "SrcLens", "SrcLenses", "SrcLocs", "Caddy",
 		"SrcIntelSigHelp", "SrcIntelSigInfo", "SrcIntelSigParam", "SrcIntelDoc",
 		"SrcIntel", "SrcIntels", "SrcIntelCompl", "SrcIntelCompls",
-		"MenuItem", "Menu", "MenuItems", "MenuResponse", "Caddy",
+		"MenuItem", "Menu", "MenuItems", "MenuResponse", "MenuItemArgPrompt",
 		"DiagItem", "DiagFixUps", "Diags", "DiagItemsBy", "DiagItems",
 		"EditorAction", "ExtrasItem", "Extras", "SrcInfoTip", "SrcAnnotaction",
 	}
@@ -51,9 +51,10 @@ func main() {
 	gentjson.Gents.OtherTypes.Marshal.GenPanicImplsForOthers = true
 	gentjson.Gents.OtherTypes.Marshal.GenPrintlnOnStdlibFallbacks = true
 	gentjson.Gents.OtherTypes.Marshal.TryInterfaceTypesBeforeStdlib = []*TypeRef{
+		T.Empty.Interface,
 		T.String,
 		T.SliceOf.Strings,
-		// TMap(T.String, T.Empty.Interface),
+		TMap(T.String, T.Empty.Interface),
 	}
 
 	timetaken, _ := pkgs.MustRunGentsAndGenerateOutputFiles(nil, gents)

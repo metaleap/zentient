@@ -11,12 +11,6 @@ type IMenuItems interface {
 	MenuCategory() string
 }
 
-type menuItemIpcArgPrompt struct {
-	Prompt      string `json:"prompt,omitempty"`
-	Placeholder string `json:"placeHolder,omitempty"`
-	Value       string `json:"value,omitempty"`
-}
-
 type mainMenu struct {
 }
 

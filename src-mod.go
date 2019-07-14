@@ -253,7 +253,7 @@ func (me *SrcModBase) onSetDefMenu(req *IpcReq, resp *IpcResp) {
 	m := Menu{Desc: "First pick a known formatter, then optionally specify a custom tool name:"}
 	for _, kf := range me.Impl.KnownFormatters() {
 		var cmd = MenuItem{Title: kf.Name, IpcID: IPCID_SRCMOD_FMT_SETDEFPICK}
-		cmd.IpcArgs = map[string]interface{}{"fn": kf.Name, "fp": menuItemIpcArgPrompt{Placeholder: kf.Name,
+		cmd.IpcArgs = map[string]interface{}{"fn": kf.Name, "fp": MenuItemArgPrompt{Placeholder: kf.Name,
 			Prompt: Strf("Optionally enter the name of an alternative '%s'-compatible equivalent tool to use", kf.Name)}}
 		cmd.Desc = Strf("➜ Pick to use '%s' (or compatible equivalent) as the default %s formatter", kf.Name, Lang.Title)
 		if kf.Name != Prog.Cfg.FormatterName || !me.isFormatterCustom() {

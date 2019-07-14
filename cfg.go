@@ -284,7 +284,7 @@ func (me *SettingsBase) onListAll(menu *MenuResponse) {
 			svcur = Strf("%v", ks.ValCfg)
 		}
 		ks.menuItem.Hint = Strf("Default: %s — Current: %s", svdef, svcur)
-		ks.menuItem.IpcArgs = map[string]interface{}{"id": ks.Id, "val": menuItemIpcArgPrompt{Placeholder: ks.Desc,
+		ks.menuItem.IpcArgs = map[string]interface{}{"id": ks.Id, "val": MenuItemArgPrompt{Placeholder: ks.Desc,
 			Prompt: "Specify as instructed, or clear to reset.", Value: ks.ValStr()}}
 		menu.SubMenu.Items = append(menu.SubMenu.Items, ks.menuItem)
 	}

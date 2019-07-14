@@ -19,7 +19,7 @@ func send(resp *IpcResp) (err error) {
 
 	if err = Prog.pipeIO.stdoutEncoder.Encode(resp); err == nil {
 		err = Prog.pipeIO.stdoutWriter.Flush()
-		if resp.IpcID != 23 && len(resp.SrcMods) == 0 {
+		if resp.IpcID != 23 && len(resp.SrcMods) == 0 && resp.Menu == nil {
 			b, _ := resp.preview_MarshalJSON()
 			have := string(b)
 			b, _ = json.Marshal(resp)

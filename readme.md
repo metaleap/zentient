@@ -999,6 +999,17 @@ type MenuItem struct {
 ```
 
 
+#### type MenuItemArgPrompt
+
+```go
+type MenuItemArgPrompt struct {
+	Prompt      string `json:"prompt,omitempty"`
+	Placeholder string `json:"placeHolder,omitempty"`
+	Value       string `json:"value,omitempty"`
+}
+```
+
+
 #### type MenuItems
 
 ```go
