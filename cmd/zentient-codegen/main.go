@@ -28,11 +28,13 @@ func main() {
 	gentjson.Gents.OtherTypes.Marshal.Name, gentjson.Gents.OtherTypes.Unmarshal.Name =
 		"preview_"+gentjson.Gents.OtherTypes.Marshal.Name, "preview_"+gentjson.Gents.OtherTypes.Unmarshal.Name
 	typeNames4Marshal := []string{
-		"IpcResp", "SrcPos", "SrcRange", "SrcModEdit", "SrcLoc", "SrcLens",
+		"IpcResp", "SrcPos", "SrcRange", "SrcModEdit", "SrcModEdits",
+		"SrcLoc", "SrcLens", "SrcLenses", "SrcLocs",
 		"SrcIntelSigHelp", "SrcIntelSigInfo", "SrcIntelSigParam", "SrcIntelDoc",
-		"SrcIntel", "SrcIntels", "SrcIntelCompl", "SrcInfoTip", "SrcAnnotaction",
-		"MenuItem", "Menu", "ExtrasItem", "MenuResponse", "Extras",
-		"DiagItem", "DiagFixUps", "Caddy", "Diags", "EditorAction",
+		"SrcIntel", "SrcIntels", "SrcIntelCompl", "SrcIntelCompls",
+		"MenuItem", "Menu", "MenuItems", "MenuResponse", "Caddy",
+		"DiagItem", "DiagFixUps", "Diags", "DiagItemsBy", "DiagItems",
+		"EditorAction", "ExtrasItem", "Extras", "SrcInfoTip", "SrcAnnotaction",
 	}
 	typeNames4Unmarshal := []string{
 		"IpcReq", "WorkspaceChanges", "SrcLens", "SrcLoc", "SrcPos", "SrcRange",
