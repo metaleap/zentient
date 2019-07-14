@@ -154,7 +154,7 @@ func (*goSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (all z.SrcLocs
 	byteoff := srcLens.ByteOffsetForPos(srcLens.Pos)
 	gw, err := udevgo.QueryWhat_Guru(srcLens.FilePath, srcLens.Txt, ustr.Int(byteoff))
 	if err != nil {
-		panic(err)
+		return
 	}
 	all = make(z.SrcLocs, 0, len(gw.SameIDs))
 	for _, sameid := range gw.SameIDs {

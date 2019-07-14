@@ -25,6 +25,7 @@ func main() {
 	gentenums.Gents.Stringers.RunNeverForTypes.Named = []string{"ToolCats"}
 	gentenums.Gents.Stringers.All[0].SkipEarlyChecks = true
 
+	gentjson.Gents.OtherTypes.Marshal.ResliceInsteadOfWhitespace = false
 	gentjson.Gents.OtherTypes.Marshal.Name, gentjson.Gents.OtherTypes.Unmarshal.Name =
 		"preview_"+gentjson.Gents.OtherTypes.Marshal.Name, "preview_"+gentjson.Gents.OtherTypes.Unmarshal.Name
 	typeNames4Marshal := []string{

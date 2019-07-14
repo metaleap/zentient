@@ -55,8 +55,9 @@ func (me *IpcResp) postProcess() {
 
 func (me *IpcResp) onResponseReady() {
 	if except := recover(); except != nil {
-		debug.PrintStack()
 		me.ErrMsg = Strf("%v", except)
+		println(me.ErrMsg)
+		debug.PrintStack()
 	}
 	if me.ErrMsg != "" {
 		me.ErrMsg = Strf("[%s] %s", Prog.Name, strings.TrimPrefix(me.ErrMsg, Prog.Name+": "))
