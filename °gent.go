@@ -292,13 +292,135 @@ formatNum:
 }
 
 // preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me *SrcIntelCompl) preview_MarshalJSON() (r []byte, err error) {
+	r = make([]byte, 0, 64)
+	if me == nil {
+		r = append(r, "null"...)
+	} else {
+		r = append(r, 123)
+		si1 := len(r)
+		{
+			r = append(r, ",\"kind\":"...)
+			r = append(r, pkg__strconv.FormatInt((int64)(me.Kind), 10)...)
+		}
+		{
+			r = append(r, ",\"label\":"...)
+			r = append(r, pkg__strconv.Quote(me.Label)...)
+		}
+		if nil != me.Documentation {
+			{
+				r = append(r, ",\"documentation\":"...)
+				var e error
+				var sl []byte
+				sl, e = me.Documentation.preview_MarshalJSON()
+				if e == nil {
+					r = append(r, sl...)
+				} else {
+					err = e
+					return
+				}
+			}
+		}
+		if len(me.Detail) != 0 {
+			r = append(r, ",\"detail\":"...)
+			r = append(r, pkg__strconv.Quote(me.Detail)...)
+		}
+		if len(me.SortText) != 0 {
+			r = append(r, ",\"sortText\":"...)
+			r = append(r, pkg__strconv.Quote(me.SortText)...)
+		}
+		r = append(r, 125)
+		if r[si1] == 44 {
+			r[si1] = 32
+		}
+	}
+	return
+}
+
+// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *SrcIntelCompl) preview_UnmarshalJSON(v []byte) (err error) { return }
+
+// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me *SrcIntels) preview_MarshalJSON() (r []byte, err error) {
+	r = make([]byte, 0, 64)
+	if me == nil {
+		r = append(r, "null"...)
+	} else {
+		r = append(r, 123)
+		si2 := len(r)
+		if len(me.InfoTips) != 0 {
+			r = append(r, ",\"InfoTips\":"...)
+			r = append(r, 91)
+			ai4 := len(r)
+			for i3 := range me.InfoTips {
+				r = append(r, 44)
+				r = append(r, 123)
+				si5 := len(r)
+				{
+					r = append(r, ",\"value\":"...)
+					r = append(r, pkg__strconv.Quote(me.InfoTips[i3].Value)...)
+				}
+				if len(me.InfoTips[i3].Language) != 0 {
+					r = append(r, ",\"language\":"...)
+					r = append(r, pkg__strconv.Quote(me.InfoTips[i3].Language)...)
+				}
+				r = append(r, 125)
+				if r[si5] == 44 {
+					r[si5] = 32
+				}
+			}
+			r = append(r, 93)
+			if r[ai4] == 44 {
+				r[ai4] = 32
+			}
+		}
+		if len(me.Refs) != 0 {
+			r = append(r, ",\"Refs\":"...)
+			r = append(r, 91)
+			ai7 := len(r)
+			for i6 := range me.Refs {
+				if nil != me.Refs[i6] {
+					{
+						r = append(r, 44)
+						var e error
+						var sl []byte
+						sl, e = me.Refs[i6].preview_MarshalJSON()
+						if e == nil {
+							r = append(r, sl...)
+						} else {
+							err = e
+							return
+						}
+					}
+				} else {
+					r = append(r, 44)
+					r = append(r, "null"...)
+				}
+			}
+			r = append(r, 93)
+			if r[ai7] == 44 {
+				r[ai7] = 32
+			}
+		}
+		r = append(r, 125)
+		if r[si2] == 44 {
+			r[si2] = 32
+		}
+	}
+	return
+}
+
+// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *SrcIntels) preview_UnmarshalJSON(v []byte) (err error) { return }
+
+// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
 func (me *SrcIntelDoc) preview_MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if me == nil {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 123)
-		idx1 := len(r)
+		si8 := len(r)
 		if len(me.Value) != 0 {
 			r = append(r, ",\"value\":"...)
 			r = append(r, pkg__strconv.Quote(me.Value)...)
@@ -308,8 +430,8 @@ func (me *SrcIntelDoc) preview_MarshalJSON() (r []byte, err error) {
 			r = append(r, pkg__strconv.FormatBool(me.IsTrusted)...)
 		}
 		r = append(r, 125)
-		if r[idx1] == 44 {
-			r[idx1] = 32
+		if r[si8] == 44 {
+			r[si8] = 32
 		}
 	}
 	return
@@ -325,7 +447,7 @@ func (me *SrcIntelSigHelp) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 123)
-		idx2 := len(r)
+		si9 := len(r)
 		{
 			r = append(r, ",\"activeSignature\":"...)
 			r = append(r, pkg__strconv.FormatInt((int64)(me.ActiveSignature), 10)...)
@@ -337,14 +459,13 @@ func (me *SrcIntelSigHelp) preview_MarshalJSON() (r []byte, err error) {
 		if len(me.Signatures) != 0 {
 			r = append(r, ",\"signatures\":"...)
 			r = append(r, 91)
-			for i3 := range me.Signatures {
+			ai11 := len(r)
+			for i10 := range me.Signatures {
 				{
-					if i3 != 0 {
-						r = append(r, 44)
-					}
+					r = append(r, 44)
 					var e error
 					var sl []byte
-					sl, e = me.Signatures[i3].preview_MarshalJSON()
+					sl, e = me.Signatures[i10].preview_MarshalJSON()
 					if e == nil {
 						r = append(r, sl...)
 					} else {
@@ -354,10 +475,13 @@ func (me *SrcIntelSigHelp) preview_MarshalJSON() (r []byte, err error) {
 				}
 			}
 			r = append(r, 93)
+			if r[ai11] == 44 {
+				r[ai11] = 32
+			}
 		}
 		r = append(r, 125)
-		if r[idx2] == 44 {
-			r[idx2] = 32
+		if r[si9] == 44 {
+			r[si9] = 32
 		}
 	}
 	return
@@ -373,7 +497,7 @@ func (me *SrcIntelSigInfo) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 123)
-		idx4 := len(r)
+		si12 := len(r)
 		{
 			r = append(r, ",\"label\":"...)
 			r = append(r, pkg__strconv.Quote(me.Label)...)
@@ -393,14 +517,13 @@ func (me *SrcIntelSigInfo) preview_MarshalJSON() (r []byte, err error) {
 		{
 			r = append(r, ",\"parameters\":"...)
 			r = append(r, 91)
-			for i5 := range me.Parameters {
+			ai14 := len(r)
+			for i13 := range me.Parameters {
 				{
-					if i5 != 0 {
-						r = append(r, 44)
-					}
+					r = append(r, 44)
 					var e error
 					var sl []byte
-					sl, e = me.Parameters[i5].preview_MarshalJSON()
+					sl, e = me.Parameters[i13].preview_MarshalJSON()
 					if e == nil {
 						r = append(r, sl...)
 					} else {
@@ -410,10 +533,13 @@ func (me *SrcIntelSigInfo) preview_MarshalJSON() (r []byte, err error) {
 				}
 			}
 			r = append(r, 93)
+			if r[ai14] == 44 {
+				r[ai14] = 32
+			}
 		}
 		r = append(r, 125)
-		if r[idx4] == 44 {
-			r[idx4] = 32
+		if r[si12] == 44 {
+			r[si12] = 32
 		}
 	}
 	return
@@ -429,7 +555,7 @@ func (me *SrcIntelSigParam) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 123)
-		idx6 := len(r)
+		si15 := len(r)
 		{
 			r = append(r, ",\"label\":"...)
 			r = append(r, pkg__strconv.Quote(me.Label)...)
@@ -447,8 +573,8 @@ func (me *SrcIntelSigParam) preview_MarshalJSON() (r []byte, err error) {
 			}
 		}
 		r = append(r, 125)
-		if r[idx6] == 44 {
-			r[idx6] = 32
+		if r[si15] == 44 {
+			r[si15] = 32
 		}
 	}
 	return
@@ -464,7 +590,7 @@ func (me *SrcLens) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 123)
-		idx7 := len(r)
+		si16 := len(r)
 		{
 			r = append(r, ",\"e\":"...)
 			r = append(r, pkg__strconv.FormatInt((int64)(me.SrcLoc.Flag), 10)...)
@@ -514,8 +640,8 @@ func (me *SrcLens) preview_MarshalJSON() (r []byte, err error) {
 			r = append(r, pkg__strconv.FormatBool(me.CrLf)...)
 		}
 		r = append(r, 125)
-		if r[idx7] == 44 {
-			r[idx7] = 32
+		if r[si16] == 44 {
+			r[si16] = 32
 		}
 	}
 	return
@@ -531,7 +657,7 @@ func (me *SrcLoc) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 123)
-		idx8 := len(r)
+		si17 := len(r)
 		{
 			r = append(r, ",\"e\":"...)
 			r = append(r, pkg__strconv.FormatInt((int64)(me.Flag), 10)...)
@@ -569,8 +695,8 @@ func (me *SrcLoc) preview_MarshalJSON() (r []byte, err error) {
 			}
 		}
 		r = append(r, 125)
-		if r[idx8] == 44 {
-			r[idx8] = 32
+		if r[si17] == 44 {
+			r[si17] = 32
 		}
 	}
 	return
@@ -586,7 +712,7 @@ func (me *SrcModEdit) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 123)
-		idx9 := len(r)
+		si18 := len(r)
 		if nil != me.At {
 			{
 				r = append(r, ",\"At\":"...)
@@ -609,8 +735,8 @@ func (me *SrcModEdit) preview_MarshalJSON() (r []byte, err error) {
 			r = append(r, pkg__strconv.Quote(me.Val)...)
 		}
 		r = append(r, 125)
-		if r[idx9] == 44 {
-			r[idx9] = 32
+		if r[si18] == 44 {
+			r[si18] = 32
 		}
 	}
 	return
@@ -626,7 +752,7 @@ func (me *SrcPos) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 123)
-		idx10 := len(r)
+		si19 := len(r)
 		if me.Ln != 0 {
 			r = append(r, ",\"l\":"...)
 			r = append(r, pkg__strconv.FormatInt((int64)(me.Ln), 10)...)
@@ -640,8 +766,8 @@ func (me *SrcPos) preview_MarshalJSON() (r []byte, err error) {
 			r = append(r, pkg__strconv.FormatInt((int64)(me.Off), 10)...)
 		}
 		r = append(r, 125)
-		if r[idx10] == 44 {
-			r[idx10] = 32
+		if r[si19] == 44 {
+			r[si19] = 32
 		}
 	}
 	return
@@ -657,7 +783,7 @@ func (me *SrcRange) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 123)
-		idx11 := len(r)
+		si20 := len(r)
 		{
 			r = append(r, ",\"s\":"...)
 			var e error
@@ -683,8 +809,8 @@ func (me *SrcRange) preview_MarshalJSON() (r []byte, err error) {
 			}
 		}
 		r = append(r, 125)
-		if r[idx11] == 44 {
-			r[idx11] = 32
+		if r[si20] == 44 {
+			r[si20] = 32
 		}
 	}
 	return
@@ -700,95 +826,104 @@ func (me *WorkspaceChanges) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 123)
-		idx12 := len(r)
+		si21 := len(r)
 		{
 			r = append(r, ",\"AddedDirs\":"...)
 			r = append(r, 91)
-			for i13 := range me.AddedDirs {
+			ai23 := len(r)
+			for i22 := range me.AddedDirs {
 				{
-					if i13 != 0 {
-						r = append(r, 44)
-					}
-					r = append(r, pkg__strconv.Quote(me.AddedDirs[i13])...)
+					r = append(r, 44)
+					r = append(r, pkg__strconv.Quote(me.AddedDirs[i22])...)
 				}
 			}
 			r = append(r, 93)
+			if r[ai23] == 44 {
+				r[ai23] = 32
+			}
 		}
 		{
 			r = append(r, ",\"RemovedDirs\":"...)
 			r = append(r, 91)
-			for i14 := range me.RemovedDirs {
+			ai25 := len(r)
+			for i24 := range me.RemovedDirs {
 				{
-					if i14 != 0 {
-						r = append(r, 44)
-					}
-					r = append(r, pkg__strconv.Quote(me.RemovedDirs[i14])...)
+					r = append(r, 44)
+					r = append(r, pkg__strconv.Quote(me.RemovedDirs[i24])...)
 				}
 			}
 			r = append(r, 93)
+			if r[ai25] == 44 {
+				r[ai25] = 32
+			}
 		}
 		{
 			r = append(r, ",\"OpenedFiles\":"...)
 			r = append(r, 91)
-			for i15 := range me.OpenedFiles {
+			ai27 := len(r)
+			for i26 := range me.OpenedFiles {
 				{
-					if i15 != 0 {
-						r = append(r, 44)
-					}
-					r = append(r, pkg__strconv.Quote(me.OpenedFiles[i15])...)
+					r = append(r, 44)
+					r = append(r, pkg__strconv.Quote(me.OpenedFiles[i26])...)
 				}
 			}
 			r = append(r, 93)
+			if r[ai27] == 44 {
+				r[ai27] = 32
+			}
 		}
 		{
 			r = append(r, ",\"ClosedFiles\":"...)
 			r = append(r, 91)
-			for i16 := range me.ClosedFiles {
+			ai29 := len(r)
+			for i28 := range me.ClosedFiles {
 				{
-					if i16 != 0 {
-						r = append(r, 44)
-					}
-					r = append(r, pkg__strconv.Quote(me.ClosedFiles[i16])...)
+					r = append(r, 44)
+					r = append(r, pkg__strconv.Quote(me.ClosedFiles[i28])...)
 				}
 			}
 			r = append(r, 93)
+			if r[ai29] == 44 {
+				r[ai29] = 32
+			}
 		}
 		{
 			r = append(r, ",\"WrittenFiles\":"...)
 			r = append(r, 91)
-			for i17 := range me.WrittenFiles {
+			ai31 := len(r)
+			for i30 := range me.WrittenFiles {
 				{
-					if i17 != 0 {
-						r = append(r, 44)
-					}
-					r = append(r, pkg__strconv.Quote(me.WrittenFiles[i17])...)
+					r = append(r, 44)
+					r = append(r, pkg__strconv.Quote(me.WrittenFiles[i30])...)
 				}
 			}
 			r = append(r, 93)
+			if r[ai31] == 44 {
+				r[ai31] = 32
+			}
 		}
 		{
 			r = append(r, ",\"LiveFiles\":"...)
-			mf18 := true
 			r = append(r, 123)
-			for mk19, mv20 := range me.LiveFiles {
+			mi32 := len(r)
+			for mk33, mv34 := range me.LiveFiles {
 				{
 					{
-						if mf18 {
-							mf18 = false
-						} else {
-							r = append(r, 44)
-						}
-						r = append(r, pkg__strconv.Quote(mk19)...)
+						r = append(r, 44)
+						r = append(r, pkg__strconv.Quote(mk33)...)
 						r = append(r, 58)
 					}
-					r = append(r, pkg__strconv.Quote(mv20)...)
+					r = append(r, pkg__strconv.Quote(mv34)...)
 				}
 			}
 			r = append(r, 125)
+			if r[mi32] == 44 {
+				r[mi32] = 32
+			}
 		}
 		r = append(r, 125)
-		if r[idx12] == 44 {
-			r[idx12] = 32
+		if r[si21] == 44 {
+			r[si21] = 32
 		}
 	}
 	return
@@ -804,7 +939,7 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 123)
-		idx21 := len(r)
+		si35 := len(r)
 		{
 			r = append(r, ",\"ii\":"...)
 			r = append(r, pkg__strconv.FormatInt((int64)(me.IpcID), 10)...)
@@ -824,43 +959,44 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 		if nil != me.SrcIntel {
 			r = append(r, ",\"sI\":"...)
 			r = append(r, 123)
-			idx22 := len(r)
+			si36 := len(r)
 			if len(me.SrcIntel.SrcIntels.InfoTips) != 0 {
 				r = append(r, ",\"InfoTips\":"...)
 				r = append(r, 91)
-				for i23 := range me.SrcIntel.SrcIntels.InfoTips {
-					if i23 != 0 {
-						r = append(r, 44)
-					}
+				ai38 := len(r)
+				for i37 := range me.SrcIntel.SrcIntels.InfoTips {
+					r = append(r, 44)
 					r = append(r, 123)
-					idx24 := len(r)
+					si39 := len(r)
 					{
 						r = append(r, ",\"value\":"...)
-						r = append(r, pkg__strconv.Quote(me.SrcIntel.SrcIntels.InfoTips[i23].Value)...)
+						r = append(r, pkg__strconv.Quote(me.SrcIntel.SrcIntels.InfoTips[i37].Value)...)
 					}
-					if len(me.SrcIntel.SrcIntels.InfoTips[i23].Language) != 0 {
+					if len(me.SrcIntel.SrcIntels.InfoTips[i37].Language) != 0 {
 						r = append(r, ",\"language\":"...)
-						r = append(r, pkg__strconv.Quote(me.SrcIntel.SrcIntels.InfoTips[i23].Language)...)
+						r = append(r, pkg__strconv.Quote(me.SrcIntel.SrcIntels.InfoTips[i37].Language)...)
 					}
 					r = append(r, 125)
-					if r[idx24] == 44 {
-						r[idx24] = 32
+					if r[si39] == 44 {
+						r[si39] = 32
 					}
 				}
 				r = append(r, 93)
+				if r[ai38] == 44 {
+					r[ai38] = 32
+				}
 			}
 			if len(me.SrcIntel.SrcIntels.Refs) != 0 {
 				r = append(r, ",\"Refs\":"...)
 				r = append(r, 91)
-				for i25 := range me.SrcIntel.SrcIntels.Refs {
-					if nil != me.SrcIntel.SrcIntels.Refs[i25] {
+				ai41 := len(r)
+				for i40 := range me.SrcIntel.SrcIntels.Refs {
+					if nil != me.SrcIntel.SrcIntels.Refs[i40] {
 						{
-							if i25 != 0 {
-								r = append(r, 44)
-							}
+							r = append(r, 44)
 							var e error
 							var sl []byte
-							sl, e = me.SrcIntel.SrcIntels.Refs[i25].preview_MarshalJSON()
+							sl, e = me.SrcIntel.SrcIntels.Refs[i40].preview_MarshalJSON()
 							if e == nil {
 								r = append(r, sl...)
 							} else {
@@ -869,13 +1005,14 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 							}
 						}
 					} else {
-						if i25 != 0 {
-							r = append(r, 44)
-						}
+						r = append(r, 44)
 						r = append(r, "null"...)
 					}
 				}
 				r = append(r, 93)
+				if r[ai41] == 44 {
+					r[ai41] = 32
+				}
 			}
 			if nil != me.SrcIntel.Sig {
 				{
@@ -894,68 +1031,14 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 			if len(me.SrcIntel.Cmpl) != 0 {
 				r = append(r, ",\"Cmpl\":"...)
 				r = append(r, 91)
-				for i26 := range me.SrcIntel.Cmpl {
-					if nil != me.SrcIntel.Cmpl[i26] {
-						if i26 != 0 {
-							r = append(r, 44)
-						}
-						r = append(r, 123)
-						idx27 := len(r)
-						if me.SrcIntel.Cmpl[i26].Kind != 0 {
-							r = append(r, ",\"kind\":"...)
-							r = append(r, pkg__strconv.FormatInt((int64)(me.SrcIntel.Cmpl[i26].Kind), 10)...)
-						}
+				ai43 := len(r)
+				for i42 := range me.SrcIntel.Cmpl {
+					if nil != me.SrcIntel.Cmpl[i42] {
 						{
-							r = append(r, ",\"label\":"...)
-							r = append(r, pkg__strconv.Quote(me.SrcIntel.Cmpl[i26].Label)...)
-						}
-						if nil != me.SrcIntel.Cmpl[i26].Documentation {
-							{
-								r = append(r, ",\"documentation\":"...)
-								var e error
-								var sl []byte
-								sl, e = me.SrcIntel.Cmpl[i26].Documentation.preview_MarshalJSON()
-								if e == nil {
-									r = append(r, sl...)
-								} else {
-									err = e
-									return
-								}
-							}
-						}
-						if len(me.SrcIntel.Cmpl[i26].Detail) != 0 {
-							r = append(r, ",\"detail\":"...)
-							r = append(r, pkg__strconv.Quote(me.SrcIntel.Cmpl[i26].Detail)...)
-						}
-						if len(me.SrcIntel.Cmpl[i26].SortText) != 0 {
-							r = append(r, ",\"sortText\":"...)
-							r = append(r, pkg__strconv.Quote(me.SrcIntel.Cmpl[i26].SortText)...)
-						}
-						r = append(r, 125)
-						if r[idx27] == 44 {
-							r[idx27] = 32
-						}
-					} else {
-						if i26 != 0 {
 							r = append(r, 44)
-						}
-						r = append(r, "null"...)
-					}
-				}
-				r = append(r, 93)
-			}
-			if len(me.SrcIntel.Syms) != 0 {
-				r = append(r, ",\"Syms\":"...)
-				r = append(r, 91)
-				for i28 := range me.SrcIntel.Syms {
-					if nil != me.SrcIntel.Syms[i28] {
-						{
-							if i28 != 0 {
-								r = append(r, 44)
-							}
 							var e error
 							var sl []byte
-							sl, e = me.SrcIntel.Syms[i28].preview_MarshalJSON()
+							sl, e = me.SrcIntel.Cmpl[i42].preview_MarshalJSON()
 							if e == nil {
 								r = append(r, sl...)
 							} else {
@@ -964,29 +1047,57 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 							}
 						}
 					} else {
-						if i28 != 0 {
-							r = append(r, 44)
-						}
+						r = append(r, 44)
 						r = append(r, "null"...)
 					}
 				}
 				r = append(r, 93)
+				if r[ai43] == 44 {
+					r[ai43] = 32
+				}
+			}
+			if len(me.SrcIntel.Syms) != 0 {
+				r = append(r, ",\"Syms\":"...)
+				r = append(r, 91)
+				ai45 := len(r)
+				for i44 := range me.SrcIntel.Syms {
+					if nil != me.SrcIntel.Syms[i44] {
+						{
+							r = append(r, 44)
+							var e error
+							var sl []byte
+							sl, e = me.SrcIntel.Syms[i44].preview_MarshalJSON()
+							if e == nil {
+								r = append(r, sl...)
+							} else {
+								err = e
+								return
+							}
+						}
+					} else {
+						r = append(r, 44)
+						r = append(r, "null"...)
+					}
+				}
+				r = append(r, 93)
+				if r[ai45] == 44 {
+					r[ai45] = 32
+				}
 			}
 			if len(me.SrcIntel.Anns) != 0 {
 				r = append(r, ",\"Anns\":"...)
 				r = append(r, 91)
-				for i29 := range me.SrcIntel.Anns {
-					if nil != me.SrcIntel.Anns[i29] {
-						if i29 != 0 {
-							r = append(r, 44)
-						}
+				ai47 := len(r)
+				for i46 := range me.SrcIntel.Anns {
+					if nil != me.SrcIntel.Anns[i46] {
+						r = append(r, 44)
 						r = append(r, 123)
-						idx30 := len(r)
+						si48 := len(r)
 						{
 							r = append(r, ",\"Range\":"...)
 							var e error
 							var sl []byte
-							sl, e = me.SrcIntel.Anns[i29].Range.preview_MarshalJSON()
+							sl, e = me.SrcIntel.Anns[i46].Range.preview_MarshalJSON()
 							if e == nil {
 								r = append(r, sl...)
 							} else {
@@ -996,70 +1107,66 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 						}
 						{
 							r = append(r, ",\"Title\":"...)
-							r = append(r, pkg__strconv.Quote(me.SrcIntel.Anns[i29].Title)...)
+							r = append(r, pkg__strconv.Quote(me.SrcIntel.Anns[i46].Title)...)
 						}
-						if len(me.SrcIntel.Anns[i29].Desc) != 0 {
+						if len(me.SrcIntel.Anns[i46].Desc) != 0 {
 							r = append(r, ",\"Desc\":"...)
-							r = append(r, pkg__strconv.Quote(me.SrcIntel.Anns[i29].Desc)...)
+							r = append(r, pkg__strconv.Quote(me.SrcIntel.Anns[i46].Desc)...)
 						}
 						{
 							r = append(r, ",\"CmdName\":"...)
-							r = append(r, pkg__strconv.Quote(me.SrcIntel.Anns[i29].CmdName)...)
+							r = append(r, pkg__strconv.Quote(me.SrcIntel.Anns[i46].CmdName)...)
 						}
 						r = append(r, 125)
-						if r[idx30] == 44 {
-							r[idx30] = 32
+						if r[si48] == 44 {
+							r[si48] = 32
 						}
 					} else {
-						if i29 != 0 {
-							r = append(r, 44)
-						}
+						r = append(r, 44)
 						r = append(r, "null"...)
 					}
 				}
 				r = append(r, 93)
+				if r[ai47] == 44 {
+					r[ai47] = 32
+				}
 			}
 			r = append(r, 125)
-			if r[idx22] == 44 {
-				r[idx22] = 32
+			if r[si36] == 44 {
+				r[si36] = 32
 			}
 		}
 		if nil != me.SrcDiags {
 			r = append(r, ",\"srcDiags\":"...)
 			r = append(r, 123)
-			idx31 := len(r)
+			si49 := len(r)
 			{
 				r = append(r, ",\"All\":"...)
-				mf32 := true
 				r = append(r, 123)
-				for mk33, mv34 := range me.SrcDiags.All {
+				mi50 := len(r)
+				for mk51, mv52 := range me.SrcDiags.All {
 					{
 						{
-							if mf32 {
-								mf32 = false
-							} else {
-								r = append(r, 44)
-							}
-							r = append(r, pkg__strconv.Quote(mk33)...)
+							r = append(r, 44)
+							r = append(r, pkg__strconv.Quote(mk51)...)
 							r = append(r, 58)
 						}
 						r = append(r, 91)
-						for i35 := range mv34 {
-							if nil != mv34[i35] {
-								if i35 != 0 {
-									r = append(r, 44)
-								}
+						ai54 := len(r)
+						for i53 := range mv52 {
+							if nil != mv52[i53] {
+								r = append(r, 44)
 								r = append(r, 123)
-								idx36 := len(r)
-								if len(mv34[i35].Cat) != 0 {
+								si55 := len(r)
+								if len(mv52[i53].Cat) != 0 {
 									r = append(r, ",\"Cat\":"...)
-									r = append(r, pkg__strconv.Quote(mv34[i35].Cat)...)
+									r = append(r, pkg__strconv.Quote(mv52[i53].Cat)...)
 								}
 								{
 									r = append(r, ",\"Loc\":"...)
 									var e error
 									var sl []byte
-									sl, e = mv34[i35].Loc.preview_MarshalJSON()
+									sl, e = mv52[i53].Loc.preview_MarshalJSON()
 									if e == nil {
 										r = append(r, sl...)
 									} else {
@@ -1069,44 +1176,42 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 								}
 								{
 									r = append(r, ",\"Msg\":"...)
-									r = append(r, pkg__strconv.Quote(mv34[i35].Msg)...)
+									r = append(r, pkg__strconv.Quote(mv52[i53].Msg)...)
 								}
-								if len(mv34[i35].SrcActions) != 0 {
+								if len(mv52[i53].SrcActions) != 0 {
 									r = append(r, ",\"SrcActions\":"...)
 									r = append(r, 91)
-									for i37 := range mv34[i35].SrcActions {
-										if i37 != 0 {
-											r = append(r, 44)
-										}
+									ai57 := len(r)
+									for i56 := range mv52[i53].SrcActions {
+										r = append(r, 44)
 										r = append(r, 123)
-										idx38 := len(r)
+										si58 := len(r)
 										{
 											r = append(r, ",\"title\":"...)
-											r = append(r, pkg__strconv.Quote(mv34[i35].SrcActions[i37].Title)...)
+											r = append(r, pkg__strconv.Quote(mv52[i53].SrcActions[i56].Title)...)
 										}
 										{
 											r = append(r, ",\"command\":"...)
-											r = append(r, pkg__strconv.Quote(mv34[i35].SrcActions[i37].Cmd)...)
+											r = append(r, pkg__strconv.Quote(mv52[i53].SrcActions[i56].Cmd)...)
 										}
-										if len(mv34[i35].SrcActions[i37].Hint) != 0 {
+										if len(mv52[i53].SrcActions[i56].Hint) != 0 {
 											r = append(r, ",\"tooltip\":"...)
-											r = append(r, pkg__strconv.Quote(mv34[i35].SrcActions[i37].Hint)...)
+											r = append(r, pkg__strconv.Quote(mv52[i53].SrcActions[i56].Hint)...)
 										}
-										if len(mv34[i35].SrcActions[i37].Arguments) != 0 {
+										if len(mv52[i53].SrcActions[i56].Arguments) != 0 {
 											r = append(r, ",\"arguments\":"...)
 											r = append(r, 91)
-											for i39 := range mv34[i35].SrcActions[i37].Arguments {
-												if mv34[i35].SrcActions[i37].Arguments[i39] != nil {
-													if i39 != 0 {
-														r = append(r, 44)
-													}
+											ai60 := len(r)
+											for i59 := range mv52[i53].SrcActions[i56].Arguments {
+												if mv52[i53].SrcActions[i56].Arguments[i59] != nil {
+													r = append(r, 44)
 													var e error
 													var sl []byte
-													j, ok := mv34[i35].SrcActions[i37].Arguments[i39].(pkg__encoding_json.Marshaler)
+													j, ok := mv52[i53].SrcActions[i56].Arguments[i59].(pkg__encoding_json.Marshaler)
 													if ok && (j != nil) {
 														sl, e = j.MarshalJSON()
 													} else {
-														sl, e = pkg__encoding_json.Marshal(mv34[i35].SrcActions[i37].Arguments[i39])
+														sl, e = pkg__encoding_json.Marshal(mv52[i53].SrcActions[i56].Arguments[i59])
 													}
 													if e == nil {
 														r = append(r, sl...)
@@ -1115,108 +1220,117 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 														return
 													}
 												} else {
-													if i39 != 0 {
-														r = append(r, 44)
-													}
+													r = append(r, 44)
 													r = append(r, "null"...)
 												}
 											}
 											r = append(r, 93)
+											if r[ai60] == 44 {
+												r[ai60] = 32
+											}
 										}
 										r = append(r, 125)
-										if r[idx38] == 44 {
-											r[idx38] = 32
+										if r[si58] == 44 {
+											r[si58] = 32
 										}
 									}
 									r = append(r, 93)
+									if r[ai57] == 44 {
+										r[ai57] = 32
+									}
 								}
-								if mv34[i35].StickyAuto {
+								if mv52[i53].StickyAuto {
 									r = append(r, ",\"Sticky\":"...)
-									r = append(r, pkg__strconv.FormatBool(mv34[i35].StickyAuto)...)
+									r = append(r, pkg__strconv.FormatBool(mv52[i53].StickyAuto)...)
 								}
-								if len(mv34[i35].Tags) != 0 {
+								if len(mv52[i53].Tags) != 0 {
 									r = append(r, ",\"Tags\":"...)
 									r = append(r, 91)
-									for i40 := range mv34[i35].Tags {
+									ai62 := len(r)
+									for i61 := range mv52[i53].Tags {
 										{
-											if i40 != 0 {
-												r = append(r, 44)
-											}
-											r = append(r, pkg__strconv.FormatInt((int64)(mv34[i35].Tags[i40]), 10)...)
+											r = append(r, 44)
+											r = append(r, pkg__strconv.FormatInt((int64)(mv52[i53].Tags[i61]), 10)...)
 										}
 									}
 									r = append(r, 93)
+									if r[ai62] == 44 {
+										r[ai62] = 32
+									}
 								}
 								r = append(r, 125)
-								if r[idx36] == 44 {
-									r[idx36] = 32
+								if r[si55] == 44 {
+									r[si55] = 32
 								}
 							} else {
-								if i35 != 0 {
-									r = append(r, 44)
-								}
+								r = append(r, 44)
 								r = append(r, "null"...)
 							}
 						}
 						r = append(r, 93)
+						if r[ai54] == 44 {
+							r[ai54] = 32
+						}
 					}
 				}
 				r = append(r, 125)
+				if r[mi50] == 44 {
+					r[mi50] = 32
+				}
 			}
 			{
 				r = append(r, ",\"FixUps\":"...)
 				r = append(r, 91)
-				for i41 := range me.SrcDiags.FixUps {
-					if nil != me.SrcDiags.FixUps[i41] {
-						if i41 != 0 {
-							r = append(r, 44)
-						}
+				ai64 := len(r)
+				for i63 := range me.SrcDiags.FixUps {
+					if nil != me.SrcDiags.FixUps[i63] {
+						r = append(r, 44)
 						r = append(r, 123)
-						idx42 := len(r)
+						si65 := len(r)
 						{
 							r = append(r, ",\"FilePath\":"...)
-							r = append(r, pkg__strconv.Quote(me.SrcDiags.FixUps[i41].FilePath)...)
+							r = append(r, pkg__strconv.Quote(me.SrcDiags.FixUps[i63].FilePath)...)
 						}
 						{
 							r = append(r, ",\"Desc\":"...)
-							mf43 := true
 							r = append(r, 123)
-							for mk44, mv45 := range me.SrcDiags.FixUps[i41].Desc {
+							mi66 := len(r)
+							for mk67, mv68 := range me.SrcDiags.FixUps[i63].Desc {
 								{
 									{
-										if mf43 {
-											mf43 = false
-										} else {
-											r = append(r, 44)
-										}
-										r = append(r, pkg__strconv.Quote(mk44)...)
+										r = append(r, 44)
+										r = append(r, pkg__strconv.Quote(mk67)...)
 										r = append(r, 58)
 									}
 									r = append(r, 91)
-									for i46 := range mv45 {
+									ai70 := len(r)
+									for i69 := range mv68 {
 										{
-											if i46 != 0 {
-												r = append(r, 44)
-											}
-											r = append(r, pkg__strconv.Quote(mv45[i46])...)
+											r = append(r, 44)
+											r = append(r, pkg__strconv.Quote(mv68[i69])...)
 										}
 									}
 									r = append(r, 93)
+									if r[ai70] == 44 {
+										r[ai70] = 32
+									}
 								}
 							}
 							r = append(r, 125)
+							if r[mi66] == 44 {
+								r[mi66] = 32
+							}
 						}
 						{
 							r = append(r, ",\"Edits\":"...)
 							r = append(r, 91)
-							for i47 := range me.SrcDiags.FixUps[i41].Edits {
+							ai72 := len(r)
+							for i71 := range me.SrcDiags.FixUps[i63].Edits {
 								{
-									if i47 != 0 {
-										r = append(r, 44)
-									}
+									r = append(r, 44)
 									var e error
 									var sl []byte
-									sl, e = me.SrcDiags.FixUps[i41].Edits[i47].preview_MarshalJSON()
+									sl, e = me.SrcDiags.FixUps[i63].Edits[i71].preview_MarshalJSON()
 									if e == nil {
 										r = append(r, sl...)
 									} else {
@@ -1226,18 +1340,20 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 								}
 							}
 							r = append(r, 93)
+							if r[ai72] == 44 {
+								r[ai72] = 32
+							}
 						}
 						{
 							r = append(r, ",\"Dropped\":"...)
 							r = append(r, 91)
-							for i48 := range me.SrcDiags.FixUps[i41].Dropped {
+							ai74 := len(r)
+							for i73 := range me.SrcDiags.FixUps[i63].Dropped {
 								{
-									if i48 != 0 {
-										r = append(r, 44)
-									}
+									r = append(r, 44)
 									var e error
 									var sl []byte
-									sl, e = me.SrcDiags.FixUps[i41].Dropped[i48].preview_MarshalJSON()
+									sl, e = me.SrcDiags.FixUps[i63].Dropped[i73].preview_MarshalJSON()
 									if e == nil {
 										r = append(r, sl...)
 									} else {
@@ -1247,27 +1363,31 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 								}
 							}
 							r = append(r, 93)
+							if r[ai74] == 44 {
+								r[ai74] = 32
+							}
 						}
 						r = append(r, 125)
-						if r[idx42] == 44 {
-							r[idx42] = 32
+						if r[si65] == 44 {
+							r[si65] = 32
 						}
 					} else {
-						if i41 != 0 {
-							r = append(r, 44)
-						}
+						r = append(r, 44)
 						r = append(r, "null"...)
 					}
 				}
 				r = append(r, 93)
+				if r[ai64] == 44 {
+					r[ai64] = 32
+				}
 			}
 			{
 				r = append(r, ",\"LangID\":"...)
 				r = append(r, pkg__strconv.Quote(me.SrcDiags.LangID)...)
 			}
 			r = append(r, 125)
-			if r[idx31] == 44 {
-				r[idx31] = 32
+			if r[si49] == 44 {
+				r[si49] = 32
 			}
 		}
 		{
@@ -1335,15 +1455,14 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 		if len(me.SrcMods) != 0 {
 			r = append(r, ",\"srcMods\":"...)
 			r = append(r, 91)
-			for i49 := range me.SrcMods {
-				if nil != me.SrcMods[i49] {
+			ai76 := len(r)
+			for i75 := range me.SrcMods {
+				if nil != me.SrcMods[i75] {
 					{
-						if i49 != 0 {
-							r = append(r, 44)
-						}
+						r = append(r, 44)
 						var e error
 						var sl []byte
-						sl, e = me.SrcMods[i49].preview_MarshalJSON()
+						sl, e = me.SrcMods[i75].preview_MarshalJSON()
 						if e == nil {
 							r = append(r, sl...)
 						} else {
@@ -1352,50 +1471,49 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 						}
 					}
 				} else {
-					if i49 != 0 {
-						r = append(r, 44)
-					}
+					r = append(r, 44)
 					r = append(r, "null"...)
 				}
 			}
 			r = append(r, 93)
+			if r[ai76] == 44 {
+				r[ai76] = 32
+			}
 		}
 		if len(me.SrcActions) != 0 {
 			r = append(r, ",\"srcActions\":"...)
 			r = append(r, 91)
-			for i50 := range me.SrcActions {
-				if i50 != 0 {
-					r = append(r, 44)
-				}
+			ai78 := len(r)
+			for i77 := range me.SrcActions {
+				r = append(r, 44)
 				r = append(r, 123)
-				idx51 := len(r)
+				si79 := len(r)
 				{
 					r = append(r, ",\"title\":"...)
-					r = append(r, pkg__strconv.Quote(me.SrcActions[i50].Title)...)
+					r = append(r, pkg__strconv.Quote(me.SrcActions[i77].Title)...)
 				}
 				{
 					r = append(r, ",\"command\":"...)
-					r = append(r, pkg__strconv.Quote(me.SrcActions[i50].Cmd)...)
+					r = append(r, pkg__strconv.Quote(me.SrcActions[i77].Cmd)...)
 				}
-				if len(me.SrcActions[i50].Hint) != 0 {
+				if len(me.SrcActions[i77].Hint) != 0 {
 					r = append(r, ",\"tooltip\":"...)
-					r = append(r, pkg__strconv.Quote(me.SrcActions[i50].Hint)...)
+					r = append(r, pkg__strconv.Quote(me.SrcActions[i77].Hint)...)
 				}
-				if len(me.SrcActions[i50].Arguments) != 0 {
+				if len(me.SrcActions[i77].Arguments) != 0 {
 					r = append(r, ",\"arguments\":"...)
 					r = append(r, 91)
-					for i52 := range me.SrcActions[i50].Arguments {
-						if me.SrcActions[i50].Arguments[i52] != nil {
-							if i52 != 0 {
-								r = append(r, 44)
-							}
+					ai81 := len(r)
+					for i80 := range me.SrcActions[i77].Arguments {
+						if me.SrcActions[i77].Arguments[i80] != nil {
+							r = append(r, 44)
 							var e error
 							var sl []byte
-							j, ok := me.SrcActions[i50].Arguments[i52].(pkg__encoding_json.Marshaler)
+							j, ok := me.SrcActions[i77].Arguments[i80].(pkg__encoding_json.Marshaler)
 							if ok && (j != nil) {
 								sl, e = j.MarshalJSON()
 							} else {
-								sl, e = pkg__encoding_json.Marshal(me.SrcActions[i50].Arguments[i52])
+								sl, e = pkg__encoding_json.Marshal(me.SrcActions[i77].Arguments[i80])
 							}
 							if e == nil {
 								r = append(r, sl...)
@@ -1404,61 +1522,66 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 								return
 							}
 						} else {
-							if i52 != 0 {
-								r = append(r, 44)
-							}
+							r = append(r, 44)
 							r = append(r, "null"...)
 						}
 					}
 					r = append(r, 93)
+					if r[ai81] == 44 {
+						r[ai81] = 32
+					}
 				}
 				r = append(r, 125)
-				if r[idx51] == 44 {
-					r[idx51] = 32
+				if r[si79] == 44 {
+					r[si79] = 32
 				}
 			}
 			r = append(r, 93)
+			if r[ai78] == 44 {
+				r[ai78] = 32
+			}
 		}
 		if nil != me.Extras {
 			r = append(r, ",\"extras\":"...)
 			r = append(r, 123)
-			idx53 := len(r)
+			si82 := len(r)
 			if len(me.Extras.SrcIntels.InfoTips) != 0 {
 				r = append(r, ",\"InfoTips\":"...)
 				r = append(r, 91)
-				for i54 := range me.Extras.SrcIntels.InfoTips {
-					if i54 != 0 {
-						r = append(r, 44)
-					}
+				ai84 := len(r)
+				for i83 := range me.Extras.SrcIntels.InfoTips {
+					r = append(r, 44)
 					r = append(r, 123)
-					idx55 := len(r)
+					si85 := len(r)
 					{
 						r = append(r, ",\"value\":"...)
-						r = append(r, pkg__strconv.Quote(me.Extras.SrcIntels.InfoTips[i54].Value)...)
+						r = append(r, pkg__strconv.Quote(me.Extras.SrcIntels.InfoTips[i83].Value)...)
 					}
-					if len(me.Extras.SrcIntels.InfoTips[i54].Language) != 0 {
+					if len(me.Extras.SrcIntels.InfoTips[i83].Language) != 0 {
 						r = append(r, ",\"language\":"...)
-						r = append(r, pkg__strconv.Quote(me.Extras.SrcIntels.InfoTips[i54].Language)...)
+						r = append(r, pkg__strconv.Quote(me.Extras.SrcIntels.InfoTips[i83].Language)...)
 					}
 					r = append(r, 125)
-					if r[idx55] == 44 {
-						r[idx55] = 32
+					if r[si85] == 44 {
+						r[si85] = 32
 					}
 				}
 				r = append(r, 93)
+				if r[ai84] == 44 {
+					r[ai84] = 32
+				}
 			}
 			if len(me.Extras.SrcIntels.Refs) != 0 {
 				r = append(r, ",\"Refs\":"...)
 				r = append(r, 91)
-				for i56 := range me.Extras.SrcIntels.Refs {
-					if nil != me.Extras.SrcIntels.Refs[i56] {
+				ai87 := len(r)
+				for i86 := range me.Extras.SrcIntels.Refs {
+					if nil != me.Extras.SrcIntels.Refs[i86] {
 						{
-							if i56 != 0 {
-								r = append(r, 44)
-							}
+							r = append(r, 44)
 							var e error
 							var sl []byte
-							sl, e = me.Extras.SrcIntels.Refs[i56].preview_MarshalJSON()
+							sl, e = me.Extras.SrcIntels.Refs[i86].preview_MarshalJSON()
 							if e == nil {
 								r = append(r, sl...)
 							} else {
@@ -1467,73 +1590,76 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 							}
 						}
 					} else {
-						if i56 != 0 {
-							r = append(r, 44)
-						}
+						r = append(r, 44)
 						r = append(r, "null"...)
 					}
 				}
 				r = append(r, 93)
+				if r[ai87] == 44 {
+					r[ai87] = 32
+				}
 			}
 			{
 				r = append(r, ",\"Items\":"...)
 				r = append(r, 91)
-				for i57 := range me.Extras.Items {
-					if nil != me.Extras.Items[i57] {
-						if i57 != 0 {
-							r = append(r, 44)
-						}
+				ai89 := len(r)
+				for i88 := range me.Extras.Items {
+					if nil != me.Extras.Items[i88] {
+						r = append(r, 44)
 						r = append(r, 123)
-						idx58 := len(r)
+						si90 := len(r)
 						{
 							r = append(r, ",\"id\":"...)
-							r = append(r, pkg__strconv.Quote(me.Extras.Items[i57].ID)...)
+							r = append(r, pkg__strconv.Quote(me.Extras.Items[i88].ID)...)
 						}
 						{
 							r = append(r, ",\"label\":"...)
-							r = append(r, pkg__strconv.Quote(me.Extras.Items[i57].Label)...)
+							r = append(r, pkg__strconv.Quote(me.Extras.Items[i88].Label)...)
 						}
 						{
 							r = append(r, ",\"description\":"...)
-							r = append(r, pkg__strconv.Quote(me.Extras.Items[i57].Desc)...)
+							r = append(r, pkg__strconv.Quote(me.Extras.Items[i88].Desc)...)
 						}
-						if len(me.Extras.Items[i57].Detail) != 0 {
+						if len(me.Extras.Items[i88].Detail) != 0 {
 							r = append(r, ",\"detail\":"...)
-							r = append(r, pkg__strconv.Quote(me.Extras.Items[i57].Detail)...)
+							r = append(r, pkg__strconv.Quote(me.Extras.Items[i88].Detail)...)
 						}
-						if len(me.Extras.Items[i57].QueryArg) != 0 {
+						if len(me.Extras.Items[i88].QueryArg) != 0 {
 							r = append(r, ",\"arg\":"...)
-							r = append(r, pkg__strconv.Quote(me.Extras.Items[i57].QueryArg)...)
+							r = append(r, pkg__strconv.Quote(me.Extras.Items[i88].QueryArg)...)
 						}
-						if len(me.Extras.Items[i57].FilePos) != 0 {
+						if len(me.Extras.Items[i88].FilePos) != 0 {
 							r = append(r, ",\"fPos\":"...)
-							r = append(r, pkg__strconv.Quote(me.Extras.Items[i57].FilePos)...)
+							r = append(r, pkg__strconv.Quote(me.Extras.Items[i88].FilePos)...)
 						}
 						r = append(r, 125)
-						if r[idx58] == 44 {
-							r[idx58] = 32
+						if r[si90] == 44 {
+							r[si90] = 32
 						}
 					} else {
-						if i57 != 0 {
-							r = append(r, 44)
-						}
+						r = append(r, 44)
 						r = append(r, "null"...)
 					}
 				}
 				r = append(r, 93)
+				if r[ai89] == 44 {
+					r[ai89] = 32
+				}
 			}
 			if len(me.Extras.Warns) != 0 {
 				r = append(r, ",\"Warns\":"...)
 				r = append(r, 91)
-				for i59 := range me.Extras.Warns {
+				ai92 := len(r)
+				for i91 := range me.Extras.Warns {
 					{
-						if i59 != 0 {
-							r = append(r, 44)
-						}
-						r = append(r, pkg__strconv.Quote(me.Extras.Warns[i59])...)
+						r = append(r, 44)
+						r = append(r, pkg__strconv.Quote(me.Extras.Warns[i91])...)
 					}
 				}
 				r = append(r, 93)
+				if r[ai92] == 44 {
+					r[ai92] = 32
+				}
 			}
 			if len(me.Extras.Desc) != 0 {
 				r = append(r, ",\"Desc\":"...)
@@ -1544,8 +1670,8 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 				r = append(r, pkg__strconv.Quote(me.Extras.Url)...)
 			}
 			r = append(r, 125)
-			if r[idx53] == 44 {
-				r[idx53] = 32
+			if r[si82] == 44 {
+				r[si82] = 32
 			}
 		}
 		{
@@ -1631,11 +1757,11 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 		if nil != me.Menu {
 			r = append(r, ",\"menu\":"...)
 			r = append(r, 123)
-			idx60 := len(r)
+			si93 := len(r)
 			if nil != me.Menu.SubMenu {
 				r = append(r, ",\"SubMenu\":"...)
 				r = append(r, 123)
-				idx61 := len(r)
+				si94 := len(r)
 				if len(me.Menu.SubMenu.Desc) != 0 {
 					r = append(r, ",\"desc\":"...)
 					r = append(r, pkg__strconv.Quote(me.Menu.SubMenu.Desc)...)
@@ -1647,26 +1773,25 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 				{
 					r = append(r, ",\"items\":"...)
 					r = append(r, 91)
-					for i62 := range me.Menu.SubMenu.Items {
-						if nil != me.Menu.SubMenu.Items[i62] {
-							if i62 != 0 {
-								r = append(r, 44)
-							}
+					ai96 := len(r)
+					for i95 := range me.Menu.SubMenu.Items {
+						if nil != me.Menu.SubMenu.Items[i95] {
+							r = append(r, 44)
 							r = append(r, 123)
-							idx63 := len(r)
-							if me.Menu.SubMenu.Items[i62].IpcID != 0 {
+							si97 := len(r)
+							if me.Menu.SubMenu.Items[i95].IpcID != 0 {
 								r = append(r, ",\"ii\":"...)
-								r = append(r, pkg__strconv.FormatInt((int64)(me.Menu.SubMenu.Items[i62].IpcID), 10)...)
+								r = append(r, pkg__strconv.FormatInt((int64)(me.Menu.SubMenu.Items[i95].IpcID), 10)...)
 							}
-							if me.Menu.SubMenu.Items[i62].IpcArgs != nil {
+							if me.Menu.SubMenu.Items[i95].IpcArgs != nil {
 								r = append(r, ",\"ia\":"...)
 								var e error
 								var sl []byte
-								j, ok := me.Menu.SubMenu.Items[i62].IpcArgs.(pkg__encoding_json.Marshaler)
+								j, ok := me.Menu.SubMenu.Items[i95].IpcArgs.(pkg__encoding_json.Marshaler)
 								if ok && (j != nil) {
 									sl, e = j.MarshalJSON()
 								} else {
-									sl, e = pkg__encoding_json.Marshal(me.Menu.SubMenu.Items[i62].IpcArgs)
+									sl, e = pkg__encoding_json.Marshal(me.Menu.SubMenu.Items[i95].IpcArgs)
 								}
 								if e == nil {
 									r = append(r, sl...)
@@ -1675,42 +1800,43 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 									return
 								}
 							}
-							if len(me.Menu.SubMenu.Items[i62].Category) != 0 {
+							if len(me.Menu.SubMenu.Items[i95].Category) != 0 {
 								r = append(r, ",\"c\":"...)
-								r = append(r, pkg__strconv.Quote(me.Menu.SubMenu.Items[i62].Category)...)
+								r = append(r, pkg__strconv.Quote(me.Menu.SubMenu.Items[i95].Category)...)
 							}
 							{
 								r = append(r, ",\"t\":"...)
-								r = append(r, pkg__strconv.Quote(me.Menu.SubMenu.Items[i62].Title)...)
+								r = append(r, pkg__strconv.Quote(me.Menu.SubMenu.Items[i95].Title)...)
 							}
-							if len(me.Menu.SubMenu.Items[i62].Desc) != 0 {
+							if len(me.Menu.SubMenu.Items[i95].Desc) != 0 {
 								r = append(r, ",\"d\":"...)
-								r = append(r, pkg__strconv.Quote(me.Menu.SubMenu.Items[i62].Desc)...)
+								r = append(r, pkg__strconv.Quote(me.Menu.SubMenu.Items[i95].Desc)...)
 							}
-							if len(me.Menu.SubMenu.Items[i62].Hint) != 0 {
+							if len(me.Menu.SubMenu.Items[i95].Hint) != 0 {
 								r = append(r, ",\"h\":"...)
-								r = append(r, pkg__strconv.Quote(me.Menu.SubMenu.Items[i62].Hint)...)
+								r = append(r, pkg__strconv.Quote(me.Menu.SubMenu.Items[i95].Hint)...)
 							}
-							if len(me.Menu.SubMenu.Items[i62].Confirm) != 0 {
+							if len(me.Menu.SubMenu.Items[i95].Confirm) != 0 {
 								r = append(r, ",\"q\":"...)
-								r = append(r, pkg__strconv.Quote(me.Menu.SubMenu.Items[i62].Confirm)...)
+								r = append(r, pkg__strconv.Quote(me.Menu.SubMenu.Items[i95].Confirm)...)
 							}
 							r = append(r, 125)
-							if r[idx63] == 44 {
-								r[idx63] = 32
+							if r[si97] == 44 {
+								r[si97] = 32
 							}
 						} else {
-							if i62 != 0 {
-								r = append(r, 44)
-							}
+							r = append(r, 44)
 							r = append(r, "null"...)
 						}
 					}
 					r = append(r, 93)
+					if r[ai96] == 44 {
+						r[ai96] = 32
+					}
 				}
 				r = append(r, 125)
-				if r[idx61] == 44 {
-					r[idx61] = 32
+				if r[si94] == 44 {
+					r[si94] = 32
 				}
 			}
 			if len(me.Menu.WebsiteURL) != 0 {
@@ -1732,15 +1858,14 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 			if len(me.Menu.Refs) != 0 {
 				r = append(r, ",\"Refs\":"...)
 				r = append(r, 91)
-				for i64 := range me.Menu.Refs {
-					if nil != me.Menu.Refs[i64] {
+				ai99 := len(r)
+				for i98 := range me.Menu.Refs {
+					if nil != me.Menu.Refs[i98] {
 						{
-							if i64 != 0 {
-								r = append(r, 44)
-							}
+							r = append(r, 44)
 							var e error
 							var sl []byte
-							sl, e = me.Menu.Refs[i64].preview_MarshalJSON()
+							sl, e = me.Menu.Refs[i98].preview_MarshalJSON()
 							if e == nil {
 								r = append(r, sl...)
 							} else {
@@ -1749,23 +1874,24 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 							}
 						}
 					} else {
-						if i64 != 0 {
-							r = append(r, 44)
-						}
+						r = append(r, 44)
 						r = append(r, "null"...)
 					}
 				}
 				r = append(r, 93)
+				if r[ai99] == 44 {
+					r[ai99] = 32
+				}
 			}
 			r = append(r, 125)
-			if r[idx60] == 44 {
-				r[idx60] = 32
+			if r[si93] == 44 {
+				r[si93] = 32
 			}
 		}
 		if nil != me.CaddyUpdate {
 			r = append(r, ",\"caddy\":"...)
 			r = append(r, 123)
-			idx65 := len(r)
+			si100 := len(r)
 			if len(me.CaddyUpdate.ID) != 0 {
 				r = append(r, ",\"ID\":"...)
 				r = append(r, pkg__strconv.Quote(me.CaddyUpdate.ID)...)
@@ -1784,7 +1910,7 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 			}
 			r = append(r, ",\"Status\":"...)
 			r = append(r, 123)
-			idx66 := len(r)
+			si101 := len(r)
 			{
 				r = append(r, ",\"Flag\":"...)
 				r = append(r, pkg__strconv.FormatInt((int64)(me.CaddyUpdate.Status.Flag), 10)...)
@@ -1794,8 +1920,8 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 				r = append(r, pkg__strconv.Quote(me.CaddyUpdate.Status.Desc)...)
 			}
 			r = append(r, 125)
-			if r[idx66] == 44 {
-				r[idx66] = 32
+			if r[si101] == 44 {
+				r[si101] = 32
 			}
 			if len(me.CaddyUpdate.Details) != 0 {
 				r = append(r, ",\"Details\":"...)
@@ -1810,8 +1936,8 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 				r = append(r, pkg__strconv.FormatBool(me.CaddyUpdate.ShowTitle)...)
 			}
 			r = append(r, 125)
-			if r[idx65] == 44 {
-				r[idx65] = 32
+			if r[si100] == 44 {
+				r[si100] = 32
 			}
 		}
 		if me.Val != nil {
@@ -1835,8 +1961,8 @@ func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
 			r = append(r, "null"...)
 		}
 		r = append(r, 125)
-		if r[idx21] == 44 {
-			r[idx21] = 32
+		if r[si35] == 44 {
+			r[si35] = 32
 		}
 	}
 	return

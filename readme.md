@@ -1351,7 +1351,7 @@ func (*SrcIntelBase) Symbols(*SrcLens, string, bool) SrcLenses
 
 ```go
 type SrcIntelCompl struct {
-	Kind          Completion   `json:"kind,omitempty"`
+	Kind          Completion   `json:"kind"`
 	Label         string       `json:"label"`
 	Documentation *SrcIntelDoc `json:"documentation,omitempty"`
 	Detail        string       `json:"detail,omitempty"`
@@ -1527,7 +1527,7 @@ func (me SrcLenses) Swap(i int, j int)
 
 ```go
 type SrcLoc struct {
-	Flag     int       `json:"e"` // don't omitempty
+	Flag     int       `json:"e"` // don't omitempty, often member of an enum starting at 0
 	FilePath string    `json:"f,omitempty"`
 	Pos      *SrcPos   `json:"p,omitempty"`
 	Range    *SrcRange `json:"r,omitempty"`

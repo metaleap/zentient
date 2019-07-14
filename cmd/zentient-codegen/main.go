@@ -27,7 +27,7 @@ func main() {
 	gentjson.Gents.Structs.RunOnlyForTypes.Named = []string{
 		"fooResp", "SrcPos", "SrcRange", "WorkspaceChanges", "SrcModEdit", "SrcLoc",
 		"SrcLens", "SrcIntelSigHelp", "SrcIntelSigInfo", "SrcIntelSigParam",
-		"SrcIntelDoc",
+		"SrcIntelDoc", "SrcIntels", "SrcIntelCompl",
 	}
 
 	pkgs.MustRunGentsAndGenerateOutputFiles(nil, gents)
