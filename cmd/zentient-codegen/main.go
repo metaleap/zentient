@@ -5,7 +5,6 @@ import (
 	"github.com/metaleap/go-gent"
 	"github.com/metaleap/go-gent/gents/enums"
 	"github.com/metaleap/go-gent/gents/json"
-	"github.com/metaleap/go-gent/gents/structs"
 )
 
 func main() {
@@ -17,8 +16,6 @@ func main() {
 	gents := gent.Gents{
 		&gentenums.Gents.IsValid,
 		&gentenums.Gents.Stringers,
-		&gentstructs.Gents.StructFieldsTrav,
-		&gentstructs.Gents.StructFieldsGetSet,
 		&gentjson.Gents.Structs,
 	}
 	gentenums.Gents.IsValid.RunOnlyForTypes.Named = []string{"IpcIDs"}
@@ -28,8 +25,6 @@ func main() {
 	// temporaries..
 	gentjson.Gents.Structs.Marshal.Name, gentjson.Gents.Structs.Unmarshal.Name = "preview_"+gentjson.Gents.Structs.Marshal.Name, "preview_"+gentjson.Gents.Structs.Unmarshal.Name
 	gentjson.Gents.Structs.RunOnlyForTypes.Named = []string{"fooResp"}
-	gentstructs.Gents.StructFieldsTrav.RunOnlyForTypes.Named = []string{"fooResp"}
-	gentstructs.Gents.StructFieldsGetSet.RunOnlyForTypes.Named = []string{"fooResp"}
 
 	pkgs.MustRunGentsAndGenerateOutputFiles(nil, gents)
 }
