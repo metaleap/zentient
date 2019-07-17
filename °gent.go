@@ -950,16 +950,16 @@ func (me *DiagItem) preview_MarshalJSON() (r []byte, err error) {
 			r = append(r, ",\"Msg\":"...)
 			r = append(r, pkg__strconv.Quote(me.Msg)...)
 		}
-		if len(me.SrcActions) != 0 {
-			r = append(r, ",\"SrcActions\":"...)
+		if len(me.Rel) != 0 {
+			r = append(r, ",\"Rel\":"...)
 			r = append(r, 91)
 			ai190 := len(r)
-			for i189 := range me.SrcActions {
+			for i189 := range me.Rel {
 				{
 					r = append(r, 44)
 					var e error
 					var sl []byte
-					sl, e = me.SrcActions[i189].preview_MarshalJSON()
+					sl, e = me.Rel[i189].preview_MarshalJSON()
 					if e == nil {
 						r = append(r, sl...)
 					} else {
@@ -973,6 +973,29 @@ func (me *DiagItem) preview_MarshalJSON() (r []byte, err error) {
 				r = append(r[:ai190], r[(ai190+1):]...)
 			}
 		}
+		if len(me.SrcActions) != 0 {
+			r = append(r, ",\"SrcActions\":"...)
+			r = append(r, 91)
+			ai198 := len(r)
+			for i197 := range me.SrcActions {
+				{
+					r = append(r, 44)
+					var e error
+					var sl []byte
+					sl, e = me.SrcActions[i197].preview_MarshalJSON()
+					if e == nil {
+						r = append(r, sl...)
+					} else {
+						err = e
+						return
+					}
+				}
+			}
+			r = append(r, 93)
+			if r[ai198] == 44 {
+				r = append(r[:ai198], r[(ai198+1):]...)
+			}
+		}
 		if me.StickyAuto {
 			r = append(r, ",\"Sticky\":"...)
 			r = append(r, pkg__strconv.FormatBool(me.StickyAuto)...)
@@ -980,16 +1003,16 @@ func (me *DiagItem) preview_MarshalJSON() (r []byte, err error) {
 		if len(me.Tags) != 0 {
 			r = append(r, ",\"Tags\":"...)
 			r = append(r, 91)
-			ai198 := len(r)
-			for i197 := range me.Tags {
+			ai206 := len(r)
+			for i205 := range me.Tags {
 				{
 					r = append(r, 44)
-					r = append(r, pkg__strconv.FormatInt((int64)(me.Tags[i197]), 10)...)
+					r = append(r, pkg__strconv.FormatInt((int64)(me.Tags[i205]), 10)...)
 				}
 			}
 			r = append(r, 93)
-			if r[ai198] == 44 {
-				r = append(r[:ai198], r[(ai198+1):]...)
+			if r[ai206] == 44 {
+				r = append(r[:ai206], r[(ai206+1):]...)
 			}
 		}
 		r = append(r, 125)
@@ -1007,14 +1030,14 @@ func (me DiagItems) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 91)
-		ai200 := len(r)
-		for i199 := range me {
-			if nil != me[i199] {
+		ai208 := len(r)
+		for i207 := range me {
+			if nil != me[i207] {
 				{
 					r = append(r, 44)
 					var e error
 					var sl []byte
-					sl, e = me[i199].preview_MarshalJSON()
+					sl, e = me[i207].preview_MarshalJSON()
 					if e == nil {
 						r = append(r, sl...)
 					} else {
@@ -1028,8 +1051,8 @@ func (me DiagItems) preview_MarshalJSON() (r []byte, err error) {
 			}
 		}
 		r = append(r, 93)
-		if r[ai200] == 44 {
-			r = append(r[:ai200], r[(ai200+1):]...)
+		if r[ai208] == 44 {
+			r = append(r[:ai208], r[(ai208+1):]...)
 		}
 	}
 	return
@@ -1042,17 +1065,17 @@ func (me DiagItemsBy) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 123)
-		mi207 := len(r)
-		for mk208, mv209 := range me {
+		mi215 := len(r)
+		for mk216, mv217 := range me {
 			{
 				{
 					r = append(r, 44)
-					r = append(r, pkg__strconv.Quote(mk208)...)
+					r = append(r, pkg__strconv.Quote(mk216)...)
 					r = append(r, 58)
 				}
 				var e error
 				var sl []byte
-				sl, e = mv209.preview_MarshalJSON()
+				sl, e = mv217.preview_MarshalJSON()
 				if e == nil {
 					r = append(r, sl...)
 				} else {
@@ -1062,8 +1085,8 @@ func (me DiagItemsBy) preview_MarshalJSON() (r []byte, err error) {
 			}
 		}
 		r = append(r, 125)
-		if r[mi207] == 44 {
-			r = append(r[:mi207], r[(mi207+1):]...)
+		if r[mi215] == 44 {
+			r = append(r[:mi215], r[(mi215+1):]...)
 		}
 	}
 	return
@@ -1076,7 +1099,7 @@ func (me *EditorAction) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 123)
-		si216 := len(r)
+		si224 := len(r)
 		{
 			r = append(r, ",\"title\":"...)
 			r = append(r, pkg__strconv.Quote(me.Title)...)
@@ -1092,9 +1115,9 @@ func (me *EditorAction) preview_MarshalJSON() (r []byte, err error) {
 		if len(me.Arguments) != 0 {
 			r = append(r, ",\"arguments\":"...)
 			r = append(r, 91)
-			ai218 := len(r)
-			for i217 := range me.Arguments {
-				sl, e := __gent__jsonMarshal_interface____(me.Arguments[i217])
+			ai226 := len(r)
+			for i225 := range me.Arguments {
+				sl, e := __gent__jsonMarshal_interface____(me.Arguments[i225])
 				if e == nil {
 					r = append(r, 44)
 					r = append(r, sl...)
@@ -1104,13 +1127,13 @@ func (me *EditorAction) preview_MarshalJSON() (r []byte, err error) {
 				}
 			}
 			r = append(r, 93)
-			if r[ai218] == 44 {
-				r = append(r[:ai218], r[(ai218+1):]...)
+			if r[ai226] == 44 {
+				r = append(r[:ai226], r[(ai226+1):]...)
 			}
 		}
 		r = append(r, 125)
-		if r[si216] == 44 {
-			r = append(r[:si216], r[(si216+1):]...)
+		if r[si224] == 44 {
+			r = append(r[:si224], r[(si224+1):]...)
 		}
 	}
 	return
@@ -1123,7 +1146,7 @@ func (me *ExtrasItem) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 123)
-		si219 := len(r)
+		si227 := len(r)
 		{
 			r = append(r, ",\"id\":"...)
 			r = append(r, pkg__strconv.Quote(me.ID)...)
@@ -1149,8 +1172,8 @@ func (me *ExtrasItem) preview_MarshalJSON() (r []byte, err error) {
 			r = append(r, pkg__strconv.Quote(me.FilePos)...)
 		}
 		r = append(r, 125)
-		if r[si219] == 44 {
-			r = append(r[:si219], r[(si219+1):]...)
+		if r[si227] == 44 {
+			r = append(r[:si227], r[(si227+1):]...)
 		}
 	}
 	return
@@ -1163,7 +1186,7 @@ func (me *Menu) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 123)
-		si220 := len(r)
+		si228 := len(r)
 		if len(me.Desc) != 0 {
 			r = append(r, ",\"desc\":"...)
 			r = append(r, pkg__strconv.Quote(me.Desc)...)
@@ -1185,8 +1208,8 @@ func (me *Menu) preview_MarshalJSON() (r []byte, err error) {
 			}
 		}
 		r = append(r, 125)
-		if r[si220] == 44 {
-			r = append(r[:si220], r[(si220+1):]...)
+		if r[si228] == 44 {
+			r = append(r[:si228], r[(si228+1):]...)
 		}
 	}
 	return
@@ -1199,14 +1222,14 @@ func (me MenuItems) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 91)
-		ai228 := len(r)
-		for i227 := range me {
-			if nil != me[i227] {
+		ai236 := len(r)
+		for i235 := range me {
+			if nil != me[i235] {
 				{
 					r = append(r, 44)
 					var e error
 					var sl []byte
-					sl, e = me[i227].preview_MarshalJSON()
+					sl, e = me[i235].preview_MarshalJSON()
 					if e == nil {
 						r = append(r, sl...)
 					} else {
@@ -1220,8 +1243,8 @@ func (me MenuItems) preview_MarshalJSON() (r []byte, err error) {
 			}
 		}
 		r = append(r, 93)
-		if r[ai228] == 44 {
-			r = append(r[:ai228], r[(ai228+1):]...)
+		if r[ai236] == 44 {
+			r = append(r[:ai236], r[(ai236+1):]...)
 		}
 	}
 	return
@@ -1234,7 +1257,7 @@ func (me *MenuItem) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 123)
-		si235 := len(r)
+		si243 := len(r)
 		if me.IpcID != 0 {
 			r = append(r, ",\"ii\":"...)
 			r = append(r, pkg__strconv.FormatInt((int64)(me.IpcID), 10)...)
@@ -1270,8 +1293,8 @@ func (me *MenuItem) preview_MarshalJSON() (r []byte, err error) {
 			r = append(r, pkg__strconv.Quote(me.Confirm)...)
 		}
 		r = append(r, 125)
-		if r[si235] == 44 {
-			r = append(r[:si235], r[(si235+1):]...)
+		if r[si243] == 44 {
+			r = append(r[:si243], r[(si243+1):]...)
 		}
 	}
 	return
@@ -1284,7 +1307,7 @@ func (me *MenuItemArgPrompt) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 123)
-		si236 := len(r)
+		si244 := len(r)
 		if len(me.Prompt) != 0 {
 			r = append(r, ",\"prompt\":"...)
 			r = append(r, pkg__strconv.Quote(me.Prompt)...)
@@ -1298,8 +1321,8 @@ func (me *MenuItemArgPrompt) preview_MarshalJSON() (r []byte, err error) {
 			r = append(r, pkg__strconv.Quote(me.Value)...)
 		}
 		r = append(r, 125)
-		if r[si236] == 44 {
-			r = append(r[:si236], r[(si236+1):]...)
+		if r[si244] == 44 {
+			r = append(r[:si244], r[(si244+1):]...)
 		}
 	}
 	return
@@ -1312,7 +1335,7 @@ func (me *SrcAnnotaction) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 123)
-		si237 := len(r)
+		si245 := len(r)
 		{
 			r = append(r, ",\"Range\":"...)
 			var e error
@@ -1338,8 +1361,8 @@ func (me *SrcAnnotaction) preview_MarshalJSON() (r []byte, err error) {
 			r = append(r, pkg__strconv.Quote(me.CmdName)...)
 		}
 		r = append(r, 125)
-		if r[si237] == 44 {
-			r = append(r[:si237], r[(si237+1):]...)
+		if r[si245] == 44 {
+			r = append(r[:si245], r[(si245+1):]...)
 		}
 	}
 	return
@@ -1352,7 +1375,7 @@ func (me *SrcInfoTip) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 123)
-		si244 := len(r)
+		si252 := len(r)
 		{
 			r = append(r, ",\"value\":"...)
 			r = append(r, pkg__strconv.Quote(me.Value)...)
@@ -1362,8 +1385,8 @@ func (me *SrcInfoTip) preview_MarshalJSON() (r []byte, err error) {
 			r = append(r, pkg__strconv.Quote(me.Language)...)
 		}
 		r = append(r, 125)
-		if r[si244] == 44 {
-			r = append(r[:si244], r[(si244+1):]...)
+		if r[si252] == 44 {
+			r = append(r[:si252], r[(si252+1):]...)
 		}
 	}
 	return
@@ -1376,7 +1399,7 @@ func (me *SrcIntelCompl) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 123)
-		si245 := len(r)
+		si253 := len(r)
 		{
 			r = append(r, ",\"kind\":"...)
 			r = append(r, pkg__strconv.FormatInt((int64)(me.Kind), 10)...)
@@ -1408,8 +1431,8 @@ func (me *SrcIntelCompl) preview_MarshalJSON() (r []byte, err error) {
 			r = append(r, pkg__strconv.Quote(me.SortText)...)
 		}
 		r = append(r, 125)
-		if r[si245] == 44 {
-			r = append(r[:si245], r[(si245+1):]...)
+		if r[si253] == 44 {
+			r = append(r[:si253], r[(si253+1):]...)
 		}
 	}
 	return
@@ -1422,14 +1445,14 @@ func (me SrcIntelCompls) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 91)
-		ai253 := len(r)
-		for i252 := range me {
-			if nil != me[i252] {
+		ai261 := len(r)
+		for i260 := range me {
+			if nil != me[i260] {
 				{
 					r = append(r, 44)
 					var e error
 					var sl []byte
-					sl, e = me[i252].preview_MarshalJSON()
+					sl, e = me[i260].preview_MarshalJSON()
 					if e == nil {
 						r = append(r, sl...)
 					} else {
@@ -1443,8 +1466,8 @@ func (me SrcIntelCompls) preview_MarshalJSON() (r []byte, err error) {
 			}
 		}
 		r = append(r, 93)
-		if r[ai253] == 44 {
-			r = append(r[:ai253], r[(ai253+1):]...)
+		if r[ai261] == 44 {
+			r = append(r[:ai261], r[(ai261+1):]...)
 		}
 	}
 	return
@@ -1457,17 +1480,17 @@ func (me *SrcIntels) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 123)
-		si260 := len(r)
+		si268 := len(r)
 		if len(me.InfoTips) != 0 {
 			r = append(r, ",\"InfoTips\":"...)
 			r = append(r, 91)
-			ai262 := len(r)
-			for i261 := range me.InfoTips {
+			ai270 := len(r)
+			for i269 := range me.InfoTips {
 				{
 					r = append(r, 44)
 					var e error
 					var sl []byte
-					sl, e = me.InfoTips[i261].preview_MarshalJSON()
+					sl, e = me.InfoTips[i269].preview_MarshalJSON()
 					if e == nil {
 						r = append(r, sl...)
 					} else {
@@ -1477,8 +1500,8 @@ func (me *SrcIntels) preview_MarshalJSON() (r []byte, err error) {
 				}
 			}
 			r = append(r, 93)
-			if r[ai262] == 44 {
-				r = append(r[:ai262], r[(ai262+1):]...)
+			if r[ai270] == 44 {
+				r = append(r[:ai270], r[(ai270+1):]...)
 			}
 		}
 		if len(me.Refs) != 0 {
@@ -1494,8 +1517,8 @@ func (me *SrcIntels) preview_MarshalJSON() (r []byte, err error) {
 			}
 		}
 		r = append(r, 125)
-		if r[si260] == 44 {
-			r = append(r[:si260], r[(si260+1):]...)
+		if r[si268] == 44 {
+			r = append(r[:si268], r[(si268+1):]...)
 		}
 	}
 	return
@@ -1508,7 +1531,7 @@ func (me *SrcIntelDoc) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 123)
-		si275 := len(r)
+		si283 := len(r)
 		if len(me.Value) != 0 {
 			r = append(r, ",\"value\":"...)
 			r = append(r, pkg__strconv.Quote(me.Value)...)
@@ -1518,8 +1541,8 @@ func (me *SrcIntelDoc) preview_MarshalJSON() (r []byte, err error) {
 			r = append(r, pkg__strconv.FormatBool(me.IsTrusted)...)
 		}
 		r = append(r, 125)
-		if r[si275] == 44 {
-			r = append(r[:si275], r[(si275+1):]...)
+		if r[si283] == 44 {
+			r = append(r[:si283], r[(si283+1):]...)
 		}
 	}
 	return
@@ -1532,7 +1555,7 @@ func (me *SrcIntelSigHelp) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 123)
-		si276 := len(r)
+		si284 := len(r)
 		{
 			r = append(r, ",\"activeSignature\":"...)
 			r = append(r, pkg__strconv.FormatInt((int64)(me.ActiveSignature), 10)...)
@@ -1544,13 +1567,13 @@ func (me *SrcIntelSigHelp) preview_MarshalJSON() (r []byte, err error) {
 		if len(me.Signatures) != 0 {
 			r = append(r, ",\"signatures\":"...)
 			r = append(r, 91)
-			ai278 := len(r)
-			for i277 := range me.Signatures {
+			ai286 := len(r)
+			for i285 := range me.Signatures {
 				{
 					r = append(r, 44)
 					var e error
 					var sl []byte
-					sl, e = me.Signatures[i277].preview_MarshalJSON()
+					sl, e = me.Signatures[i285].preview_MarshalJSON()
 					if e == nil {
 						r = append(r, sl...)
 					} else {
@@ -1560,13 +1583,13 @@ func (me *SrcIntelSigHelp) preview_MarshalJSON() (r []byte, err error) {
 				}
 			}
 			r = append(r, 93)
-			if r[ai278] == 44 {
-				r = append(r[:ai278], r[(ai278+1):]...)
+			if r[ai286] == 44 {
+				r = append(r[:ai286], r[(ai286+1):]...)
 			}
 		}
 		r = append(r, 125)
-		if r[si276] == 44 {
-			r = append(r[:si276], r[(si276+1):]...)
+		if r[si284] == 44 {
+			r = append(r[:si284], r[(si284+1):]...)
 		}
 	}
 	return
@@ -1579,7 +1602,7 @@ func (me *SrcIntelSigInfo) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 123)
-		si285 := len(r)
+		si293 := len(r)
 		{
 			r = append(r, ",\"label\":"...)
 			r = append(r, pkg__strconv.Quote(me.Label)...)
@@ -1602,13 +1625,13 @@ func (me *SrcIntelSigInfo) preview_MarshalJSON() (r []byte, err error) {
 		} else {
 			r = append(r, ",\"parameters\":"...)
 			r = append(r, 91)
-			ai293 := len(r)
-			for i292 := range me.Parameters {
+			ai301 := len(r)
+			for i300 := range me.Parameters {
 				{
 					r = append(r, 44)
 					var e error
 					var sl []byte
-					sl, e = me.Parameters[i292].preview_MarshalJSON()
+					sl, e = me.Parameters[i300].preview_MarshalJSON()
 					if e == nil {
 						r = append(r, sl...)
 					} else {
@@ -1618,13 +1641,13 @@ func (me *SrcIntelSigInfo) preview_MarshalJSON() (r []byte, err error) {
 				}
 			}
 			r = append(r, 93)
-			if r[ai293] == 44 {
-				r = append(r[:ai293], r[(ai293+1):]...)
+			if r[ai301] == 44 {
+				r = append(r[:ai301], r[(ai301+1):]...)
 			}
 		}
 		r = append(r, 125)
-		if r[si285] == 44 {
-			r = append(r[:si285], r[(si285+1):]...)
+		if r[si293] == 44 {
+			r = append(r[:si293], r[(si293+1):]...)
 		}
 	}
 	return
@@ -1637,7 +1660,7 @@ func (me *SrcIntelSigParam) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 123)
-		si300 := len(r)
+		si308 := len(r)
 		{
 			r = append(r, ",\"label\":"...)
 			r = append(r, pkg__strconv.Quote(me.Label)...)
@@ -1655,8 +1678,8 @@ func (me *SrcIntelSigParam) preview_MarshalJSON() (r []byte, err error) {
 			}
 		}
 		r = append(r, 125)
-		if r[si300] == 44 {
-			r = append(r[:si300], r[(si300+1):]...)
+		if r[si308] == 44 {
+			r = append(r[:si308], r[(si308+1):]...)
 		}
 	}
 	return
@@ -1669,14 +1692,14 @@ func (me SrcLenses) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 91)
-		ai308 := len(r)
-		for i307 := range me {
-			if nil != me[i307] {
+		ai316 := len(r)
+		for i315 := range me {
+			if nil != me[i315] {
 				{
 					r = append(r, 44)
 					var e error
 					var sl []byte
-					sl, e = me[i307].preview_MarshalJSON()
+					sl, e = me[i315].preview_MarshalJSON()
 					if e == nil {
 						r = append(r, sl...)
 					} else {
@@ -1690,8 +1713,8 @@ func (me SrcLenses) preview_MarshalJSON() (r []byte, err error) {
 			}
 		}
 		r = append(r, 93)
-		if r[ai308] == 44 {
-			r = append(r[:ai308], r[(ai308+1):]...)
+		if r[ai316] == 44 {
+			r = append(r[:ai316], r[(ai316+1):]...)
 		}
 	}
 	return
@@ -1704,7 +1727,7 @@ func (me *SrcLens) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 123)
-		si315 := len(r)
+		si323 := len(r)
 		{
 			r = append(r, ",\"e\":"...)
 			r = append(r, pkg__strconv.FormatInt((int64)(me.SrcLoc.Flag), 10)...)
@@ -1754,8 +1777,8 @@ func (me *SrcLens) preview_MarshalJSON() (r []byte, err error) {
 			r = append(r, pkg__strconv.FormatBool(me.CrLf)...)
 		}
 		r = append(r, 125)
-		if r[si315] == 44 {
-			r = append(r[:si315], r[(si315+1):]...)
+		if r[si323] == 44 {
+			r = append(r[:si323], r[(si323+1):]...)
 		}
 	}
 	return
@@ -1771,7 +1794,7 @@ func (me *SrcLoc) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 123)
-		si328 := len(r)
+		si336 := len(r)
 		{
 			r = append(r, ",\"e\":"...)
 			r = append(r, pkg__strconv.FormatInt((int64)(me.Flag), 10)...)
@@ -1809,8 +1832,8 @@ func (me *SrcLoc) preview_MarshalJSON() (r []byte, err error) {
 			}
 		}
 		r = append(r, 125)
-		if r[si328] == 44 {
-			r = append(r[:si328], r[(si328+1):]...)
+		if r[si336] == 44 {
+			r = append(r[:si336], r[(si336+1):]...)
 		}
 	}
 	return
@@ -1826,14 +1849,14 @@ func (me SrcLocs) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 91)
-		ai342 := len(r)
-		for i341 := range me {
-			if nil != me[i341] {
+		ai350 := len(r)
+		for i349 := range me {
+			if nil != me[i349] {
 				{
 					r = append(r, 44)
 					var e error
 					var sl []byte
-					sl, e = me[i341].preview_MarshalJSON()
+					sl, e = me[i349].preview_MarshalJSON()
 					if e == nil {
 						r = append(r, sl...)
 					} else {
@@ -1847,8 +1870,8 @@ func (me SrcLocs) preview_MarshalJSON() (r []byte, err error) {
 			}
 		}
 		r = append(r, 93)
-		if r[ai342] == 44 {
-			r = append(r[:ai342], r[(ai342+1):]...)
+		if r[ai350] == 44 {
+			r = append(r[:ai350], r[(ai350+1):]...)
 		}
 	}
 	return
@@ -1861,7 +1884,7 @@ func (me *SrcModEdit) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 123)
-		si349 := len(r)
+		si357 := len(r)
 		if nil != me.At {
 			{
 				r = append(r, ",\"At\":"...)
@@ -1884,8 +1907,8 @@ func (me *SrcModEdit) preview_MarshalJSON() (r []byte, err error) {
 			r = append(r, pkg__strconv.Quote(me.Val)...)
 		}
 		r = append(r, 125)
-		if r[si349] == 44 {
-			r = append(r[:si349], r[(si349+1):]...)
+		if r[si357] == 44 {
+			r = append(r[:si357], r[(si357+1):]...)
 		}
 	}
 	return
@@ -1898,13 +1921,13 @@ func (me SrcModEdits) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 91)
-		ai357 := len(r)
-		for i356 := range me {
+		ai365 := len(r)
+		for i364 := range me {
 			{
 				r = append(r, 44)
 				var e error
 				var sl []byte
-				sl, e = me[i356].preview_MarshalJSON()
+				sl, e = me[i364].preview_MarshalJSON()
 				if e == nil {
 					r = append(r, sl...)
 				} else {
@@ -1914,8 +1937,8 @@ func (me SrcModEdits) preview_MarshalJSON() (r []byte, err error) {
 			}
 		}
 		r = append(r, 93)
-		if r[ai357] == 44 {
-			r = append(r[:ai357], r[(ai357+1):]...)
+		if r[ai365] == 44 {
+			r = append(r[:ai365], r[(ai365+1):]...)
 		}
 	}
 	return
@@ -1928,7 +1951,7 @@ func (me *SrcPos) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 123)
-		si364 := len(r)
+		si372 := len(r)
 		if me.Ln != 0 {
 			r = append(r, ",\"l\":"...)
 			r = append(r, pkg__strconv.FormatInt((int64)(me.Ln), 10)...)
@@ -1942,8 +1965,8 @@ func (me *SrcPos) preview_MarshalJSON() (r []byte, err error) {
 			r = append(r, pkg__strconv.FormatInt((int64)(me.Off), 10)...)
 		}
 		r = append(r, 125)
-		if r[si364] == 44 {
-			r = append(r[:si364], r[(si364+1):]...)
+		if r[si372] == 44 {
+			r = append(r[:si372], r[(si372+1):]...)
 		}
 	}
 	return
@@ -1959,7 +1982,7 @@ func (me *SrcRange) preview_MarshalJSON() (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 123)
-		si365 := len(r)
+		si373 := len(r)
 		{
 			r = append(r, ",\"s\":"...)
 			var e error
@@ -1985,8 +2008,8 @@ func (me *SrcRange) preview_MarshalJSON() (r []byte, err error) {
 			}
 		}
 		r = append(r, 125)
-		if r[si365] == 44 {
-			r = append(r[:si365], r[(si365+1):]...)
+		if r[si373] == 44 {
+			r = append(r[:si373], r[(si373+1):]...)
 		}
 	}
 	return
