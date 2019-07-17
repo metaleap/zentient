@@ -365,11 +365,11 @@ type DiagItem struct {
 	Cat         string `json:",omitempty"`
 	Loc         SrcLoc
 	Msg         string
+	Rel         []SrcLens      `json:",omitempty"`
 	SrcActions  []EditorAction `json:",omitempty"`
 	StickyForce bool           `json:"-"`
 	StickyAuto  bool           `json:"Sticky,omitempty"`
 	Tags        []int          `json:"Tags,omitempty"`
-	Misc        []interface{}  `json:"-"`
 }
 ```
 
