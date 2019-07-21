@@ -2027,6 +2027,286 @@ func (me *WorkspaceChanges) preview_MarshalJSON() (r []byte, err error) {
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
 func (me *WorkspaceChanges) preview_UnmarshalJSON(v []byte) (err error) { ; return }
 
+// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me *fooResp) preview_MarshalJSON() (r []byte, err error) {
+	r = make([]byte, 0, 64)
+	if me == nil {
+		r = append(r, "null"...)
+	} else {
+		r = append(r, 123)
+		si1 := len(r)
+		{
+			r = append(r, ",\"ii\":"...)
+			r = append(r, pkg__strconv.FormatInt((int64)(me.IpcID), 10)...)
+		}
+		if me.ReqID != 0 {
+			r = append(r, ",\"ri\":"...)
+			r = append(r, pkg__strconv.FormatInt((int64)(me.ReqID), 10)...)
+		}
+		{
+			r = append(r, ",\"Flag\":"...)
+			r = append(r, pkg__strconv.FormatBool(me.Flag)...)
+		}
+		if len(me.ErrMsg) != 0 {
+			r = append(r, ",\"err\":"...)
+			r = append(r, pkg__strconv.Quote(me.ErrMsg)...)
+		}
+		if nil != me.SrcIntel {
+			{
+				r = append(r, ",\"sI\":"...)
+				var e error
+				var sl []byte
+				sl, e = me.SrcIntel.preview_MarshalJSON()
+				if e == nil {
+					r = append(r, sl...)
+				} else {
+					err = e
+					return
+				}
+			}
+		}
+		if nil != me.SrcDiags {
+			{
+				r = append(r, ",\"srcDiags\":"...)
+				var e error
+				var sl []byte
+				sl, e = me.SrcDiags.preview_MarshalJSON()
+				if e == nil {
+					r = append(r, sl...)
+				} else {
+					err = e
+					return
+				}
+			}
+		}
+		{
+			r = append(r, ",\"ri\":"...)
+			r = append(r, pkg__strconv.FormatInt((int64)(me.IpcReq.ReqID), 10)...)
+		}
+		{
+			r = append(r, ",\"ii\":"...)
+			r = append(r, pkg__strconv.FormatInt((int64)(me.IpcReq.IpcID), 10)...)
+		}
+		{
+			sl, e := __gent__jsonMarshal_interface____(me.IpcReq.IpcArgs)
+			if e == nil {
+				r = append(r, ",\"ia\":"...)
+				r = append(r, sl...)
+			} else {
+				err = e
+				return
+			}
+		}
+		if nil != me.IpcReq.ProjUpd {
+			{
+				r = append(r, ",\"projUpd\":"...)
+				var e error
+				var sl []byte
+				sl, e = me.IpcReq.ProjUpd.preview_MarshalJSON()
+				if e == nil {
+					r = append(r, sl...)
+				} else {
+					err = e
+					return
+				}
+			}
+		} else {
+			r = append(r, ",\"projUpd\":"...)
+			r = append(r, "null"...)
+		}
+		if nil != me.IpcReq.SrcLens {
+			{
+				r = append(r, ",\"srcLens\":"...)
+				var e error
+				var sl []byte
+				sl, e = me.IpcReq.SrcLens.preview_MarshalJSON()
+				if e == nil {
+					r = append(r, sl...)
+				} else {
+					err = e
+					return
+				}
+			}
+		} else {
+			r = append(r, ",\"srcLens\":"...)
+			r = append(r, "null"...)
+		}
+		if len(me.SrcMods) != 0 {
+			r = append(r, ",\"srcMods\":"...)
+			var e error
+			var sl []byte
+			sl, e = me.SrcMods.preview_MarshalJSON()
+			if e == nil {
+				r = append(r, sl...)
+			} else {
+				err = e
+				return
+			}
+		}
+		if len(me.SrcActions) != 0 {
+			r = append(r, ",\"srcActions\":"...)
+			r = append(r, 91)
+			ai33 := len(r)
+			for i32 := range me.SrcActions {
+				{
+					r = append(r, 44)
+					var e error
+					var sl []byte
+					sl, e = me.SrcActions[i32].preview_MarshalJSON()
+					if e == nil {
+						r = append(r, sl...)
+					} else {
+						err = e
+						return
+					}
+				}
+			}
+			r = append(r, 93)
+			if r[ai33] == 44 {
+				r = append(r[:ai33], r[(ai33+1):]...)
+			}
+		}
+		if nil != me.Extras {
+			{
+				r = append(r, ",\"extras\":"...)
+				var e error
+				var sl []byte
+				sl, e = me.Extras.preview_MarshalJSON()
+				if e == nil {
+					r = append(r, sl...)
+				} else {
+					err = e
+					return
+				}
+			}
+		}
+		{
+			r = append(r, ",\"e\":"...)
+			r = append(r, pkg__strconv.FormatInt((int64)(me.SrcLens.SrcLoc.Flag), 10)...)
+		}
+		if len(me.SrcLens.SrcLoc.FilePath) != 0 {
+			r = append(r, ",\"f\":"...)
+			r = append(r, pkg__strconv.Quote(me.SrcLens.SrcLoc.FilePath)...)
+		}
+		if nil != me.SrcLens.SrcLoc.Pos {
+			{
+				r = append(r, ",\"p\":"...)
+				var e error
+				var sl []byte
+				sl, e = me.SrcLens.SrcLoc.Pos.preview_MarshalJSON()
+				if e == nil {
+					r = append(r, sl...)
+				} else {
+					err = e
+					return
+				}
+			}
+		}
+		if nil != me.SrcLens.SrcLoc.Range {
+			{
+				r = append(r, ",\"r\":"...)
+				var e error
+				var sl []byte
+				sl, e = me.SrcLens.SrcLoc.Range.preview_MarshalJSON()
+				if e == nil {
+					r = append(r, sl...)
+				} else {
+					err = e
+					return
+				}
+			}
+		}
+		if len(me.SrcLens.Txt) != 0 {
+			r = append(r, ",\"t\":"...)
+			r = append(r, pkg__strconv.Quote(me.SrcLens.Txt)...)
+		}
+		if len(me.SrcLens.Str) != 0 {
+			r = append(r, ",\"s\":"...)
+			r = append(r, pkg__strconv.Quote(me.SrcLens.Str)...)
+		}
+		if me.SrcLens.CrLf {
+			r = append(r, ",\"l\":"...)
+			r = append(r, pkg__strconv.FormatBool(me.SrcLens.CrLf)...)
+		}
+		if nil != me.Link {
+			{
+				r = append(r, ",\"Link\":"...)
+				var e error
+				var sl []byte
+				sl, e = me.Link.preview_MarshalJSON()
+				if e == nil {
+					r = append(r, sl...)
+				} else {
+					err = e
+					return
+				}
+			}
+		} else {
+			r = append(r, ",\"Link\":"...)
+			r = append(r, "null"...)
+		}
+		{
+			r = append(r, ",\"Pats\":"...)
+			var e error
+			var sl []byte
+			sl, e = pkg__encoding_json.Marshal(me.Pats)
+			println("JSON.MARSHAL:", pkg__fmt.Sprintf("%T", me.Pats))
+			if e == nil {
+				r = append(r, sl...)
+			} else {
+				err = e
+				return
+			}
+		}
+		if nil != me.Menu {
+			{
+				r = append(r, ",\"menu\":"...)
+				var e error
+				var sl []byte
+				sl, e = me.Menu.preview_MarshalJSON()
+				if e == nil {
+					r = append(r, sl...)
+				} else {
+					err = e
+					return
+				}
+			}
+		}
+		if nil != me.CaddyUpdate {
+			{
+				r = append(r, ",\"caddy\":"...)
+				var e error
+				var sl []byte
+				sl, e = me.CaddyUpdate.preview_MarshalJSON()
+				if e == nil {
+					r = append(r, sl...)
+				} else {
+					err = e
+					return
+				}
+			}
+		}
+		{
+			sl, e := __gent__jsonMarshal_interface____(me.Val)
+			if e == nil {
+				r = append(r, ",\"valya\":"...)
+				r = append(r, sl...)
+			} else {
+				err = e
+				return
+			}
+		}
+		r = append(r, 125)
+		if r[si1] == 44 {
+			r = append(r[:si1], r[(si1+1):]...)
+		}
+	}
+	return
+}
+
+// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *fooResp) preview_UnmarshalJSON(v []byte) (err error) { ; return }
+
 func __gent__jsonMarshal_interface____(v interface{}) (r []byte, err error) {
 	if nil == v {
 		r = append(r, "null"...)
@@ -2054,8 +2334,8 @@ func __gent__jsonMarshal_interface____(v interface{}) (r []byte, err error) {
 						if ok3 {
 							sl, e = __gent__jsonMarshal_string(v2)
 						} else {
-							println("JSON.MARSHAL:", pkg__fmt.Sprintf("%T", v))
 							sl, e = pkg__encoding_json.Marshal(v)
+							println("JSON.MARSHAL:", pkg__fmt.Sprintf("%T", v))
 						}
 					}
 				}
