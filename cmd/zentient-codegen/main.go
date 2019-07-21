@@ -28,7 +28,7 @@ func main() {
 	gentjson.Gents.OtherTypes.Marshal.Name, gentjson.Gents.OtherTypes.Unmarshal.Name =
 		"preview_"+gentjson.Gents.OtherTypes.Marshal.Name, "preview_"+gentjson.Gents.OtherTypes.Unmarshal.Name
 	typeNames4Marshal := []string{
-		"fooResp", "IpcResp", "SrcPos", "SrcRange", "SrcModEdit", "SrcModEdits",
+		"IpcResp", "SrcPos", "SrcRange", "SrcModEdit", "SrcModEdits",
 		"SrcLoc", "SrcLens", "SrcLenses", "SrcLocs", "Caddy",
 		"SrcIntelSigHelp", "SrcIntelSigInfo", "SrcIntelSigParam", "SrcIntelDoc",
 		"SrcIntel", "SrcIntels", "SrcIntelCompl", "SrcIntelCompls",
@@ -37,7 +37,7 @@ func main() {
 		"EditorAction", "ExtrasItem", "Extras", "SrcInfoTip", "SrcAnnotaction",
 	}
 	typeNames4Unmarshal := []string{
-		"fooResp", "IpcReq", "WorkspaceChanges", "SrcLens", "SrcLoc", "SrcPos", "SrcRange",
+		"IpcReq", "WorkspaceChanges", "SrcLens", "SrcLoc", "SrcPos", "SrcRange",
 	}
 	gentjson.Gents.OtherTypes.Marshal.MayGenFor = func(t *gent.Type) bool {
 		return ustr.In(t.Name, typeNames4Marshal...)
