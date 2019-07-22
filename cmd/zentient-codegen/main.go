@@ -47,6 +47,8 @@ func main() {
 	}
 	gentjson.Gents.OtherTypes.RunOnlyForTypes.Named =
 		append(typeNames4Marshal, typeNames4Unmarshal...)
+	typeNames4Unmarshal /*TEMP*/ = gentjson.Gents.OtherTypes.RunOnlyForTypes.Named
+
 	gentjson.Gents.OtherTypes.Marshal.ResliceInsteadOfWhitespace = true
 	gentjson.Gents.OtherTypes.Marshal.GenPanicImplsForOthers = true
 	gentjson.Gents.OtherTypes.Marshal.OnStdlibFallbacks = onStdlibAddPrintlnStmt
