@@ -297,7 +297,9 @@ func (me *IpcReq) preview_MarshalJSON() (r []byte, err error) { panic("IpcReq");
 
 func (me *IpcReq) jsonUnmarshal_FromAny(v map[string]interface{}) {
 	v1, o2 := v["ri"]
-	if o2 {
+	if !o2 {
+		me.ReqID = 0
+	} else {
 		println(v1)
 		if nil != v1 {
 			me.ReqID = (int64)(v1.(float64))
@@ -305,52 +307,60 @@ func (me *IpcReq) jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.ReqID = 0
 		}
 	}
-	v4, o5 := v["ii"]
-	if o5 {
-		println(v4)
-		if nil != v4 {
-			me.IpcID = (IpcIDs)(v4.(float64))
+	v5, o6 := v["ii"]
+	if !o6 {
+		me.IpcID = 0
+	} else {
+		println(v5)
+		if nil != v5 {
+			me.IpcID = (IpcIDs)(v5.(float64))
 		} else {
 			me.IpcID = 0
 		}
 	}
-	v7, o8 := v["ia"]
-	if o8 {
-		println(v7)
-		if nil != v7 {
+	v9, o10 := v["ia"]
+	if !o10 {
+		me.IpcArgs = nil
+	} else {
+		println(v9)
+		if nil != v9 {
 		} else {
 			me.IpcArgs = nil
 		}
 	}
-	v10, o11 := v["projUpd"]
-	if o11 {
-		println(v10)
-		if nil != v10 {
-			v13 := v10.(map[string]interface{})
-			if v13 == nil {
+	v13, o14 := v["projUpd"]
+	if !o14 {
+		me.ProjUpd = nil
+	} else {
+		println(v13)
+		if nil != v13 {
+			v17 := v13.(map[string]interface{})
+			if v17 == nil {
 				me.ProjUpd = nil
 			} else {
 				if nil == me.ProjUpd {
 					me.ProjUpd = new(WorkspaceChanges)
 				}
-				me.ProjUpd.jsonUnmarshal_FromAny(v13)
+				me.ProjUpd.jsonUnmarshal_FromAny(v17)
 			}
 		} else {
 			me.ProjUpd = nil
 		}
 	}
-	v14, o15 := v["srcLens"]
-	if o15 {
-		println(v14)
-		if nil != v14 {
-			v17 := v14.(map[string]interface{})
-			if v17 == nil {
+	v18, o19 := v["srcLens"]
+	if !o19 {
+		me.SrcLens = nil
+	} else {
+		println(v18)
+		if nil != v18 {
+			v22 := v18.(map[string]interface{})
+			if v22 == nil {
 				me.SrcLens = nil
 			} else {
 				if nil == me.SrcLens {
 					me.SrcLens = new(SrcLens)
 				}
-				me.SrcLens.jsonUnmarshal_FromAny(v17)
+				me.SrcLens.jsonUnmarshal_FromAny(v22)
 			}
 		} else {
 			me.SrcLens = nil
@@ -513,7 +523,9 @@ func (me *IpcResp) preview_MarshalJSON() (r []byte, err error) {
 
 func (me *IpcResp) jsonUnmarshal_FromAny(v map[string]interface{}) {
 	v1, o2 := v["ii"]
-	if o2 {
+	if !o2 {
+		me.IpcID = 0
+	} else {
 		println(v1)
 		if nil != v1 {
 			me.IpcID = (IpcIDs)(v1.(float64))
@@ -521,102 +533,114 @@ func (me *IpcResp) jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.IpcID = 0
 		}
 	}
-	v4, o5 := v["ri"]
-	if o5 {
-		println(v4)
-		if nil != v4 {
-			me.ReqID = (int64)(v4.(float64))
+	v5, o6 := v["ri"]
+	if !o6 {
+		me.ReqID = 0
+	} else {
+		println(v5)
+		if nil != v5 {
+			me.ReqID = (int64)(v5.(float64))
 		} else {
 			me.ReqID = 0
 		}
 	}
-	v7, o8 := v["err"]
-	if o8 {
-		println(v7)
-		if nil != v7 {
-			me.ErrMsg = (string)(v7.(string))
+	v9, o10 := v["err"]
+	if !o10 {
+		me.ErrMsg = ""
+	} else {
+		println(v9)
+		if nil != v9 {
+			me.ErrMsg = (string)(v9.(string))
 		} else {
 			me.ErrMsg = ""
 		}
 	}
-	v10, o11 := v["sI"]
-	if o11 {
-		println(v10)
-		if nil != v10 {
-			v13 := v10.(map[string]interface{})
-			if v13 == nil {
+	v13, o14 := v["sI"]
+	if !o14 {
+		me.SrcIntel = nil
+	} else {
+		println(v13)
+		if nil != v13 {
+			v17 := v13.(map[string]interface{})
+			if v17 == nil {
 				me.SrcIntel = nil
 			} else {
 				if nil == me.SrcIntel {
 					me.SrcIntel = new(SrcIntel)
 				}
-				me.SrcIntel.jsonUnmarshal_FromAny(v13)
+				me.SrcIntel.jsonUnmarshal_FromAny(v17)
 			}
 		} else {
 			me.SrcIntel = nil
 		}
 	}
-	v14, o15 := v["srcDiags"]
-	if o15 {
-		println(v14)
-		if nil != v14 {
-			v17 := v14.(map[string]interface{})
-			if v17 == nil {
+	v18, o19 := v["srcDiags"]
+	if !o19 {
+		me.SrcDiags = nil
+	} else {
+		println(v18)
+		if nil != v18 {
+			v22 := v18.(map[string]interface{})
+			if v22 == nil {
 				me.SrcDiags = nil
 			} else {
 				if nil == me.SrcDiags {
 					me.SrcDiags = new(Diags)
 				}
-				me.SrcDiags.jsonUnmarshal_FromAny(v17)
+				me.SrcDiags.jsonUnmarshal_FromAny(v22)
 			}
 		} else {
 			me.SrcDiags = nil
 		}
 	}
-	v18, o19 := v["srcMods"]
-	if o19 {
-		println(v18)
-		if nil != v18 {
-			v21 := v18.([]interface{})
-			if v21 == nil {
+	v23, o24 := v["srcMods"]
+	if !o24 {
+		me.SrcMods = nil
+	} else {
+		println(v23)
+		if nil != v23 {
+			v27 := v23.([]interface{})
+			if v27 == nil {
 				me.SrcMods = nil
 			} else {
 				if false {
 				}
-				me.SrcMods.jsonUnmarshal_FromAny(v21)
+				me.SrcMods.jsonUnmarshal_FromAny(v27)
 			}
 		} else {
 			me.SrcMods = nil
 		}
 	}
-	v22, o23 := v["srcActions"]
-	if o23 {
-		println(v22)
-		if nil != v22 {
-			s25 := v22.([]interface{})
-			if s25 == nil {
+	v28, o29 := v["srcActions"]
+	if !o29 {
+		me.SrcActions = nil
+	} else {
+		println(v28)
+		if nil != v28 {
+			s32 := v28.([]interface{})
+			if s32 == nil {
 				me.SrcActions = nil
 			} else {
-				if len(me.SrcActions) >= len(s25) {
-					me.SrcActions = me.SrcActions[0:len(s25)]
+				if len(me.SrcActions) >= len(s32) {
+					me.SrcActions = me.SrcActions[0:len(s32)]
 				} else {
-					me.SrcActions = make([]EditorAction, len(s25))
+					me.SrcActions = make([]EditorAction, len(s32))
 				}
-				for si26, sv27 := range s25 {
-					println(sv27)
-					if nil != sv27 {
-						v29 := sv27.(map[string]interface{})
-						if v29 == nil {
-							var z28 EditorAction
-							me.SrcActions[si26] = z28
+				for si33, sv34 := range s32 {
+					println(sv34)
+					if nil != sv34 {
+						v36 := sv34.(map[string]interface{})
+						if v36 == nil {
+							var z35 EditorAction
+							me.SrcActions[si33] = z35
 						} else {
 							if false {
 							}
-							me.SrcActions[si26].jsonUnmarshal_FromAny(v29)
+							me.SrcActions[si33].jsonUnmarshal_FromAny(v36)
 						}
 					} else {
-						var z28 EditorAction
-						me.SrcActions[si26] = z28
+						var z35 EditorAction
+						me.SrcActions[si33] = z35
 					}
 				}
 			}
@@ -624,61 +648,69 @@ func (me *IpcResp) jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.SrcActions = nil
 		}
 	}
-	v30, o31 := v["extras"]
-	if o31 {
-		println(v30)
-		if nil != v30 {
-			v33 := v30.(map[string]interface{})
-			if v33 == nil {
+	v37, o38 := v["extras"]
+	if !o38 {
+		me.Extras = nil
+	} else {
+		println(v37)
+		if nil != v37 {
+			v41 := v37.(map[string]interface{})
+			if v41 == nil {
 				me.Extras = nil
 			} else {
 				if nil == me.Extras {
 					me.Extras = new(Extras)
 				}
-				me.Extras.jsonUnmarshal_FromAny(v33)
+				me.Extras.jsonUnmarshal_FromAny(v41)
 			}
 		} else {
 			me.Extras = nil
 		}
 	}
-	v34, o35 := v["menu"]
-	if o35 {
-		println(v34)
-		if nil != v34 {
-			v37 := v34.(map[string]interface{})
-			if v37 == nil {
+	v42, o43 := v["menu"]
+	if !o43 {
+		me.Menu = nil
+	} else {
+		println(v42)
+		if nil != v42 {
+			v46 := v42.(map[string]interface{})
+			if v46 == nil {
 				me.Menu = nil
 			} else {
 				if nil == me.Menu {
 					me.Menu = new(MenuResponse)
 				}
-				me.Menu.jsonUnmarshal_FromAny(v37)
+				me.Menu.jsonUnmarshal_FromAny(v46)
 			}
 		} else {
 			me.Menu = nil
 		}
 	}
-	v38, o39 := v["caddy"]
-	if o39 {
-		println(v38)
-		if nil != v38 {
-			v41 := v38.(map[string]interface{})
-			if v41 == nil {
+	v47, o48 := v["caddy"]
+	if !o48 {
+		me.CaddyUpdate = nil
+	} else {
+		println(v47)
+		if nil != v47 {
+			v51 := v47.(map[string]interface{})
+			if v51 == nil {
 				me.CaddyUpdate = nil
 			} else {
 				if nil == me.CaddyUpdate {
 					me.CaddyUpdate = new(Caddy)
 				}
-				me.CaddyUpdate.jsonUnmarshal_FromAny(v41)
+				me.CaddyUpdate.jsonUnmarshal_FromAny(v51)
 			}
 		} else {
 			me.CaddyUpdate = nil
 		}
 	}
-	v42, o43 := v["val"]
-	if o43 {
-		println(v42)
-		if nil != v42 {
+	v52, o53 := v["val"]
+	if !o53 {
+		me.Val = nil
+	} else {
+		println(v52)
+		if nil != v52 {
 		} else {
 			me.Val = nil
 		}
@@ -760,49 +792,53 @@ func (me *Diags) preview_MarshalJSON() (r []byte, err error) {
 
 func (me *Diags) jsonUnmarshal_FromAny(v map[string]interface{}) {
 	v1, o2 := v["All"]
-	if o2 {
+	if !o2 {
+		me.All = nil
+	} else {
 		println(v1)
 		if nil != v1 {
-			v4 := v1.(map[string]interface{})
-			if v4 == nil {
+			v5 := v1.(map[string]interface{})
+			if v5 == nil {
 				me.All = nil
 			} else {
 				if nil == me.All {
-					me.All = make(DiagItemsBy, len(v4))
+					me.All = make(DiagItemsBy, len(v5))
 				}
-				me.All.jsonUnmarshal_FromAny(v4)
+				me.All.jsonUnmarshal_FromAny(v5)
 			}
 		} else {
 			me.All = nil
 		}
 	}
-	v5, o6 := v["FixUps"]
-	if o6 {
-		println(v5)
-		if nil != v5 {
-			s8 := v5.([]interface{})
-			if s8 == nil {
+	v6, o7 := v["FixUps"]
+	if !o7 {
+		me.FixUps = nil
+	} else {
+		println(v6)
+		if nil != v6 {
+			s10 := v6.([]interface{})
+			if s10 == nil {
 				me.FixUps = nil
 			} else {
-				if len(me.FixUps) >= len(s8) {
-					me.FixUps = me.FixUps[0:len(s8)]
+				if len(me.FixUps) >= len(s10) {
+					me.FixUps = me.FixUps[0:len(s10)]
 				} else {
-					me.FixUps = make([]*DiagFixUps, len(s8))
+					me.FixUps = make([]*DiagFixUps, len(s10))
 				}
-				for si9, sv10 := range s8 {
-					println(sv10)
-					if nil != sv10 {
-						v12 := sv10.(map[string]interface{})
-						if v12 == nil {
-							me.FixUps[si9] = nil
+				for si11, sv12 := range s10 {
+					println(sv12)
+					if nil != sv12 {
+						v14 := sv12.(map[string]interface{})
+						if v14 == nil {
+							me.FixUps[si11] = nil
 						} else {
-							if nil == me.FixUps[si9] {
-								me.FixUps[si9] = new(DiagFixUps)
+							if nil == me.FixUps[si11] {
+								me.FixUps[si11] = new(DiagFixUps)
 							}
-							me.FixUps[si9].jsonUnmarshal_FromAny(v12)
+							me.FixUps[si11].jsonUnmarshal_FromAny(v14)
 						}
 					} else {
-						me.FixUps[si9] = nil
+						me.FixUps[si11] = nil
 					}
 				}
 			}
@@ -810,11 +846,13 @@ func (me *Diags) jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.FixUps = nil
 		}
 	}
-	v13, o14 := v["LangID"]
-	if o14 {
-		println(v13)
-		if nil != v13 {
-			me.LangID = (string)(v13.(string))
+	v15, o16 := v["LangID"]
+	if !o16 {
+		me.LangID = ""
+	} else {
+		println(v15)
+		if nil != v15 {
+			me.LangID = (string)(v15.(string))
 		} else {
 			me.LangID = ""
 		}
@@ -933,50 +971,55 @@ func (me *Extras) preview_MarshalJSON() (r []byte, err error) {
 
 func (me *Extras) jsonUnmarshal_FromAny(v map[string]interface{}) {
 	v1, o2 := v["SrcIntels"]
-	if o2 {
+	if !o2 {
+		var z3 SrcIntels
+		me.SrcIntels = z3
+	} else {
 		println(v1)
 		if nil != v1 {
-			v4 := v1.(map[string]interface{})
-			if v4 == nil {
-				var z3 SrcIntels
-				me.SrcIntels = z3
+			v5 := v1.(map[string]interface{})
+			if v5 == nil {
+				var z4 SrcIntels
+				me.SrcIntels = z4
 			} else {
 				if false {
 				}
-				me.SrcIntels.jsonUnmarshal_FromAny(v4)
+				me.SrcIntels.jsonUnmarshal_FromAny(v5)
 			}
 		} else {
-			var z3 SrcIntels
-			me.SrcIntels = z3
+			var z4 SrcIntels
+			me.SrcIntels = z4
 		}
 	}
-	v5, o6 := v["Items"]
-	if o6 {
-		println(v5)
-		if nil != v5 {
-			s8 := v5.([]interface{})
-			if s8 == nil {
+	v6, o7 := v["Items"]
+	if !o7 {
+		me.Items = nil
+	} else {
+		println(v6)
+		if nil != v6 {
+			s10 := v6.([]interface{})
+			if s10 == nil {
 				me.Items = nil
 			} else {
-				if len(me.Items) >= len(s8) {
-					me.Items = me.Items[0:len(s8)]
+				if len(me.Items) >= len(s10) {
+					me.Items = me.Items[0:len(s10)]
 				} else {
-					me.Items = make([]*ExtrasItem, len(s8))
+					me.Items = make([]*ExtrasItem, len(s10))
 				}
-				for si9, sv10 := range s8 {
-					println(sv10)
-					if nil != sv10 {
-						v12 := sv10.(map[string]interface{})
-						if v12 == nil {
-							me.Items[si9] = nil
+				for si11, sv12 := range s10 {
+					println(sv12)
+					if nil != sv12 {
+						v14 := sv12.(map[string]interface{})
+						if v14 == nil {
+							me.Items[si11] = nil
 						} else {
-							if nil == me.Items[si9] {
-								me.Items[si9] = new(ExtrasItem)
+							if nil == me.Items[si11] {
+								me.Items[si11] = new(ExtrasItem)
 							}
-							me.Items[si9].jsonUnmarshal_FromAny(v12)
+							me.Items[si11].jsonUnmarshal_FromAny(v14)
 						}
 					} else {
-						me.Items[si9] = nil
+						me.Items[si11] = nil
 					}
 				}
 			}
@@ -984,25 +1027,27 @@ func (me *Extras) jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.Items = nil
 		}
 	}
-	v13, o14 := v["Warns"]
-	if o14 {
-		println(v13)
-		if nil != v13 {
-			s16 := v13.([]interface{})
-			if s16 == nil {
+	v15, o16 := v["Warns"]
+	if !o16 {
+		me.Warns = nil
+	} else {
+		println(v15)
+		if nil != v15 {
+			s19 := v15.([]interface{})
+			if s19 == nil {
 				me.Warns = nil
 			} else {
-				if len(me.Warns) >= len(s16) {
-					me.Warns = me.Warns[0:len(s16)]
+				if len(me.Warns) >= len(s19) {
+					me.Warns = me.Warns[0:len(s19)]
 				} else {
-					me.Warns = make([]string, len(s16))
+					me.Warns = make([]string, len(s19))
 				}
-				for si17, sv18 := range s16 {
-					println(sv18)
-					if nil != sv18 {
-						me.Warns[si17] = (string)(sv18.(string))
+				for si20, sv21 := range s19 {
+					println(sv21)
+					if nil != sv21 {
+						me.Warns[si20] = (string)(sv21.(string))
 					} else {
-						me.Warns[si17] = ""
+						me.Warns[si20] = ""
 					}
 				}
 			}
@@ -1010,20 +1055,24 @@ func (me *Extras) jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.Warns = nil
 		}
 	}
-	v20, o21 := v["Desc"]
-	if o21 {
-		println(v20)
-		if nil != v20 {
-			me.Desc = (string)(v20.(string))
+	v23, o24 := v["Desc"]
+	if !o24 {
+		me.Desc = ""
+	} else {
+		println(v23)
+		if nil != v23 {
+			me.Desc = (string)(v23.(string))
 		} else {
 			me.Desc = ""
 		}
 	}
-	v23, o24 := v["Url"]
-	if o24 {
-		println(v23)
-		if nil != v23 {
-			me.Url = (string)(v23.(string))
+	v27, o28 := v["Url"]
+	if !o28 {
+		me.Url = ""
+	} else {
+		println(v27)
+		if nil != v27 {
+			me.Url = (string)(v27.(string))
 		} else {
 			me.Url = ""
 		}
@@ -1100,69 +1149,81 @@ func (me *MenuResponse) preview_MarshalJSON() (r []byte, err error) {
 
 func (me *MenuResponse) jsonUnmarshal_FromAny(v map[string]interface{}) {
 	v1, o2 := v["SubMenu"]
-	if o2 {
+	if !o2 {
+		me.SubMenu = nil
+	} else {
 		println(v1)
 		if nil != v1 {
-			v4 := v1.(map[string]interface{})
-			if v4 == nil {
+			v5 := v1.(map[string]interface{})
+			if v5 == nil {
 				me.SubMenu = nil
 			} else {
 				if nil == me.SubMenu {
 					me.SubMenu = new(Menu)
 				}
-				me.SubMenu.jsonUnmarshal_FromAny(v4)
+				me.SubMenu.jsonUnmarshal_FromAny(v5)
 			}
 		} else {
 			me.SubMenu = nil
 		}
 	}
-	v5, o6 := v["WebsiteURL"]
-	if o6 {
-		println(v5)
-		if nil != v5 {
-			me.WebsiteURL = (string)(v5.(string))
+	v6, o7 := v["WebsiteURL"]
+	if !o7 {
+		me.WebsiteURL = ""
+	} else {
+		println(v6)
+		if nil != v6 {
+			me.WebsiteURL = (string)(v6.(string))
 		} else {
 			me.WebsiteURL = ""
 		}
 	}
-	v8, o9 := v["NoteInfo"]
-	if o9 {
-		println(v8)
-		if nil != v8 {
-			me.NoteInfo = (string)(v8.(string))
+	v10, o11 := v["NoteInfo"]
+	if !o11 {
+		me.NoteInfo = ""
+	} else {
+		println(v10)
+		if nil != v10 {
+			me.NoteInfo = (string)(v10.(string))
 		} else {
 			me.NoteInfo = ""
 		}
 	}
-	v11, o12 := v["NoteWarn"]
-	if o12 {
-		println(v11)
-		if nil != v11 {
-			me.NoteWarn = (string)(v11.(string))
+	v14, o15 := v["NoteWarn"]
+	if !o15 {
+		me.NoteWarn = ""
+	} else {
+		println(v14)
+		if nil != v14 {
+			me.NoteWarn = (string)(v14.(string))
 		} else {
 			me.NoteWarn = ""
 		}
 	}
-	v14, o15 := v["UxActionLabel"]
-	if o15 {
-		println(v14)
-		if nil != v14 {
-			me.UxActionLabel = (string)(v14.(string))
+	v18, o19 := v["UxActionLabel"]
+	if !o19 {
+		me.UxActionLabel = ""
+	} else {
+		println(v18)
+		if nil != v18 {
+			me.UxActionLabel = (string)(v18.(string))
 		} else {
 			me.UxActionLabel = ""
 		}
 	}
-	v17, o18 := v["Refs"]
-	if o18 {
-		println(v17)
-		if nil != v17 {
-			v20 := v17.([]interface{})
-			if v20 == nil {
+	v22, o23 := v["Refs"]
+	if !o23 {
+		me.Refs = nil
+	} else {
+		println(v22)
+		if nil != v22 {
+			v26 := v22.([]interface{})
+			if v26 == nil {
 				me.Refs = nil
 			} else {
 				if false {
 				}
-				me.Refs.jsonUnmarshal_FromAny(v20)
+				me.Refs.jsonUnmarshal_FromAny(v26)
 			}
 		} else {
 			me.Refs = nil
@@ -1299,99 +1360,110 @@ func (me *SrcIntel) preview_MarshalJSON() (r []byte, err error) {
 
 func (me *SrcIntel) jsonUnmarshal_FromAny(v map[string]interface{}) {
 	v1, o2 := v["SrcIntels"]
-	if o2 {
+	if !o2 {
+		var z3 SrcIntels
+		me.SrcIntels = z3
+	} else {
 		println(v1)
 		if nil != v1 {
-			v4 := v1.(map[string]interface{})
-			if v4 == nil {
-				var z3 SrcIntels
-				me.SrcIntels = z3
+			v5 := v1.(map[string]interface{})
+			if v5 == nil {
+				var z4 SrcIntels
+				me.SrcIntels = z4
 			} else {
 				if false {
 				}
-				me.SrcIntels.jsonUnmarshal_FromAny(v4)
+				me.SrcIntels.jsonUnmarshal_FromAny(v5)
 			}
 		} else {
-			var z3 SrcIntels
-			me.SrcIntels = z3
+			var z4 SrcIntels
+			me.SrcIntels = z4
 		}
 	}
-	v5, o6 := v["Sig"]
-	if o6 {
-		println(v5)
-		if nil != v5 {
-			v8 := v5.(map[string]interface{})
-			if v8 == nil {
+	v6, o7 := v["Sig"]
+	if !o7 {
+		me.Sig = nil
+	} else {
+		println(v6)
+		if nil != v6 {
+			v10 := v6.(map[string]interface{})
+			if v10 == nil {
 				me.Sig = nil
 			} else {
 				if nil == me.Sig {
 					me.Sig = new(SrcIntelSigHelp)
 				}
-				me.Sig.jsonUnmarshal_FromAny(v8)
+				me.Sig.jsonUnmarshal_FromAny(v10)
 			}
 		} else {
 			me.Sig = nil
 		}
 	}
-	v9, o10 := v["Cmpl"]
-	if o10 {
-		println(v9)
-		if nil != v9 {
-			v12 := v9.([]interface{})
-			if v12 == nil {
+	v11, o12 := v["Cmpl"]
+	if !o12 {
+		me.Cmpl = nil
+	} else {
+		println(v11)
+		if nil != v11 {
+			v15 := v11.([]interface{})
+			if v15 == nil {
 				me.Cmpl = nil
 			} else {
 				if false {
 				}
-				me.Cmpl.jsonUnmarshal_FromAny(v12)
+				me.Cmpl.jsonUnmarshal_FromAny(v15)
 			}
 		} else {
 			me.Cmpl = nil
 		}
 	}
-	v13, o14 := v["Syms"]
-	if o14 {
-		println(v13)
-		if nil != v13 {
-			v16 := v13.([]interface{})
-			if v16 == nil {
+	v16, o17 := v["Syms"]
+	if !o17 {
+		me.Syms = nil
+	} else {
+		println(v16)
+		if nil != v16 {
+			v20 := v16.([]interface{})
+			if v20 == nil {
 				me.Syms = nil
 			} else {
 				if false {
 				}
-				me.Syms.jsonUnmarshal_FromAny(v16)
+				me.Syms.jsonUnmarshal_FromAny(v20)
 			}
 		} else {
 			me.Syms = nil
 		}
 	}
-	v17, o18 := v["Anns"]
-	if o18 {
-		println(v17)
-		if nil != v17 {
-			s20 := v17.([]interface{})
-			if s20 == nil {
+	v21, o22 := v["Anns"]
+	if !o22 {
+		me.Anns = nil
+	} else {
+		println(v21)
+		if nil != v21 {
+			s25 := v21.([]interface{})
+			if s25 == nil {
 				me.Anns = nil
 			} else {
-				if len(me.Anns) >= len(s20) {
-					me.Anns = me.Anns[0:len(s20)]
+				if len(me.Anns) >= len(s25) {
+					me.Anns = me.Anns[0:len(s25)]
 				} else {
-					me.Anns = make([]*SrcAnnotaction, len(s20))
+					me.Anns = make([]*SrcAnnotaction, len(s25))
 				}
-				for si21, sv22 := range s20 {
-					println(sv22)
-					if nil != sv22 {
-						v24 := sv22.(map[string]interface{})
-						if v24 == nil {
-							me.Anns[si21] = nil
+				for si26, sv27 := range s25 {
+					println(sv27)
+					if nil != sv27 {
+						v29 := sv27.(map[string]interface{})
+						if v29 == nil {
+							me.Anns[si26] = nil
 						} else {
-							if nil == me.Anns[si21] {
-								me.Anns[si21] = new(SrcAnnotaction)
+							if nil == me.Anns[si26] {
+								me.Anns[si26] = new(SrcAnnotaction)
 							}
-							me.Anns[si21].jsonUnmarshal_FromAny(v24)
+							me.Anns[si26].jsonUnmarshal_FromAny(v29)
 						}
 					} else {
-						me.Anns[si21] = nil
+						me.Anns[si26] = nil
 					}
 				}
 			}
@@ -1472,7 +1544,9 @@ func (me *Caddy) preview_MarshalJSON() (r []byte, err error) {
 
 func (me *Caddy) jsonUnmarshal_FromAny(v map[string]interface{}) {
 	v1, o2 := v["ID"]
-	if o2 {
+	if !o2 {
+		me.ID = ""
+	} else {
 		println(v1)
 		if nil != v1 {
 			me.ID = (string)(v1.(string))
@@ -1480,95 +1554,117 @@ func (me *Caddy) jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.ID = ""
 		}
 	}
-	v4, o5 := v["LangID"]
-	if o5 {
-		println(v4)
-		if nil != v4 {
-			me.LangID = (string)(v4.(string))
+	v5, o6 := v["LangID"]
+	if !o6 {
+		me.LangID = ""
+	} else {
+		println(v5)
+		if nil != v5 {
+			me.LangID = (string)(v5.(string))
 		} else {
 			me.LangID = ""
 		}
 	}
-	v7, o8 := v["Icon"]
-	if o8 {
-		println(v7)
-		if nil != v7 {
-			me.Icon = (string)(v7.(string))
+	v9, o10 := v["Icon"]
+	if !o10 {
+		me.Icon = ""
+	} else {
+		println(v9)
+		if nil != v9 {
+			me.Icon = (string)(v9.(string))
 		} else {
 			me.Icon = ""
 		}
 	}
-	v10, o11 := v["Title"]
-	if o11 {
-		println(v10)
-		if nil != v10 {
-			me.Title = (string)(v10.(string))
+	v13, o14 := v["Title"]
+	if !o14 {
+		me.Title = ""
+	} else {
+		println(v13)
+		if nil != v13 {
+			me.Title = (string)(v13.(string))
 		} else {
 			me.Title = ""
 		}
 	}
-	v13, o14 := v["Status"]
-	if o14 {
-		println(v13)
-		if nil != v13 {
-			t16 := v13.(map[string]interface{})
-			if nil == t16 {
-				var z15 struct {
+	v17, o18 := v["Status"]
+	if !o18 {
+		var z19 struct {
+			Flag CaddyStatus
+			Desc string `json:",omitempty"`
+		}
+		me.Status = z19
+	} else {
+		println(v17)
+		if nil != v17 {
+			t21 := v17.(map[string]interface{})
+			if nil == t21 {
+				var z20 struct {
 					Flag CaddyStatus
 					Desc string `json:",omitempty"`
 				}
-				me.Status = z15
+				me.Status = z20
 			} else {
-				v17, o18 := t16["Flag"]
-				if o18 {
-					println(v17)
-					if nil != v17 {
-						me.Status.Flag = (CaddyStatus)(v17.(float64))
+				v22, o23 := t21["Flag"]
+				if !o23 {
+					me.Status.Flag = 0
+				} else {
+					println(v22)
+					if nil != v22 {
+						me.Status.Flag = (CaddyStatus)(v22.(float64))
 					} else {
 						me.Status.Flag = 0
 					}
 				}
-				v20, o21 := t16["Desc"]
-				if o21 {
-					println(v20)
-					if nil != v20 {
-						me.Status.Desc = (string)(v20.(string))
+				v26, o27 := t21["Desc"]
+				if !o27 {
+					me.Status.Desc = ""
+				} else {
+					println(v26)
+					if nil != v26 {
+						me.Status.Desc = (string)(v26.(string))
 					} else {
 						me.Status.Desc = ""
 					}
 				}
 			}
 		} else {
-			var z15 struct {
+			var z20 struct {
 				Flag CaddyStatus
 				Desc string `json:",omitempty"`
 			}
-			me.Status = z15
+			me.Status = z20
 		}
 	}
-	v23, o24 := v["Details"]
-	if o24 {
-		println(v23)
-		if nil != v23 {
-			me.Details = (string)(v23.(string))
+	v30, o31 := v["Details"]
+	if !o31 {
+		me.Details = ""
+	} else {
+		println(v30)
+		if nil != v30 {
+			me.Details = (string)(v30.(string))
 		} else {
 			me.Details = ""
 		}
 	}
-	v26, o27 := v["UxActionID"]
-	if o27 {
-		println(v26)
-		if nil != v26 {
-			me.UxActionID = (string)(v26.(string))
+	v34, o35 := v["UxActionID"]
+	if !o35 {
+		me.UxActionID = ""
+	} else {
+		println(v34)
+		if nil != v34 {
+			me.UxActionID = (string)(v34.(string))
 		} else {
 			me.UxActionID = ""
 		}
 	}
-	v29, o30 := v["ShowTitle"]
-	if o30 {
-		println(v29)
-		if nil != v29 {
-			me.ShowTitle = (bool)(v29.(bool))
+	v38, o39 := v["ShowTitle"]
+	if !o39 {
+		me.ShowTitle = false
+	} else {
+		println(v38)
+		if nil != v38 {
+			me.ShowTitle = (bool)(v38.(bool))
 		} else {
 			me.ShowTitle = false
 		}
@@ -1671,7 +1767,9 @@ func (me *DiagFixUps) preview_MarshalJSON() (r []byte, err error) {
 
 func (me *DiagFixUps) jsonUnmarshal_FromAny(v map[string]interface{}) {
 	v1, o2 := v["FilePath"]
-	if o2 {
+	if !o2 {
+		me.FilePath = ""
+	} else {
 		println(v1)
 		if nil != v1 {
 			me.FilePath = (string)(v1.(string))
@@ -1679,58 +1777,64 @@ func (me *DiagFixUps) jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.FilePath = ""
 		}
 	}
-	v4, o5 := v["Desc"]
-	if o5 {
-		println(v4)
-		if nil != v4 {
+	v5, o6 := v["Desc"]
+	if !o6 {
+		me.Desc = nil
+	} else {
+		println(v5)
+		if nil != v5 {
 		} else {
 			me.Desc = nil
 		}
 	}
-	v7, o8 := v["Edits"]
-	if o8 {
-		println(v7)
-		if nil != v7 {
-			v10 := v7.([]interface{})
-			if v10 == nil {
+	v9, o10 := v["Edits"]
+	if !o10 {
+		me.Edits = nil
+	} else {
+		println(v9)
+		if nil != v9 {
+			v13 := v9.([]interface{})
+			if v13 == nil {
 				me.Edits = nil
 			} else {
 				if false {
 				}
-				me.Edits.jsonUnmarshal_FromAny(v10)
+				me.Edits.jsonUnmarshal_FromAny(v13)
 			}
 		} else {
 			me.Edits = nil
 		}
 	}
-	v11, o12 := v["Dropped"]
-	if o12 {
-		println(v11)
-		if nil != v11 {
-			s14 := v11.([]interface{})
-			if s14 == nil {
+	v14, o15 := v["Dropped"]
+	if !o15 {
+		me.Dropped = nil
+	} else {
+		println(v14)
+		if nil != v14 {
+			s18 := v14.([]interface{})
+			if s18 == nil {
 				me.Dropped = nil
 			} else {
-				if len(me.Dropped) >= len(s14) {
-					me.Dropped = me.Dropped[0:len(s14)]
+				if len(me.Dropped) >= len(s18) {
+					me.Dropped = me.Dropped[0:len(s18)]
 				} else {
-					me.Dropped = make([]SrcModEdit, len(s14))
+					me.Dropped = make([]SrcModEdit, len(s18))
 				}
-				for si15, sv16 := range s14 {
-					println(sv16)
-					if nil != sv16 {
-						v18 := sv16.(map[string]interface{})
-						if v18 == nil {
-							var z17 SrcModEdit
-							me.Dropped[si15] = z17
+				for si19, sv20 := range s18 {
+					println(sv20)
+					if nil != sv20 {
+						v22 := sv20.(map[string]interface{})
+						if v22 == nil {
+							var z21 SrcModEdit
+							me.Dropped[si19] = z21
 						} else {
 							if false {
 							}
-							me.Dropped[si15].jsonUnmarshal_FromAny(v18)
+							me.Dropped[si19].jsonUnmarshal_FromAny(v22)
 						}
 					} else {
-						var z17 SrcModEdit
-						me.Dropped[si15] = z17
+						var z21 SrcModEdit
+						me.Dropped[si19] = z21
 					}
 				}
 			}
@@ -1853,7 +1957,9 @@ func (me *DiagItem) preview_MarshalJSON() (r []byte, err error) {
 
 func (me *DiagItem) jsonUnmarshal_FromAny(v map[string]interface{}) {
 	v1, o2 := v["Cat"]
-	if o2 {
+	if !o2 {
+		me.Cat = ""
+	} else {
 		println(v1)
 		if nil != v1 {
 			me.Cat = (string)(v1.(string))
@@ -1861,61 +1967,68 @@ func (me *DiagItem) jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.Cat = ""
 		}
 	}
-	v4, o5 := v["Loc"]
-	if o5 {
-		println(v4)
-		if nil != v4 {
-			v7 := v4.(map[string]interface{})
-			if v7 == nil {
-				var z6 SrcLoc
-				me.Loc = z6
+	v5, o6 := v["Loc"]
+	if !o6 {
+		var z7 SrcLoc
+		me.Loc = z7
+	} else {
+		println(v5)
+		if nil != v5 {
+			v9 := v5.(map[string]interface{})
+			if v9 == nil {
+				var z8 SrcLoc
+				me.Loc = z8
 			} else {
 				if false {
 				}
-				me.Loc.jsonUnmarshal_FromAny(v7)
+				me.Loc.jsonUnmarshal_FromAny(v9)
 			}
 		} else {
-			var z6 SrcLoc
-			me.Loc = z6
+			var z8 SrcLoc
+			me.Loc = z8
 		}
 	}
-	v8, o9 := v["Msg"]
-	if o9 {
-		println(v8)
-		if nil != v8 {
-			me.Msg = (string)(v8.(string))
+	v10, o11 := v["Msg"]
+	if !o11 {
+		me.Msg = ""
+	} else {
+		println(v10)
+		if nil != v10 {
+			me.Msg = (string)(v10.(string))
 		} else {
 			me.Msg = ""
 		}
 	}
-	v11, o12 := v["Rel"]
-	if o12 {
-		println(v11)
-		if nil != v11 {
-			s14 := v11.([]interface{})
-			if s14 == nil {
+	v14, o15 := v["Rel"]
+	if !o15 {
+		me.Rel = nil
+	} else {
+		println(v14)
+		if nil != v14 {
+			s18 := v14.([]interface{})
+			if s18 == nil {
 				me.Rel = nil
 			} else {
-				if len(me.Rel) >= len(s14) {
-					me.Rel = me.Rel[0:len(s14)]
+				if len(me.Rel) >= len(s18) {
+					me.Rel = me.Rel[0:len(s18)]
 				} else {
-					me.Rel = make([]SrcLens, len(s14))
+					me.Rel = make([]SrcLens, len(s18))
 				}
-				for si15, sv16 := range s14 {
-					println(sv16)
-					if nil != sv16 {
-						v18 := sv16.(map[string]interface{})
-						if v18 == nil {
-							var z17 SrcLens
-							me.Rel[si15] = z17
+				for si19, sv20 := range s18 {
+					println(sv20)
+					if nil != sv20 {
+						v22 := sv20.(map[string]interface{})
+						if v22 == nil {
+							var z21 SrcLens
+							me.Rel[si19] = z21
 						} else {
 							if false {
 							}
-							me.Rel[si15].jsonUnmarshal_FromAny(v18)
+							me.Rel[si19].jsonUnmarshal_FromAny(v22)
 						}
 					} else {
-						var z17 SrcLens
-						me.Rel[si15] = z17
+						var z21 SrcLens
+						me.Rel[si19] = z21
 					}
 				}
 			}
@@ -1923,34 +2036,36 @@ func (me *DiagItem) jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.Rel = nil
 		}
 	}
-	v19, o20 := v["SrcActions"]
-	if o20 {
-		println(v19)
-		if nil != v19 {
-			s22 := v19.([]interface{})
-			if s22 == nil {
+	v23, o24 := v["SrcActions"]
+	if !o24 {
+		me.SrcActions = nil
+	} else {
+		println(v23)
+		if nil != v23 {
+			s27 := v23.([]interface{})
+			if s27 == nil {
 				me.SrcActions = nil
 			} else {
-				if len(me.SrcActions) >= len(s22) {
-					me.SrcActions = me.SrcActions[0:len(s22)]
+				if len(me.SrcActions) >= len(s27) {
+					me.SrcActions = me.SrcActions[0:len(s27)]
 				} else {
-					me.SrcActions = make([]EditorAction, len(s22))
+					me.SrcActions = make([]EditorAction, len(s27))
 				}
-				for si23, sv24 := range s22 {
-					println(sv24)
-					if nil != sv24 {
-						v26 := sv24.(map[string]interface{})
-						if v26 == nil {
-							var z25 EditorAction
-							me.SrcActions[si23] = z25
+				for si28, sv29 := range s27 {
+					println(sv29)
+					if nil != sv29 {
+						v31 := sv29.(map[string]interface{})
+						if v31 == nil {
+							var z30 EditorAction
+							me.SrcActions[si28] = z30
 						} else {
 							if false {
 							}
-							me.SrcActions[si23].jsonUnmarshal_FromAny(v26)
+							me.SrcActions[si28].jsonUnmarshal_FromAny(v31)
 						}
 					} else {
-						var z25 EditorAction
-						me.SrcActions[si23] = z25
+						var z30 EditorAction
+						me.SrcActions[si28] = z30
 					}
 				}
 			}
@@ -1958,34 +2073,38 @@ func (me *DiagItem) jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.SrcActions = nil
 		}
 	}
-	v27, o28 := v["Sticky"]
-	if o28 {
-		println(v27)
-		if nil != v27 {
-			me.StickyAuto = (bool)(v27.(bool))
+	v32, o33 := v["Sticky"]
+	if !o33 {
+		me.StickyAuto = false
+	} else {
+		println(v32)
+		if nil != v32 {
+			me.StickyAuto = (bool)(v32.(bool))
 		} else {
 			me.StickyAuto = false
 		}
 	}
-	v30, o31 := v["Tags"]
-	if o31 {
-		println(v30)
-		if nil != v30 {
-			s33 := v30.([]interface{})
-			if s33 == nil {
+	v36, o37 := v["Tags"]
+	if !o37 {
+		me.Tags = nil
+	} else {
+		println(v36)
+		if nil != v36 {
+			s40 := v36.([]interface{})
+			if s40 == nil {
 				me.Tags = nil
 			} else {
-				if len(me.Tags) >= len(s33) {
-					me.Tags = me.Tags[0:len(s33)]
+				if len(me.Tags) >= len(s40) {
+					me.Tags = me.Tags[0:len(s40)]
 				} else {
-					me.Tags = make([]int, len(s33))
+					me.Tags = make([]int, len(s40))
 				}
-				for si34, sv35 := range s33 {
-					println(sv35)
-					if nil != sv35 {
-						me.Tags[si34] = (int)(sv35.(float64))
+				for si41, sv42 := range s40 {
+					println(sv42)
+					if nil != sv42 {
+						me.Tags[si41] = (int)(sv42.(float64))
 					} else {
-						me.Tags[si34] = 0
+						me.Tags[si41] = 0
 					}
 				}
 			}
@@ -2143,7 +2262,9 @@ func (me *EditorAction) preview_MarshalJSON() (r []byte, err error) {
 
 func (me *EditorAction) jsonUnmarshal_FromAny(v map[string]interface{}) {
 	v1, o2 := v["title"]
-	if o2 {
+	if !o2 {
+		me.Title = ""
+	} else {
 		println(v1)
 		if nil != v1 {
 			me.Title = (string)(v1.(string))
@@ -2151,42 +2272,48 @@ func (me *EditorAction) jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.Title = ""
 		}
 	}
-	v4, o5 := v["command"]
-	if o5 {
-		println(v4)
-		if nil != v4 {
-			me.Cmd = (string)(v4.(string))
+	v5, o6 := v["command"]
+	if !o6 {
+		me.Cmd = ""
+	} else {
+		println(v5)
+		if nil != v5 {
+			me.Cmd = (string)(v5.(string))
 		} else {
 			me.Cmd = ""
 		}
 	}
-	v7, o8 := v["tooltip"]
-	if o8 {
-		println(v7)
-		if nil != v7 {
-			me.Hint = (string)(v7.(string))
+	v9, o10 := v["tooltip"]
+	if !o10 {
+		me.Hint = ""
+	} else {
+		println(v9)
+		if nil != v9 {
+			me.Hint = (string)(v9.(string))
 		} else {
 			me.Hint = ""
 		}
 	}
-	v10, o11 := v["arguments"]
-	if o11 {
-		println(v10)
-		if nil != v10 {
-			s13 := v10.([]interface{})
-			if s13 == nil {
+	v13, o14 := v["arguments"]
+	if !o14 {
+		me.Arguments = nil
+	} else {
+		println(v13)
+		if nil != v13 {
+			s17 := v13.([]interface{})
+			if s17 == nil {
 				me.Arguments = nil
 			} else {
-				if len(me.Arguments) >= len(s13) {
-					me.Arguments = me.Arguments[0:len(s13)]
+				if len(me.Arguments) >= len(s17) {
+					me.Arguments = me.Arguments[0:len(s17)]
 				} else {
-					me.Arguments = make([]interface{}, len(s13))
+					me.Arguments = make([]interface{}, len(s17))
 				}
-				for si14, sv15 := range s13 {
-					println(sv15)
-					if nil != sv15 {
+				for si18, sv19 := range s17 {
+					println(sv19)
+					if nil != sv19 {
 					} else {
-						me.Arguments[si14] = nil
+						me.Arguments[si18] = nil
 					}
 				}
 			}
@@ -2248,7 +2375,9 @@ func (me *ExtrasItem) preview_MarshalJSON() (r []byte, err error) {
 
 func (me *ExtrasItem) jsonUnmarshal_FromAny(v map[string]interface{}) {
 	v1, o2 := v["id"]
-	if o2 {
+	if !o2 {
+		me.ID = ""
+	} else {
 		println(v1)
 		if nil != v1 {
 			me.ID = (string)(v1.(string))
@@ -2256,47 +2385,57 @@ func (me *ExtrasItem) jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.ID = ""
 		}
 	}
-	v4, o5 := v["label"]
-	if o5 {
-		println(v4)
-		if nil != v4 {
-			me.Label = (string)(v4.(string))
+	v5, o6 := v["label"]
+	if !o6 {
+		me.Label = ""
+	} else {
+		println(v5)
+		if nil != v5 {
+			me.Label = (string)(v5.(string))
 		} else {
 			me.Label = ""
 		}
 	}
-	v7, o8 := v["description"]
-	if o8 {
-		println(v7)
-		if nil != v7 {
-			me.Desc = (string)(v7.(string))
+	v9, o10 := v["description"]
+	if !o10 {
+		me.Desc = ""
+	} else {
+		println(v9)
+		if nil != v9 {
+			me.Desc = (string)(v9.(string))
 		} else {
 			me.Desc = ""
 		}
 	}
-	v10, o11 := v["detail"]
-	if o11 {
-		println(v10)
-		if nil != v10 {
-			me.Detail = (string)(v10.(string))
+	v13, o14 := v["detail"]
+	if !o14 {
+		me.Detail = ""
+	} else {
+		println(v13)
+		if nil != v13 {
+			me.Detail = (string)(v13.(string))
 		} else {
 			me.Detail = ""
 		}
 	}
-	v13, o14 := v["arg"]
-	if o14 {
-		println(v13)
-		if nil != v13 {
-			me.QueryArg = (string)(v13.(string))
+	v17, o18 := v["arg"]
+	if !o18 {
+		me.QueryArg = ""
+	} else {
+		println(v17)
+		if nil != v17 {
+			me.QueryArg = (string)(v17.(string))
 		} else {
 			me.QueryArg = ""
 		}
 	}
-	v16, o17 := v["fPos"]
-	if o17 {
-		println(v16)
-		if nil != v16 {
-			me.FilePos = (string)(v16.(string))
+	v21, o22 := v["fPos"]
+	if !o22 {
+		me.FilePos = ""
+	} else {
+		println(v21)
+		if nil != v21 {
+			me.FilePos = (string)(v21.(string))
 		} else {
 			me.FilePos = ""
 		}
@@ -2351,7 +2490,9 @@ func (me *Menu) preview_MarshalJSON() (r []byte, err error) {
 
 func (me *Menu) jsonUnmarshal_FromAny(v map[string]interface{}) {
 	v1, o2 := v["desc"]
-	if o2 {
+	if !o2 {
+		me.Desc = ""
+	} else {
 		println(v1)
 		if nil != v1 {
 			me.Desc = (string)(v1.(string))
@@ -2359,26 +2500,30 @@ func (me *Menu) jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.Desc = ""
 		}
 	}
-	v4, o5 := v["topLevel"]
-	if o5 {
-		println(v4)
-		if nil != v4 {
-			me.TopLevel = (bool)(v4.(bool))
+	v5, o6 := v["topLevel"]
+	if !o6 {
+		me.TopLevel = false
+	} else {
+		println(v5)
+		if nil != v5 {
+			me.TopLevel = (bool)(v5.(bool))
 		} else {
 			me.TopLevel = false
 		}
 	}
-	v7, o8 := v["items"]
-	if o8 {
-		println(v7)
-		if nil != v7 {
-			v10 := v7.([]interface{})
-			if v10 == nil {
+	v9, o10 := v["items"]
+	if !o10 {
+		me.Items = nil
+	} else {
+		println(v9)
+		if nil != v9 {
+			v13 := v9.([]interface{})
+			if v13 == nil {
 				me.Items = nil
 			} else {
 				if false {
 				}
-				me.Items.jsonUnmarshal_FromAny(v10)
+				me.Items.jsonUnmarshal_FromAny(v13)
 			}
 		} else {
 			me.Items = nil
@@ -2493,7 +2638,9 @@ func (me *MenuItem) preview_MarshalJSON() (r []byte, err error) {
 
 func (me *MenuItem) jsonUnmarshal_FromAny(v map[string]interface{}) {
 	v1, o2 := v["ii"]
-	if o2 {
+	if !o2 {
+		me.IpcID = 0
+	} else {
 		println(v1)
 		if nil != v1 {
 			me.IpcID = (IpcIDs)(v1.(float64))
@@ -2501,55 +2648,67 @@ func (me *MenuItem) jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.IpcID = 0
 		}
 	}
-	v4, o5 := v["ia"]
-	if o5 {
-		println(v4)
-		if nil != v4 {
+	v5, o6 := v["ia"]
+	if !o6 {
+		me.IpcArgs = nil
+	} else {
+		println(v5)
+		if nil != v5 {
 		} else {
 			me.IpcArgs = nil
 		}
 	}
-	v7, o8 := v["c"]
-	if o8 {
-		println(v7)
-		if nil != v7 {
-			me.Category = (string)(v7.(string))
+	v9, o10 := v["c"]
+	if !o10 {
+		me.Category = ""
+	} else {
+		println(v9)
+		if nil != v9 {
+			me.Category = (string)(v9.(string))
 		} else {
 			me.Category = ""
 		}
 	}
-	v10, o11 := v["t"]
-	if o11 {
-		println(v10)
-		if nil != v10 {
-			me.Title = (string)(v10.(string))
+	v13, o14 := v["t"]
+	if !o14 {
+		me.Title = ""
+	} else {
+		println(v13)
+		if nil != v13 {
+			me.Title = (string)(v13.(string))
 		} else {
 			me.Title = ""
 		}
 	}
-	v13, o14 := v["d"]
-	if o14 {
-		println(v13)
-		if nil != v13 {
-			me.Desc = (string)(v13.(string))
+	v17, o18 := v["d"]
+	if !o18 {
+		me.Desc = ""
+	} else {
+		println(v17)
+		if nil != v17 {
+			me.Desc = (string)(v17.(string))
 		} else {
 			me.Desc = ""
 		}
 	}
-	v16, o17 := v["h"]
-	if o17 {
-		println(v16)
-		if nil != v16 {
-			me.Hint = (string)(v16.(string))
+	v21, o22 := v["h"]
+	if !o22 {
+		me.Hint = ""
+	} else {
+		println(v21)
+		if nil != v21 {
+			me.Hint = (string)(v21.(string))
 		} else {
 			me.Hint = ""
 		}
 	}
-	v19, o20 := v["q"]
-	if o20 {
-		println(v19)
-		if nil != v19 {
-			me.Confirm = (string)(v19.(string))
+	v25, o26 := v["q"]
+	if !o26 {
+		me.Confirm = ""
+	} else {
+		println(v25)
+		if nil != v25 {
+			me.Confirm = (string)(v25.(string))
 		} else {
 			me.Confirm = ""
 		}
@@ -2596,7 +2755,9 @@ func (me *MenuItemArgPrompt) preview_MarshalJSON() (r []byte, err error) {
 
 func (me *MenuItemArgPrompt) jsonUnmarshal_FromAny(v map[string]interface{}) {
 	v1, o2 := v["prompt"]
-	if o2 {
+	if !o2 {
+		me.Prompt = ""
+	} else {
 		println(v1)
 		if nil != v1 {
 			me.Prompt = (string)(v1.(string))
@@ -2604,20 +2765,24 @@ func (me *MenuItemArgPrompt) jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.Prompt = ""
 		}
 	}
-	v4, o5 := v["placeHolder"]
-	if o5 {
-		println(v4)
-		if nil != v4 {
-			me.Placeholder = (string)(v4.(string))
+	v5, o6 := v["placeHolder"]
+	if !o6 {
+		me.Placeholder = ""
+	} else {
+		println(v5)
+		if nil != v5 {
+			me.Placeholder = (string)(v5.(string))
 		} else {
 			me.Placeholder = ""
 		}
 	}
-	v7, o8 := v["value"]
-	if o8 {
-		println(v7)
-		if nil != v7 {
-			me.Value = (string)(v7.(string))
+	v9, o10 := v["value"]
+	if !o10 {
+		me.Value = ""
+	} else {
+		println(v9)
+		if nil != v9 {
+			me.Value = (string)(v9.(string))
 		} else {
 			me.Value = ""
 		}
@@ -2676,46 +2841,55 @@ func (me *SrcAnnotaction) preview_MarshalJSON() (r []byte, err error) {
 
 func (me *SrcAnnotaction) jsonUnmarshal_FromAny(v map[string]interface{}) {
 	v1, o2 := v["Range"]
-	if o2 {
+	if !o2 {
+		var z3 SrcRange
+		me.Range = z3
+	} else {
 		println(v1)
 		if nil != v1 {
-			v4 := v1.(map[string]interface{})
-			if v4 == nil {
-				var z3 SrcRange
-				me.Range = z3
+			v5 := v1.(map[string]interface{})
+			if v5 == nil {
+				var z4 SrcRange
+				me.Range = z4
 			} else {
 				if false {
 				}
-				me.Range.jsonUnmarshal_FromAny(v4)
+				me.Range.jsonUnmarshal_FromAny(v5)
 			}
 		} else {
-			var z3 SrcRange
-			me.Range = z3
+			var z4 SrcRange
+			me.Range = z4
 		}
 	}
-	v5, o6 := v["Title"]
-	if o6 {
-		println(v5)
-		if nil != v5 {
-			me.Title = (string)(v5.(string))
+	v6, o7 := v["Title"]
+	if !o7 {
+		me.Title = ""
+	} else {
+		println(v6)
+		if nil != v6 {
+			me.Title = (string)(v6.(string))
 		} else {
 			me.Title = ""
 		}
 	}
-	v8, o9 := v["Desc"]
-	if o9 {
-		println(v8)
-		if nil != v8 {
-			me.Desc = (string)(v8.(string))
+	v10, o11 := v["Desc"]
+	if !o11 {
+		me.Desc = ""
+	} else {
+		println(v10)
+		if nil != v10 {
+			me.Desc = (string)(v10.(string))
 		} else {
 			me.Desc = ""
 		}
 	}
-	v11, o12 := v["CmdName"]
-	if o12 {
-		println(v11)
-		if nil != v11 {
-			me.CmdName = (string)(v11.(string))
+	v14, o15 := v["CmdName"]
+	if !o15 {
+		me.CmdName = ""
+	} else {
+		println(v14)
+		if nil != v14 {
+			me.CmdName = (string)(v14.(string))
 		} else {
 			me.CmdName = ""
 		}
@@ -2758,7 +2932,9 @@ func (me *SrcInfoTip) preview_MarshalJSON() (r []byte, err error) {
 
 func (me *SrcInfoTip) jsonUnmarshal_FromAny(v map[string]interface{}) {
 	v1, o2 := v["value"]
-	if o2 {
+	if !o2 {
+		me.Value = ""
+	} else {
 		println(v1)
 		if nil != v1 {
 			me.Value = (string)(v1.(string))
@@ -2766,11 +2942,13 @@ func (me *SrcInfoTip) jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.Value = ""
 		}
 	}
-	v4, o5 := v["language"]
-	if o5 {
-		println(v4)
-		if nil != v4 {
-			me.Language = (string)(v4.(string))
+	v5, o6 := v["language"]
+	if !o6 {
+		me.Language = ""
+	} else {
+		println(v5)
+		if nil != v5 {
+			me.Language = (string)(v5.(string))
 		} else {
 			me.Language = ""
 		}
@@ -2835,7 +3013,9 @@ func (me *SrcIntelCompl) preview_MarshalJSON() (r []byte, err error) {
 
 func (me *SrcIntelCompl) jsonUnmarshal_FromAny(v map[string]interface{}) {
 	v1, o2 := v["kind"]
-	if o2 {
+	if !o2 {
+		me.Kind = 0
+	} else {
 		println(v1)
 		if nil != v1 {
 			me.Kind = (Completion)(v1.(float64))
@@ -2843,46 +3023,54 @@ func (me *SrcIntelCompl) jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.Kind = 0
 		}
 	}
-	v4, o5 := v["label"]
-	if o5 {
-		println(v4)
-		if nil != v4 {
-			me.Label = (string)(v4.(string))
+	v5, o6 := v["label"]
+	if !o6 {
+		me.Label = ""
+	} else {
+		println(v5)
+		if nil != v5 {
+			me.Label = (string)(v5.(string))
 		} else {
 			me.Label = ""
 		}
 	}
-	v7, o8 := v["documentation"]
-	if o8 {
-		println(v7)
-		if nil != v7 {
-			v10 := v7.(map[string]interface{})
-			if v10 == nil {
+	v9, o10 := v["documentation"]
+	if !o10 {
+		me.Documentation = nil
+	} else {
+		println(v9)
+		if nil != v9 {
+			v13 := v9.(map[string]interface{})
+			if v13 == nil {
 				me.Documentation = nil
 			} else {
 				if nil == me.Documentation {
 					me.Documentation = new(SrcIntelDoc)
 				}
-				me.Documentation.jsonUnmarshal_FromAny(v10)
+				me.Documentation.jsonUnmarshal_FromAny(v13)
 			}
 		} else {
 			me.Documentation = nil
 		}
 	}
-	v11, o12 := v["detail"]
-	if o12 {
-		println(v11)
-		if nil != v11 {
-			me.Detail = (string)(v11.(string))
+	v14, o15 := v["detail"]
+	if !o15 {
+		me.Detail = ""
+	} else {
+		println(v14)
+		if nil != v14 {
+			me.Detail = (string)(v14.(string))
 		} else {
 			me.Detail = ""
 		}
 	}
-	v14, o15 := v["sortText"]
-	if o15 {
-		println(v14)
-		if nil != v14 {
-			me.SortText = (string)(v14.(string))
+	v18, o19 := v["sortText"]
+	if !o19 {
+		me.SortText = ""
+	} else {
+		println(v18)
+		if nil != v18 {
+			me.SortText = (string)(v18.(string))
 		} else {
 			me.SortText = ""
 		}
@@ -2997,33 +3185,35 @@ func (me *SrcIntels) preview_MarshalJSON() (r []byte, err error) {
 
 func (me *SrcIntels) jsonUnmarshal_FromAny(v map[string]interface{}) {
 	v1, o2 := v["InfoTips"]
-	if o2 {
+	if !o2 {
+		me.InfoTips = nil
+	} else {
 		println(v1)
 		if nil != v1 {
-			s4 := v1.([]interface{})
-			if s4 == nil {
+			s5 := v1.([]interface{})
+			if s5 == nil {
 				me.InfoTips = nil
 			} else {
-				if len(me.InfoTips) >= len(s4) {
-					me.InfoTips = me.InfoTips[0:len(s4)]
+				if len(me.InfoTips) >= len(s5) {
+					me.InfoTips = me.InfoTips[0:len(s5)]
 				} else {
-					me.InfoTips = make([]SrcInfoTip, len(s4))
+					me.InfoTips = make([]SrcInfoTip, len(s5))
 				}
-				for si5, sv6 := range s4 {
-					println(sv6)
-					if nil != sv6 {
-						v8 := sv6.(map[string]interface{})
-						if v8 == nil {
-							var z7 SrcInfoTip
-							me.InfoTips[si5] = z7
+				for si6, sv7 := range s5 {
+					println(sv7)
+					if nil != sv7 {
+						v9 := sv7.(map[string]interface{})
+						if v9 == nil {
+							var z8 SrcInfoTip
+							me.InfoTips[si6] = z8
 						} else {
 							if false {
 							}
-							me.InfoTips[si5].jsonUnmarshal_FromAny(v8)
+							me.InfoTips[si6].jsonUnmarshal_FromAny(v9)
 						}
 					} else {
-						var z7 SrcInfoTip
-						me.InfoTips[si5] = z7
+						var z8 SrcInfoTip
+						me.InfoTips[si6] = z8
 					}
 				}
 			}
@@ -3031,17 +3221,19 @@ func (me *SrcIntels) jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.InfoTips = nil
 		}
 	}
-	v9, o10 := v["Refs"]
-	if o10 {
-		println(v9)
-		if nil != v9 {
-			v12 := v9.([]interface{})
-			if v12 == nil {
+	v10, o11 := v["Refs"]
+	if !o11 {
+		me.Refs = nil
+	} else {
+		println(v10)
+		if nil != v10 {
+			v14 := v10.([]interface{})
+			if v14 == nil {
 				me.Refs = nil
 			} else {
 				if false {
 				}
-				me.Refs.jsonUnmarshal_FromAny(v12)
+				me.Refs.jsonUnmarshal_FromAny(v14)
 			}
 		} else {
 			me.Refs = nil
@@ -3085,7 +3277,9 @@ func (me *SrcIntelDoc) preview_MarshalJSON() (r []byte, err error) {
 
 func (me *SrcIntelDoc) jsonUnmarshal_FromAny(v map[string]interface{}) {
 	v1, o2 := v["value"]
-	if o2 {
+	if !o2 {
+		me.Value = ""
+	} else {
 		println(v1)
 		if nil != v1 {
 			me.Value = (string)(v1.(string))
@@ -3093,11 +3287,13 @@ func (me *SrcIntelDoc) jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.Value = ""
 		}
 	}
-	v4, o5 := v["isTrusted"]
-	if o5 {
-		println(v4)
-		if nil != v4 {
-			me.IsTrusted = (bool)(v4.(bool))
+	v5, o6 := v["isTrusted"]
+	if !o6 {
+		me.IsTrusted = false
+	} else {
+		println(v5)
+		if nil != v5 {
+			me.IsTrusted = (bool)(v5.(bool))
 		} else {
 			me.IsTrusted = false
 		}
@@ -3163,7 +3359,9 @@ func (me *SrcIntelSigHelp) preview_MarshalJSON() (r []byte, err error) {
 
 func (me *SrcIntelSigHelp) jsonUnmarshal_FromAny(v map[string]interface{}) {
 	v1, o2 := v["activeSignature"]
-	if o2 {
+	if !o2 {
+		me.ActiveSignature = 0
+	} else {
 		println(v1)
 		if nil != v1 {
 			me.ActiveSignature = (int)(v1.(float64))
@@ -3171,43 +3369,47 @@ func (me *SrcIntelSigHelp) jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.ActiveSignature = 0
 		}
 	}
-	v4, o5 := v["activeParameter"]
-	if o5 {
-		println(v4)
-		if nil != v4 {
-			me.ActiveParameter = (int)(v4.(float64))
+	v5, o6 := v["activeParameter"]
+	if !o6 {
+		me.ActiveParameter = 0
+	} else {
+		println(v5)
+		if nil != v5 {
+			me.ActiveParameter = (int)(v5.(float64))
 		} else {
 			me.ActiveParameter = 0
 		}
 	}
-	v7, o8 := v["signatures"]
-	if o8 {
-		println(v7)
-		if nil != v7 {
-			s10 := v7.([]interface{})
-			if s10 == nil {
+	v9, o10 := v["signatures"]
+	if !o10 {
+		me.Signatures = nil
+	} else {
+		println(v9)
+		if nil != v9 {
+			s13 := v9.([]interface{})
+			if s13 == nil {
 				me.Signatures = nil
 			} else {
-				if len(me.Signatures) >= len(s10) {
-					me.Signatures = me.Signatures[0:len(s10)]
+				if len(me.Signatures) >= len(s13) {
+					me.Signatures = me.Signatures[0:len(s13)]
 				} else {
-					me.Signatures = make([]SrcIntelSigInfo, len(s10))
+					me.Signatures = make([]SrcIntelSigInfo, len(s13))
 				}
-				for si11, sv12 := range s10 {
-					println(sv12)
-					if nil != sv12 {
-						v14 := sv12.(map[string]interface{})
-						if v14 == nil {
-							var z13 SrcIntelSigInfo
-							me.Signatures[si11] = z13
+				for si14, sv15 := range s13 {
+					println(sv15)
+					if nil != sv15 {
+						v17 := sv15.(map[string]interface{})
+						if v17 == nil {
+							var z16 SrcIntelSigInfo
+							me.Signatures[si14] = z16
 						} else {
 							if false {
 							}
-							me.Signatures[si11].jsonUnmarshal_FromAny(v14)
+							me.Signatures[si14].jsonUnmarshal_FromAny(v17)
 						}
 					} else {
-						var z13 SrcIntelSigInfo
-						me.Signatures[si11] = z13
+						var z16 SrcIntelSigInfo
+						me.Signatures[si14] = z16
 					}
 				}
 			}
@@ -3287,7 +3489,9 @@ func (me *SrcIntelSigInfo) preview_MarshalJSON() (r []byte, err error) {
 
 func (me *SrcIntelSigInfo) jsonUnmarshal_FromAny(v map[string]interface{}) {
 	v1, o2 := v["label"]
-	if o2 {
+	if !o2 {
+		me.Label = ""
+	} else {
 		println(v1)
 		if nil != v1 {
 			me.Label = (string)(v1.(string))
@@ -3295,52 +3499,57 @@ func (me *SrcIntelSigInfo) jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.Label = ""
 		}
 	}
-	v4, o5 := v["documentation"]
-	if o5 {
-		println(v4)
-		if nil != v4 {
-			v7 := v4.(map[string]interface{})
-			if v7 == nil {
-				var z6 SrcIntelDoc
-				me.Documentation = z6
+	v5, o6 := v["documentation"]
+	if !o6 {
+		var z7 SrcIntelDoc
+		me.Documentation = z7
+	} else {
+		println(v5)
+		if nil != v5 {
+			v9 := v5.(map[string]interface{})
+			if v9 == nil {
+				var z8 SrcIntelDoc
+				me.Documentation = z8
 			} else {
 				if false {
 				}
-				me.Documentation.jsonUnmarshal_FromAny(v7)
+				me.Documentation.jsonUnmarshal_FromAny(v9)
 			}
 		} else {
-			var z6 SrcIntelDoc
-			me.Documentation = z6
+			var z8 SrcIntelDoc
+			me.Documentation = z8
 		}
 	}
-	v8, o9 := v["parameters"]
-	if o9 {
-		println(v8)
-		if nil != v8 {
-			s11 := v8.([]interface{})
-			if s11 == nil {
+	v10, o11 := v["parameters"]
+	if !o11 {
+		me.Parameters = nil
+	} else {
+		println(v10)
+		if nil != v10 {
+			s14 := v10.([]interface{})
+			if s14 == nil {
 				me.Parameters = nil
 			} else {
-				if len(me.Parameters) >= len(s11) {
-					me.Parameters = me.Parameters[0:len(s11)]
+				if len(me.Parameters) >= len(s14) {
+					me.Parameters = me.Parameters[0:len(s14)]
 				} else {
-					me.Parameters = make([]SrcIntelSigParam, len(s11))
+					me.Parameters = make([]SrcIntelSigParam, len(s14))
 				}
-				for si12, sv13 := range s11 {
-					println(sv13)
-					if nil != sv13 {
-						v15 := sv13.(map[string]interface{})
-						if v15 == nil {
-							var z14 SrcIntelSigParam
-							me.Parameters[si12] = z14
+				for si15, sv16 := range s14 {
+					println(sv16)
+					if nil != sv16 {
+						v18 := sv16.(map[string]interface{})
+						if v18 == nil {
+							var z17 SrcIntelSigParam
+							me.Parameters[si15] = z17
 						} else {
 							if false {
 							}
-							me.Parameters[si12].jsonUnmarshal_FromAny(v15)
+							me.Parameters[si15].jsonUnmarshal_FromAny(v18)
 						}
 					} else {
-						var z14 SrcIntelSigParam
-						me.Parameters[si12] = z14
+						var z17 SrcIntelSigParam
+						me.Parameters[si15] = z17
 					}
 				}
 			}
@@ -3394,7 +3603,9 @@ func (me *SrcIntelSigParam) preview_MarshalJSON() (r []byte, err error) {
 
 func (me *SrcIntelSigParam) jsonUnmarshal_FromAny(v map[string]interface{}) {
 	v1, o2 := v["label"]
-	if o2 {
+	if !o2 {
+		me.Label = ""
+	} else {
 		println(v1)
 		if nil != v1 {
 			me.Label = (string)(v1.(string))
@@ -3402,22 +3613,25 @@ func (me *SrcIntelSigParam) jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.Label = ""
 		}
 	}
-	v4, o5 := v["documentation"]
-	if o5 {
-		println(v4)
-		if nil != v4 {
-			v7 := v4.(map[string]interface{})
-			if v7 == nil {
-				var z6 SrcIntelDoc
-				me.Documentation = z6
+	v5, o6 := v["documentation"]
+	if !o6 {
+		var z7 SrcIntelDoc
+		me.Documentation = z7
+	} else {
+		println(v5)
+		if nil != v5 {
+			v9 := v5.(map[string]interface{})
+			if v9 == nil {
+				var z8 SrcIntelDoc
+				me.Documentation = z8
 			} else {
 				if false {
 				}
-				me.Documentation.jsonUnmarshal_FromAny(v7)
+				me.Documentation.jsonUnmarshal_FromAny(v9)
 			}
 		} else {
-			var z6 SrcIntelDoc
-			me.Documentation = z6
+			var z8 SrcIntelDoc
+			me.Documentation = z8
 		}
 	}
 }
@@ -3543,46 +3757,55 @@ func (me *SrcLens) preview_MarshalJSON() (r []byte, err error) {
 
 func (me *SrcLens) jsonUnmarshal_FromAny(v map[string]interface{}) {
 	v1, o2 := v["SrcLoc"]
-	if o2 {
+	if !o2 {
+		var z3 SrcLoc
+		me.SrcLoc = z3
+	} else {
 		println(v1)
 		if nil != v1 {
-			v4 := v1.(map[string]interface{})
-			if v4 == nil {
-				var z3 SrcLoc
-				me.SrcLoc = z3
+			v5 := v1.(map[string]interface{})
+			if v5 == nil {
+				var z4 SrcLoc
+				me.SrcLoc = z4
 			} else {
 				if false {
 				}
-				me.SrcLoc.jsonUnmarshal_FromAny(v4)
+				me.SrcLoc.jsonUnmarshal_FromAny(v5)
 			}
 		} else {
-			var z3 SrcLoc
-			me.SrcLoc = z3
+			var z4 SrcLoc
+			me.SrcLoc = z4
 		}
 	}
-	v5, o6 := v["t"]
-	if o6 {
-		println(v5)
-		if nil != v5 {
-			me.Txt = (string)(v5.(string))
+	v6, o7 := v["t"]
+	if !o7 {
+		me.Txt = ""
+	} else {
+		println(v6)
+		if nil != v6 {
+			me.Txt = (string)(v6.(string))
 		} else {
 			me.Txt = ""
 		}
 	}
-	v8, o9 := v["s"]
-	if o9 {
-		println(v8)
-		if nil != v8 {
-			me.Str = (string)(v8.(string))
+	v10, o11 := v["s"]
+	if !o11 {
+		me.Str = ""
+	} else {
+		println(v10)
+		if nil != v10 {
+			me.Str = (string)(v10.(string))
 		} else {
 			me.Str = ""
 		}
 	}
-	v11, o12 := v["l"]
-	if o12 {
-		println(v11)
-		if nil != v11 {
-			me.CrLf = (bool)(v11.(bool))
+	v14, o15 := v["l"]
+	if !o15 {
+		me.CrLf = false
+	} else {
+		println(v14)
+		if nil != v14 {
+			me.CrLf = (bool)(v14.(bool))
 		} else {
 			me.CrLf = false
 		}
@@ -3653,7 +3876,9 @@ func (me *SrcLoc) preview_MarshalJSON() (r []byte, err error) {
 
 func (me *SrcLoc) jsonUnmarshal_FromAny(v map[string]interface{}) {
 	v1, o2 := v["e"]
-	if o2 {
+	if !o2 {
+		me.Flag = 0
+	} else {
 		println(v1)
 		if nil != v1 {
 			me.Flag = (int)(v1.(float64))
@@ -3661,44 +3886,50 @@ func (me *SrcLoc) jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.Flag = 0
 		}
 	}
-	v4, o5 := v["f"]
-	if o5 {
-		println(v4)
-		if nil != v4 {
-			me.FilePath = (string)(v4.(string))
+	v5, o6 := v["f"]
+	if !o6 {
+		me.FilePath = ""
+	} else {
+		println(v5)
+		if nil != v5 {
+			me.FilePath = (string)(v5.(string))
 		} else {
 			me.FilePath = ""
 		}
 	}
-	v7, o8 := v["p"]
-	if o8 {
-		println(v7)
-		if nil != v7 {
-			v10 := v7.(map[string]interface{})
-			if v10 == nil {
+	v9, o10 := v["p"]
+	if !o10 {
+		me.Pos = nil
+	} else {
+		println(v9)
+		if nil != v9 {
+			v13 := v9.(map[string]interface{})
+			if v13 == nil {
 				me.Pos = nil
 			} else {
 				if nil == me.Pos {
 					me.Pos = new(SrcPos)
 				}
-				me.Pos.jsonUnmarshal_FromAny(v10)
+				me.Pos.jsonUnmarshal_FromAny(v13)
 			}
 		} else {
 			me.Pos = nil
 		}
 	}
-	v11, o12 := v["r"]
-	if o12 {
-		println(v11)
-		if nil != v11 {
-			v14 := v11.(map[string]interface{})
-			if v14 == nil {
+	v14, o15 := v["r"]
+	if !o15 {
+		me.Range = nil
+	} else {
+		println(v14)
+		if nil != v14 {
+			v18 := v14.(map[string]interface{})
+			if v18 == nil {
 				me.Range = nil
 			} else {
 				if nil == me.Range {
 					me.Range = new(SrcRange)
 				}
-				me.Range.jsonUnmarshal_FromAny(v14)
+				me.Range.jsonUnmarshal_FromAny(v18)
 			}
 		} else {
 			me.Range = nil
@@ -3800,27 +4031,31 @@ func (me *SrcModEdit) preview_MarshalJSON() (r []byte, err error) {
 
 func (me *SrcModEdit) jsonUnmarshal_FromAny(v map[string]interface{}) {
 	v1, o2 := v["At"]
-	if o2 {
+	if !o2 {
+		me.At = nil
+	} else {
 		println(v1)
 		if nil != v1 {
-			v4 := v1.(map[string]interface{})
-			if v4 == nil {
+			v5 := v1.(map[string]interface{})
+			if v5 == nil {
 				me.At = nil
 			} else {
 				if nil == me.At {
 					me.At = new(SrcRange)
 				}
-				me.At.jsonUnmarshal_FromAny(v4)
+				me.At.jsonUnmarshal_FromAny(v5)
 			}
 		} else {
 			me.At = nil
 		}
 	}
-	v5, o6 := v["Val"]
-	if o6 {
-		println(v5)
-		if nil != v5 {
-			me.Val = (string)(v5.(string))
+	v6, o7 := v["Val"]
+	if !o7 {
+		me.Val = ""
+	} else {
+		println(v6)
+		if nil != v6 {
+			me.Val = (string)(v6.(string))
 		} else {
 			me.Val = ""
 		}
@@ -3907,7 +4142,9 @@ func (me *SrcPos) preview_MarshalJSON() (r []byte, err error) {
 
 func (me *SrcPos) jsonUnmarshal_FromAny(v map[string]interface{}) {
 	v1, o2 := v["l"]
-	if o2 {
+	if !o2 {
+		me.Ln = 0
+	} else {
 		println(v1)
 		if nil != v1 {
 			me.Ln = (int)(v1.(float64))
@@ -3915,20 +4152,24 @@ func (me *SrcPos) jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.Ln = 0
 		}
 	}
-	v4, o5 := v["c"]
-	if o5 {
-		println(v4)
-		if nil != v4 {
-			me.Col = (int)(v4.(float64))
+	v5, o6 := v["c"]
+	if !o6 {
+		me.Col = 0
+	} else {
+		println(v5)
+		if nil != v5 {
+			me.Col = (int)(v5.(float64))
 		} else {
 			me.Col = 0
 		}
 	}
-	v7, o8 := v["o"]
-	if o8 {
-		println(v7)
-		if nil != v7 {
-			me.Off = (int)(v7.(float64))
+	v9, o10 := v["o"]
+	if !o10 {
+		me.Off = 0
+	} else {
+		println(v9)
+		if nil != v9 {
+			me.Off = (int)(v9.(float64))
 		} else {
 			me.Off = 0
 		}
@@ -3987,39 +4228,45 @@ func (me *SrcRange) preview_MarshalJSON() (r []byte, err error) {
 
 func (me *SrcRange) jsonUnmarshal_FromAny(v map[string]interface{}) {
 	v1, o2 := v["s"]
-	if o2 {
+	if !o2 {
+		var z3 SrcPos
+		me.Start = z3
+	} else {
 		println(v1)
 		if nil != v1 {
-			v4 := v1.(map[string]interface{})
-			if v4 == nil {
-				var z3 SrcPos
-				me.Start = z3
+			v5 := v1.(map[string]interface{})
+			if v5 == nil {
+				var z4 SrcPos
+				me.Start = z4
 			} else {
 				if false {
 				}
-				me.Start.jsonUnmarshal_FromAny(v4)
+				me.Start.jsonUnmarshal_FromAny(v5)
 			}
 		} else {
-			var z3 SrcPos
-			me.Start = z3
+			var z4 SrcPos
+			me.Start = z4
 		}
 	}
-	v5, o6 := v["e"]
-	if o6 {
-		println(v5)
-		if nil != v5 {
-			v8 := v5.(map[string]interface{})
-			if v8 == nil {
-				var z7 SrcPos
-				me.End = z7
+	v6, o7 := v["e"]
+	if !o7 {
+		var z8 SrcPos
+		me.End = z8
+	} else {
+		println(v6)
+		if nil != v6 {
+			v10 := v6.(map[string]interface{})
+			if v10 == nil {
+				var z9 SrcPos
+				me.End = z9
 			} else {
 				if false {
 				}
-				me.End.jsonUnmarshal_FromAny(v8)
+				me.End.jsonUnmarshal_FromAny(v10)
 			}
 		} else {
-			var z7 SrcPos
-			me.End = z7
+			var z9 SrcPos
+			me.End = z9
 		}
 	}
 }
@@ -4042,24 +4289,26 @@ func (me *WorkspaceChanges) preview_MarshalJSON() (r []byte, err error) {
 
 func (me *WorkspaceChanges) jsonUnmarshal_FromAny(v map[string]interface{}) {
 	v1, o2 := v["AddedDirs"]
-	if o2 {
+	if !o2 {
+		me.AddedDirs = nil
+	} else {
 		println(v1)
 		if nil != v1 {
-			s4 := v1.([]interface{})
-			if s4 == nil {
+			s5 := v1.([]interface{})
+			if s5 == nil {
 				me.AddedDirs = nil
 			} else {
-				if len(me.AddedDirs) >= len(s4) {
-					me.AddedDirs = me.AddedDirs[0:len(s4)]
+				if len(me.AddedDirs) >= len(s5) {
+					me.AddedDirs = me.AddedDirs[0:len(s5)]
 				} else {
-					me.AddedDirs = make([]string, len(s4))
+					me.AddedDirs = make([]string, len(s5))
 				}
-				for si5, sv6 := range s4 {
-					println(sv6)
-					if nil != sv6 {
-						me.AddedDirs[si5] = (string)(sv6.(string))
+				for si6, sv7 := range s5 {
+					println(sv7)
+					if nil != sv7 {
+						me.AddedDirs[si6] = (string)(sv7.(string))
 					} else {
-						me.AddedDirs[si5] = ""
+						me.AddedDirs[si6] = ""
 					}
 				}
 			}
@@ -4067,25 +4316,27 @@ func (me *WorkspaceChanges) jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.AddedDirs = nil
 		}
 	}
-	v8, o9 := v["RemovedDirs"]
-	if o9 {
-		println(v8)
-		if nil != v8 {
-			s11 := v8.([]interface{})
-			if s11 == nil {
+	v9, o10 := v["RemovedDirs"]
+	if !o10 {
+		me.RemovedDirs = nil
+	} else {
+		println(v9)
+		if nil != v9 {
+			s13 := v9.([]interface{})
+			if s13 == nil {
 				me.RemovedDirs = nil
 			} else {
-				if len(me.RemovedDirs) >= len(s11) {
-					me.RemovedDirs = me.RemovedDirs[0:len(s11)]
+				if len(me.RemovedDirs) >= len(s13) {
+					me.RemovedDirs = me.RemovedDirs[0:len(s13)]
 				} else {
-					me.RemovedDirs = make([]string, len(s11))
+					me.RemovedDirs = make([]string, len(s13))
 				}
-				for si12, sv13 := range s11 {
-					println(sv13)
-					if nil != sv13 {
-						me.RemovedDirs[si12] = (string)(sv13.(string))
+				for si14, sv15 := range s13 {
+					println(sv15)
+					if nil != sv15 {
+						me.RemovedDirs[si14] = (string)(sv15.(string))
 					} else {
-						me.RemovedDirs[si12] = ""
+						me.RemovedDirs[si14] = ""
 					}
 				}
 			}
@@ -4093,25 +4344,27 @@ func (me *WorkspaceChanges) jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.RemovedDirs = nil
 		}
 	}
-	v15, o16 := v["OpenedFiles"]
-	if o16 {
-		println(v15)
-		if nil != v15 {
-			s18 := v15.([]interface{})
-			if s18 == nil {
+	v17, o18 := v["OpenedFiles"]
+	if !o18 {
+		me.OpenedFiles = nil
+	} else {
+		println(v17)
+		if nil != v17 {
+			s21 := v17.([]interface{})
+			if s21 == nil {
 				me.OpenedFiles = nil
 			} else {
-				if len(me.OpenedFiles) >= len(s18) {
-					me.OpenedFiles = me.OpenedFiles[0:len(s18)]
+				if len(me.OpenedFiles) >= len(s21) {
+					me.OpenedFiles = me.OpenedFiles[0:len(s21)]
 				} else {
-					me.OpenedFiles = make([]string, len(s18))
+					me.OpenedFiles = make([]string, len(s21))
 				}
-				for si19, sv20 := range s18 {
-					println(sv20)
-					if nil != sv20 {
-						me.OpenedFiles[si19] = (string)(sv20.(string))
+				for si22, sv23 := range s21 {
+					println(sv23)
+					if nil != sv23 {
+						me.OpenedFiles[si22] = (string)(sv23.(string))
 					} else {
-						me.OpenedFiles[si19] = ""
+						me.OpenedFiles[si22] = ""
 					}
 				}
 			}
@@ -4119,25 +4372,27 @@ func (me *WorkspaceChanges) jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.OpenedFiles = nil
 		}
 	}
-	v22, o23 := v["ClosedFiles"]
-	if o23 {
-		println(v22)
-		if nil != v22 {
-			s25 := v22.([]interface{})
-			if s25 == nil {
+	v25, o26 := v["ClosedFiles"]
+	if !o26 {
+		me.ClosedFiles = nil
+	} else {
+		println(v25)
+		if nil != v25 {
+			s29 := v25.([]interface{})
+			if s29 == nil {
 				me.ClosedFiles = nil
 			} else {
-				if len(me.ClosedFiles) >= len(s25) {
-					me.ClosedFiles = me.ClosedFiles[0:len(s25)]
+				if len(me.ClosedFiles) >= len(s29) {
+					me.ClosedFiles = me.ClosedFiles[0:len(s29)]
 				} else {
-					me.ClosedFiles = make([]string, len(s25))
+					me.ClosedFiles = make([]string, len(s29))
 				}
-				for si26, sv27 := range s25 {
-					println(sv27)
-					if nil != sv27 {
-						me.ClosedFiles[si26] = (string)(sv27.(string))
+				for si30, sv31 := range s29 {
+					println(sv31)
+					if nil != sv31 {
+						me.ClosedFiles[si30] = (string)(sv31.(string))
 					} else {
-						me.ClosedFiles[si26] = ""
+						me.ClosedFiles[si30] = ""
 					}
 				}
 			}
@@ -4145,25 +4400,27 @@ func (me *WorkspaceChanges) jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.ClosedFiles = nil
 		}
 	}
-	v29, o30 := v["WrittenFiles"]
-	if o30 {
-		println(v29)
-		if nil != v29 {
-			s32 := v29.([]interface{})
-			if s32 == nil {
+	v33, o34 := v["WrittenFiles"]
+	if !o34 {
+		me.WrittenFiles = nil
+	} else {
+		println(v33)
+		if nil != v33 {
+			s37 := v33.([]interface{})
+			if s37 == nil {
 				me.WrittenFiles = nil
 			} else {
-				if len(me.WrittenFiles) >= len(s32) {
-					me.WrittenFiles = me.WrittenFiles[0:len(s32)]
+				if len(me.WrittenFiles) >= len(s37) {
+					me.WrittenFiles = me.WrittenFiles[0:len(s37)]
 				} else {
-					me.WrittenFiles = make([]string, len(s32))
+					me.WrittenFiles = make([]string, len(s37))
 				}
-				for si33, sv34 := range s32 {
-					println(sv34)
-					if nil != sv34 {
-						me.WrittenFiles[si33] = (string)(sv34.(string))
+				for si38, sv39 := range s37 {
+					println(sv39)
+					if nil != sv39 {
+						me.WrittenFiles[si38] = (string)(sv39.(string))
 					} else {
-						me.WrittenFiles[si33] = ""
+						me.WrittenFiles[si38] = ""
 					}
 				}
 			}
@@ -4171,10 +4428,12 @@ func (me *WorkspaceChanges) jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.WrittenFiles = nil
 		}
 	}
-	v36, o37 := v["LiveFiles"]
-	if o37 {
-		println(v36)
-		if nil != v36 {
+	v41, o42 := v["LiveFiles"]
+	if !o42 {
+		me.LiveFiles = nil
+	} else {
+		println(v41)
+		if nil != v41 {
 		} else {
 			me.LiveFiles = nil
 		}
