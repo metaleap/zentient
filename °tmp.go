@@ -1,10 +1,8 @@
 package z
 
 import (
-	// "encoding/json"
-	// "github.com/go-leap/std"
+	"encoding/json"
 	"github.com/go-leap/str"
-	// "strconv"
 )
 
 type fooResp struct {
@@ -30,46 +28,30 @@ type fooResp struct {
 	Val         interface{}   `json:"valya"`
 }
 
-// func (me *fooResp) tmp() {
-// 	me.Pats = nil
-// }
+func (me *SrcModEdit) unm(_ []byte) (err error) {
+	j := json.NewDecoder(nil)
+	var k, v json.Token
 
-// // MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-// func (me *fooResp) marshalJSON() (r []byte, err error) {
+	if _, err = j.Token(); err == nil {
+		for j.More() {
+			if k, err = j.Token(); err == nil {
+				if v, err = j.Token(); err == nil && v != nil {
+					if k == "At" {
 
-// 	var buf ustd.Buf
+					} else if k == "Val" {
+						me.Val = v.(string)
+					}
+				}
+			}
+		}
+		_, err = j.Token()
+	}
+	return
+}
 
-// 	buf.WriteString("{\"")
-// 	buf.WriteString("ReqID")
-// 	buf.WriteString("\":")
-// 	buf.WriteString(strconv.FormatInt(me.ReqID, 10))
+func tokIsDelim(t json.Token, err error) error {
+	if err == nil {
 
-// 	buf.WriteString(",\"")
-// 	buf.WriteString("Str")
-// 	buf.WriteString("\":")
-// 	buf.WriteString(strconv.Quote(me.Str))
-
-// 	buf.WriteString(",\"")
-// 	buf.WriteString("Flag")
-// 	buf.WriteString("\":")
-// 	buf.WriteString(strconv.FormatInt(int64(me.Flag), 10))
-
-// 	buf.WriteString(",\"")
-// 	buf.WriteString("IpcArgs")
-// 	buf.WriteString("\":")
-// 	enc := json.NewEncoder(&buf)
-// 	enc.SetEscapeHTML(false)
-// 	if err = enc.Encode(me.IpcArgs); err != nil {
-// 		return
-// 	}
-// 	buf.TrimSuffix('\n')
-
-// 	buf.WriteString(",\"")
-// 	buf.WriteString("CrLf")
-// 	buf.WriteString("\":")
-// 	buf.WriteString(strconv.FormatBool(me.CrLf))
-
-// 	buf.WriteByte('}')
-// 	r = buf.Bytes()
-// 	return
-// }
+	}
+	return err
+}

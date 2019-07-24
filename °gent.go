@@ -4,6 +4,7 @@ package z
 
 import (
 	pkg__encoding_json "encoding/json"
+	pkg__errors "errors"
 	pkg__fmt "fmt"
 	pkg__strconv "strconv"
 )
@@ -368,6 +369,38 @@ func (me *IpcReq) __gent__jsonUnmarshal_FromAny(v map[string]interface{}) {
 	}
 }
 
+func (me *IpcReq) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	var t25 pkg__encoding_json.Token
+	t25, err = j.Token()
+	if err == nil {
+		d26, _ := t25.(pkg__encoding_json.Delim)
+		if 123 != d26 {
+			err = pkg__errors.New("expected {")
+		} else {
+			for (err == nil) && j.More() {
+				var jk23 pkg__encoding_json.Token
+				jk23, err = j.Token()
+				if err == nil {
+					fn24 := jk23.(string)
+					switch fn24 {
+					case "ri":
+					case "ii":
+					case "ia":
+					case "projUpd":
+					case "srcLens":
+					}
+				}
+			}
+			if err == nil {
+				_, err = j.Token()
+			}
+			if err == nil {
+			}
+		}
+	}
+	return
+}
+
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
 func (me *IpcReq) preview_UnmarshalJSON(v []byte) (err error) {
 	var kvs = make(map[string]interface{}, 5)
@@ -717,6 +750,44 @@ func (me *IpcResp) __gent__jsonUnmarshal_FromAny(v map[string]interface{}) {
 	}
 }
 
+func (me *IpcResp) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	var t58 pkg__encoding_json.Token
+	t58, err = j.Token()
+	if err == nil {
+		d59, _ := t58.(pkg__encoding_json.Delim)
+		if 123 != d59 {
+			err = pkg__errors.New("expected {")
+		} else {
+			for (err == nil) && j.More() {
+				var jk56 pkg__encoding_json.Token
+				jk56, err = j.Token()
+				if err == nil {
+					fn57 := jk56.(string)
+					switch fn57 {
+					case "ii":
+					case "ri":
+					case "err":
+					case "sI":
+					case "srcDiags":
+					case "srcMods":
+					case "srcActions":
+					case "extras":
+					case "menu":
+					case "caddy":
+					case "val":
+					}
+				}
+			}
+			if err == nil {
+				_, err = j.Token()
+			}
+			if err == nil {
+			}
+		}
+	}
+	return
+}
+
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
 func (me *IpcResp) preview_UnmarshalJSON(v []byte) (err error) {
 	var kvs = make(map[string]interface{}, 11)
@@ -857,6 +928,36 @@ func (me *Diags) __gent__jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.LangID = ""
 		}
 	}
+}
+
+func (me *Diags) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	var t21 pkg__encoding_json.Token
+	t21, err = j.Token()
+	if err == nil {
+		d22, _ := t21.(pkg__encoding_json.Delim)
+		if 123 != d22 {
+			err = pkg__errors.New("expected {")
+		} else {
+			for (err == nil) && j.More() {
+				var jk19 pkg__encoding_json.Token
+				jk19, err = j.Token()
+				if err == nil {
+					fn20 := jk19.(string)
+					switch fn20 {
+					case "All":
+					case "FixUps":
+					case "LangID":
+					}
+				}
+			}
+			if err == nil {
+				_, err = j.Token()
+			}
+			if err == nil {
+			}
+		}
+	}
+	return
 }
 
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
@@ -1079,6 +1180,38 @@ func (me *Extras) __gent__jsonUnmarshal_FromAny(v map[string]interface{}) {
 	}
 }
 
+func (me *Extras) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	var t33 pkg__encoding_json.Token
+	t33, err = j.Token()
+	if err == nil {
+		d34, _ := t33.(pkg__encoding_json.Delim)
+		if 123 != d34 {
+			err = pkg__errors.New("expected {")
+		} else {
+			for (err == nil) && j.More() {
+				var jk31 pkg__encoding_json.Token
+				jk31, err = j.Token()
+				if err == nil {
+					fn32 := jk31.(string)
+					switch fn32 {
+					case "SrcIntels":
+					case "Items":
+					case "Warns":
+					case "Desc":
+					case "Url":
+					}
+				}
+			}
+			if err == nil {
+				_, err = j.Token()
+			}
+			if err == nil {
+			}
+		}
+	}
+	return
+}
+
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
 func (me *Extras) preview_UnmarshalJSON(v []byte) (err error) {
 	var kvs = make(map[string]interface{}, 5)
@@ -1229,6 +1362,39 @@ func (me *MenuResponse) __gent__jsonUnmarshal_FromAny(v map[string]interface{}) 
 			me.Refs = nil
 		}
 	}
+}
+
+func (me *MenuResponse) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	var t29 pkg__encoding_json.Token
+	t29, err = j.Token()
+	if err == nil {
+		d30, _ := t29.(pkg__encoding_json.Delim)
+		if 123 != d30 {
+			err = pkg__errors.New("expected {")
+		} else {
+			for (err == nil) && j.More() {
+				var jk27 pkg__encoding_json.Token
+				jk27, err = j.Token()
+				if err == nil {
+					fn28 := jk27.(string)
+					switch fn28 {
+					case "SubMenu":
+					case "WebsiteURL":
+					case "NoteInfo":
+					case "NoteWarn":
+					case "UxActionLabel":
+					case "Refs":
+					}
+				}
+			}
+			if err == nil {
+				_, err = j.Token()
+			}
+			if err == nil {
+			}
+		}
+	}
+	return
 }
 
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
@@ -1473,6 +1639,38 @@ func (me *SrcIntel) __gent__jsonUnmarshal_FromAny(v map[string]interface{}) {
 	}
 }
 
+func (me *SrcIntel) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	var t32 pkg__encoding_json.Token
+	t32, err = j.Token()
+	if err == nil {
+		d33, _ := t32.(pkg__encoding_json.Delim)
+		if 123 != d33 {
+			err = pkg__errors.New("expected {")
+		} else {
+			for (err == nil) && j.More() {
+				var jk30 pkg__encoding_json.Token
+				jk30, err = j.Token()
+				if err == nil {
+					fn31 := jk30.(string)
+					switch fn31 {
+					case "SrcIntels":
+					case "Sig":
+					case "Cmpl":
+					case "Syms":
+					case "Anns":
+					}
+				}
+			}
+			if err == nil {
+				_, err = j.Token()
+			}
+			if err == nil {
+			}
+		}
+	}
+	return
+}
+
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
 func (me *SrcIntel) preview_UnmarshalJSON(v []byte) (err error) {
 	var kvs = make(map[string]interface{}, 5)
@@ -1669,6 +1867,41 @@ func (me *Caddy) __gent__jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.ShowTitle = false
 		}
 	}
+}
+
+func (me *Caddy) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	var t44 pkg__encoding_json.Token
+	t44, err = j.Token()
+	if err == nil {
+		d45, _ := t44.(pkg__encoding_json.Delim)
+		if 123 != d45 {
+			err = pkg__errors.New("expected {")
+		} else {
+			for (err == nil) && j.More() {
+				var jk42 pkg__encoding_json.Token
+				jk42, err = j.Token()
+				if err == nil {
+					fn43 := jk42.(string)
+					switch fn43 {
+					case "ID":
+					case "LangID":
+					case "Icon":
+					case "Title":
+					case "Status":
+					case "Details":
+					case "UxActionID":
+					case "ShowTitle":
+					}
+				}
+			}
+			if err == nil {
+				_, err = j.Token()
+			}
+			if err == nil {
+			}
+		}
+	}
+	return
 }
 
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
@@ -1875,6 +2108,37 @@ func (me *DiagFixUps) __gent__jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.Dropped = nil
 		}
 	}
+}
+
+func (me *DiagFixUps) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	var t34 pkg__encoding_json.Token
+	t34, err = j.Token()
+	if err == nil {
+		d35, _ := t34.(pkg__encoding_json.Delim)
+		if 123 != d35 {
+			err = pkg__errors.New("expected {")
+		} else {
+			for (err == nil) && j.More() {
+				var jk32 pkg__encoding_json.Token
+				jk32, err = j.Token()
+				if err == nil {
+					fn33 := jk32.(string)
+					switch fn33 {
+					case "FilePath":
+					case "Desc":
+					case "Edits":
+					case "Dropped":
+					}
+				}
+			}
+			if err == nil {
+				_, err = j.Token()
+			}
+			if err == nil {
+			}
+		}
+	}
+	return
 }
 
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
@@ -2147,6 +2411,40 @@ func (me *DiagItem) __gent__jsonUnmarshal_FromAny(v map[string]interface{}) {
 	}
 }
 
+func (me *DiagItem) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	var t46 pkg__encoding_json.Token
+	t46, err = j.Token()
+	if err == nil {
+		d47, _ := t46.(pkg__encoding_json.Delim)
+		if 123 != d47 {
+			err = pkg__errors.New("expected {")
+		} else {
+			for (err == nil) && j.More() {
+				var jk44 pkg__encoding_json.Token
+				jk44, err = j.Token()
+				if err == nil {
+					fn45 := jk44.(string)
+					switch fn45 {
+					case "Cat":
+					case "Loc":
+					case "Msg":
+					case "Rel":
+					case "SrcActions":
+					case "Sticky":
+					case "Tags":
+					}
+				}
+			}
+			if err == nil {
+				_, err = j.Token()
+			}
+			if err == nil {
+			}
+		}
+	}
+	return
+}
+
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
 func (me *DiagItem) preview_UnmarshalJSON(v []byte) (err error) {
 	var kvs = make(map[string]interface{}, 8)
@@ -2218,6 +2516,11 @@ func (me *DiagItems) __gent__jsonUnmarshal_FromAny(v []interface{}) {
 	*me = sl
 }
 
+func (me *DiagItems) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	err = nil
+	return
+}
+
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
 func (me *DiagItems) preview_UnmarshalJSON(v []byte) (err error) {
 	var sl []interface{}
@@ -2285,10 +2588,48 @@ func (me *DiagItemsBy) __gent__jsonUnmarshal_FromAny(v map[string]interface{}) {
 	*me = kvs
 }
 
+func (me *DiagItemsBy) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	var kvs DiagItemsBy
+	var t10 pkg__encoding_json.Token
+	t10, err = j.Token()
+	if err == nil {
+		d11, _ := t10.(pkg__encoding_json.Delim)
+		if 123 != d11 {
+			err = pkg__errors.New("expected {")
+		} else {
+			t9 := make(DiagItemsBy)
+			for (err == nil) && j.More() {
+				var jk6 pkg__encoding_json.Token
+				jk6, err = j.Token()
+				if err == nil {
+					mk7 := jk6.(string)
+					var jv8 pkg__encoding_json.Token
+					jv8, err = j.Token()
+					if err == nil {
+						println(jv8, mk7, jk6)
+					}
+				}
+			}
+			if err == nil {
+				_, err = j.Token()
+			}
+			if err == nil {
+				kvs = t9
+			}
+		}
+	}
+	if err == nil {
+		*me = kvs
+	}
+	return
+}
+
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
 func (me *DiagItemsBy) preview_UnmarshalJSON(v []byte) (err error) {
-	{
-		err = nil
+	var kvs map[string]interface{}
+	err = pkg__encoding_json.Unmarshal(v, &kvs)
+	if err == nil {
+		me.__gent__jsonUnmarshal_FromAny(kvs)
 	}
 	return
 }
@@ -2401,6 +2742,37 @@ func (me *EditorAction) __gent__jsonUnmarshal_FromAny(v map[string]interface{}) 
 			me.Arguments = nil
 		}
 	}
+}
+
+func (me *EditorAction) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	var t23 pkg__encoding_json.Token
+	t23, err = j.Token()
+	if err == nil {
+		d24, _ := t23.(pkg__encoding_json.Delim)
+		if 123 != d24 {
+			err = pkg__errors.New("expected {")
+		} else {
+			for (err == nil) && j.More() {
+				var jk21 pkg__encoding_json.Token
+				jk21, err = j.Token()
+				if err == nil {
+					fn22 := jk21.(string)
+					switch fn22 {
+					case "title":
+					case "command":
+					case "tooltip":
+					case "arguments":
+					}
+				}
+			}
+			if err == nil {
+				_, err = j.Token()
+			}
+			if err == nil {
+			}
+		}
+	}
+	return
 }
 
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
@@ -2522,6 +2894,39 @@ func (me *ExtrasItem) __gent__jsonUnmarshal_FromAny(v map[string]interface{}) {
 	}
 }
 
+func (me *ExtrasItem) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	var t27 pkg__encoding_json.Token
+	t27, err = j.Token()
+	if err == nil {
+		d28, _ := t27.(pkg__encoding_json.Delim)
+		if 123 != d28 {
+			err = pkg__errors.New("expected {")
+		} else {
+			for (err == nil) && j.More() {
+				var jk25 pkg__encoding_json.Token
+				jk25, err = j.Token()
+				if err == nil {
+					fn26 := jk25.(string)
+					switch fn26 {
+					case "id":
+					case "label":
+					case "description":
+					case "detail":
+					case "arg":
+					case "fPos":
+					}
+				}
+			}
+			if err == nil {
+				_, err = j.Token()
+			}
+			if err == nil {
+			}
+		}
+	}
+	return
+}
+
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
 func (me *ExtrasItem) preview_UnmarshalJSON(v []byte) (err error) {
 	var kvs = make(map[string]interface{}, 6)
@@ -2611,6 +3016,36 @@ func (me *Menu) __gent__jsonUnmarshal_FromAny(v map[string]interface{}) {
 	}
 }
 
+func (me *Menu) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	var t16 pkg__encoding_json.Token
+	t16, err = j.Token()
+	if err == nil {
+		d17, _ := t16.(pkg__encoding_json.Delim)
+		if 123 != d17 {
+			err = pkg__errors.New("expected {")
+		} else {
+			for (err == nil) && j.More() {
+				var jk14 pkg__encoding_json.Token
+				jk14, err = j.Token()
+				if err == nil {
+					fn15 := jk14.(string)
+					switch fn15 {
+					case "desc":
+					case "topLevel":
+					case "items":
+					}
+				}
+			}
+			if err == nil {
+				_, err = j.Token()
+			}
+			if err == nil {
+			}
+		}
+	}
+	return
+}
+
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
 func (me *Menu) preview_UnmarshalJSON(v []byte) (err error) {
 	var kvs = make(map[string]interface{}, 3)
@@ -2680,6 +3115,11 @@ func (me *MenuItems) __gent__jsonUnmarshal_FromAny(v []interface{}) {
 		}
 	}
 	*me = sl
+}
+
+func (me *MenuItems) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	err = nil
+	return
 }
 
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
@@ -2821,6 +3261,40 @@ func (me *MenuItem) __gent__jsonUnmarshal_FromAny(v map[string]interface{}) {
 	}
 }
 
+func (me *MenuItem) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	var t31 pkg__encoding_json.Token
+	t31, err = j.Token()
+	if err == nil {
+		d32, _ := t31.(pkg__encoding_json.Delim)
+		if 123 != d32 {
+			err = pkg__errors.New("expected {")
+		} else {
+			for (err == nil) && j.More() {
+				var jk29 pkg__encoding_json.Token
+				jk29, err = j.Token()
+				if err == nil {
+					fn30 := jk29.(string)
+					switch fn30 {
+					case "ii":
+					case "ia":
+					case "c":
+					case "t":
+					case "d":
+					case "h":
+					case "q":
+					}
+				}
+			}
+			if err == nil {
+				_, err = j.Token()
+			}
+			if err == nil {
+			}
+		}
+	}
+	return
+}
+
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
 func (me *MenuItem) preview_UnmarshalJSON(v []byte) (err error) {
 	var kvs = make(map[string]interface{}, 8)
@@ -2893,6 +3367,36 @@ func (me *MenuItemArgPrompt) __gent__jsonUnmarshal_FromAny(v map[string]interfac
 			me.Value = ""
 		}
 	}
+}
+
+func (me *MenuItemArgPrompt) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	var t15 pkg__encoding_json.Token
+	t15, err = j.Token()
+	if err == nil {
+		d16, _ := t15.(pkg__encoding_json.Delim)
+		if 123 != d16 {
+			err = pkg__errors.New("expected {")
+		} else {
+			for (err == nil) && j.More() {
+				var jk13 pkg__encoding_json.Token
+				jk13, err = j.Token()
+				if err == nil {
+					fn14 := jk13.(string)
+					switch fn14 {
+					case "prompt":
+					case "placeHolder":
+					case "value":
+					}
+				}
+			}
+			if err == nil {
+				_, err = j.Token()
+			}
+			if err == nil {
+			}
+		}
+	}
+	return
 }
 
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
@@ -3002,6 +3506,37 @@ func (me *SrcAnnotaction) __gent__jsonUnmarshal_FromAny(v map[string]interface{}
 	}
 }
 
+func (me *SrcAnnotaction) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	var t20 pkg__encoding_json.Token
+	t20, err = j.Token()
+	if err == nil {
+		d21, _ := t20.(pkg__encoding_json.Delim)
+		if 123 != d21 {
+			err = pkg__errors.New("expected {")
+		} else {
+			for (err == nil) && j.More() {
+				var jk18 pkg__encoding_json.Token
+				jk18, err = j.Token()
+				if err == nil {
+					fn19 := jk18.(string)
+					switch fn19 {
+					case "Range":
+					case "Title":
+					case "Desc":
+					case "CmdName":
+					}
+				}
+			}
+			if err == nil {
+				_, err = j.Token()
+			}
+			if err == nil {
+			}
+		}
+	}
+	return
+}
+
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
 func (me *SrcAnnotaction) preview_UnmarshalJSON(v []byte) (err error) {
 	var kvs = make(map[string]interface{}, 4)
@@ -3059,6 +3594,35 @@ func (me *SrcInfoTip) __gent__jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.Language = ""
 		}
 	}
+}
+
+func (me *SrcInfoTip) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	var t11 pkg__encoding_json.Token
+	t11, err = j.Token()
+	if err == nil {
+		d12, _ := t11.(pkg__encoding_json.Delim)
+		if 123 != d12 {
+			err = pkg__errors.New("expected {")
+		} else {
+			for (err == nil) && j.More() {
+				var jk9 pkg__encoding_json.Token
+				jk9, err = j.Token()
+				if err == nil {
+					fn10 := jk9.(string)
+					switch fn10 {
+					case "value":
+					case "language":
+					}
+				}
+			}
+			if err == nil {
+				_, err = j.Token()
+			}
+			if err == nil {
+			}
+		}
+	}
+	return
 }
 
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
@@ -3183,6 +3747,38 @@ func (me *SrcIntelCompl) __gent__jsonUnmarshal_FromAny(v map[string]interface{})
 	}
 }
 
+func (me *SrcIntelCompl) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	var t24 pkg__encoding_json.Token
+	t24, err = j.Token()
+	if err == nil {
+		d25, _ := t24.(pkg__encoding_json.Delim)
+		if 123 != d25 {
+			err = pkg__errors.New("expected {")
+		} else {
+			for (err == nil) && j.More() {
+				var jk22 pkg__encoding_json.Token
+				jk22, err = j.Token()
+				if err == nil {
+					fn23 := jk22.(string)
+					switch fn23 {
+					case "kind":
+					case "label":
+					case "documentation":
+					case "detail":
+					case "sortText":
+					}
+				}
+			}
+			if err == nil {
+				_, err = j.Token()
+			}
+			if err == nil {
+			}
+		}
+	}
+	return
+}
+
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
 func (me *SrcIntelCompl) preview_UnmarshalJSON(v []byte) (err error) {
 	var kvs = make(map[string]interface{}, 6)
@@ -3252,6 +3848,11 @@ func (me *SrcIntelCompls) __gent__jsonUnmarshal_FromAny(v []interface{}) {
 		}
 	}
 	*me = sl
+}
+
+func (me *SrcIntelCompls) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	err = nil
+	return
 }
 
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
@@ -3373,6 +3974,35 @@ func (me *SrcIntels) __gent__jsonUnmarshal_FromAny(v map[string]interface{}) {
 	}
 }
 
+func (me *SrcIntels) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	var t17 pkg__encoding_json.Token
+	t17, err = j.Token()
+	if err == nil {
+		d18, _ := t17.(pkg__encoding_json.Delim)
+		if 123 != d18 {
+			err = pkg__errors.New("expected {")
+		} else {
+			for (err == nil) && j.More() {
+				var jk15 pkg__encoding_json.Token
+				jk15, err = j.Token()
+				if err == nil {
+					fn16 := jk15.(string)
+					switch fn16 {
+					case "InfoTips":
+					case "Refs":
+					}
+				}
+			}
+			if err == nil {
+				_, err = j.Token()
+			}
+			if err == nil {
+			}
+		}
+	}
+	return
+}
+
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
 func (me *SrcIntels) preview_UnmarshalJSON(v []byte) (err error) {
 	var kvs = make(map[string]interface{}, 2)
@@ -3430,6 +4060,35 @@ func (me *SrcIntelDoc) __gent__jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.IsTrusted = false
 		}
 	}
+}
+
+func (me *SrcIntelDoc) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	var t11 pkg__encoding_json.Token
+	t11, err = j.Token()
+	if err == nil {
+		d12, _ := t11.(pkg__encoding_json.Delim)
+		if 123 != d12 {
+			err = pkg__errors.New("expected {")
+		} else {
+			for (err == nil) && j.More() {
+				var jk9 pkg__encoding_json.Token
+				jk9, err = j.Token()
+				if err == nil {
+					fn10 := jk9.(string)
+					switch fn10 {
+					case "value":
+					case "isTrusted":
+					}
+				}
+			}
+			if err == nil {
+				_, err = j.Token()
+			}
+			if err == nil {
+			}
+		}
+	}
+	return
 }
 
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
@@ -3549,6 +4208,36 @@ func (me *SrcIntelSigHelp) __gent__jsonUnmarshal_FromAny(v map[string]interface{
 			me.Signatures = nil
 		}
 	}
+}
+
+func (me *SrcIntelSigHelp) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	var t20 pkg__encoding_json.Token
+	t20, err = j.Token()
+	if err == nil {
+		d21, _ := t20.(pkg__encoding_json.Delim)
+		if 123 != d21 {
+			err = pkg__errors.New("expected {")
+		} else {
+			for (err == nil) && j.More() {
+				var jk18 pkg__encoding_json.Token
+				jk18, err = j.Token()
+				if err == nil {
+					fn19 := jk18.(string)
+					switch fn19 {
+					case "activeSignature":
+					case "activeParameter":
+					case "signatures":
+					}
+				}
+			}
+			if err == nil {
+				_, err = j.Token()
+			}
+			if err == nil {
+			}
+		}
+	}
+	return
 }
 
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
@@ -3691,6 +4380,36 @@ func (me *SrcIntelSigInfo) __gent__jsonUnmarshal_FromAny(v map[string]interface{
 	}
 }
 
+func (me *SrcIntelSigInfo) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	var t21 pkg__encoding_json.Token
+	t21, err = j.Token()
+	if err == nil {
+		d22, _ := t21.(pkg__encoding_json.Delim)
+		if 123 != d22 {
+			err = pkg__errors.New("expected {")
+		} else {
+			for (err == nil) && j.More() {
+				var jk19 pkg__encoding_json.Token
+				jk19, err = j.Token()
+				if err == nil {
+					fn20 := jk19.(string)
+					switch fn20 {
+					case "label":
+					case "documentation":
+					case "parameters":
+					}
+				}
+			}
+			if err == nil {
+				_, err = j.Token()
+			}
+			if err == nil {
+			}
+		}
+	}
+	return
+}
+
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
 func (me *SrcIntelSigInfo) preview_UnmarshalJSON(v []byte) (err error) {
 	var kvs = make(map[string]interface{}, 3)
@@ -3768,6 +4487,35 @@ func (me *SrcIntelSigParam) __gent__jsonUnmarshal_FromAny(v map[string]interface
 	}
 }
 
+func (me *SrcIntelSigParam) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	var t12 pkg__encoding_json.Token
+	t12, err = j.Token()
+	if err == nil {
+		d13, _ := t12.(pkg__encoding_json.Delim)
+		if 123 != d13 {
+			err = pkg__errors.New("expected {")
+		} else {
+			for (err == nil) && j.More() {
+				var jk10 pkg__encoding_json.Token
+				jk10, err = j.Token()
+				if err == nil {
+					fn11 := jk10.(string)
+					switch fn11 {
+					case "label":
+					case "documentation":
+					}
+				}
+			}
+			if err == nil {
+				_, err = j.Token()
+			}
+			if err == nil {
+			}
+		}
+	}
+	return
+}
+
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
 func (me *SrcIntelSigParam) preview_UnmarshalJSON(v []byte) (err error) {
 	var kvs = make(map[string]interface{}, 2)
@@ -3837,6 +4585,11 @@ func (me *SrcLenses) __gent__jsonUnmarshal_FromAny(v []interface{}) {
 		}
 	}
 	*me = sl
+}
+
+func (me *SrcLenses) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	err = nil
+	return
 }
 
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
@@ -3970,6 +4723,37 @@ func (me *SrcLens) __gent__jsonUnmarshal_FromAny(v map[string]interface{}) {
 	}
 }
 
+func (me *SrcLens) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	var t20 pkg__encoding_json.Token
+	t20, err = j.Token()
+	if err == nil {
+		d21, _ := t20.(pkg__encoding_json.Delim)
+		if 123 != d21 {
+			err = pkg__errors.New("expected {")
+		} else {
+			for (err == nil) && j.More() {
+				var jk18 pkg__encoding_json.Token
+				jk18, err = j.Token()
+				if err == nil {
+					fn19 := jk18.(string)
+					switch fn19 {
+					case "SrcLoc":
+					case "t":
+					case "s":
+					case "l":
+					}
+				}
+			}
+			if err == nil {
+				_, err = j.Token()
+			}
+			if err == nil {
+			}
+		}
+	}
+	return
+}
+
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
 func (me *SrcLens) preview_UnmarshalJSON(v []byte) (err error) {
 	var kvs = make(map[string]interface{}, 4)
@@ -4095,6 +4879,37 @@ func (me *SrcLoc) __gent__jsonUnmarshal_FromAny(v map[string]interface{}) {
 	}
 }
 
+func (me *SrcLoc) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	var t21 pkg__encoding_json.Token
+	t21, err = j.Token()
+	if err == nil {
+		d22, _ := t21.(pkg__encoding_json.Delim)
+		if 123 != d22 {
+			err = pkg__errors.New("expected {")
+		} else {
+			for (err == nil) && j.More() {
+				var jk19 pkg__encoding_json.Token
+				jk19, err = j.Token()
+				if err == nil {
+					fn20 := jk19.(string)
+					switch fn20 {
+					case "e":
+					case "f":
+					case "p":
+					case "r":
+					}
+				}
+			}
+			if err == nil {
+				_, err = j.Token()
+			}
+			if err == nil {
+			}
+		}
+	}
+	return
+}
+
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
 func (me *SrcLoc) preview_UnmarshalJSON(v []byte) (err error) {
 	var kvs = make(map[string]interface{}, 4)
@@ -4166,6 +4981,11 @@ func (me *SrcLocs) __gent__jsonUnmarshal_FromAny(v []interface{}) {
 	*me = sl
 }
 
+func (me *SrcLocs) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	err = nil
+	return
+}
+
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
 func (me *SrcLocs) preview_UnmarshalJSON(v []byte) (err error) {
 	var sl []interface{}
@@ -4213,19 +5033,6 @@ func (me *SrcModEdit) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-func (me *SrcModEdit) unm(v []byte) (err error) {
-	jd := pkg__encoding_json.NewDecoder(nil)
-	var t pkg__encoding_json.Token
-	if t, err = jd.Token(); err == nil && t != nil {
-		for jd.More() {
-
-		}
-
-		_, err = jd.Token()
-	}
-	return
-}
-
 func (me *SrcModEdit) __gent__jsonUnmarshal_FromAny(v map[string]interface{}) {
 	v1, o2 := v["At"]
 	if !o2 {
@@ -4257,6 +5064,35 @@ func (me *SrcModEdit) __gent__jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.Val = ""
 		}
 	}
+}
+
+func (me *SrcModEdit) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	var t12 pkg__encoding_json.Token
+	t12, err = j.Token()
+	if err == nil {
+		d13, _ := t12.(pkg__encoding_json.Delim)
+		if 123 != d13 {
+			err = pkg__errors.New("expected {")
+		} else {
+			for (err == nil) && j.More() {
+				var jk10 pkg__encoding_json.Token
+				jk10, err = j.Token()
+				if err == nil {
+					fn11 := jk10.(string)
+					switch fn11 {
+					case "At":
+					case "Val":
+					}
+				}
+			}
+			if err == nil {
+				_, err = j.Token()
+			}
+			if err == nil {
+			}
+		}
+	}
+	return
 }
 
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
@@ -4324,6 +5160,11 @@ func (me *SrcModEdits) __gent__jsonUnmarshal_FromAny(v []interface{}) {
 		}
 	}
 	*me = sl
+}
+
+func (me *SrcModEdits) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	err = nil
+	return
 }
 
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
@@ -4398,6 +5239,36 @@ func (me *SrcPos) __gent__jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.Off = 0
 		}
 	}
+}
+
+func (me *SrcPos) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	var t15 pkg__encoding_json.Token
+	t15, err = j.Token()
+	if err == nil {
+		d16, _ := t15.(pkg__encoding_json.Delim)
+		if 123 != d16 {
+			err = pkg__errors.New("expected {")
+		} else {
+			for (err == nil) && j.More() {
+				var jk13 pkg__encoding_json.Token
+				jk13, err = j.Token()
+				if err == nil {
+					fn14 := jk13.(string)
+					switch fn14 {
+					case "l":
+					case "c":
+					case "o":
+					}
+				}
+			}
+			if err == nil {
+				_, err = j.Token()
+			}
+			if err == nil {
+			}
+		}
+	}
+	return
 }
 
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
@@ -4493,6 +5364,35 @@ func (me *SrcRange) __gent__jsonUnmarshal_FromAny(v map[string]interface{}) {
 			me.End = z9
 		}
 	}
+}
+
+func (me *SrcRange) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	var t13 pkg__encoding_json.Token
+	t13, err = j.Token()
+	if err == nil {
+		d14, _ := t13.(pkg__encoding_json.Delim)
+		if 123 != d14 {
+			err = pkg__errors.New("expected {")
+		} else {
+			for (err == nil) && j.More() {
+				var jk11 pkg__encoding_json.Token
+				jk11, err = j.Token()
+				if err == nil {
+					fn12 := jk11.(string)
+					switch fn12 {
+					case "s":
+					case "e":
+					}
+				}
+			}
+			if err == nil {
+				_, err = j.Token()
+			}
+			if err == nil {
+			}
+		}
+	}
+	return
 }
 
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
@@ -4678,6 +5578,39 @@ func (me *WorkspaceChanges) __gent__jsonUnmarshal_FromAny(v map[string]interface
 			me.LiveFiles = nil
 		}
 	}
+}
+
+func (me *WorkspaceChanges) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
+	var t52 pkg__encoding_json.Token
+	t52, err = j.Token()
+	if err == nil {
+		d53, _ := t52.(pkg__encoding_json.Delim)
+		if 123 != d53 {
+			err = pkg__errors.New("expected {")
+		} else {
+			for (err == nil) && j.More() {
+				var jk50 pkg__encoding_json.Token
+				jk50, err = j.Token()
+				if err == nil {
+					fn51 := jk50.(string)
+					switch fn51 {
+					case "AddedDirs":
+					case "RemovedDirs":
+					case "OpenedFiles":
+					case "ClosedFiles":
+					case "WrittenFiles":
+					case "LiveFiles":
+					}
+				}
+			}
+			if err == nil {
+				_, err = j.Token()
+			}
+			if err == nil {
+			}
+		}
+	}
+	return
 }
 
 // preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
