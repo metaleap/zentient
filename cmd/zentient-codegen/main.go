@@ -47,7 +47,6 @@ func main() {
 	}
 	gentjson.Gents.OtherTypes.RunOnlyForTypes.Named =
 		append(typeNames4Marshal, typeNames4Unmarshal...)
-	typeNames4Unmarshal /*TEMP*/ = gentjson.Gents.OtherTypes.RunOnlyForTypes.Named
 
 	gentjson.Gents.OtherTypes.Marshal.ResliceInsteadOfWhitespace = true
 	gentjson.Gents.OtherTypes.Marshal.GenPanicImplsForOthers = true
@@ -58,6 +57,7 @@ func main() {
 		T.SliceOf.Strings,
 		TMap(T.String, T.Empty.Interface),
 	}
+	gentjson.Gents.OtherTypes.Unmarshal.GenPanicImplsForOthers = true
 
 	timetaken, _ := pkgs.MustRunGentsAndGenerateOutputFiles(nil, gents)
 	println(timetaken.String())
