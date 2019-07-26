@@ -51,7 +51,7 @@ func main() {
 
 	gentjson.Gents.OtherTypes.Marshal.ResliceInsteadOfWhitespace = true
 	gentjson.Gents.OtherTypes.Marshal.GenPanicImplsForOthers = true
-	gentjson.Gents.OtherTypes.Marshal.OnStdlibFallbacks = onStdlibAddPrintlnStmt
+	gentjson.Gents.OtherTypes.Marshal.OnStdlibFallbacks = onMarshalStdlibAddPrintlnStmt
 	gentjson.Gents.OtherTypes.Marshal.TryInterfaceTypesBeforeStdlib = []*TypeRef{
 		T.Empty.Interface,
 		T.String,
@@ -64,13 +64,20 @@ func main() {
 		TSlice(T.Empty.Interface),
 	}
 	gentjson.Gents.OtherTypes.Unmarshal.GenPanicImplsForOthers = true
+	gentjson.Gents.OtherTypes.Unmarshal.OnStdlibFallbacks = onUnmarshalStdlibAddPrintlnStmt
 
 	timetaken, _ := pkgs.MustRunGentsAndGenerateOutputFiles(nil, gents)
 	println(timetaken.String())
 }
 
-func onStdlibAddPrintlnStmt(ctx *gent.Ctx, fAcc ISyn, s ...ISyn) Syns {
+func onMarshalStdlibAddPrintlnStmt(ctx *gent.Ctx, fAcc ISyn, s ...ISyn) Syns {
 	return append(s,
-		B.Println.Of("JSON.MARSHAL:", ctx.Import("fmt").C("Sprintf", "%T", fAcc)),
+		B.Panic.Of(fAcc),
+	)
+}
+
+func onUnmarshalStdlibAddPrintlnStmt(ctx *gent.Ctx, fAcc ISyn, s ...ISyn) Syns {
+	return append(s,
+		B.Panic.Of(fAcc),
 	)
 }

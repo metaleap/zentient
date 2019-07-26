@@ -6,7 +6,6 @@ import (
 	pkg__bytes "bytes"
 	pkg__encoding_json "encoding/json"
 	pkg__errors "errors"
-	pkg__fmt "fmt"
 	pkg__strconv "strconv"
 )
 
@@ -2608,7 +2607,7 @@ func __gent__jsonMarshal_interface____(v interface{}) (r []byte, err error) {
 							sl, e = __gent__jsonMarshal_string(v2)
 						} else {
 							sl, e = pkg__encoding_json.Marshal(v)
-							println("JSON.MARSHAL:", pkg__fmt.Sprintf("%T", v))
+							panic(v)
 						}
 					}
 				}
