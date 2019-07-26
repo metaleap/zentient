@@ -185,11 +185,27 @@ func (me *Caddy) IsPendingOrBusy() bool
 func (me *Caddy) IsReady() bool
 ```
 
+#### func (*Caddy) MarshalJSON
+
+```go
+func (me *Caddy) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
 #### func (*Caddy) OnStatusChanged
 
 ```go
 func (me *Caddy) OnStatusChanged()
 ```
+
+#### func (*Caddy) UnmarshalJSON
+
+```go
+func (me *Caddy) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
 
 #### type CaddyStatus
 
@@ -358,6 +374,22 @@ type DiagFixUps struct {
 ```
 
 
+#### func (*DiagFixUps) MarshalJSON
+
+```go
+func (me *DiagFixUps) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
+#### func (*DiagFixUps) UnmarshalJSON
+
+```go
+func (me *DiagFixUps) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
+
 #### type DiagItem
 
 ```go
@@ -374,6 +406,22 @@ type DiagItem struct {
 ```
 
 
+#### func (*DiagItem) MarshalJSON
+
+```go
+func (me *DiagItem) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
+#### func (*DiagItem) UnmarshalJSON
+
+```go
+func (me *DiagItem) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
+
 #### type DiagItems
 
 ```go
@@ -381,12 +429,44 @@ type DiagItems []*DiagItem
 ```
 
 
+#### func (DiagItems) MarshalJSON
+
+```go
+func (me DiagItems) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
+#### func (*DiagItems) UnmarshalJSON
+
+```go
+func (me *DiagItems) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
+
 #### type DiagItemsBy
 
 ```go
 type DiagItemsBy map[string]DiagItems
 ```
 
+
+#### func (DiagItemsBy) MarshalJSON
+
+```go
+func (me DiagItemsBy) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
+#### func (*DiagItemsBy) UnmarshalJSON
+
+```go
+func (me *DiagItemsBy) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
 
 #### type DiagJob
 
@@ -478,6 +558,22 @@ type Diags struct {
 ```
 
 
+#### func (*Diags) MarshalJSON
+
+```go
+func (me *Diags) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
+#### func (*Diags) UnmarshalJSON
+
+```go
+func (me *Diags) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
+
 #### type EditorAction
 
 ```go
@@ -489,6 +585,22 @@ type EditorAction struct {
 }
 ```
 
+
+#### func (*EditorAction) MarshalJSON
+
+```go
+func (me *EditorAction) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
+#### func (*EditorAction) UnmarshalJSON
+
+```go
+func (me *EditorAction) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
 
 #### type Extras
 
@@ -502,6 +614,22 @@ type Extras struct {
 }
 ```
 
+
+#### func (*Extras) MarshalJSON
+
+```go
+func (me *Extras) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
+#### func (*Extras) UnmarshalJSON
+
+```go
+func (me *Extras) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
 
 #### type ExtrasBase
 
@@ -531,6 +659,22 @@ type ExtrasItem struct {
 }
 ```
 
+
+#### func (*ExtrasItem) MarshalJSON
+
+```go
+func (me *ExtrasItem) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
+#### func (*ExtrasItem) UnmarshalJSON
+
+```go
+func (me *ExtrasItem) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
 
 #### type FixUp
 
@@ -866,6 +1010,22 @@ type IpcReq struct {
 ```
 
 
+#### func (*IpcReq) MarshalJSON
+
+```go
+func (me *IpcReq) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
+#### func (*IpcReq) UnmarshalJSON
+
+```go
+func (me *IpcReq) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
+
 #### type IpcResp
 
 ```go
@@ -884,6 +1044,22 @@ type IpcResp struct {
 }
 ```
 
+
+#### func (*IpcResp) MarshalJSON
+
+```go
+func (me *IpcResp) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
+#### func (*IpcResp) UnmarshalJSON
+
+```go
+func (me *IpcResp) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
 
 #### type ListBase
 
@@ -984,6 +1160,22 @@ type Menu struct {
 ```
 
 
+#### func (*Menu) MarshalJSON
+
+```go
+func (me *Menu) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
+#### func (*Menu) UnmarshalJSON
+
+```go
+func (me *Menu) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
+
 #### type MenuItem
 
 ```go
@@ -999,6 +1191,22 @@ type MenuItem struct {
 ```
 
 
+#### func (*MenuItem) MarshalJSON
+
+```go
+func (me *MenuItem) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
+#### func (*MenuItem) UnmarshalJSON
+
+```go
+func (me *MenuItem) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
+
 #### type MenuItemArgPrompt
 
 ```go
@@ -1010,12 +1218,44 @@ type MenuItemArgPrompt struct {
 ```
 
 
+#### func (*MenuItemArgPrompt) MarshalJSON
+
+```go
+func (me *MenuItemArgPrompt) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
+#### func (*MenuItemArgPrompt) UnmarshalJSON
+
+```go
+func (me *MenuItemArgPrompt) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
+
 #### type MenuItems
 
 ```go
 type MenuItems []*MenuItem
 ```
 
+
+#### func (MenuItems) MarshalJSON
+
+```go
+func (me MenuItems) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
+#### func (*MenuItems) UnmarshalJSON
+
+```go
+func (me *MenuItems) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
 
 #### type MenuResponse
 
@@ -1030,6 +1270,22 @@ type MenuResponse struct {
 }
 ```
 
+
+#### func (*MenuResponse) MarshalJSON
+
+```go
+func (me *MenuResponse) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
+#### func (*MenuResponse) UnmarshalJSON
+
+```go
+func (me *MenuResponse) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
 
 #### type PagesBase
 
@@ -1230,6 +1486,22 @@ type SrcAnnotaction struct {
 ```
 
 
+#### func (*SrcAnnotaction) MarshalJSON
+
+```go
+func (me *SrcAnnotaction) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
+#### func (*SrcAnnotaction) UnmarshalJSON
+
+```go
+func (me *SrcAnnotaction) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
+
 #### type SrcFormattingClientPrefs
 
 ```go
@@ -1252,6 +1524,22 @@ type SrcInfoTip struct {
 ```
 
 
+#### func (*SrcInfoTip) MarshalJSON
+
+```go
+func (me *SrcInfoTip) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
+#### func (*SrcInfoTip) UnmarshalJSON
+
+```go
+func (me *SrcInfoTip) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
+
 #### type SrcIntel
 
 ```go
@@ -1264,6 +1552,22 @@ type SrcIntel struct {
 }
 ```
 
+
+#### func (*SrcIntel) MarshalJSON
+
+```go
+func (me *SrcIntel) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
+#### func (*SrcIntel) UnmarshalJSON
+
+```go
+func (me *SrcIntel) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
 
 #### type SrcIntelBase
 
@@ -1375,6 +1679,22 @@ type SrcIntelCompl struct {
 ```
 
 
+#### func (*SrcIntelCompl) MarshalJSON
+
+```go
+func (me *SrcIntelCompl) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
+#### func (*SrcIntelCompl) UnmarshalJSON
+
+```go
+func (me *SrcIntelCompl) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
+
 #### type SrcIntelCompls
 
 ```go
@@ -1394,11 +1714,27 @@ func (me SrcIntelCompls) Len() int
 func (me SrcIntelCompls) Less(i int, j int) bool
 ```
 
+#### func (SrcIntelCompls) MarshalJSON
+
+```go
+func (me SrcIntelCompls) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
 #### func (SrcIntelCompls) Swap
 
 ```go
 func (me SrcIntelCompls) Swap(i int, j int)
 ```
+
+#### func (*SrcIntelCompls) UnmarshalJSON
+
+```go
+func (me *SrcIntelCompls) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
 
 #### type SrcIntelDoc
 
@@ -1409,6 +1745,22 @@ type SrcIntelDoc struct {
 }
 ```
 
+
+#### func (*SrcIntelDoc) MarshalJSON
+
+```go
+func (me *SrcIntelDoc) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
+#### func (*SrcIntelDoc) UnmarshalJSON
+
+```go
+func (me *SrcIntelDoc) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
 
 #### type SrcIntelLex
 
@@ -1436,6 +1788,22 @@ type SrcIntelSigHelp struct {
 ```
 
 
+#### func (*SrcIntelSigHelp) MarshalJSON
+
+```go
+func (me *SrcIntelSigHelp) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
+#### func (*SrcIntelSigHelp) UnmarshalJSON
+
+```go
+func (me *SrcIntelSigHelp) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
+
 #### type SrcIntelSigInfo
 
 ```go
@@ -1447,6 +1815,22 @@ type SrcIntelSigInfo struct {
 ```
 
 
+#### func (*SrcIntelSigInfo) MarshalJSON
+
+```go
+func (me *SrcIntelSigInfo) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
+#### func (*SrcIntelSigInfo) UnmarshalJSON
+
+```go
+func (me *SrcIntelSigInfo) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
+
 #### type SrcIntelSigParam
 
 ```go
@@ -1457,6 +1841,22 @@ type SrcIntelSigParam struct {
 ```
 
 
+#### func (*SrcIntelSigParam) MarshalJSON
+
+```go
+func (me *SrcIntelSigParam) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
+#### func (*SrcIntelSigParam) UnmarshalJSON
+
+```go
+func (me *SrcIntelSigParam) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
+
 #### type SrcIntels
 
 ```go
@@ -1466,6 +1866,22 @@ type SrcIntels struct {
 }
 ```
 
+
+#### func (*SrcIntels) MarshalJSON
+
+```go
+func (me *SrcIntels) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
+#### func (*SrcIntels) UnmarshalJSON
+
+```go
+func (me *SrcIntels) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
 
 #### type SrcLens
 
@@ -1497,11 +1913,27 @@ func (me *SrcLens) ByteOffsetForPos(pos *SrcPos) int
 func (me *SrcLens) EnsureSrcFull()
 ```
 
+#### func (*SrcLens) MarshalJSON
+
+```go
+func (me *SrcLens) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
 #### func (*SrcLens) Rune1OffsetForByte0Offset
 
 ```go
 func (me *SrcLens) Rune1OffsetForByte0Offset(byte0off int) (rune1off int)
 ```
+
+#### func (*SrcLens) UnmarshalJSON
+
+```go
+func (me *SrcLens) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
 
 #### type SrcLenses
 
@@ -1528,11 +1960,27 @@ func (me SrcLenses) Len() int
 func (me SrcLenses) Less(i int, j int) bool
 ```
 
+#### func (SrcLenses) MarshalJSON
+
+```go
+func (me SrcLenses) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
 #### func (SrcLenses) Swap
 
 ```go
 func (me SrcLenses) Swap(i int, j int)
 ```
+
+#### func (*SrcLenses) UnmarshalJSON
+
+```go
+func (me *SrcLenses) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
 
 #### type SrcLoc
 
@@ -1546,11 +1994,27 @@ type SrcLoc struct {
 ```
 
 
+#### func (*SrcLoc) MarshalJSON
+
+```go
+func (me *SrcLoc) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
 #### func (*SrcLoc) SetFilePathAndPosOrRangeFrom
 
 ```go
 func (me *SrcLoc) SetFilePathAndPosOrRangeFrom(srcRef *udev.SrcMsg, fallbackFilePath func() string)
 ```
+
+#### func (*SrcLoc) UnmarshalJSON
+
+```go
+func (me *SrcLoc) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
 
 #### type SrcLocs
 
@@ -1570,6 +2034,22 @@ func (me *SrcLocs) Add(srcFilePath string, pos *udevlex.Pos) (loc *SrcLoc)
 ```go
 func (me *SrcLocs) AddFrom(srcRefLoc *udev.SrcMsg, fallbackFilePath func() string) (loc *SrcLoc)
 ```
+
+#### func (SrcLocs) MarshalJSON
+
+```go
+func (me SrcLocs) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
+#### func (*SrcLocs) UnmarshalJSON
+
+```go
+func (me *SrcLocs) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
 
 #### type SrcModBase
 
@@ -1632,6 +2112,22 @@ type SrcModEdit struct {
 ```
 
 
+#### func (*SrcModEdit) MarshalJSON
+
+```go
+func (me *SrcModEdit) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
+#### func (*SrcModEdit) UnmarshalJSON
+
+```go
+func (me *SrcModEdit) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
+
 #### type SrcModEdits
 
 ```go
@@ -1663,11 +2159,27 @@ func (me SrcModEdits) Len() int
 func (me SrcModEdits) Less(i int, j int) bool
 ```
 
+#### func (SrcModEdits) MarshalJSON
+
+```go
+func (me SrcModEdits) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
 #### func (SrcModEdits) Swap
 
 ```go
 func (me SrcModEdits) Swap(i int, j int)
 ```
+
+#### func (*SrcModEdits) UnmarshalJSON
+
+```go
+func (me *SrcModEdits) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
 
 #### type SrcPos
 
@@ -1682,6 +2194,14 @@ type SrcPos struct {
 
 All public fields are 1-based (so 0 means 'missing') and rune-not-byte-based
 
+#### func (*SrcPos) MarshalJSON
+
+```go
+func (me *SrcPos) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
 #### func (*SrcPos) SetRune1OffFromByte0Off
 
 ```go
@@ -1694,6 +2214,14 @@ func (me *SrcPos) SetRune1OffFromByte0Off(byte0Off int, src []byte)
 func (me *SrcPos) String() string
 ```
 
+#### func (*SrcPos) UnmarshalJSON
+
+```go
+func (me *SrcPos) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
+
 #### type SrcRange
 
 ```go
@@ -1703,6 +2231,22 @@ type SrcRange struct {
 }
 ```
 
+
+#### func (*SrcRange) MarshalJSON
+
+```go
+func (me *SrcRange) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
+#### func (*SrcRange) UnmarshalJSON
+
+```go
+func (me *SrcRange) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
 
 #### type Symbol
 
@@ -1944,6 +2488,22 @@ type WorkspaceChanges struct {
 ```go
 func (me *WorkspaceChanges) HasDirChanges() bool
 ```
+
+#### func (*WorkspaceChanges) MarshalJSON
+
+```go
+func (me *WorkspaceChanges) MarshalJSON() (r []byte, err error)
+```
+MarshalJSON implements the Go standard library's `encoding/json.Marshaler`
+interface.
+
+#### func (*WorkspaceChanges) UnmarshalJSON
+
+```go
+func (me *WorkspaceChanges) UnmarshalJSON(b []byte) (err error)
+```
+UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler`
+interface.
 
 #### type WorkspaceChangesAfter
 

@@ -62,7 +62,7 @@ func (*goSettings) onChangingGuruScopeExcl(newVal interface{}) {
 					}
 				}
 				if !found {
-					z.BadPanic("guru `-scope` exclusion pattern (no existing import-path matches `/...` pattern) — ", pat)
+					// z.BadPanic("guru `-scope` exclusion pattern (no existing import-path matches `/...` pattern) — ", pat)
 				}
 			}
 		}

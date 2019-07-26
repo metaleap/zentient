@@ -25,8 +25,6 @@ func main() {
 	gentenums.Gents.Stringers.RunNeverForTypes.Named = []string{"ToolCats"}
 	gentenums.Gents.Stringers.All[0].SkipEarlyChecks = true
 
-	gentjson.Gents.OtherTypes.Marshal.Name, gentjson.Gents.OtherTypes.Unmarshal.Name =
-		"preview_"+gentjson.Gents.OtherTypes.Marshal.Name, "preview_"+gentjson.Gents.OtherTypes.Unmarshal.Name
 	typeNames4Marshal := []string{
 		"IpcResp", "SrcPos", "SrcRange", "SrcModEdit", "SrcModEdits",
 		"SrcLoc", "SrcLens", "SrcLenses", "SrcLocs", "Caddy",
@@ -45,9 +43,7 @@ func main() {
 	gentjson.Gents.OtherTypes.Unmarshal.MayGenFor = func(t *gent.Type) bool {
 		return ustr.In(t.Name, typeNames4Unmarshal...)
 	}
-	gentjson.Gents.OtherTypes.RunOnlyForTypes.Named = make([]string, len(typeNames4Marshal)+len(typeNames4Unmarshal))
-	copy(gentjson.Gents.OtherTypes.RunOnlyForTypes.Named[:len(typeNames4Marshal)], typeNames4Marshal)
-	copy(gentjson.Gents.OtherTypes.RunOnlyForTypes.Named[len(typeNames4Marshal):], typeNames4Unmarshal)
+	gentjson.Gents.OtherTypes.RunOnlyForTypes.Named = append(append([]string{}, typeNames4Marshal...), typeNames4Unmarshal...)
 
 	gentjson.Gents.OtherTypes.Marshal.ResliceInsteadOfWhitespace = true
 	gentjson.Gents.OtherTypes.Marshal.GenPanicImplsForOthers = true
@@ -56,6 +52,7 @@ func main() {
 		T.Empty.Interface,
 		T.String,
 		T.SliceOf.Strings,
+		TLocal("MenuItemArgPrompt"),
 		TMap(T.String, T.Empty.Interface),
 	}
 	gentjson.Gents.OtherTypes.Unmarshal.CommonTypesToExtractToHelpers = []*TypeRef{

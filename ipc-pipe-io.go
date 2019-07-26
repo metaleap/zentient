@@ -1,10 +1,8 @@
 package z
 
 import (
-	"encoding/json"
 	"fmt"
 	"runtime/debug"
-	"strings"
 
 	"github.com/go-leap/run"
 )
@@ -19,17 +17,6 @@ func send(resp *IpcResp) (err error) {
 
 	if err = Prog.pipeIO.stdoutEncoder.Encode(resp); err == nil {
 		err = Prog.pipeIO.stdoutWriter.Flush()
-		if resp.IpcID != IPCID_SRCDIAG_PUB && len(resp.SrcMods) == 0 && resp.Menu == nil {
-			copy := *resp
-			bw, _ := json.Marshal(copy)
-			want := string(bw)
-			bh, _ := copy.preview_MarshalJSON()
-			have := string(bh)
-			if want != have && strings.Index(want, `\u`) < 0 {
-				println("WANT:" + want)
-				println("HAVE:" + have)
-			}
-		}
 	}
 	return
 }
@@ -78,13 +65,13 @@ func Serve() (err error) {
 	// - edit: dropped for now /* was: "allows json-decoding in separate go-routine" */
 	// - bad lines are simply reported to client without having a single 'global' decoder in confused/error state / without needing to exit
 	for Prog.pipeIO.stdinReadLn.Scan() {
-		go serveIncomingReq(Prog.pipeIO.stdinReadLn.Text())
+		go serveIncomingReq(append(make([]byte, 0, 64), Prog.pipeIO.stdinReadLn.Bytes()...))
 	}
 	err = Prog.pipeIO.stdinReadLn.Err()
 	return
 }
 
-func serveIncomingReq(jsonreq string) {
+func serveIncomingReq(jsonreq []byte) {
 	// println(jsonreq)
 	resp := ipcDecodeReqAndRespond(jsonreq)
 

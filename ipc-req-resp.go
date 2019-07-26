@@ -1,7 +1,6 @@
 package z
 
 import (
-	"encoding/json"
 	"runtime/debug"
 	"strings"
 )
@@ -16,10 +15,10 @@ type IObjSnap interface {
 	ObjSnap(string) interface{}
 }
 
-func ipcDecodeReqAndRespond(jsonreq string) *IpcResp {
+func ipcDecodeReqAndRespond(jsonreq []byte) *IpcResp {
 	var req IpcReq
 	var resp IpcResp
-	if err := json.NewDecoder(strings.NewReader(jsonreq)).Decode(&req); err != nil {
+	if err := req.UnmarshalJSON(jsonreq); err != nil {
 		resp.ErrMsg = err.Error()
 	} else if Lang.InitErr != nil {
 		resp.ErrMsg = Strf("%s does not appear to be installed correctly on this machine. (Re-)Install it or disable `"+Prog.Name+"` in your editor config to avoid repeats of this message. Init-time error message was:\n\n%s", Lang.Title, Lang.InitErr)

@@ -293,11 +293,11 @@ formatNum:
 	return
 }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me *IpcReq) preview_MarshalJSON() (r []byte, err error) { panic("IpcReq"); return }
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me *IpcReq) MarshalJSON() (r []byte, err error) { panic("IpcReq"); return }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *IpcReq) preview_UnmarshalJSON(b []byte) (err error) {
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *IpcReq) UnmarshalJSON(b []byte) (err error) {
 	j := pkg__encoding_json.NewDecoder(pkg__bytes.NewReader(b))
 	j.UseNumber()
 	err = me.__gent__jsonUnmarshal_Decode(j)
@@ -382,8 +382,8 @@ func (me *IpcReq) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (e
 	return
 }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me *IpcResp) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me *IpcResp) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if me == nil {
 		r = append(r, "null"...)
@@ -407,7 +407,7 @@ func (me *IpcResp) preview_MarshalJSON() (r []byte, err error) {
 				r = append(r, ",\"sI\":"...)
 				var e error
 				var sl []byte
-				sl, e = me.SrcIntel.preview_MarshalJSON()
+				sl, e = me.SrcIntel.MarshalJSON()
 				if e == nil {
 					r = append(r, sl...)
 				} else {
@@ -421,7 +421,7 @@ func (me *IpcResp) preview_MarshalJSON() (r []byte, err error) {
 				r = append(r, ",\"srcDiags\":"...)
 				var e error
 				var sl []byte
-				sl, e = me.SrcDiags.preview_MarshalJSON()
+				sl, e = me.SrcDiags.MarshalJSON()
 				if e == nil {
 					r = append(r, sl...)
 				} else {
@@ -434,7 +434,7 @@ func (me *IpcResp) preview_MarshalJSON() (r []byte, err error) {
 			r = append(r, ",\"srcMods\":"...)
 			var e error
 			var sl []byte
-			sl, e = me.SrcMods.preview_MarshalJSON()
+			sl, e = me.SrcMods.MarshalJSON()
 			if e == nil {
 				r = append(r, sl...)
 			} else {
@@ -445,13 +445,13 @@ func (me *IpcResp) preview_MarshalJSON() (r []byte, err error) {
 		if len(me.SrcActions) != 0 {
 			r = append(r, ",\"srcActions\":"...)
 			r = append(r, 91)
-			ai21 := len(r)
-			for i20 := range me.SrcActions {
+			ai27 := len(r)
+			for i26 := range me.SrcActions {
 				{
 					r = append(r, 44)
 					var e error
 					var sl []byte
-					sl, e = me.SrcActions[i20].preview_MarshalJSON()
+					sl, e = me.SrcActions[i26].MarshalJSON()
 					if e == nil {
 						r = append(r, sl...)
 					} else {
@@ -461,8 +461,8 @@ func (me *IpcResp) preview_MarshalJSON() (r []byte, err error) {
 				}
 			}
 			r = append(r, 93)
-			if r[ai21] == 44 {
-				r = append(r[:ai21], r[(ai21+1):]...)
+			if r[ai27] == 44 {
+				r = append(r[:ai27], r[(ai27+1):]...)
 			}
 		}
 		if nil != me.Extras {
@@ -470,7 +470,7 @@ func (me *IpcResp) preview_MarshalJSON() (r []byte, err error) {
 				r = append(r, ",\"extras\":"...)
 				var e error
 				var sl []byte
-				sl, e = me.Extras.preview_MarshalJSON()
+				sl, e = me.Extras.MarshalJSON()
 				if e == nil {
 					r = append(r, sl...)
 				} else {
@@ -484,7 +484,7 @@ func (me *IpcResp) preview_MarshalJSON() (r []byte, err error) {
 				r = append(r, ",\"menu\":"...)
 				var e error
 				var sl []byte
-				sl, e = me.Menu.preview_MarshalJSON()
+				sl, e = me.Menu.MarshalJSON()
 				if e == nil {
 					r = append(r, sl...)
 				} else {
@@ -498,7 +498,7 @@ func (me *IpcResp) preview_MarshalJSON() (r []byte, err error) {
 				r = append(r, ",\"caddy\":"...)
 				var e error
 				var sl []byte
-				sl, e = me.CaddyUpdate.preview_MarshalJSON()
+				sl, e = me.CaddyUpdate.MarshalJSON()
 				if e == nil {
 					r = append(r, sl...)
 				} else {
@@ -525,11 +525,11 @@ func (me *IpcResp) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *IpcResp) preview_UnmarshalJSON(b []byte) (err error) { panic("IpcResp"); return }
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *IpcResp) UnmarshalJSON(b []byte) (err error) { panic("IpcResp"); return }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me *Diags) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me *Diags) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if me == nil {
 		r = append(r, "null"...)
@@ -540,7 +540,7 @@ func (me *Diags) preview_MarshalJSON() (r []byte, err error) {
 			r = append(r, ",\"All\":"...)
 			var e error
 			var sl []byte
-			sl, e = me.All.preview_MarshalJSON()
+			sl, e = me.All.MarshalJSON()
 			if e == nil {
 				r = append(r, sl...)
 			} else {
@@ -554,14 +554,14 @@ func (me *Diags) preview_MarshalJSON() (r []byte, err error) {
 		} else {
 			r = append(r, ",\"FixUps\":"...)
 			r = append(r, 91)
-			ai9 := len(r)
-			for i8 := range me.FixUps {
-				if nil != me.FixUps[i8] {
+			ai11 := len(r)
+			for i10 := range me.FixUps {
+				if nil != me.FixUps[i10] {
 					{
 						r = append(r, 44)
 						var e error
 						var sl []byte
-						sl, e = me.FixUps[i8].preview_MarshalJSON()
+						sl, e = me.FixUps[i10].MarshalJSON()
 						if e == nil {
 							r = append(r, sl...)
 						} else {
@@ -575,8 +575,8 @@ func (me *Diags) preview_MarshalJSON() (r []byte, err error) {
 				}
 			}
 			r = append(r, 93)
-			if r[ai9] == 44 {
-				r = append(r[:ai9], r[(ai9+1):]...)
+			if r[ai11] == 44 {
+				r = append(r[:ai11], r[(ai11+1):]...)
 			}
 		}
 		{
@@ -591,11 +591,11 @@ func (me *Diags) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *Diags) preview_UnmarshalJSON(b []byte) (err error) { panic("Diags"); return }
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *Diags) UnmarshalJSON(b []byte) (err error) { panic("Diags"); return }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me *Extras) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me *Extras) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if me == nil {
 		r = append(r, "null"...)
@@ -611,7 +611,7 @@ func (me *Extras) preview_MarshalJSON() (r []byte, err error) {
 					r = append(r, 44)
 					var e error
 					var sl []byte
-					sl, e = me.SrcIntels.InfoTips[i2].preview_MarshalJSON()
+					sl, e = me.SrcIntels.InfoTips[i2].MarshalJSON()
 					if e == nil {
 						r = append(r, sl...)
 					} else {
@@ -629,7 +629,7 @@ func (me *Extras) preview_MarshalJSON() (r []byte, err error) {
 			r = append(r, ",\"Refs\":"...)
 			var e error
 			var sl []byte
-			sl, e = me.SrcIntels.Refs.preview_MarshalJSON()
+			sl, e = me.SrcIntels.Refs.MarshalJSON()
 			if e == nil {
 				r = append(r, sl...)
 			} else {
@@ -643,14 +643,14 @@ func (me *Extras) preview_MarshalJSON() (r []byte, err error) {
 		} else {
 			r = append(r, ",\"Items\":"...)
 			r = append(r, 91)
-			ai17 := len(r)
-			for i16 := range me.Items {
-				if nil != me.Items[i16] {
+			ai21 := len(r)
+			for i20 := range me.Items {
+				if nil != me.Items[i20] {
 					{
 						r = append(r, 44)
 						var e error
 						var sl []byte
-						sl, e = me.Items[i16].preview_MarshalJSON()
+						sl, e = me.Items[i20].MarshalJSON()
 						if e == nil {
 							r = append(r, sl...)
 						} else {
@@ -664,8 +664,8 @@ func (me *Extras) preview_MarshalJSON() (r []byte, err error) {
 				}
 			}
 			r = append(r, 93)
-			if r[ai17] == 44 {
-				r = append(r[:ai17], r[(ai17+1):]...)
+			if r[ai21] == 44 {
+				r = append(r[:ai21], r[(ai21+1):]...)
 			}
 		}
 		if len(me.Warns) != 0 {
@@ -694,11 +694,11 @@ func (me *Extras) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *Extras) preview_UnmarshalJSON(b []byte) (err error) { panic("Extras"); return }
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *Extras) UnmarshalJSON(b []byte) (err error) { panic("Extras"); return }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me *MenuResponse) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me *MenuResponse) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if me == nil {
 		r = append(r, "null"...)
@@ -710,7 +710,7 @@ func (me *MenuResponse) preview_MarshalJSON() (r []byte, err error) {
 				r = append(r, ",\"SubMenu\":"...)
 				var e error
 				var sl []byte
-				sl, e = me.SubMenu.preview_MarshalJSON()
+				sl, e = me.SubMenu.MarshalJSON()
 				if e == nil {
 					r = append(r, sl...)
 				} else {
@@ -739,7 +739,7 @@ func (me *MenuResponse) preview_MarshalJSON() (r []byte, err error) {
 			r = append(r, ",\"Refs\":"...)
 			var e error
 			var sl []byte
-			sl, e = me.Refs.preview_MarshalJSON()
+			sl, e = me.Refs.MarshalJSON()
 			if e == nil {
 				r = append(r, sl...)
 			} else {
@@ -755,11 +755,11 @@ func (me *MenuResponse) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *MenuResponse) preview_UnmarshalJSON(b []byte) (err error) { panic("MenuResponse"); return }
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *MenuResponse) UnmarshalJSON(b []byte) (err error) { panic("MenuResponse"); return }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me *SrcIntel) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me *SrcIntel) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if me == nil {
 		r = append(r, "null"...)
@@ -775,7 +775,7 @@ func (me *SrcIntel) preview_MarshalJSON() (r []byte, err error) {
 					r = append(r, 44)
 					var e error
 					var sl []byte
-					sl, e = me.SrcIntels.InfoTips[i2].preview_MarshalJSON()
+					sl, e = me.SrcIntels.InfoTips[i2].MarshalJSON()
 					if e == nil {
 						r = append(r, sl...)
 					} else {
@@ -793,7 +793,7 @@ func (me *SrcIntel) preview_MarshalJSON() (r []byte, err error) {
 			r = append(r, ",\"Refs\":"...)
 			var e error
 			var sl []byte
-			sl, e = me.SrcIntels.Refs.preview_MarshalJSON()
+			sl, e = me.SrcIntels.Refs.MarshalJSON()
 			if e == nil {
 				r = append(r, sl...)
 			} else {
@@ -806,7 +806,7 @@ func (me *SrcIntel) preview_MarshalJSON() (r []byte, err error) {
 				r = append(r, ",\"Sig\":"...)
 				var e error
 				var sl []byte
-				sl, e = me.Sig.preview_MarshalJSON()
+				sl, e = me.Sig.MarshalJSON()
 				if e == nil {
 					r = append(r, sl...)
 				} else {
@@ -819,7 +819,7 @@ func (me *SrcIntel) preview_MarshalJSON() (r []byte, err error) {
 			r = append(r, ",\"Cmpl\":"...)
 			var e error
 			var sl []byte
-			sl, e = me.Cmpl.preview_MarshalJSON()
+			sl, e = me.Cmpl.MarshalJSON()
 			if e == nil {
 				r = append(r, sl...)
 			} else {
@@ -831,7 +831,7 @@ func (me *SrcIntel) preview_MarshalJSON() (r []byte, err error) {
 			r = append(r, ",\"Syms\":"...)
 			var e error
 			var sl []byte
-			sl, e = me.Syms.preview_MarshalJSON()
+			sl, e = me.Syms.MarshalJSON()
 			if e == nil {
 				r = append(r, sl...)
 			} else {
@@ -842,14 +842,14 @@ func (me *SrcIntel) preview_MarshalJSON() (r []byte, err error) {
 		if len(me.Anns) != 0 {
 			r = append(r, ",\"Anns\":"...)
 			r = append(r, 91)
-			ai35 := len(r)
-			for i34 := range me.Anns {
-				if nil != me.Anns[i34] {
+			ai45 := len(r)
+			for i44 := range me.Anns {
+				if nil != me.Anns[i44] {
 					{
 						r = append(r, 44)
 						var e error
 						var sl []byte
-						sl, e = me.Anns[i34].preview_MarshalJSON()
+						sl, e = me.Anns[i44].MarshalJSON()
 						if e == nil {
 							r = append(r, sl...)
 						} else {
@@ -863,8 +863,8 @@ func (me *SrcIntel) preview_MarshalJSON() (r []byte, err error) {
 				}
 			}
 			r = append(r, 93)
-			if r[ai35] == 44 {
-				r = append(r[:ai35], r[(ai35+1):]...)
+			if r[ai45] == 44 {
+				r = append(r[:ai45], r[(ai45+1):]...)
 			}
 		}
 		r = append(r, 125)
@@ -875,11 +875,11 @@ func (me *SrcIntel) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *SrcIntel) preview_UnmarshalJSON(b []byte) (err error) { panic("SrcIntel"); return }
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *SrcIntel) UnmarshalJSON(b []byte) (err error) { panic("SrcIntel"); return }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me *Caddy) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me *Caddy) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if me == nil {
 		r = append(r, "null"...)
@@ -937,11 +937,11 @@ func (me *Caddy) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *Caddy) preview_UnmarshalJSON(b []byte) (err error) { panic("Caddy"); return }
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *Caddy) UnmarshalJSON(b []byte) (err error) { panic("Caddy"); return }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me *DiagFixUps) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me *DiagFixUps) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if me == nil {
 		r = append(r, "null"...)
@@ -982,7 +982,7 @@ func (me *DiagFixUps) preview_MarshalJSON() (r []byte, err error) {
 			r = append(r, ",\"Edits\":"...)
 			var e error
 			var sl []byte
-			sl, e = me.Edits.preview_MarshalJSON()
+			sl, e = me.Edits.MarshalJSON()
 			if e == nil {
 				r = append(r, sl...)
 			} else {
@@ -996,13 +996,13 @@ func (me *DiagFixUps) preview_MarshalJSON() (r []byte, err error) {
 		} else {
 			r = append(r, ",\"Dropped\":"...)
 			r = append(r, 91)
-			ai12 := len(r)
-			for i11 := range me.Dropped {
+			ai14 := len(r)
+			for i13 := range me.Dropped {
 				{
 					r = append(r, 44)
 					var e error
 					var sl []byte
-					sl, e = me.Dropped[i11].preview_MarshalJSON()
+					sl, e = me.Dropped[i13].MarshalJSON()
 					if e == nil {
 						r = append(r, sl...)
 					} else {
@@ -1012,8 +1012,8 @@ func (me *DiagFixUps) preview_MarshalJSON() (r []byte, err error) {
 				}
 			}
 			r = append(r, 93)
-			if r[ai12] == 44 {
-				r = append(r[:ai12], r[(ai12+1):]...)
+			if r[ai14] == 44 {
+				r = append(r[:ai14], r[(ai14+1):]...)
 			}
 		}
 		r = append(r, 125)
@@ -1024,11 +1024,11 @@ func (me *DiagFixUps) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *DiagFixUps) preview_UnmarshalJSON(b []byte) (err error) { panic("DiagFixUps"); return }
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *DiagFixUps) UnmarshalJSON(b []byte) (err error) { panic("DiagFixUps"); return }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me *DiagItem) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me *DiagItem) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if me == nil {
 		r = append(r, "null"...)
@@ -1043,7 +1043,7 @@ func (me *DiagItem) preview_MarshalJSON() (r []byte, err error) {
 			r = append(r, ",\"Loc\":"...)
 			var e error
 			var sl []byte
-			sl, e = me.Loc.preview_MarshalJSON()
+			sl, e = me.Loc.MarshalJSON()
 			if e == nil {
 				r = append(r, sl...)
 			} else {
@@ -1058,13 +1058,13 @@ func (me *DiagItem) preview_MarshalJSON() (r []byte, err error) {
 		if len(me.Rel) != 0 {
 			r = append(r, ",\"Rel\":"...)
 			r = append(r, 91)
-			ai9 := len(r)
-			for i8 := range me.Rel {
+			ai11 := len(r)
+			for i10 := range me.Rel {
 				{
 					r = append(r, 44)
 					var e error
 					var sl []byte
-					sl, e = me.Rel[i8].preview_MarshalJSON()
+					sl, e = me.Rel[i10].MarshalJSON()
 					if e == nil {
 						r = append(r, sl...)
 					} else {
@@ -1074,20 +1074,20 @@ func (me *DiagItem) preview_MarshalJSON() (r []byte, err error) {
 				}
 			}
 			r = append(r, 93)
-			if r[ai9] == 44 {
-				r = append(r[:ai9], r[(ai9+1):]...)
+			if r[ai11] == 44 {
+				r = append(r[:ai11], r[(ai11+1):]...)
 			}
 		}
 		if len(me.SrcActions) != 0 {
 			r = append(r, ",\"SrcActions\":"...)
 			r = append(r, 91)
-			ai17 := len(r)
-			for i16 := range me.SrcActions {
+			ai21 := len(r)
+			for i20 := range me.SrcActions {
 				{
 					r = append(r, 44)
 					var e error
 					var sl []byte
-					sl, e = me.SrcActions[i16].preview_MarshalJSON()
+					sl, e = me.SrcActions[i20].MarshalJSON()
 					if e == nil {
 						r = append(r, sl...)
 					} else {
@@ -1097,8 +1097,8 @@ func (me *DiagItem) preview_MarshalJSON() (r []byte, err error) {
 				}
 			}
 			r = append(r, 93)
-			if r[ai17] == 44 {
-				r = append(r[:ai17], r[(ai17+1):]...)
+			if r[ai21] == 44 {
+				r = append(r[:ai21], r[(ai21+1):]...)
 			}
 		}
 		if me.StickyAuto {
@@ -1108,16 +1108,16 @@ func (me *DiagItem) preview_MarshalJSON() (r []byte, err error) {
 		if len(me.Tags) != 0 {
 			r = append(r, ",\"Tags\":"...)
 			r = append(r, 91)
-			ai25 := len(r)
-			for i24 := range me.Tags {
+			ai31 := len(r)
+			for i30 := range me.Tags {
 				{
 					r = append(r, 44)
-					r = append(r, pkg__strconv.FormatInt((int64)(me.Tags[i24]), 10)...)
+					r = append(r, pkg__strconv.FormatInt((int64)(me.Tags[i30]), 10)...)
 				}
 			}
 			r = append(r, 93)
-			if r[ai25] == 44 {
-				r = append(r[:ai25], r[(ai25+1):]...)
+			if r[ai31] == 44 {
+				r = append(r[:ai31], r[(ai31+1):]...)
 			}
 		}
 		r = append(r, 125)
@@ -1128,11 +1128,11 @@ func (me *DiagItem) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *DiagItem) preview_UnmarshalJSON(b []byte) (err error) { panic("DiagItem"); return }
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *DiagItem) UnmarshalJSON(b []byte) (err error) { panic("DiagItem"); return }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me DiagItems) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me DiagItems) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if nil == me {
 		r = append(r, "null"...)
@@ -1145,7 +1145,7 @@ func (me DiagItems) preview_MarshalJSON() (r []byte, err error) {
 					r = append(r, 44)
 					var e error
 					var sl []byte
-					sl, e = me[i1].preview_MarshalJSON()
+					sl, e = me[i1].MarshalJSON()
 					if e == nil {
 						r = append(r, sl...)
 					} else {
@@ -1166,11 +1166,11 @@ func (me DiagItems) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *DiagItems) preview_UnmarshalJSON(b []byte) (err error) { panic("DiagItems"); return }
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *DiagItems) UnmarshalJSON(b []byte) (err error) { panic("DiagItems"); return }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me DiagItemsBy) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me DiagItemsBy) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if nil == me {
 		r = append(r, "null"...)
@@ -1186,7 +1186,7 @@ func (me DiagItemsBy) preview_MarshalJSON() (r []byte, err error) {
 				}
 				var e error
 				var sl []byte
-				sl, e = mv3.preview_MarshalJSON()
+				sl, e = mv3.MarshalJSON()
 				if e == nil {
 					r = append(r, sl...)
 				} else {
@@ -1203,11 +1203,11 @@ func (me DiagItemsBy) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *DiagItemsBy) preview_UnmarshalJSON(b []byte) (err error) { panic("DiagItemsBy"); return }
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *DiagItemsBy) UnmarshalJSON(b []byte) (err error) { panic("DiagItemsBy"); return }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me *EditorAction) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me *EditorAction) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if me == nil {
 		r = append(r, "null"...)
@@ -1253,11 +1253,11 @@ func (me *EditorAction) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *EditorAction) preview_UnmarshalJSON(b []byte) (err error) { panic("EditorAction"); return }
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *EditorAction) UnmarshalJSON(b []byte) (err error) { panic("EditorAction"); return }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me *ExtrasItem) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me *ExtrasItem) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if me == nil {
 		r = append(r, "null"...)
@@ -1296,11 +1296,11 @@ func (me *ExtrasItem) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *ExtrasItem) preview_UnmarshalJSON(b []byte) (err error) { panic("ExtrasItem"); return }
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *ExtrasItem) UnmarshalJSON(b []byte) (err error) { panic("ExtrasItem"); return }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me *Menu) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me *Menu) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if me == nil {
 		r = append(r, "null"...)
@@ -1319,7 +1319,7 @@ func (me *Menu) preview_MarshalJSON() (r []byte, err error) {
 			r = append(r, ",\"items\":"...)
 			var e error
 			var sl []byte
-			sl, e = me.Items.preview_MarshalJSON()
+			sl, e = me.Items.MarshalJSON()
 			if e == nil {
 				r = append(r, sl...)
 			} else {
@@ -1335,11 +1335,11 @@ func (me *Menu) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *Menu) preview_UnmarshalJSON(b []byte) (err error) { panic("Menu"); return }
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *Menu) UnmarshalJSON(b []byte) (err error) { panic("Menu"); return }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me MenuItems) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me MenuItems) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if nil == me {
 		r = append(r, "null"...)
@@ -1352,7 +1352,7 @@ func (me MenuItems) preview_MarshalJSON() (r []byte, err error) {
 					r = append(r, 44)
 					var e error
 					var sl []byte
-					sl, e = me[i1].preview_MarshalJSON()
+					sl, e = me[i1].MarshalJSON()
 					if e == nil {
 						r = append(r, sl...)
 					} else {
@@ -1373,11 +1373,11 @@ func (me MenuItems) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *MenuItems) preview_UnmarshalJSON(b []byte) (err error) { panic("MenuItems"); return }
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *MenuItems) UnmarshalJSON(b []byte) (err error) { panic("MenuItems"); return }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me *MenuItem) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me *MenuItem) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if me == nil {
 		r = append(r, "null"...)
@@ -1426,11 +1426,11 @@ func (me *MenuItem) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *MenuItem) preview_UnmarshalJSON(b []byte) (err error) { panic("MenuItem"); return }
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *MenuItem) UnmarshalJSON(b []byte) (err error) { panic("MenuItem"); return }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me *MenuItemArgPrompt) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me *MenuItemArgPrompt) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if me == nil {
 		r = append(r, "null"...)
@@ -1457,14 +1457,11 @@ func (me *MenuItemArgPrompt) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *MenuItemArgPrompt) preview_UnmarshalJSON(b []byte) (err error) {
-	panic("MenuItemArgPrompt")
-	return
-}
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *MenuItemArgPrompt) UnmarshalJSON(b []byte) (err error) { panic("MenuItemArgPrompt"); return }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me *SrcAnnotaction) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me *SrcAnnotaction) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if me == nil {
 		r = append(r, "null"...)
@@ -1475,7 +1472,7 @@ func (me *SrcAnnotaction) preview_MarshalJSON() (r []byte, err error) {
 			r = append(r, ",\"Range\":"...)
 			var e error
 			var sl []byte
-			sl, e = me.Range.preview_MarshalJSON()
+			sl, e = me.Range.MarshalJSON()
 			if e == nil {
 				r = append(r, sl...)
 			} else {
@@ -1503,11 +1500,11 @@ func (me *SrcAnnotaction) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *SrcAnnotaction) preview_UnmarshalJSON(b []byte) (err error) { panic("SrcAnnotaction"); return }
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *SrcAnnotaction) UnmarshalJSON(b []byte) (err error) { panic("SrcAnnotaction"); return }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me *SrcInfoTip) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me *SrcInfoTip) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if me == nil {
 		r = append(r, "null"...)
@@ -1530,11 +1527,11 @@ func (me *SrcInfoTip) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *SrcInfoTip) preview_UnmarshalJSON(b []byte) (err error) { panic("SrcInfoTip"); return }
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *SrcInfoTip) UnmarshalJSON(b []byte) (err error) { panic("SrcInfoTip"); return }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me *SrcIntelCompl) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me *SrcIntelCompl) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if me == nil {
 		r = append(r, "null"...)
@@ -1554,7 +1551,7 @@ func (me *SrcIntelCompl) preview_MarshalJSON() (r []byte, err error) {
 				r = append(r, ",\"documentation\":"...)
 				var e error
 				var sl []byte
-				sl, e = me.Documentation.preview_MarshalJSON()
+				sl, e = me.Documentation.MarshalJSON()
 				if e == nil {
 					r = append(r, sl...)
 				} else {
@@ -1579,11 +1576,11 @@ func (me *SrcIntelCompl) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *SrcIntelCompl) preview_UnmarshalJSON(b []byte) (err error) { panic("SrcIntelCompl"); return }
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *SrcIntelCompl) UnmarshalJSON(b []byte) (err error) { panic("SrcIntelCompl"); return }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me SrcIntelCompls) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me SrcIntelCompls) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if nil == me {
 		r = append(r, "null"...)
@@ -1596,7 +1593,7 @@ func (me SrcIntelCompls) preview_MarshalJSON() (r []byte, err error) {
 					r = append(r, 44)
 					var e error
 					var sl []byte
-					sl, e = me[i1].preview_MarshalJSON()
+					sl, e = me[i1].MarshalJSON()
 					if e == nil {
 						r = append(r, sl...)
 					} else {
@@ -1617,11 +1614,11 @@ func (me SrcIntelCompls) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *SrcIntelCompls) preview_UnmarshalJSON(b []byte) (err error) { panic("SrcIntelCompls"); return }
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *SrcIntelCompls) UnmarshalJSON(b []byte) (err error) { panic("SrcIntelCompls"); return }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me *SrcIntels) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me *SrcIntels) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if me == nil {
 		r = append(r, "null"...)
@@ -1637,7 +1634,7 @@ func (me *SrcIntels) preview_MarshalJSON() (r []byte, err error) {
 					r = append(r, 44)
 					var e error
 					var sl []byte
-					sl, e = me.InfoTips[i2].preview_MarshalJSON()
+					sl, e = me.InfoTips[i2].MarshalJSON()
 					if e == nil {
 						r = append(r, sl...)
 					} else {
@@ -1655,7 +1652,7 @@ func (me *SrcIntels) preview_MarshalJSON() (r []byte, err error) {
 			r = append(r, ",\"Refs\":"...)
 			var e error
 			var sl []byte
-			sl, e = me.Refs.preview_MarshalJSON()
+			sl, e = me.Refs.MarshalJSON()
 			if e == nil {
 				r = append(r, sl...)
 			} else {
@@ -1671,11 +1668,11 @@ func (me *SrcIntels) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *SrcIntels) preview_UnmarshalJSON(b []byte) (err error) { panic("SrcIntels"); return }
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *SrcIntels) UnmarshalJSON(b []byte) (err error) { panic("SrcIntels"); return }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me *SrcIntelDoc) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me *SrcIntelDoc) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if me == nil {
 		r = append(r, "null"...)
@@ -1698,11 +1695,11 @@ func (me *SrcIntelDoc) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *SrcIntelDoc) preview_UnmarshalJSON(b []byte) (err error) { panic("SrcIntelDoc"); return }
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *SrcIntelDoc) UnmarshalJSON(b []byte) (err error) { panic("SrcIntelDoc"); return }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me *SrcIntelSigHelp) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me *SrcIntelSigHelp) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if me == nil {
 		r = append(r, "null"...)
@@ -1726,7 +1723,7 @@ func (me *SrcIntelSigHelp) preview_MarshalJSON() (r []byte, err error) {
 					r = append(r, 44)
 					var e error
 					var sl []byte
-					sl, e = me.Signatures[i2].preview_MarshalJSON()
+					sl, e = me.Signatures[i2].MarshalJSON()
 					if e == nil {
 						r = append(r, sl...)
 					} else {
@@ -1748,14 +1745,11 @@ func (me *SrcIntelSigHelp) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *SrcIntelSigHelp) preview_UnmarshalJSON(b []byte) (err error) {
-	panic("SrcIntelSigHelp")
-	return
-}
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *SrcIntelSigHelp) UnmarshalJSON(b []byte) (err error) { panic("SrcIntelSigHelp"); return }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me *SrcIntelSigInfo) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me *SrcIntelSigInfo) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if me == nil {
 		r = append(r, "null"...)
@@ -1770,7 +1764,7 @@ func (me *SrcIntelSigInfo) preview_MarshalJSON() (r []byte, err error) {
 			r = append(r, ",\"documentation\":"...)
 			var e error
 			var sl []byte
-			sl, e = me.Documentation.preview_MarshalJSON()
+			sl, e = me.Documentation.MarshalJSON()
 			if e == nil {
 				r = append(r, sl...)
 			} else {
@@ -1784,13 +1778,13 @@ func (me *SrcIntelSigInfo) preview_MarshalJSON() (r []byte, err error) {
 		} else {
 			r = append(r, ",\"parameters\":"...)
 			r = append(r, 91)
-			ai9 := len(r)
-			for i8 := range me.Parameters {
+			ai11 := len(r)
+			for i10 := range me.Parameters {
 				{
 					r = append(r, 44)
 					var e error
 					var sl []byte
-					sl, e = me.Parameters[i8].preview_MarshalJSON()
+					sl, e = me.Parameters[i10].MarshalJSON()
 					if e == nil {
 						r = append(r, sl...)
 					} else {
@@ -1800,8 +1794,8 @@ func (me *SrcIntelSigInfo) preview_MarshalJSON() (r []byte, err error) {
 				}
 			}
 			r = append(r, 93)
-			if r[ai9] == 44 {
-				r = append(r[:ai9], r[(ai9+1):]...)
+			if r[ai11] == 44 {
+				r = append(r[:ai11], r[(ai11+1):]...)
 			}
 		}
 		r = append(r, 125)
@@ -1812,14 +1806,11 @@ func (me *SrcIntelSigInfo) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *SrcIntelSigInfo) preview_UnmarshalJSON(b []byte) (err error) {
-	panic("SrcIntelSigInfo")
-	return
-}
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *SrcIntelSigInfo) UnmarshalJSON(b []byte) (err error) { panic("SrcIntelSigInfo"); return }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me *SrcIntelSigParam) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me *SrcIntelSigParam) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if me == nil {
 		r = append(r, "null"...)
@@ -1834,7 +1825,7 @@ func (me *SrcIntelSigParam) preview_MarshalJSON() (r []byte, err error) {
 			r = append(r, ",\"documentation\":"...)
 			var e error
 			var sl []byte
-			sl, e = me.Documentation.preview_MarshalJSON()
+			sl, e = me.Documentation.MarshalJSON()
 			if e == nil {
 				r = append(r, sl...)
 			} else {
@@ -1850,14 +1841,11 @@ func (me *SrcIntelSigParam) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *SrcIntelSigParam) preview_UnmarshalJSON(b []byte) (err error) {
-	panic("SrcIntelSigParam")
-	return
-}
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *SrcIntelSigParam) UnmarshalJSON(b []byte) (err error) { panic("SrcIntelSigParam"); return }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me SrcLenses) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me SrcLenses) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if nil == me {
 		r = append(r, "null"...)
@@ -1870,7 +1858,7 @@ func (me SrcLenses) preview_MarshalJSON() (r []byte, err error) {
 					r = append(r, 44)
 					var e error
 					var sl []byte
-					sl, e = me[i1].preview_MarshalJSON()
+					sl, e = me[i1].MarshalJSON()
 					if e == nil {
 						r = append(r, sl...)
 					} else {
@@ -1891,11 +1879,11 @@ func (me SrcLenses) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *SrcLenses) preview_UnmarshalJSON(b []byte) (err error) { panic("SrcLenses"); return }
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *SrcLenses) UnmarshalJSON(b []byte) (err error) { panic("SrcLenses"); return }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me *SrcLens) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me *SrcLens) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if me == nil {
 		r = append(r, "null"...)
@@ -1915,7 +1903,7 @@ func (me *SrcLens) preview_MarshalJSON() (r []byte, err error) {
 				r = append(r, ",\"p\":"...)
 				var e error
 				var sl []byte
-				sl, e = me.SrcLoc.Pos.preview_MarshalJSON()
+				sl, e = me.SrcLoc.Pos.MarshalJSON()
 				if e == nil {
 					r = append(r, sl...)
 				} else {
@@ -1929,7 +1917,7 @@ func (me *SrcLens) preview_MarshalJSON() (r []byte, err error) {
 				r = append(r, ",\"r\":"...)
 				var e error
 				var sl []byte
-				sl, e = me.SrcLoc.Range.preview_MarshalJSON()
+				sl, e = me.SrcLoc.Range.MarshalJSON()
 				if e == nil {
 					r = append(r, sl...)
 				} else {
@@ -1958,8 +1946,8 @@ func (me *SrcLens) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *SrcLens) preview_UnmarshalJSON(b []byte) (err error) {
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *SrcLens) UnmarshalJSON(b []byte) (err error) {
 	j := pkg__encoding_json.NewDecoder(pkg__bytes.NewReader(b))
 	j.UseNumber()
 	err = me.__gent__jsonUnmarshal_Decode(j)
@@ -1967,13 +1955,13 @@ func (me *SrcLens) preview_UnmarshalJSON(b []byte) (err error) {
 }
 
 func (me *SrcLens) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
-	var t9 pkg__encoding_json.Token
-	t9, err = j.Token()
-	if (err == nil) && (t9 != nil) {
-		switch d10 := t9.(type) {
+	var t15 pkg__encoding_json.Token
+	t15, err = j.Token()
+	if (err == nil) && (t15 != nil) {
+		switch d16 := t15.(type) {
 		case nil:
 		case pkg__encoding_json.Delim:
-			if 0x7b != d10 {
+			if 0x7b != d16 {
 				err = pkg__errors.New("expected {")
 			} else {
 				for (err == nil) && j.More() {
@@ -1982,13 +1970,51 @@ func (me *SrcLens) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (
 					if err == nil {
 						fn2 := jk1.(string)
 						switch fn2 {
-						case "SrcLoc":
-							err = me.SrcLoc.__gent__jsonUnmarshal_Decode(j)
-						case "t":
+						case "e":
 							var jt3 pkg__encoding_json.Token
 							jt3, err = j.Token()
 							if (err == nil) && (jt3 != nil) {
 								switch v := jt3.(type) {
+								case nil:
+								case pkg__encoding_json.Number:
+									var v4 int64
+									v4, err = v.Int64()
+									if err == nil {
+										me.SrcLoc.Flag = (int)(v4)
+									}
+								default:
+									err = pkg__errors.New("expected pkg__encoding_json.Number")
+								}
+							}
+						case "f":
+							var jt5 pkg__encoding_json.Token
+							jt5, err = j.Token()
+							if (err == nil) && (jt5 != nil) {
+								switch v := jt5.(type) {
+								case nil:
+								case string:
+									me.SrcLoc.FilePath = v
+								default:
+									err = pkg__errors.New("expected string")
+								}
+							}
+						case "p":
+							var pv7 SrcPos
+							err = pv7.__gent__jsonUnmarshal_Decode(j)
+							if err == nil {
+								me.SrcLoc.Pos = &pv7
+							}
+						case "r":
+							var pv8 SrcRange
+							err = pv8.__gent__jsonUnmarshal_Decode(j)
+							if err == nil {
+								me.SrcLoc.Range = &pv8
+							}
+						case "t":
+							var jt9 pkg__encoding_json.Token
+							jt9, err = j.Token()
+							if (err == nil) && (jt9 != nil) {
+								switch v := jt9.(type) {
 								case nil:
 								case string:
 									me.Txt = v
@@ -1997,10 +2023,10 @@ func (me *SrcLens) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (
 								}
 							}
 						case "s":
-							var jt5 pkg__encoding_json.Token
-							jt5, err = j.Token()
-							if (err == nil) && (jt5 != nil) {
-								switch v := jt5.(type) {
+							var jt11 pkg__encoding_json.Token
+							jt11, err = j.Token()
+							if (err == nil) && (jt11 != nil) {
+								switch v := jt11.(type) {
 								case nil:
 								case string:
 									me.Str = v
@@ -2009,10 +2035,10 @@ func (me *SrcLens) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (
 								}
 							}
 						case "l":
-							var jt7 pkg__encoding_json.Token
-							jt7, err = j.Token()
-							if (err == nil) && (jt7 != nil) {
-								switch v := jt7.(type) {
+							var jt13 pkg__encoding_json.Token
+							jt13, err = j.Token()
+							if (err == nil) && (jt13 != nil) {
+								switch v := jt13.(type) {
 								case nil:
 								case bool:
 									me.CrLf = v
@@ -2036,8 +2062,8 @@ func (me *SrcLens) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (
 	return
 }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me *SrcLoc) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me *SrcLoc) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if me == nil {
 		r = append(r, "null"...)
@@ -2057,7 +2083,7 @@ func (me *SrcLoc) preview_MarshalJSON() (r []byte, err error) {
 				r = append(r, ",\"p\":"...)
 				var e error
 				var sl []byte
-				sl, e = me.Pos.preview_MarshalJSON()
+				sl, e = me.Pos.MarshalJSON()
 				if e == nil {
 					r = append(r, sl...)
 				} else {
@@ -2071,7 +2097,7 @@ func (me *SrcLoc) preview_MarshalJSON() (r []byte, err error) {
 				r = append(r, ",\"r\":"...)
 				var e error
 				var sl []byte
-				sl, e = me.Range.preview_MarshalJSON()
+				sl, e = me.Range.MarshalJSON()
 				if e == nil {
 					r = append(r, sl...)
 				} else {
@@ -2088,8 +2114,8 @@ func (me *SrcLoc) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *SrcLoc) preview_UnmarshalJSON(b []byte) (err error) {
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *SrcLoc) UnmarshalJSON(b []byte) (err error) {
 	j := pkg__encoding_json.NewDecoder(pkg__bytes.NewReader(b))
 	j.UseNumber()
 	err = me.__gent__jsonUnmarshal_Decode(j)
@@ -2168,8 +2194,8 @@ func (me *SrcLoc) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (e
 	return
 }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me SrcLocs) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me SrcLocs) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if nil == me {
 		r = append(r, "null"...)
@@ -2182,7 +2208,7 @@ func (me SrcLocs) preview_MarshalJSON() (r []byte, err error) {
 					r = append(r, 44)
 					var e error
 					var sl []byte
-					sl, e = me[i1].preview_MarshalJSON()
+					sl, e = me[i1].MarshalJSON()
 					if e == nil {
 						r = append(r, sl...)
 					} else {
@@ -2203,11 +2229,11 @@ func (me SrcLocs) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *SrcLocs) preview_UnmarshalJSON(b []byte) (err error) { panic("SrcLocs"); return }
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *SrcLocs) UnmarshalJSON(b []byte) (err error) { panic("SrcLocs"); return }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me *SrcModEdit) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me *SrcModEdit) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if me == nil {
 		r = append(r, "null"...)
@@ -2219,7 +2245,7 @@ func (me *SrcModEdit) preview_MarshalJSON() (r []byte, err error) {
 				r = append(r, ",\"At\":"...)
 				var e error
 				var sl []byte
-				sl, e = me.At.preview_MarshalJSON()
+				sl, e = me.At.MarshalJSON()
 				if e == nil {
 					r = append(r, sl...)
 				} else {
@@ -2243,11 +2269,11 @@ func (me *SrcModEdit) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *SrcModEdit) preview_UnmarshalJSON(b []byte) (err error) { panic("SrcModEdit"); return }
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *SrcModEdit) UnmarshalJSON(b []byte) (err error) { panic("SrcModEdit"); return }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me SrcModEdits) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me SrcModEdits) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if nil == me {
 		r = append(r, "null"...)
@@ -2259,7 +2285,7 @@ func (me SrcModEdits) preview_MarshalJSON() (r []byte, err error) {
 				r = append(r, 44)
 				var e error
 				var sl []byte
-				sl, e = me[i1].preview_MarshalJSON()
+				sl, e = me[i1].MarshalJSON()
 				if e == nil {
 					r = append(r, sl...)
 				} else {
@@ -2276,11 +2302,11 @@ func (me SrcModEdits) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *SrcModEdits) preview_UnmarshalJSON(b []byte) (err error) { panic("SrcModEdits"); return }
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *SrcModEdits) UnmarshalJSON(b []byte) (err error) { panic("SrcModEdits"); return }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me *SrcPos) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me *SrcPos) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if me == nil {
 		r = append(r, "null"...)
@@ -2307,8 +2333,8 @@ func (me *SrcPos) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *SrcPos) preview_UnmarshalJSON(b []byte) (err error) {
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *SrcPos) UnmarshalJSON(b []byte) (err error) {
 	j := pkg__encoding_json.NewDecoder(pkg__bytes.NewReader(b))
 	j.UseNumber()
 	err = me.__gent__jsonUnmarshal_Decode(j)
@@ -2395,8 +2421,8 @@ func (me *SrcPos) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (e
 	return
 }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me *SrcRange) preview_MarshalJSON() (r []byte, err error) {
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me *SrcRange) MarshalJSON() (r []byte, err error) {
 	r = make([]byte, 0, 64)
 	if me == nil {
 		r = append(r, "null"...)
@@ -2407,7 +2433,7 @@ func (me *SrcRange) preview_MarshalJSON() (r []byte, err error) {
 			r = append(r, ",\"s\":"...)
 			var e error
 			var sl []byte
-			sl, e = me.Start.preview_MarshalJSON()
+			sl, e = me.Start.MarshalJSON()
 			if e == nil {
 				r = append(r, sl...)
 			} else {
@@ -2419,7 +2445,7 @@ func (me *SrcRange) preview_MarshalJSON() (r []byte, err error) {
 			r = append(r, ",\"e\":"...)
 			var e error
 			var sl []byte
-			sl, e = me.End.preview_MarshalJSON()
+			sl, e = me.End.MarshalJSON()
 			if e == nil {
 				r = append(r, sl...)
 			} else {
@@ -2435,8 +2461,8 @@ func (me *SrcRange) preview_MarshalJSON() (r []byte, err error) {
 	return
 }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *SrcRange) preview_UnmarshalJSON(b []byte) (err error) {
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *SrcRange) UnmarshalJSON(b []byte) (err error) {
 	j := pkg__encoding_json.NewDecoder(pkg__bytes.NewReader(b))
 	j.UseNumber()
 	err = me.__gent__jsonUnmarshal_Decode(j)
@@ -2479,14 +2505,11 @@ func (me *SrcRange) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) 
 	return
 }
 
-// preview_MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
-func (me *WorkspaceChanges) preview_MarshalJSON() (r []byte, err error) {
-	panic("WorkspaceChanges")
-	return
-}
+// MarshalJSON implements the Go standard library's `encoding/json.Marshaler` interface.
+func (me *WorkspaceChanges) MarshalJSON() (r []byte, err error) { panic("WorkspaceChanges"); return }
 
-// preview_UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
-func (me *WorkspaceChanges) preview_UnmarshalJSON(b []byte) (err error) {
+// UnmarshalJSON implements the Go standard library's `encoding/json.Unmarshaler` interface.
+func (me *WorkspaceChanges) UnmarshalJSON(b []byte) (err error) {
 	j := pkg__encoding_json.NewDecoder(pkg__bytes.NewReader(b))
 	j.UseNumber()
 	err = me.__gent__jsonUnmarshal_Decode(j)
@@ -2594,20 +2617,25 @@ func __gent__jsonMarshal_interface____(v interface{}) (r []byte, err error) {
 					sl = ([]byte)("null")
 				}
 			} else {
-				v6, ok7 := v.(map[string]interface{})
-				if ok7 {
-					sl, e = __gent__jsonMarshal_mapsstring_interface____(v6)
+				v8, ok9 := v.(map[string]interface{})
+				if ok9 {
+					sl, e = __gent__jsonMarshal_mapsstring_interface____(v8)
 				} else {
-					v4, ok5 := v.([]string)
-					if ok5 {
-						sl, e = __gent__jsonMarshal_s_string(v4)
+					v6, ok7 := v.(MenuItemArgPrompt)
+					if ok7 {
+						sl, e = __gent__jsonMarshal_MenuItemArgPrompt(v6)
 					} else {
-						v2, ok3 := v.(string)
-						if ok3 {
-							sl, e = __gent__jsonMarshal_string(v2)
+						v4, ok5 := v.([]string)
+						if ok5 {
+							sl, e = __gent__jsonMarshal_s_string(v4)
 						} else {
-							sl, e = pkg__encoding_json.Marshal(v)
-							panic(v)
+							v2, ok3 := v.(string)
+							if ok3 {
+								sl, e = __gent__jsonMarshal_string(v2)
+							} else {
+								sl, e = pkg__encoding_json.Marshal(v)
+								panic(v)
+							}
 						}
 					}
 				}
@@ -2635,16 +2663,31 @@ func __gent__jsonMarshal_s_string(v []string) (r []byte, err error) {
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 91)
-		ai9 := len(r)
-		for i8 := range v {
+		ai11 := len(r)
+		for i10 := range v {
 			{
 				r = append(r, 44)
-				r = append(r, pkg__strconv.Quote(v[i8])...)
+				r = append(r, pkg__strconv.Quote(v[i10])...)
 			}
 		}
 		r = append(r, 93)
-		if r[ai9] == 44 {
-			r = append(r[:ai9], r[(ai9+1):]...)
+		if r[ai11] == 44 {
+			r = append(r[:ai11], r[(ai11+1):]...)
+		}
+	}
+	return
+}
+
+func __gent__jsonMarshal_MenuItemArgPrompt(v MenuItemArgPrompt) (r []byte, err error) {
+	{
+		var e error
+		var sl []byte
+		sl, e = v.MarshalJSON()
+		if e == nil {
+			r = append(r, sl...)
+		} else {
+			err = e
+			return
 		}
 	}
 	return
@@ -2655,13 +2698,13 @@ func __gent__jsonMarshal_mapsstring_interface____(v map[string]interface{}) (r [
 		r = append(r, "null"...)
 	} else {
 		r = append(r, 123)
-		mi10 := len(r)
-		for mk11, mv12 := range v {
-			sl, e := __gent__jsonMarshal_interface____(mv12)
+		mi20 := len(r)
+		for mk21, mv22 := range v {
+			sl, e := __gent__jsonMarshal_interface____(mv22)
 			if e == nil {
 				{
 					r = append(r, 44)
-					r = append(r, pkg__strconv.Quote(mk11)...)
+					r = append(r, pkg__strconv.Quote(mk21)...)
 					r = append(r, 58)
 				}
 				r = append(r, sl...)
@@ -2671,8 +2714,8 @@ func __gent__jsonMarshal_mapsstring_interface____(v map[string]interface{}) (r [
 			}
 		}
 		r = append(r, 125)
-		if r[mi10] == 44 {
-			r = append(r[:mi10], r[(mi10+1):]...)
+		if r[mi20] == 44 {
+			r = append(r[:mi20], r[(mi20+1):]...)
 		}
 	}
 	return
