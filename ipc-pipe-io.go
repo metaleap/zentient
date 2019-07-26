@@ -5,6 +5,7 @@ import (
 	"runtime/debug"
 
 	"github.com/go-leap/run"
+	"github.com/go-leap/str"
 )
 
 func canSend() bool {
@@ -72,13 +73,16 @@ func Serve() (err error) {
 }
 
 func serveIncomingReq(jsonreq []byte) {
-	// println(jsonreq)
 	resp := ipcDecodeReqAndRespond(jsonreq)
 
 	// err only covers: either resp couldn't be json-encoded, or stdout write/flush problem:
 	// both would indicate bigger problems -- still recover()ed in Serve(), but program-ending.
 	// any other kind of error, above ipcDecodeReqAndRespond call will record into resp.ErrMsg to report it back to the client and the program stays running
 	if err := send(resp); err != nil {
-		panic(err)
+		if errmsg := err.Error(); ustr.Has(errmsg, "in string escape code") {
+			SendNotificationMessageToClient(DIAG_SEV_ERR, ustr.Int(int(resp.ReqID)))
+		} else {
+			panic(err)
+		}
 	}
 }
