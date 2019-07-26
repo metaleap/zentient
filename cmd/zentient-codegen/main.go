@@ -59,6 +59,8 @@ func main() {
 		T.Empty.Interface,
 		T.SliceOf.Strings,
 		TSlice(T.Empty.Interface),
+		T.String,
+		T.Int,
 	}
 	gentjson.Gents.OtherTypes.Unmarshal.GenPanicImplsForOthers = true
 	gentjson.Gents.OtherTypes.Unmarshal.OnStdlibFallbacks = onUnmarshalStdlibAddPrintlnStmt

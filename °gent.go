@@ -305,38 +305,22 @@ func (me *IpcReq) UnmarshalJSON(b []byte) (err error) {
 }
 
 func (me *IpcReq) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
-	var t32 pkg__encoding_json.Token
-	t32, err = j.Token()
-	if (err == nil) && (t32 != nil) {
-		switch d33 := t32.(type) {
+	var t34 pkg__encoding_json.Token
+	t34, err = j.Token()
+	if (err == nil) && (t34 != nil) {
+		switch d35 := t34.(type) {
 		case nil:
 		case pkg__encoding_json.Delim:
-			if 0x7b != d33 {
+			if 0x7b != d35 {
 				err = pkg__errors.New("expected {")
 			} else {
 				for (err == nil) && j.More() {
-					var jk24 pkg__encoding_json.Token
-					jk24, err = j.Token()
+					var jk26 pkg__encoding_json.Token
+					jk26, err = j.Token()
 					if err == nil {
-						fn25 := jk24.(string)
-						switch fn25 {
+						fn27 := jk26.(string)
+						switch fn27 {
 						case "ri":
-							var jt26 pkg__encoding_json.Token
-							jt26, err = j.Token()
-							if (err == nil) && (jt26 != nil) {
-								switch v := jt26.(type) {
-								case nil:
-								case pkg__encoding_json.Number:
-									var v27 int64
-									v27, err = v.Int64()
-									if err == nil {
-										me.ReqID = (int64)(v27)
-									}
-								default:
-									err = pkg__errors.New("expected pkg__encoding_json.Number")
-								}
-							}
-						case "ii":
 							var jt28 pkg__encoding_json.Token
 							jt28, err = j.Token()
 							if (err == nil) && (jt28 != nil) {
@@ -346,7 +330,23 @@ func (me *IpcReq) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (e
 									var v29 int64
 									v29, err = v.Int64()
 									if err == nil {
-										me.IpcID = (IpcIDs)(v29)
+										me.ReqID = (int64)(v29)
+									}
+								default:
+									err = pkg__errors.New("expected pkg__encoding_json.Number")
+								}
+							}
+						case "ii":
+							var jt30 pkg__encoding_json.Token
+							jt30, err = j.Token()
+							if (err == nil) && (jt30 != nil) {
+								switch v := jt30.(type) {
+								case nil:
+								case pkg__encoding_json.Number:
+									var v31 int64
+									v31, err = v.Int64()
+									if err == nil {
+										me.IpcID = (IpcIDs)(v31)
 									}
 								default:
 									err = pkg__errors.New("expected pkg__encoding_json.Number")
@@ -355,16 +355,16 @@ func (me *IpcReq) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (e
 						case "ia":
 							me.IpcArgs, err = __gent__jsonUnmarshal_interface____(j)
 						case "projUpd":
-							var pv30 WorkspaceChanges
-							err = pv30.__gent__jsonUnmarshal_Decode(j)
+							var pv32 WorkspaceChanges
+							err = pv32.__gent__jsonUnmarshal_Decode(j)
 							if err == nil {
-								me.ProjUpd = &pv30
+								me.ProjUpd = &pv32
 							}
 						case "srcLens":
-							var pv31 SrcLens
-							err = pv31.__gent__jsonUnmarshal_Decode(j)
+							var pv33 SrcLens
+							err = pv33.__gent__jsonUnmarshal_Decode(j)
 							if err == nil {
-								me.SrcLens = &pv31
+								me.SrcLens = &pv33
 							}
 						}
 					}
@@ -1955,13 +1955,13 @@ func (me *SrcLens) UnmarshalJSON(b []byte) (err error) {
 }
 
 func (me *SrcLens) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
-	var t15 pkg__encoding_json.Token
-	t15, err = j.Token()
-	if (err == nil) && (t15 != nil) {
-		switch d16 := t15.(type) {
+	var t7 pkg__encoding_json.Token
+	t7, err = j.Token()
+	if (err == nil) && (t7 != nil) {
+		switch d8 := t7.(type) {
 		case nil:
 		case pkg__encoding_json.Delim:
-			if 0x7b != d16 {
+			if 0x7b != d8 {
 				err = pkg__errors.New("expected {")
 			} else {
 				for (err == nil) && j.More() {
@@ -1971,74 +1971,30 @@ func (me *SrcLens) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (
 						fn2 := jk1.(string)
 						switch fn2 {
 						case "e":
-							var jt3 pkg__encoding_json.Token
-							jt3, err = j.Token()
-							if (err == nil) && (jt3 != nil) {
-								switch v := jt3.(type) {
-								case nil:
-								case pkg__encoding_json.Number:
-									var v4 int64
-									v4, err = v.Int64()
-									if err == nil {
-										me.SrcLoc.Flag = (int)(v4)
-									}
-								default:
-									err = pkg__errors.New("expected pkg__encoding_json.Number")
-								}
-							}
+							me.SrcLoc.Flag, err = __gent__jsonUnmarshal_int(j)
 						case "f":
+							me.SrcLoc.FilePath, err = __gent__jsonUnmarshal_string(j)
+						case "p":
+							var pv3 SrcPos
+							err = pv3.__gent__jsonUnmarshal_Decode(j)
+							if err == nil {
+								me.SrcLoc.Pos = &pv3
+							}
+						case "r":
+							var pv4 SrcRange
+							err = pv4.__gent__jsonUnmarshal_Decode(j)
+							if err == nil {
+								me.SrcLoc.Range = &pv4
+							}
+						case "t":
+							me.Txt, err = __gent__jsonUnmarshal_string(j)
+						case "s":
+							me.Str, err = __gent__jsonUnmarshal_string(j)
+						case "l":
 							var jt5 pkg__encoding_json.Token
 							jt5, err = j.Token()
 							if (err == nil) && (jt5 != nil) {
 								switch v := jt5.(type) {
-								case nil:
-								case string:
-									me.SrcLoc.FilePath = v
-								default:
-									err = pkg__errors.New("expected string")
-								}
-							}
-						case "p":
-							var pv7 SrcPos
-							err = pv7.__gent__jsonUnmarshal_Decode(j)
-							if err == nil {
-								me.SrcLoc.Pos = &pv7
-							}
-						case "r":
-							var pv8 SrcRange
-							err = pv8.__gent__jsonUnmarshal_Decode(j)
-							if err == nil {
-								me.SrcLoc.Range = &pv8
-							}
-						case "t":
-							var jt9 pkg__encoding_json.Token
-							jt9, err = j.Token()
-							if (err == nil) && (jt9 != nil) {
-								switch v := jt9.(type) {
-								case nil:
-								case string:
-									me.Txt = v
-								default:
-									err = pkg__errors.New("expected string")
-								}
-							}
-						case "s":
-							var jt11 pkg__encoding_json.Token
-							jt11, err = j.Token()
-							if (err == nil) && (jt11 != nil) {
-								switch v := jt11.(type) {
-								case nil:
-								case string:
-									me.Str = v
-								default:
-									err = pkg__errors.New("expected string")
-								}
-							}
-						case "l":
-							var jt13 pkg__encoding_json.Token
-							jt13, err = j.Token()
-							if (err == nil) && (jt13 != nil) {
-								switch v := jt13.(type) {
 								case nil:
 								case bool:
 									me.CrLf = v
@@ -2123,13 +2079,13 @@ func (me *SrcLoc) UnmarshalJSON(b []byte) (err error) {
 }
 
 func (me *SrcLoc) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
-	var t9 pkg__encoding_json.Token
-	t9, err = j.Token()
-	if (err == nil) && (t9 != nil) {
-		switch d10 := t9.(type) {
+	var t5 pkg__encoding_json.Token
+	t5, err = j.Token()
+	if (err == nil) && (t5 != nil) {
+		switch d6 := t5.(type) {
 		case nil:
 		case pkg__encoding_json.Delim:
-			if 0x7b != d10 {
+			if 0x7b != d6 {
 				err = pkg__errors.New("expected {")
 			} else {
 				for (err == nil) && j.More() {
@@ -2139,44 +2095,20 @@ func (me *SrcLoc) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (e
 						fn2 := jk1.(string)
 						switch fn2 {
 						case "e":
-							var jt3 pkg__encoding_json.Token
-							jt3, err = j.Token()
-							if (err == nil) && (jt3 != nil) {
-								switch v := jt3.(type) {
-								case nil:
-								case pkg__encoding_json.Number:
-									var v4 int64
-									v4, err = v.Int64()
-									if err == nil {
-										me.Flag = (int)(v4)
-									}
-								default:
-									err = pkg__errors.New("expected pkg__encoding_json.Number")
-								}
-							}
+							me.Flag, err = __gent__jsonUnmarshal_int(j)
 						case "f":
-							var jt5 pkg__encoding_json.Token
-							jt5, err = j.Token()
-							if (err == nil) && (jt5 != nil) {
-								switch v := jt5.(type) {
-								case nil:
-								case string:
-									me.FilePath = v
-								default:
-									err = pkg__errors.New("expected string")
-								}
-							}
+							me.FilePath, err = __gent__jsonUnmarshal_string(j)
 						case "p":
-							var pv7 SrcPos
-							err = pv7.__gent__jsonUnmarshal_Decode(j)
+							var pv3 SrcPos
+							err = pv3.__gent__jsonUnmarshal_Decode(j)
 							if err == nil {
-								me.Pos = &pv7
+								me.Pos = &pv3
 							}
 						case "r":
-							var pv8 SrcRange
-							err = pv8.__gent__jsonUnmarshal_Decode(j)
+							var pv4 SrcRange
+							err = pv4.__gent__jsonUnmarshal_Decode(j)
 							if err == nil {
-								me.Range = &pv8
+								me.Range = &pv4
 							}
 						}
 					}
@@ -2342,13 +2274,13 @@ func (me *SrcPos) UnmarshalJSON(b []byte) (err error) {
 }
 
 func (me *SrcPos) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
-	var t9 pkg__encoding_json.Token
-	t9, err = j.Token()
-	if (err == nil) && (t9 != nil) {
-		switch d10 := t9.(type) {
+	var t3 pkg__encoding_json.Token
+	t3, err = j.Token()
+	if (err == nil) && (t3 != nil) {
+		switch d4 := t3.(type) {
 		case nil:
 		case pkg__encoding_json.Delim:
-			if 0x7b != d10 {
+			if 0x7b != d4 {
 				err = pkg__errors.New("expected {")
 			} else {
 				for (err == nil) && j.More() {
@@ -2358,53 +2290,11 @@ func (me *SrcPos) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (e
 						fn2 := jk1.(string)
 						switch fn2 {
 						case "l":
-							var jt3 pkg__encoding_json.Token
-							jt3, err = j.Token()
-							if (err == nil) && (jt3 != nil) {
-								switch v := jt3.(type) {
-								case nil:
-								case pkg__encoding_json.Number:
-									var v4 int64
-									v4, err = v.Int64()
-									if err == nil {
-										me.Ln = (int)(v4)
-									}
-								default:
-									err = pkg__errors.New("expected pkg__encoding_json.Number")
-								}
-							}
+							me.Ln, err = __gent__jsonUnmarshal_int(j)
 						case "c":
-							var jt5 pkg__encoding_json.Token
-							jt5, err = j.Token()
-							if (err == nil) && (jt5 != nil) {
-								switch v := jt5.(type) {
-								case nil:
-								case pkg__encoding_json.Number:
-									var v6 int64
-									v6, err = v.Int64()
-									if err == nil {
-										me.Col = (int)(v6)
-									}
-								default:
-									err = pkg__errors.New("expected pkg__encoding_json.Number")
-								}
-							}
+							me.Col, err = __gent__jsonUnmarshal_int(j)
 						case "o":
-							var jt7 pkg__encoding_json.Token
-							jt7, err = j.Token()
-							if (err == nil) && (jt7 != nil) {
-								switch v := jt7.(type) {
-								case nil:
-								case pkg__encoding_json.Number:
-									var v8 int64
-									v8, err = v.Int64()
-									if err == nil {
-										me.Off = (int)(v8)
-									}
-								default:
-									err = pkg__errors.New("expected pkg__encoding_json.Number")
-								}
-							}
+							me.Off, err = __gent__jsonUnmarshal_int(j)
 						}
 					}
 				}
@@ -2517,13 +2407,13 @@ func (me *WorkspaceChanges) UnmarshalJSON(b []byte) (err error) {
 }
 
 func (me *WorkspaceChanges) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.Decoder) (err error) {
-	var t11 pkg__encoding_json.Token
-	t11, err = j.Token()
-	if (err == nil) && (t11 != nil) {
-		switch d12 := t11.(type) {
+	var t9 pkg__encoding_json.Token
+	t9, err = j.Token()
+	if (err == nil) && (t9 != nil) {
+		switch d10 := t9.(type) {
 		case nil:
 		case pkg__encoding_json.Delim:
-			if 0x7b != d12 {
+			if 0x7b != d10 {
 				err = pkg__errors.New("expected {")
 			} else {
 				for (err == nil) && j.More() {
@@ -2543,13 +2433,13 @@ func (me *WorkspaceChanges) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.D
 						case "WrittenFiles":
 							me.WrittenFiles, err = __gent__jsonUnmarshal_s_string(j)
 						case "LiveFiles":
-							var t9 pkg__encoding_json.Token
-							t9, err = j.Token()
-							if (err == nil) && (t9 != nil) {
-								switch d10 := t9.(type) {
+							var t7 pkg__encoding_json.Token
+							t7, err = j.Token()
+							if (err == nil) && (t7 != nil) {
+								switch d8 := t7.(type) {
 								case nil:
 								case pkg__encoding_json.Delim:
-									if 0x7b != d10 {
+									if 0x7b != d8 {
 										err = pkg__errors.New("expected {")
 									} else {
 										t6 := make(map[string]string, 0)
@@ -2559,17 +2449,7 @@ func (me *WorkspaceChanges) __gent__jsonUnmarshal_Decode(j *pkg__encoding_json.D
 											if err == nil {
 												mk4 := jk3.(string)
 												var mv5 string
-												var jt7 pkg__encoding_json.Token
-												jt7, err = j.Token()
-												if (err == nil) && (jt7 != nil) {
-													switch v := jt7.(type) {
-													case nil:
-													case string:
-														mv5 = v
-													default:
-														err = pkg__errors.New("expected string")
-													}
-												}
+												mv5, err = __gent__jsonUnmarshal_string(j)
 												if err == nil {
 													t6[mk4] = mv5
 												}
@@ -2785,29 +2665,19 @@ func __gent__jsonUnmarshal_interface____(j *pkg__encoding_json.Decoder) (r inter
 }
 
 func __gent__jsonUnmarshal_s_string(j *pkg__encoding_json.Decoder) (r []string, err error) {
-	var t18 pkg__encoding_json.Token
-	t18, err = j.Token()
-	if (err == nil) && (t18 != nil) {
-		switch d19 := t18.(type) {
+	var t16 pkg__encoding_json.Token
+	t16, err = j.Token()
+	if (err == nil) && (t16 != nil) {
+		switch d17 := t16.(type) {
 		case nil:
 		case pkg__encoding_json.Delim:
-			if 0x5b != d19 {
+			if 0x5b != d17 {
 				err = pkg__errors.New("expected [")
 			} else {
 				sl14 := make([]string, 0, 0)
 				for (err == nil) && j.More() {
 					var v15 string
-					var jt16 pkg__encoding_json.Token
-					jt16, err = j.Token()
-					if (err == nil) && (jt16 != nil) {
-						switch v := jt16.(type) {
-						case nil:
-						case string:
-							v15 = v
-						default:
-							err = pkg__errors.New("expected string")
-						}
-					}
+					v15, err = __gent__jsonUnmarshal_string(j)
 					if err == nil {
 						sl14 = append(sl14, v15)
 					}
@@ -2827,32 +2697,66 @@ func __gent__jsonUnmarshal_s_string(j *pkg__encoding_json.Decoder) (r []string, 
 }
 
 func __gent__jsonUnmarshal_s_interface____(j *pkg__encoding_json.Decoder) (r []interface{}, err error) {
-	var t22 pkg__encoding_json.Token
-	t22, err = j.Token()
-	if (err == nil) && (t22 != nil) {
-		switch d23 := t22.(type) {
+	var t20 pkg__encoding_json.Token
+	t20, err = j.Token()
+	if (err == nil) && (t20 != nil) {
+		switch d21 := t20.(type) {
 		case nil:
 		case pkg__encoding_json.Delim:
-			if 0x5b != d23 {
+			if 0x5b != d21 {
 				err = pkg__errors.New("expected [")
 			} else {
-				sl20 := make([]interface{}, 0, 0)
+				sl18 := make([]interface{}, 0, 0)
 				for (err == nil) && j.More() {
-					var v21 interface{}
-					v21, err = __gent__jsonUnmarshal_interface____(j)
+					var v19 interface{}
+					v19, err = __gent__jsonUnmarshal_interface____(j)
 					if err == nil {
-						sl20 = append(sl20, v21)
+						sl18 = append(sl18, v19)
 					}
 				}
 				if err == nil {
 					_, err = j.Token()
 				}
 				if err == nil {
-					r = sl20
+					r = sl18
 				}
 			}
 		default:
 			err = pkg__errors.New("expected [")
+		}
+	}
+	return
+}
+
+func __gent__jsonUnmarshal_string(j *pkg__encoding_json.Decoder) (r string, err error) {
+	var jt22 pkg__encoding_json.Token
+	jt22, err = j.Token()
+	if (err == nil) && (jt22 != nil) {
+		switch v := jt22.(type) {
+		case nil:
+		case string:
+			r = v
+		default:
+			err = pkg__errors.New("expected string")
+		}
+	}
+	return
+}
+
+func __gent__jsonUnmarshal_int(j *pkg__encoding_json.Decoder) (r int, err error) {
+	var jt24 pkg__encoding_json.Token
+	jt24, err = j.Token()
+	if (err == nil) && (jt24 != nil) {
+		switch v := jt24.(type) {
+		case nil:
+		case pkg__encoding_json.Number:
+			var v25 int64
+			v25, err = v.Int64()
+			if err == nil {
+				r = (int)(v25)
+			}
+		default:
+			err = pkg__errors.New("expected pkg__encoding_json.Number")
 		}
 	}
 	return
