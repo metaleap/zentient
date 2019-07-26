@@ -20,10 +20,11 @@ func send(resp *IpcResp) (err error) {
 	if err = Prog.pipeIO.stdoutEncoder.Encode(resp); err == nil {
 		err = Prog.pipeIO.stdoutWriter.Flush()
 		if resp.IpcID != IPCID_SRCDIAG_PUB && len(resp.SrcMods) == 0 && resp.Menu == nil {
-			b, _ := resp.preview_MarshalJSON()
-			have := string(b)
-			b, _ = json.Marshal(resp)
-			want := string(b)
+			copy := *resp
+			bw, _ := json.Marshal(copy)
+			want := string(bw)
+			bh, _ := copy.preview_MarshalJSON()
+			have := string(bh)
 			if want != have && strings.Index(want, `\u`) < 0 {
 				println("WANT:" + want)
 				println("HAVE:" + have)

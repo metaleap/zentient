@@ -45,8 +45,9 @@ func main() {
 	gentjson.Gents.OtherTypes.Unmarshal.MayGenFor = func(t *gent.Type) bool {
 		return ustr.In(t.Name, typeNames4Unmarshal...)
 	}
-	gentjson.Gents.OtherTypes.RunOnlyForTypes.Named =
-		append(typeNames4Marshal, typeNames4Unmarshal...)
+	gentjson.Gents.OtherTypes.RunOnlyForTypes.Named = make([]string, len(typeNames4Marshal)+len(typeNames4Unmarshal))
+	copy(gentjson.Gents.OtherTypes.RunOnlyForTypes.Named[:len(typeNames4Marshal)], typeNames4Marshal)
+	copy(gentjson.Gents.OtherTypes.RunOnlyForTypes.Named[len(typeNames4Marshal):], typeNames4Unmarshal)
 
 	gentjson.Gents.OtherTypes.Marshal.ResliceInsteadOfWhitespace = true
 	gentjson.Gents.OtherTypes.Marshal.GenPanicImplsForOthers = true
@@ -56,6 +57,11 @@ func main() {
 		T.String,
 		T.SliceOf.Strings,
 		TMap(T.String, T.Empty.Interface),
+	}
+	gentjson.Gents.OtherTypes.Unmarshal.CommonTypesToExtractToHelpers = []*TypeRef{
+		T.Empty.Interface,
+		T.SliceOf.Strings,
+		TSlice(T.Empty.Interface),
 	}
 	gentjson.Gents.OtherTypes.Unmarshal.GenPanicImplsForOthers = true
 
