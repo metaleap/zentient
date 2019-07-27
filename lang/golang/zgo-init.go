@@ -8,7 +8,8 @@ import (
 )
 
 func OnPreInit() (err error) {
-	if z.Lang.ID, z.Lang.Title = "go", "Go"; !udevgo.HasGoDevEnv() {
+	z.Lang.ID, z.Lang.Title, z.Lang.Misc.BacktickStrings = "go", "Go", true
+	if !udevgo.HasGoDevEnv() {
 		err = errors.New("Go does not appear to be installed.")
 	} else {
 		settings.onPreInit()

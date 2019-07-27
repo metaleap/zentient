@@ -9,10 +9,13 @@
 var (
 	Strf = fmt.Sprintf
 	Lang struct {
-		InitErr   error
-		ID        string
-		Title     string
-		Live      bool
+		InitErr error
+		ID      string
+		Title   string
+		Live    bool
+		Misc    struct {
+			BacktickStrings bool
+		}
 		SrcMod    ISrcMod
 		SrcIntel  ISrcIntel
 		Diag      IDiag

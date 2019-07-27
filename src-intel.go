@@ -1,8 +1,8 @@
 package z
 
 import (
-	"fmt"
 	"sort"
+	"strconv"
 	"text/scanner"
 	"unicode/utf8"
 
@@ -125,7 +125,7 @@ func (me *SrcIntelBase) onHover(req *IpcReq, resp *IpcResp) {
 	} else if lex.Int != "" || lex.Float != "" {
 		if i, ui, f := ustr.ToI64(lex.Int, 0, 0), ustr.ToUi64(lex.Int, 0, 0), ustr.ToF64(lex.Float, 0); ui != 0 || i != 0 || f != 0 {
 			const strf = "`%s` — `%s`\n\n"
-			formats := []string{"%v", "%d", "%x", "%X", "%o", "%b", "%c", "%U", "%q"}
+			formats := []string{"%v", "%d", "%x", "%X", "%o", "%b" /*"%c",*/, "%U", "%q"}
 			if i == 0 && ui == 0 {
 				formats = []string{"%v", "%g", "%G", "%f", "%0f", "%.f", "%9.6f", "%b", "%e", "%E"}
 			}
@@ -139,12 +139,11 @@ func (me *SrcIntelBase) onHover(req *IpcReq, resp *IpcResp) {
 				}
 			}
 		}
-	} else if lex.String != "" {
-		var str string
-		if n, e := fmt.Sscanf(lex.String, "%q", &str); e != nil {
+	} else if lex.String != "" && (lex.String[0] != '`' || Lang.Misc.BacktickStrings) {
+		if str, e := strconv.Unquote(lex.String); e != nil {
 			hov.Value = e.Error()
-		} else if n > 0 && str != "" {
-			hov.Value = Strf("Byte-length: %d — rune count: %d\n\n---------------------------------------\n\n%s", len(str), utf8.RuneCountInString(str), str)
+		} else if str != "" {
+			hov.Value = Strf("%d byte(s), %d rune(s)", len(str), utf8.RuneCountInString(str))
 		}
 	} else if lex.Comment != "" {
 		if ustr.Pref(lex.Comment, "//") {
