@@ -516,7 +516,6 @@ func (me *IpcResp) MarshalJSON() (r []byte, err error) {
 			r = append(r[:si1], r[(si1+1):]...)
 		}
 	}
-	println(string(r))
 	return
 }
 
