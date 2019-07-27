@@ -165,7 +165,7 @@ func (me *atmoSrcIntel) Hovers(srcLens *z.SrcLens) (ret []z.SrcInfoTip) {
 				if tlc, astnodes := me.astAt(kit, srcLens); len(astnodes) > 0 {
 					var nodetypenames string
 					for _, n := range astnodes {
-						nodetypenames += z.Strf("— %T ", n)
+						nodetypenames += z.Strf("─ %T ", n)
 					}
 					ret = append(ret,
 						z.SrcInfoTip{Value: tlc.Ast.Def.Orig.Name.Val},
