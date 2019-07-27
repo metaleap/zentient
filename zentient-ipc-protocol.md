@@ -1,3 +1,5 @@
+(update: not in all detail up to speed with the codebase)
+
 # zentient IPC protocol
 
 Casual definitions of terms used in this doc:

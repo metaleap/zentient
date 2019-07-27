@@ -931,9 +931,6 @@ const (
 
 	IPCID_OBJ_SNAPSHOT
 	IPCID_PAGE_HTML
-	IPCID_TREEVIEW_GETITEM
-	IPCID_TREEVIEW_CHILDREN
-	IPCID_TREEVIEW_CHANGED
 	IPCID_CFG_RESETALL
 	IPCID_CFG_LIST
 	IPCID_CFG_SET
@@ -2386,21 +2383,6 @@ func (me *ToolingBase) MenuCategory() string
 
 ```go
 type Tools []*Tool
-```
-
-
-#### type TreeViewItem
-
-```go
-type TreeViewItem struct {
-	ID               string        `json:"id,omitempty"`
-	Label            string        `json:"label,omitempty"`
-	IconPath         string        `json:"iconPath,omitempty"`
-	Tooltip          string        `json:"tooltip,omitempty"`
-	Command          *EditorAction `json:"command,omitempty"`
-	ContextValue     string        `json:"contextValue,omitempty"`
-	CollapsibleState int           `json:"collapsibleState"`
-}
 ```
 
 
