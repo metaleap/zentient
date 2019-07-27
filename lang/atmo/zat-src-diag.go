@@ -3,6 +3,7 @@ package zat
 import (
 	"sync"
 
+	"github.com/go-leap/str"
 	"github.com/metaleap/atmo"
 	"github.com/metaleap/zentient"
 )
@@ -27,7 +28,7 @@ func (me *atmoDiag) updateFromErrs(_ bool) {
 		for _, err := range kit.Errors(errs2srcs) {
 			errdiag := &z.DiagItem{Msg: err.Error()}
 			if e, _ := err.(*atmo.Error); e != nil {
-				errdiag.Msg, errdiag.Cat = e.Msg(), e.Cat().String()
+				errdiag.Msg, errdiag.Cat = e.Msg(), "Æ"+ustr.Int(e.Code())+" #"+e.Cat().String()
 				if e.Cat() == atmo.ErrCatUnreachable {
 					errdiag.Tags = []int{1}
 				}
