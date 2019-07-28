@@ -13,11 +13,13 @@ var Ctx *atmosess.Ctx
 func OnPreInit() error {
 	z.Lang.ID, z.Lang.Title = "atmo", "atmo"
 	var ctx atmosess.Ctx
-	if err := ctx.Init(false, ""); err != nil {
+	kitimppath, err := ctx.Init(false, "")
+	if err != nil {
 		return err
 	}
 	Ctx, z.Lang.Live =
 		&ctx, liveMode
+	Ctx.KitsEnsureLoaded(true, kitimppath)
 	workspace.onPreInit()
 	Ctx.On.SomeKitsRefreshed = diag.updateFromErrs
 	Ctx.On.NewBackgroundMessages = onNewBackgroundMessages
