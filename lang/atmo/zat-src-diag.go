@@ -3,7 +3,6 @@ package zat
 import (
 	"sync"
 
-	"github.com/go-leap/str"
 	"github.com/metaleap/atmo"
 	"github.com/metaleap/zentient"
 )
@@ -24,26 +23,23 @@ type atmoDiag struct {
 func (me *atmoDiag) updateFromErrs(_ bool) {
 	var errdiags z.DiagItems
 	for _, kit := range Ctx.Kits.All {
-		errs2srcs := make(map[error][]byte, 4)
+		errs2srcs := make(map[*atmo.Error][]byte, 4)
 		for _, err := range kit.Errors(errs2srcs) {
-			errdiag := &z.DiagItem{Msg: err.Error()}
-			if e, _ := err.(*atmo.Error); e != nil {
-				errdiag.Msg, errdiag.Cat = e.Msg(), "Æ"+ustr.Int(e.Code())+" #"+e.Cat().String()
-				if e.Cat() == atmo.ErrCatUnreachable {
-					errdiag.Tags = []int{1}
+			errdiag := &z.DiagItem{Cat: err.CodeAndCat(), Msg: err.Msg()}
+			if err.Cat() == atmo.ErrCatUnreachable {
+				errdiag.Tags = []int{1}
+			}
+			if pos, src := err.Pos(), errs2srcs[err]; pos != nil {
+				errdiag.Loc.FilePath, errdiag.Loc.Pos = pos.FilePath, &z.SrcPos{}
+				if errdiag.Loc.Pos.Ln, errdiag.Loc.Pos.Col = pos.Ln1, pos.Col1; len(src) > 0 {
+					errdiag.Loc.Pos.SetRune1OffFromByte0Off(pos.Off0, src)
+				} else if pos.Ln1 < 1 || pos.Col1 < 1 {
+					errdiag.Loc.Pos.Off = 1 + pos.Off0
 				}
-				if pos, src := e.Pos(), errs2srcs[err]; pos != nil {
-					errdiag.Loc.FilePath, errdiag.Loc.Pos = pos.FilePath, &z.SrcPos{}
-					if errdiag.Loc.Pos.Ln, errdiag.Loc.Pos.Col = pos.Ln1, pos.Col1; len(src) > 0 {
-						errdiag.Loc.Pos.SetRune1OffFromByte0Off(pos.Off0, src)
-					} else if pos.Ln1 < 1 || pos.Col1 < 1 {
-						errdiag.Loc.Pos.Off = 1 + pos.Off0
-					}
-					if errlen := e.Len(); errlen > 1 && len(src) > 0 {
-						errdiag.Loc.Range = &z.SrcRange{}
-						errdiag.Loc.Range.Start.SetRune1OffFromByte0Off(pos.Off0, src)
-						errdiag.Loc.Range.End.SetRune1OffFromByte0Off(pos.Off0+errlen, src)
-					}
+				if errlen := err.Len(); errlen > 1 && len(src) > 0 {
+					errdiag.Loc.Range = &z.SrcRange{}
+					errdiag.Loc.Range.Start.SetRune1OffFromByte0Off(pos.Off0, src)
+					errdiag.Loc.Range.End.SetRune1OffFromByte0Off(pos.Off0+errlen, src)
 				}
 			}
 			errdiags = append(errdiags, errdiag)
