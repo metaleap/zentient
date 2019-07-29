@@ -56,7 +56,7 @@ func (me *DiagItem) resetAndInferSrcActions(maybeOrigSrcRef *udev.SrcMsg) {
 					me.SrcActions = append(me.SrcActions, EditorAction{
 						Cmd:       "zen.internal.openFileAt",
 						Title:     Strf("Jump to %s", filepath.Base(fpathref)),
-						Arguments: []interface{}{fpathref},
+						Arguments: []string{fpathref},
 					})
 				}
 			}
@@ -72,7 +72,7 @@ func (me *DiagItem) resetAndInferSrcActions(maybeOrigSrcRef *udev.SrcMsg) {
 					Cmd:       "zen.internal.replaceText",
 					Title:     "Apply Suggestion",
 					Hint:      ustr.Join(notes, "\n"),
-					Arguments: []interface{}{from, to},
+					Arguments: []string{from, to},
 				})
 			}
 			me.Msg += " —\n" + ustr.Join(append([]string{"Instead of:\n\t" + from, "Consider:\n\t" + to}, notes...), "\n")
@@ -139,4 +139,88 @@ func (me *DiagBase) NewDiagItemFrom(srcRef *udev.SrcMsg, toolName string, fallba
 	di.Loc.SetFilePathAndPosOrRangeFrom(srcRef, fallbackFilePath)
 	di.resetAndInferSrcActions(srcRef)
 	return
+}
+
+func (me DiagItems) dropDupls() DiagItems {
+	for i := 0; i < len(me); i++ {
+		for j := i + 1; j < len(me); j++ {
+			if me[i].equivTo(me[j]) {
+				me = append(me[:j], me[j+1:]...)
+				i = i - 1
+				break
+			}
+		}
+	}
+	return me
+}
+
+func (me *DiagItem) equivTo(cmp *DiagItem) bool {
+	if me != nil && cmp != nil && me != cmp {
+		if !(me.Cat == cmp.Cat && me.Msg == cmp.Msg && me.StickyAuto == cmp.StickyAuto && me.StickyForce == cmp.StickyForce && len(me.Tags) == len(cmp.Tags) && len(me.Rel) == len(cmp.Rel) && len(me.SrcActions) == len(cmp.SrcActions) && me.Loc.equivTo(&cmp.Loc)) {
+			return false
+		} else {
+			for i, t := range me.Tags {
+				if t != cmp.Tags[i] {
+					return false
+				}
+			}
+			for i := range me.Rel {
+				if !(me.Rel[i].equivTo(&cmp.Rel[i])) {
+					return false
+				}
+			}
+			for i := range me.SrcActions {
+				if !me.SrcActions[i].equivTo(&cmp.SrcActions[i]) {
+					return false
+				}
+			}
+			return true
+		}
+	}
+	return me == cmp
+}
+
+func (me *EditorAction) equivTo(cmp *EditorAction) bool {
+	if me != nil && cmp != nil && me != cmp {
+		if len(me.Arguments) != len(cmp.Arguments) {
+			return false
+		}
+		for i := range me.Arguments {
+			if me.Arguments[i] != cmp.Arguments[i] {
+				return false
+			}
+		}
+		return me.Cmd == cmp.Cmd && me.Hint == cmp.Hint && me.Title == cmp.Title
+	}
+	return me == cmp
+}
+
+func (me *SrcLens) equivTo(cmp *SrcLens) bool {
+	if me != nil && cmp != nil && me != cmp {
+		return me.CrLf == cmp.CrLf && me.Str == cmp.Str && me.Txt == cmp.Txt &&
+			me.SrcLoc.equivTo(&cmp.SrcLoc)
+	}
+	return me == cmp
+}
+
+func (me *SrcLoc) equivTo(cmp *SrcLoc) bool {
+	if me != nil && cmp != nil && me != cmp {
+		return me.FilePath == cmp.FilePath && me.Flag == cmp.Flag &&
+			me.Pos.equivTo(cmp.Pos) && me.Range.equivTo(cmp.Range)
+	}
+	return me == cmp
+}
+
+func (me *SrcPos) equivTo(cmp *SrcPos) bool {
+	if me != nil && cmp != nil && me != cmp {
+		return me.Off == cmp.Off || (me.Ln == cmp.Ln && me.Col == cmp.Col)
+	}
+	return me == cmp
+}
+
+func (me *SrcRange) equivTo(cmp *SrcRange) bool {
+	if me != nil && cmp != nil && me != cmp {
+		return me.Start.equivTo(&cmp.Start) && me.End.equivTo(&cmp.End)
+	}
+	return me == cmp
 }

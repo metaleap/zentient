@@ -262,7 +262,7 @@ func (me *DiagBase) send(workspaceFiles WorkspaceFiles, onlyBuildDiags bool) {
 		if onlyBuildDiags {
 			fdiagitems = f.Diags.Build.Items
 		}
-		resp.All[f.Path] = fdiagitems
+		resp.All[f.Path] = fdiagitems.dropDupls()
 	}
 	send(&IpcResp{IpcID: IPCID_SRCDIAG_PUB, SrcDiags: resp})
 }

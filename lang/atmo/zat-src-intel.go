@@ -191,13 +191,8 @@ func (me *atmoSrcIntel) Hovers(srcLens *z.SrcLens) (ret []z.SrcInfoTip) {
 					)
 
 					if _, ilnodes := kit.IrNodeOfAstNode(tlc.Id(), astnodes[0]); len(ilnodes) > 0 {
-						for _, n := range ilnodes {
-							if nid, _ := n.(*atmoil.IrIdentName); nid != nil {
-								ret = append(ret, z.SrcInfoTip{Value: z.Strf("(resolves to %v candidate/s)", len(nid.Anns.Candidates))})
-							}
-							// ret = append(ret,
-							// 	z.SrcInfoTip{Value: z.Strf("%T:\n%s", n, n.Facts().Description()), Language: "plain"},
-							// )
+						if nid, _ := ilnodes[0].(*atmoil.IrIdentName); nid != nil {
+							ret = append(ret, z.SrcInfoTip{Value: z.Strf("(resolves to %v candidate/s)", len(nid.Anns.Candidates))})
 						}
 					}
 				}

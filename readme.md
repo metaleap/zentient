@@ -581,10 +581,10 @@ interface.
 
 ```go
 type EditorAction struct {
-	Title     string        `json:"title"`
-	Cmd       string        `json:"command"`
-	Hint      string        `json:"tooltip,omitempty"`
-	Arguments []interface{} `json:"arguments,omitempty"`
+	Title     string   `json:"title"`
+	Cmd       string   `json:"command"`
+	Hint      string   `json:"tooltip,omitempty"`
+	Arguments []string `json:"arguments,omitempty"`
 }
 ```
 

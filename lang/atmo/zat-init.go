@@ -1,11 +1,10 @@
 package zat
 
 import (
-	"time"
-
 	"github.com/go-leap/str"
 	"github.com/metaleap/atmo/session"
 	"github.com/metaleap/zentient"
+	"time"
 )
 
 const liveMode = true
@@ -17,7 +16,6 @@ func OnPreInit() error {
 	var ctx atmosess.Ctx
 	ctx.On.SomeKitsRefreshed = diag.updateFromErrs
 	ctx.On.NewBackgroundMessages = onNewBackgroundMessages
-	ctx.Options.FileModsCatchup.BurstLimit = 456 * time.Millisecond
 	kitimppath, err := ctx.Init(false, "")
 	if err != nil {
 		return err
@@ -28,6 +26,7 @@ func OnPreInit() error {
 	workspace.onPreInit()
 	diag.updateFromErrs(Ctx, true)
 	onNewBackgroundMessages(Ctx)
+	ctx.Options.FileModsCatchup.BurstLimit = 789 * time.Millisecond
 	return nil
 }
 
