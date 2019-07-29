@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"github.com/metaleap/atmo"
+	"github.com/metaleap/atmo/session"
 	"github.com/metaleap/zentient"
 )
 
@@ -20,9 +21,9 @@ type atmoDiag struct {
 	errDiags z.DiagItems
 }
 
-func (me *atmoDiag) updateFromErrs(_ bool) {
+func (me *atmoDiag) updateFromErrs(ctx *atmosess.Ctx, hadFreshErrs bool) {
 	var errdiags z.DiagItems
-	for _, kit := range Ctx.Kits.All {
+	for _, kit := range ctx.Kits.All {
 		errs2srcs := make(map[*atmo.Error][]byte, 4)
 		for _, err := range kit.Errors(errs2srcs) {
 			errdiag := &z.DiagItem{Cat: err.CodeAndCat(), Msg: err.Msg()}

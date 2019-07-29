@@ -1,6 +1,8 @@
 package zat
 
 import (
+	"time"
+
 	"github.com/go-leap/str"
 	"github.com/metaleap/atmo/session"
 	"github.com/metaleap/zentient"
@@ -13,6 +15,9 @@ var Ctx *atmosess.Ctx
 func OnPreInit() error {
 	z.Lang.ID, z.Lang.Title = "atmo", "atmo"
 	var ctx atmosess.Ctx
+	ctx.On.SomeKitsRefreshed = diag.updateFromErrs
+	ctx.On.NewBackgroundMessages = onNewBackgroundMessages
+	ctx.Options.FileModsCatchup.BurstLimit = 456 * time.Millisecond
 	kitimppath, err := ctx.Init(false, "")
 	if err != nil {
 		return err
@@ -21,19 +26,17 @@ func OnPreInit() error {
 		&ctx, liveMode
 	Ctx.KitsEnsureLoaded(true, kitimppath)
 	workspace.onPreInit()
-	Ctx.On.SomeKitsRefreshed = diag.updateFromErrs
-	Ctx.On.NewBackgroundMessages = onNewBackgroundMessages
-	diag.updateFromErrs(true)
-	onNewBackgroundMessages()
+	diag.updateFromErrs(Ctx, true)
+	onNewBackgroundMessages(Ctx)
 	return nil
 }
 
 func OnPostInit() {
 }
 
-func onNewBackgroundMessages() {
-	Ctx.Locked(func() {
-		msgs := Ctx.BackgroundMessages(true)
+func onNewBackgroundMessages(ctx *atmosess.Ctx) {
+	ctx.Locked(func() {
+		msgs := ctx.BackgroundMessages(true)
 		for i := range msgs {
 			println(msgs[i].Time.Format("15:04:05") + "\t" + ustr.Join(msgs[i].Lines, "\n\t"))
 		}
