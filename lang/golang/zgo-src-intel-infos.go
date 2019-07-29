@@ -151,7 +151,7 @@ func (*goSrcIntel) goFuncDeclLineBreaks(decl string, maxlen int) string {
 	return decl
 }
 
-func (me *goSrcIntel) CanIntel(lex *z.SrcIntelLex) bool {
+func (me *goSrcIntel) CanIntelForCmplOrHover(lex *z.SrcIntelLex) bool {
 	return lex == nil || lex.Ident != "" || lex.Other != ""
 }
 

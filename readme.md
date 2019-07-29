@@ -854,7 +854,7 @@ type ISortable interface {
 
 ```go
 type ISrcIntel interface {
-	CanIntel(*SrcIntelLex) bool
+	CanIntelForCmplOrHover(*SrcIntelLex) bool
 	ComplDetails(*SrcLens, string) *SrcIntelCompl
 	ComplItems(*SrcLens) SrcIntelCompls
 	ComplItemsShouldSort(*SrcLens) bool
@@ -1584,10 +1584,10 @@ type SrcIntelBase struct {
 func (*SrcIntelBase) Annotactions(*SrcLens) []*SrcAnnotaction
 ```
 
-#### func (*SrcIntelBase) CanIntel
+#### func (*SrcIntelBase) CanIntelForCmplOrHover
 
 ```go
-func (*SrcIntelBase) CanIntel(*SrcIntelLex) bool
+func (*SrcIntelBase) CanIntelForCmplOrHover(*SrcIntelLex) bool
 ```
 
 #### func (*SrcIntelBase) ComplDetails

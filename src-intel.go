@@ -12,7 +12,7 @@ import (
 type ISrcIntel interface {
 	iDispatcher
 
-	CanIntel(*SrcIntelLex) bool
+	CanIntelForCmplOrHover(*SrcIntelLex) bool
 	ComplDetails(*SrcLens, string) *SrcIntelCompl
 	ComplItems(*SrcLens) SrcIntelCompls
 	ComplItemsShouldSort(*SrcLens) bool
@@ -79,7 +79,7 @@ func (me *SrcIntelBase) dispatch(req *IpcReq, resp *IpcResp) bool {
 }
 
 func (me *SrcIntelBase) onCmplItems(req *IpcReq, resp *IpcResp) {
-	if lex := me.posLex(req.SrcLens); me.Impl.CanIntel(lex) {
+	if lex := me.posLex(req.SrcLens); me.Impl.CanIntelForCmplOrHover(lex) {
 		resp.SrcIntel.Cmpl = me.Impl.ComplItems(req.SrcLens)
 		if me.Impl.ComplItemsShouldSort(req.SrcLens) {
 			for _, c := range resp.SrcIntel.Cmpl {
@@ -115,41 +115,43 @@ func (me *SrcIntelBase) onAnnotactions(req *IpcReq, resp *IpcResp) {
 
 func (me *SrcIntelBase) onHover(req *IpcReq, resp *IpcResp) {
 	lex := me.posLex(req.SrcLens)
-	if me.Impl.CanIntel(lex) {
+	if me.Impl.CanIntelForCmplOrHover(lex) {
 		resp.SrcIntel.InfoTips = me.Impl.Hovers(req.SrcLens)
 	}
 
 	var hov SrcInfoTip
-	if lex.Char != "" {
-		hov.Value = Strf("`%s` — byte length %d", lex.Char, len(lex.Char[:len(lex.Char)-1][1:]))
-	} else if lex.Int != "" || lex.Float != "" {
-		if i, ui, f := ustr.ToI64(lex.Int, 0, 0), ustr.ToUi64(lex.Int, 0, 0), ustr.ToF64(lex.Float, 0); ui != 0 || i != 0 || f != 0 {
-			const strf = "`%s` — `%s`\n\n"
-			formats := []string{"%v", "%d", "%x", "%X", "%o", "%b" /*"%c",*/, "%U", "%q"}
-			if i == 0 && ui == 0 {
-				formats = []string{"%v", "%g", "%G", "%f", "%0f", "%.f", "%9.6f", "%b", "%e", "%E"}
-			}
-			for _, format := range formats {
-				if ui > 0 {
-					hov.Value += Strf(strf, format, Strf(format, ui))
-				} else if i != 0 {
-					hov.Value += Strf(strf, format, Strf(format, i))
-				} else {
-					hov.Value += Strf(strf, format, Strf(format, f))
+	if lex != nil {
+		if lex.Char != "" {
+			hov.Value = Strf("`%s` — byte length %d", lex.Char, len(lex.Char[:len(lex.Char)-1][1:]))
+		} else if lex.Int != "" || lex.Float != "" {
+			if i, ui, f := ustr.ToI64(lex.Int, 0, 0), ustr.ToUi64(lex.Int, 0, 0), ustr.ToF64(lex.Float, 0); ui != 0 || i != 0 || f != 0 {
+				const strf = "`%s` — `%s`\n\n"
+				formats := []string{"%v", "%d", "%x", "%X", "%o", "%b" /*"%c",*/, "%U", "%q"}
+				if i == 0 && ui == 0 {
+					formats = []string{"%v", "%g", "%G", "%f", "%0f", "%.f", "%9.6f", "%b", "%e", "%E"}
+				}
+				for _, format := range formats {
+					if ui > 0 {
+						hov.Value += Strf(strf, format, Strf(format, ui))
+					} else if i != 0 {
+						hov.Value += Strf(strf, format, Strf(format, i))
+					} else {
+						hov.Value += Strf(strf, format, Strf(format, f))
+					}
 				}
 			}
-		}
-	} else if lex.String != "" && (lex.String[0] != '`' || Lang.Misc.BacktickStrings) {
-		if str, e := strconv.Unquote(lex.String); e != nil {
-			hov.Value = e.Error()
-		} else if str != "" {
-			hov.Value = Strf("%d byte(s), %d rune(s)", len(str), utf8.RuneCountInString(str))
-		}
-	} else if lex.Comment != "" {
-		if ustr.Pref(lex.Comment, "//") {
-			hov.Value = ustr.Trim(ustr.TrimPref(lex.Comment, "//"))
-		} else {
-			hov.Value = ustr.TrimSuff(ustr.TrimPref(lex.Comment, "/*"), "*/")
+		} else if lex.String != "" && (lex.String[0] != '`' || Lang.Misc.BacktickStrings) {
+			if str, e := strconv.Unquote(lex.String); e != nil {
+				hov.Value = e.Error()
+			} else if str != "" {
+				hov.Value = Strf("%d byte(s), %d rune(s)", len(str), utf8.RuneCountInString(str))
+			}
+		} else if lex.Comment != "" {
+			if ustr.Pref(lex.Comment, "//") {
+				hov.Value = ustr.Trim(ustr.TrimPref(lex.Comment, "//"))
+			} else {
+				hov.Value = ustr.TrimSuff(ustr.TrimPref(lex.Comment, "/*"), "*/")
+			}
 		}
 	}
 	if hov.Value != "" {
@@ -226,7 +228,7 @@ func (me *SrcIntelBase) posLex(srcLens *SrcLens) (posLex *SrcIntelLex) {
 }
 
 func (*SrcIntelBase) posLexErrNoOp(*scanner.Scanner, string)       {}
-func (*SrcIntelBase) CanIntel(*SrcIntelLex) bool                   { return true }
+func (*SrcIntelBase) CanIntelForCmplOrHover(*SrcIntelLex) bool     { return true }
 func (*SrcIntelBase) ComplItems(*SrcLens) SrcIntelCompls           { return nil }
 func (*SrcIntelBase) ComplDetails(*SrcLens, string) *SrcIntelCompl { return nil }
 func (*SrcIntelBase) ComplItemsShouldSort(*SrcLens) bool           { return false }
