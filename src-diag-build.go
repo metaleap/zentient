@@ -18,9 +18,9 @@ type FixUp struct {
 
 type IDiagBuild interface {
 	FixerUppers() []FixerUpper
-	PrepIssueJobs(WorkspaceFiles, []string) DiagBuildJobs
-	RunIssueJobs(DiagBuildJobs, WorkspaceFiles) DiagItems
-	UpdateIssueDiagsAsNeeded(WorkspaceFiles, []string)
+	PrepProbJobs(WorkspaceFiles, []string) DiagBuildJobs
+	RunProbJobs(DiagBuildJobs, WorkspaceFiles) DiagItems
+	UpdateProbDiagsAsNeeded(WorkspaceFiles, []string)
 }
 
 type DiagBuildJobs []*DiagJobBuild
@@ -121,8 +121,8 @@ func (me *DiagBase) fixUps(diags DiagItems) {
 	}
 }
 
-func (me *DiagBase) UpdateIssueDiagsAsNeeded(workspaceFiles WorkspaceFiles, writtenFiles []string) {
-	if jobs := me.Impl.PrepIssueJobs(workspaceFiles, writtenFiles).withoutDuplicates(); len(jobs) > 0 {
+func (me *DiagBase) UpdateProbDiagsAsNeeded(workspaceFiles WorkspaceFiles, writtenFiles []string) {
+	if jobs := me.Impl.PrepProbJobs(workspaceFiles, writtenFiles).withoutDuplicates(); len(jobs) > 0 {
 		sort.Sort(jobs)
 		for _, job := range jobs {
 			job.forgetPrevDiags(nil, false, workspaceFiles)
@@ -130,7 +130,7 @@ func (me *DiagBase) UpdateIssueDiagsAsNeeded(workspaceFiles WorkspaceFiles, writ
 		if !Lang.Live {
 			me.send(workspaceFiles, true)
 		}
-		diagitems := me.Impl.RunIssueJobs(jobs, workspaceFiles)
+		diagitems := me.Impl.RunProbJobs(jobs, workspaceFiles)
 		diagitems.propagate(false, true, workspaceFiles)
 		if len(diagitems) > 0 {
 			go me.fixUps(diagitems)

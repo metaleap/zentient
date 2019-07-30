@@ -64,9 +64,9 @@ func (me *DiagBase) menuItems(srcLens *SrcLens) (menu MenuItems) {
 			len(ds.files), workspacefiles.numDirs(func(f *WorkspaceFile) bool { return ds.files[f] }))
 		for dsf := range ds.files {
 			if me.cmdForgetAllDiags.Hint += " — " + filepath.Base(dsf.Path); !dsf.IsOpen {
-				if l := len(dsf.Diags.Lint.Items); l > 0 {
+				if l := len(dsf.Diags.Lintishs.Items); l > 0 {
 					hiddenlintfiles[dsf] = true
-					for _, lintdiag := range dsf.Diags.Lint.Items {
+					for _, lintdiag := range dsf.Diags.Lintishs.Items {
 						if !lintdiag.StickyAuto {
 							hiddenlintnum, hiddenlintcats[lintdiag.Cat] = hiddenlintnum+1, true
 						}
@@ -136,8 +136,8 @@ func (me *DiagBase) onPeekHidden(approxNum int, resp *MenuResponse) {
 	workspacefiles := Lang.Workspace.Files()
 	resp.Refs = make(SrcLocs, 0, approxNum)
 	for _, f := range workspacefiles {
-		if (!f.IsOpen) && len(f.Diags.Lint.Items) > 0 {
-			for _, lintdiag := range f.Diags.Lint.Items {
+		if (!f.IsOpen) && len(f.Diags.Lintishs.Items) > 0 {
+			for _, lintdiag := range f.Diags.Lintishs.Items {
 				if !lintdiag.StickyAuto {
 					resp.Refs = append(resp.Refs, &lintdiag.Loc)
 				}
@@ -248,19 +248,19 @@ func (me *DiagBase) onToggled() {
 	defer Lang.Workspace.Unlock()
 	workspaceFiles := Lang.Workspace.Files()
 	for _, f := range workspaceFiles {
-		f.Diags.Lint.forget(nil)
+		f.Diags.Lintishs.forget(nil)
 		f.Diags.AutoLintUpToDate = false
 	}
 	me.Impl.UpdateLintDiagsIfAndAsNeeded(workspaceFiles, true)
 }
 
-func (me *DiagBase) send(workspaceFiles WorkspaceFiles, onlyIssueDiags bool) {
+func (me *DiagBase) send(workspaceFiles WorkspaceFiles, onlyProbDiags bool) {
 	resp := &Diags{LangID: Lang.ID, All: make(DiagItemsBy, len(workspaceFiles))}
-	onlyIssueDiags = onlyIssueDiags || workspaceFiles.haveAnyDiags(true, false)
+	onlyProbDiags = onlyProbDiags || workspaceFiles.haveAnyDiags(true, false)
 	for _, f := range workspaceFiles {
-		fdiagitems := f.Diags.Lint.Items
-		if onlyIssueDiags {
-			fdiagitems = f.Diags.Issue.Items
+		fdiagitems := f.Diags.Lintishs.Items
+		if onlyProbDiags {
+			fdiagitems = f.Diags.Problems.Items
 		}
 		if fdiagitems != nil {
 			resp.All[f.Path] = fdiagitems.dropDupls()

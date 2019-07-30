@@ -328,16 +328,16 @@ func (me *DiagBase) MenuCategory() string
 func (me *DiagBase) NewDiagItemFrom(srcRef *udev.SrcMsg, toolName string, fallbackFilePath func() string) (di *DiagItem)
 ```
 
-#### func (*DiagBase) UpdateIssueDiagsAsNeeded
-
-```go
-func (me *DiagBase) UpdateIssueDiagsAsNeeded(workspaceFiles WorkspaceFiles, writtenFiles []string)
-```
-
 #### func (*DiagBase) UpdateLintDiagsIfAndAsNeeded
 
 ```go
 func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(workspaceFiles WorkspaceFiles, autos bool, onlyFilePaths ...string)
+```
+
+#### func (*DiagBase) UpdateProbDiagsAsNeeded
+
+```go
+func (me *DiagBase) UpdateProbDiagsAsNeeded(workspaceFiles WorkspaceFiles, writtenFiles []string)
 ```
 
 #### type DiagBuildJobs
@@ -714,9 +714,9 @@ type IDiag interface {
 ```go
 type IDiagBuild interface {
 	FixerUppers() []FixerUpper
-	PrepIssueJobs(WorkspaceFiles, []string) DiagBuildJobs
-	RunIssueJobs(DiagBuildJobs, WorkspaceFiles) DiagItems
-	UpdateIssueDiagsAsNeeded(WorkspaceFiles, []string)
+	PrepProbJobs(WorkspaceFiles, []string) DiagBuildJobs
+	RunProbJobs(DiagBuildJobs, WorkspaceFiles) DiagItems
+	UpdateProbDiagsAsNeeded(WorkspaceFiles, []string)
 }
 ```
 
@@ -2528,8 +2528,8 @@ type WorkspaceFile struct {
 	IsOpen bool `json:",omitempty"`
 	Diags  struct {
 		AutoLintUpToDate bool
-		Issue            diags
-		Lint             diags
+		Problems         diags
+		Lintishs         diags
 	}
 }
 ```
@@ -2548,10 +2548,10 @@ type WorkspaceFiles map[string]*WorkspaceFile
 func (me WorkspaceFiles) Has(fpath string) bool
 ```
 
-#### func (WorkspaceFiles) HasIssueDiags
+#### func (WorkspaceFiles) HasProbDiags
 
 ```go
-func (me WorkspaceFiles) HasIssueDiags(filePath string) (has bool)
+func (me WorkspaceFiles) HasProbDiags(filePath string) (has bool)
 ```
 
 #### func (WorkspaceFiles) IsOpen

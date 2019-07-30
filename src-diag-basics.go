@@ -83,9 +83,9 @@ func (me *DiagItem) resetAndInferSrcActions(maybeOrigSrcRef *udev.SrcMsg) {
 func (me DiagItems) propagate(lintDiags bool, diagsSticky bool, workspaceFiles WorkspaceFiles) {
 	for _, diag := range me {
 		f := workspaceFiles.ensure(diag.Loc.FilePath)
-		fd := &f.Diags.Lint
+		fd := &f.Diags.Lintishs
 		if (!lintDiags) && diag.Loc.Flag == int(DIAG_SEV_ERR) {
-			fd = &f.Diags.Issue
+			fd = &f.Diags.Problems
 		}
 		if diag.StickyForce, fd.Items = diagsSticky, append(fd.Items, diag); diagsSticky {
 			diag.StickyAuto = true
@@ -116,12 +116,12 @@ func (me *DiagJob) forgetPrevDiags(diagToolsIfLint Tools, setAutoUpToDateToTrueI
 		}
 		if f != nil {
 			if forbuild {
-				f.Diags.Issue.forget(nil)
+				f.Diags.Problems.forget(nil)
 				f.Diags.AutoLintUpToDate = false
 			} else if setAutoUpToDateToTrueIfLint {
 				f.Diags.AutoLintUpToDate = true
 			}
-			f.Diags.Lint.forget(diagToolsIfLint)
+			f.Diags.Lintishs.forget(diagToolsIfLint)
 		}
 	}
 }

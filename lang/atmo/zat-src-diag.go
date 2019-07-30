@@ -53,13 +53,13 @@ func (me *atmoDiag) updateFromErrs(ctx *atmosess.Ctx, hadFreshErrs bool) {
 
 func (*atmoDiag) KnownLinters() z.Tools { return nil }
 
-func (me *atmoDiag) PrepIssueJobs(workspaceFiles z.WorkspaceFiles, writtenFilePaths []string) z.DiagBuildJobs {
+func (me *atmoDiag) PrepProbJobs(workspaceFiles z.WorkspaceFiles, writtenFilePaths []string) z.DiagBuildJobs {
 	var job z.DiagJobBuild
 	Ctx.Locked(func() { job.AffectedFilePaths = Ctx.Kits.All.SrcFilePaths() })
 	return z.DiagBuildJobs{&job}
 }
 
-func (me *atmoDiag) RunIssueJobs(jobs z.DiagBuildJobs, workspaceFiles z.WorkspaceFiles) (errdiags z.DiagItems) {
+func (me *atmoDiag) RunProbJobs(jobs z.DiagBuildJobs, workspaceFiles z.WorkspaceFiles) (errdiags z.DiagItems) {
 	me.Lock()
 	errdiags = me.errDiags
 	me.Unlock()

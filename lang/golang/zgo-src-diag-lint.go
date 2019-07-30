@@ -15,7 +15,7 @@ func (me *goDiag) PrepLintJobs(workspaceFiles z.WorkspaceFiles, diagTools z.Tool
 		for _, pj := range pkgjobs {
 			skippkg := false
 			for _, fpath := range pj.Target.(*udevgo.Pkg).GoFilePaths(true) {
-				if skippkg = workspaceFiles.HasIssueDiags(fpath); skippkg {
+				if skippkg = workspaceFiles.HasProbDiags(fpath); skippkg {
 					break
 				}
 			}

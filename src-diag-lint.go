@@ -28,7 +28,7 @@ func init() {
 	cfgLintStickiness.OnChanged = func(_ interface{}) {
 		val, workspacefiles := cfgLintStickiness.ValUInt(), Lang.Workspace.Files()
 		for _, f := range workspacefiles {
-			for _, d := range f.Diags.Lint.Items {
+			for _, d := range f.Diags.Lintishs.Items {
 				d.StickyAuto = uint64(d.Loc.Flag) <= val
 			}
 		}
@@ -71,7 +71,7 @@ func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(workspaceFiles WorkspaceFiles, 
 	if nonautos, diagtools := !autos, me.knownLinters(autos).instOnly(); len(diagtools) > 0 {
 		var filepaths []string
 		for _, f := range workspaceFiles {
-			if autos && len(f.Diags.Issue.Items) > 0 {
+			if autos && len(f.Diags.Problems.Items) > 0 {
 				return
 			} else if f.IsOpen && (nonautos || !f.Diags.AutoLintUpToDate) {
 				if len(onlyFilePaths) == 0 || ustr.In(f.Path, onlyFilePaths...) {
@@ -84,7 +84,7 @@ func (me *DiagBase) UpdateLintDiagsIfAndAsNeeded(workspaceFiles WorkspaceFiles, 
 		}
 	} else {
 		for _, f := range workspaceFiles {
-			if autos && len(f.Diags.Issue.Items) > 0 {
+			if autos && len(f.Diags.Problems.Items) > 0 {
 				return
 			}
 		}
