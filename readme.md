@@ -2528,7 +2528,7 @@ type WorkspaceFile struct {
 	IsOpen bool `json:",omitempty"`
 	Diags  struct {
 		AutoLintUpToDate bool
-		Build            diags
+		Issue            diags
 		Lint             diags
 	}
 }
@@ -2548,10 +2548,10 @@ type WorkspaceFiles map[string]*WorkspaceFile
 func (me WorkspaceFiles) Has(fpath string) bool
 ```
 
-#### func (WorkspaceFiles) HasBuildDiags
+#### func (WorkspaceFiles) HasIssueDiags
 
 ```go
-func (me WorkspaceFiles) HasBuildDiags(filePath string) (has bool)
+func (me WorkspaceFiles) HasIssueDiags(filePath string) (has bool)
 ```
 
 #### func (WorkspaceFiles) IsOpen

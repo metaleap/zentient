@@ -120,13 +120,16 @@ func (me *DiagBase) fixUps(diags DiagItems) {
 		send(&IpcResp{IpcID: IPCID_SRCDIAG_PUB, SrcDiags: dr})
 	}
 }
+
 func (me *DiagBase) UpdateIssueDiagsAsNeeded(workspaceFiles WorkspaceFiles, writtenFiles []string) {
 	if jobs := me.Impl.PrepIssueJobs(workspaceFiles, writtenFiles).withoutDuplicates(); len(jobs) > 0 {
 		sort.Sort(jobs)
 		for _, job := range jobs {
 			job.forgetPrevDiags(nil, false, workspaceFiles)
 		}
-		me.send(workspaceFiles, true)
+		if !Lang.Live {
+			me.send(workspaceFiles, true)
+		}
 		diagitems := me.Impl.RunIssueJobs(jobs, workspaceFiles)
 		diagitems.propagate(false, true, workspaceFiles)
 		if len(diagitems) > 0 {

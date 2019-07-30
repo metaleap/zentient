@@ -254,15 +254,17 @@ func (me *DiagBase) onToggled() {
 	me.Impl.UpdateLintDiagsIfAndAsNeeded(workspaceFiles, true)
 }
 
-func (me *DiagBase) send(workspaceFiles WorkspaceFiles, onlyBuildDiags bool) {
+func (me *DiagBase) send(workspaceFiles WorkspaceFiles, onlyIssueDiags bool) {
 	resp := &Diags{LangID: Lang.ID, All: make(DiagItemsBy, len(workspaceFiles))}
-	onlyBuildDiags = onlyBuildDiags || workspaceFiles.haveAnyDiags(true, false)
+	onlyIssueDiags = onlyIssueDiags || workspaceFiles.haveAnyDiags(true, false)
 	for _, f := range workspaceFiles {
 		fdiagitems := f.Diags.Lint.Items
-		if onlyBuildDiags {
-			fdiagitems = f.Diags.Build.Items
+		if onlyIssueDiags {
+			fdiagitems = f.Diags.Issue.Items
 		}
-		resp.All[f.Path] = fdiagitems.dropDupls()
+		if fdiagitems != nil {
+			resp.All[f.Path] = fdiagitems.dropDupls()
+		}
 	}
 	send(&IpcResp{IpcID: IPCID_SRCDIAG_PUB, SrcDiags: resp})
 }

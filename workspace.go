@@ -34,7 +34,7 @@ type WorkspaceFile struct {
 	IsOpen bool `json:",omitempty"`
 	Diags  struct {
 		AutoLintUpToDate bool
-		Build            diags
+		Issue            diags
 		Lint             diags
 	}
 
@@ -52,7 +52,7 @@ func (me *WorkspaceFile) updateModTime() (hasChanged bool) {
 }
 
 func (me *WorkspaceFile) resetDiags() {
-	me.Diags.Build.forget(nil)
+	me.Diags.Issue.forget(nil)
 	me.Diags.Lint.forget(nil)
 	me.Diags.AutoLintUpToDate = false
 }
@@ -92,7 +92,7 @@ type diagsSummary struct {
 func (me WorkspaceFiles) diagsSummary() *diagsSummary {
 	s := &diagsSummary{files: make(map[*WorkspaceFile]bool, len(me))}
 	for _, f := range me {
-		if nb, nl := len(f.Diags.Build.Items), len(f.Diags.Lint.Items); nb > 0 || nl > 0 {
+		if nb, nl := len(f.Diags.Issue.Items), len(f.Diags.Lint.Items); nb > 0 || nl > 0 {
 			s.numBuild, s.numLint, s.files[f] = s.numBuild+nb, s.numLint+nl, true
 		}
 	}
@@ -102,18 +102,18 @@ func (me WorkspaceFiles) diagsSummary() *diagsSummary {
 	return s
 }
 
-func (me WorkspaceFiles) haveAnyDiags(buildDiags bool, lintDiags bool) bool {
+func (me WorkspaceFiles) haveAnyDiags(issueDiags bool, lintDiags bool) bool {
 	for _, f := range me {
-		if lb, ll := len(f.Diags.Build.Items), len(f.Diags.Lint.Items); (buildDiags && lb > 0) || (lintDiags && ll > 0) {
+		if lb, ll := len(f.Diags.Issue.Items), len(f.Diags.Lint.Items); (issueDiags && lb > 0) || (lintDiags && ll > 0) {
 			return true
 		}
 	}
 	return false
 }
 
-func (me WorkspaceFiles) HasBuildDiags(filePath string) (has bool) {
+func (me WorkspaceFiles) HasIssueDiags(filePath string) (has bool) {
 	if f := me[filePath]; f != nil {
-		has = len(f.Diags.Build.Items) > 0
+		has = len(f.Diags.Issue.Items) > 0
 	}
 	return
 }
@@ -309,7 +309,7 @@ func (me *WorkspaceBase) onChanges(upd *WorkspaceChanges) {
 			if len(upd.WrittenFiles) > 0 || (Lang.Live && needsfreshautolints) {
 				Lang.Diag.UpdateIssueDiagsAsNeeded(files, upd.WrittenFiles)
 			}
-			if needsfreshautolints {
+			if needsfreshautolints && !files.haveAnyDiags(true, false) {
 				Lang.Diag.UpdateLintDiagsIfAndAsNeeded(files, true)
 			}
 		}

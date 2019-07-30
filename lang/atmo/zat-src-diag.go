@@ -62,6 +62,7 @@ func (me *atmoDiag) PrepIssueJobs(workspaceFiles z.WorkspaceFiles, writtenFilePa
 func (me *atmoDiag) RunIssueJobs(jobs z.DiagBuildJobs, workspaceFiles z.WorkspaceFiles) (errdiags z.DiagItems) {
 	me.Lock()
 	errdiags = me.errDiags
+	println(len(errdiags), len(me.errDiags))
 	me.Unlock()
 	return
 }

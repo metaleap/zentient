@@ -85,7 +85,7 @@ func (me DiagItems) propagate(lintDiags bool, diagsSticky bool, workspaceFiles W
 		f := workspaceFiles.ensure(diag.Loc.FilePath)
 		fd := &f.Diags.Lint
 		if (!lintDiags) && diag.Loc.Flag == int(DIAG_SEV_ERR) {
-			fd = &f.Diags.Build
+			fd = &f.Diags.Issue
 		}
 		if diag.StickyForce, fd.Items = diagsSticky, append(fd.Items, diag); diagsSticky {
 			diag.StickyAuto = true
@@ -116,7 +116,7 @@ func (me *DiagJob) forgetPrevDiags(diagToolsIfLint Tools, setAutoUpToDateToTrueI
 		}
 		if f != nil {
 			if forbuild {
-				f.Diags.Build.forget(nil)
+				f.Diags.Issue.forget(nil)
 				f.Diags.AutoLintUpToDate = false
 			} else if setAutoUpToDateToTrueIfLint {
 				f.Diags.AutoLintUpToDate = true
