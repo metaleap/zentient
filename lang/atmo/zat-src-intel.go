@@ -1,6 +1,7 @@
 package zat
 
 import (
+	"fmt"
 	"path/filepath"
 
 	"github.com/go-leap/dev/lex"
@@ -190,7 +191,10 @@ func (me *atmoSrcIntel) Hovers(srcLens *z.SrcLens) (ret []z.SrcInfoTip) {
 						z.SrcInfoTip{Value: nodetypenames[4:]},
 					)
 
-					if _, ilnodes := kit.IrNodeOfAstNode(tlc.Id(), astnodes[0]); len(ilnodes) > 0 {
+					if tld, ilnodes := kit.IrNodeOfAstNode(tlc.Id(), astnodes[0]); len(ilnodes) > 0 {
+						if tld.Anns.Preduced != nil {
+							ret = append(ret, z.SrcInfoTip{Value: "≡\n" + tld.Anns.Preduced.SummaryCompact() + ">>>" + fmt.Sprintf("%T", ilnodes[0])})
+						}
 						if nid, _ := ilnodes[0].(*atmoil.IrIdentName); nid != nil {
 							ret = append(ret, z.SrcInfoTip{Value: z.Strf("(resolves to %v candidate/s)", len(nid.Anns.Candidates))})
 						}
