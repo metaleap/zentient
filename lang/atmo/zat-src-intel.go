@@ -6,8 +6,8 @@ import (
 
 	"github.com/go-leap/dev/lex"
 	"github.com/go-leap/str"
-	"github.com/metaleap/atmo/il"
-	"github.com/metaleap/atmo/lang"
+	. "github.com/metaleap/atmo/ast"
+	. "github.com/metaleap/atmo/il"
 	"github.com/metaleap/atmo/session"
 	"github.com/metaleap/zentient"
 )
@@ -29,9 +29,9 @@ func (me *atmoSrcIntel) DefSym(srcLens *z.SrcLens) (ret z.SrcLocs) {
 				if curtlc, astnodes := me.astAt(kit, srcLens); len(astnodes) > 0 {
 					// HAPPY SMART PATH: already know the def(s) or def-arg the current name points to
 					if curtld, ilnodes := kit.IrNodeOfAstNode(curtlc.Id(), astnodes[0]); len(ilnodes) > 0 {
-						if ident, _ := ilnodes[0].(*atmoil.IrIdentName); ident != nil {
+						if ident, _ := ilnodes[0].(*IrIdentName); ident != nil {
 							for _, node := range ident.Anns.Candidates {
-								tld, _ := node.(*atmoil.IrDefTop)
+								tld, _ := node.(*IrDefTop)
 								if tld == nil {
 									tld = curtld
 									if adr, ok := node.(atmosess.IrDefRef); ok {
@@ -49,28 +49,28 @@ func (me *atmoSrcIntel) DefSym(srcLens *z.SrcLens) (ret z.SrcLocs) {
 					}
 
 					// FALL-BACK DUMB PATH: merely lexical (traversal up the original src AST, collect any & all local defs/def-args technically-in-scope and goal-named)
-					if ident, _ := astnodes[0].(*atmolang.AstIdent); ident == nil || !ident.IsName(true) {
+					if ident, _ := astnodes[0].(*AstIdent); ident == nil || !ident.IsName(true) {
 						// not an ident, then point to input node itself
 						me.addLocFromToks(curtlc, &ret, astnodes[0].Toks())
 					} else {
 						// points to local def-arg-in-scope or def-in-scope?
 						for i := 1; i < len(astnodes); i++ {
 							switch n := astnodes[i].(type) {
-							case *atmolang.AstDefArg:
-								if nid, _ := n.NameOrConstVal.(*atmolang.AstIdent); nid != nil && nid.Val == ident.Val {
+							case *AstDefArg:
+								if nid, _ := n.NameOrConstVal.(*AstIdent); nid != nil && nid.Val == ident.Val {
 									me.addLocFromToks(curtlc, &ret, nid.Tokens)
 								}
-							case *atmolang.AstDef:
+							case *AstDef:
 								if n.Name.Val == ident.Val {
 									me.addLocFromToks(curtlc, &ret, n.Name.Tokens)
 								} else {
 									for da := range n.Args {
-										if nid, _ := n.Args[da].NameOrConstVal.(*atmolang.AstIdent); nid != nil && nid.Val == ident.Val {
+										if nid, _ := n.Args[da].NameOrConstVal.(*AstIdent); nid != nil && nid.Val == ident.Val {
 											me.addLocFromToks(curtlc, &ret, nid.Tokens)
 										}
 									}
 								}
-							case *atmolang.AstExprLet:
+							case *AstExprLet:
 								for d := range n.Defs {
 									if n.Defs[d].Name.Val == ident.Val {
 										me.addLocFromToks(curtlc, &ret, n.Defs[d].Name.Tokens)
@@ -112,44 +112,44 @@ func (me *atmoSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (ret z.Sr
 		if kit := Ctx.KitByDirPath(filepath.Dir(srcLens.FilePath), true); kit != nil {
 			me.withInMemFileMod(srcLens, kit, func() {
 				if tlc, astnodes := me.astAt(kit, srcLens); len(astnodes) > 0 {
-					showscope := func(n atmolang.IAstNode) { me.addLocFromToks(tlc, &ret, n.Toks()) }
+					showscope := func(n IAstNode) { me.addLocFromToks(tlc, &ret, n.Toks()) }
 					switch astnode := astnodes[0].(type) {
-					case *atmolang.AstExprLet:
+					case *AstExprLet:
 						showscope(astnode)
-					case *atmolang.AstTopLevel:
+					case *AstTopLevel:
 						showscope(astnode)
-					case *atmolang.AstDef:
+					case *AstDef:
 						showscope(astnode)
-					case *atmolang.AstExprAppl:
+					case *AstExprAppl:
 						showscope(astnode)
-					case *atmolang.AstExprCases:
+					case *AstExprCases:
 						showscope(astnode)
 					default:
 						if len(astnodes) > 1 {
-							if astarg, _ := astnodes[1].(*atmolang.AstDefArg); astarg != nil {
+							if astarg, _ := astnodes[1].(*AstDefArg); astarg != nil {
 								// TODO: handle astarg.Affix or non-name astarg.NameOrConstVal
 							}
 						}
 						if tld, ilnodes := kit.IrNodeOfAstNode(tlc.Id(), astnode); len(ilnodes) > 0 {
-							curfileonly := func(t *atmoil.IrDefTop) bool { return t.OrigTopChunk.SrcFile.SrcFilePath == srcLens.FilePath }
-							var nodematches map[atmoil.INode]*atmoil.IrDefTop
+							curfileonly := func(t *IrDefTop) bool { return t.OrigTopChunk.SrcFile.SrcFilePath == srcLens.FilePath }
+							var nodematches map[IIrNode]*IrDefTop
 							switch ilnode := ilnodes[0].(type) {
-							case *atmoil.IrIdentDecl:
-								nodematches = kit.SelectNodes(curfileonly, func(na []atmoil.INode, n atmoil.INode, nd []atmoil.INode) (ismatch bool, dontdescend bool, donetld bool, doneall bool) {
-									if nid, _ := n.(*atmoil.IrIdentName); nid != nil {
+							case *IrIdentDecl:
+								nodematches = kit.SelectNodes(curfileonly, func(na []IIrNode, n IIrNode, nd []IIrNode) (ismatch bool, dontdescend bool, donetld bool, doneall bool) {
+									if nid, _ := n.(*IrIdentName); nid != nil {
 										ismatch = nid.ResolvesTo(ilnodes[1])
 									}
 									return
 								})
 								nodematches[ilnode] = tld
-							case *atmoil.IrIdentName:
-								nodematches = kit.SelectNodes(curfileonly, func(na []atmoil.INode, n atmoil.INode, nd []atmoil.INode) (ismatch bool, dontdescend bool, donetld bool, doneall bool) {
+							case *IrIdentName:
+								nodematches = kit.SelectNodes(curfileonly, func(na []IIrNode, n IIrNode, nd []IIrNode) (ismatch bool, dontdescend bool, donetld bool, doneall bool) {
 									for _, cand := range ilnode.Anns.Candidates {
 										if ismatch = (cand == n); ismatch {
 											break
 										}
 									}
-									if nid, _ := n.(*atmoil.IrIdentName); nid != nil && !ismatch {
+									if nid, _ := n.(*IrIdentName); nid != nil && !ismatch {
 										for _, cand := range ilnode.Anns.Candidates {
 											if ismatch = nid.ResolvesTo(cand); ismatch {
 												break
@@ -160,7 +160,7 @@ func (me *atmoSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (ret z.Sr
 								})
 								nodematches[ilnode] = tld
 							default:
-								nodematches = kit.SelectNodes(curfileonly, func(na []atmoil.INode, n atmoil.INode, nd []atmoil.INode) (ismatch bool, dontdescend bool, donetld bool, doneall bool) {
+								nodematches = kit.SelectNodes(curfileonly, func(na []IIrNode, n IIrNode, nd []IIrNode) (ismatch bool, dontdescend bool, donetld bool, doneall bool) {
 									ismatch = (ilnode == n || ilnode.EquivTo(n))
 									return
 								})
@@ -193,7 +193,7 @@ func (me *atmoSrcIntel) Hovers(srcLens *z.SrcLens) (ret []z.SrcInfoTip) {
 
 					if tld, ilnodes := kit.IrNodeOfAstNode(tlc.Id(), astnodes[0]); len(ilnodes) > 0 {
 						prednode := ilnodes[0]
-						if decl, _ := prednode.(*atmoil.IrIdentDecl); decl != nil {
+						if decl, _ := prednode.(*IrIdentDecl); decl != nil {
 							prednode = ilnodes[1]
 						}
 						if pred := Ctx.Preduce(kit, tld, prednode); pred != nil {
@@ -201,7 +201,7 @@ func (me *atmoSrcIntel) Hovers(srcLens *z.SrcLens) (ret []z.SrcInfoTip) {
 						} else {
 							ret = append(ret, z.SrcInfoTip{Value: "?\n" + fmt.Sprintf("%T", prednode)})
 						}
-						if nid, _ := ilnodes[0].(*atmoil.IrIdentName); nid != nil {
+						if nid, _ := ilnodes[0].(*IrIdentName); nid != nil {
 							ret = append(ret, z.SrcInfoTip{Value: z.Strf("(resolves to %v candidate/s)", len(nid.Anns.Candidates))})
 						}
 					}
@@ -225,10 +225,10 @@ func (me *atmoSrcIntel) References(srcLens *z.SrcLens, includeDeclaration bool) 
 		if kit := Ctx.KitByDirPath(filepath.Dir(srcLens.FilePath), true); kit != nil {
 			me.withInMemFileMod(srcLens, kit, func() {
 				if _, astnodes := me.astAt(kit, srcLens); len(astnodes) > 0 {
-					var refs map[*atmoil.IrDefTop][]atmoil.IExpr
-					if ident, _ := astnodes[0].(*atmolang.AstIdent); ident != nil {
+					var refs map[*IrDefTop][]IIrExpr
+					if ident, _ := astnodes[0].(*AstIdent); ident != nil {
 						refs = Ctx.KitsCollectReferences(true, ident.Val)
-					} else if atom, _ := astnodes[0].(atmolang.IAstExprAtomic); atom != nil {
+					} else if atom, _ := astnodes[0].(IAstExprAtomic); atom != nil {
 						refs = Ctx.KitsCollectReferences(true, atom.String())
 					}
 					for tld, ilnodes := range refs {
@@ -253,7 +253,7 @@ func (me *atmoSrcIntel) Symbols(srcLens *z.SrcLens, query string, curFileOnly bo
 		if kits = Ctx.Kits.All; curFileOnly {
 			kits = atmosess.Kits{curkit}
 		}
-		symbolForTopLevelDef := func(tlc *atmolang.SrcTopChunk) {
+		symbolForTopLevelDef := func(tlc *AstFileChunk) {
 			var name string
 			flag := z.SYM_FUNCTION
 			if tld := tlc.Ast.Def.Orig; tld != nil {
@@ -294,7 +294,7 @@ func (me *atmoSrcIntel) Symbols(srcLens *z.SrcLens, query string, curFileOnly bo
 	return
 }
 
-func (me *atmoSrcIntel) addLocFromToks(tlc *atmolang.SrcTopChunk, dst *z.SrcLocs, toks udevlex.Tokens) *z.SrcLoc {
+func (me *atmoSrcIntel) addLocFromToks(tlc *AstFileChunk, dst *z.SrcLocs, toks udevlex.Tokens) *z.SrcLoc {
 	if tok := toks.First1(); tok != nil {
 		pos := tok.OffPos(tlc.PosOffsetLine(), tlc.PosOffsetByte())
 		return dst.Add(tlc.SrcFile.SrcFilePath, pos)
@@ -302,7 +302,7 @@ func (me *atmoSrcIntel) addLocFromToks(tlc *atmolang.SrcTopChunk, dst *z.SrcLocs
 	return nil
 }
 
-func (me *atmoSrcIntel) addLocFromNode(tld *atmoil.IrDefTop, dst *z.SrcLocs, node atmoil.INode) *z.SrcLoc {
+func (me *atmoSrcIntel) addLocFromNode(tld *IrDefTop, dst *z.SrcLocs, node IIrNode) *z.SrcLoc {
 	toks := tld.OrigToks(node)
 	if def := node.IsDef(); def != nil {
 		if ts := tld.OrigToks(&def.Name); len(ts) > 0 {
@@ -312,24 +312,23 @@ func (me *atmoSrcIntel) addLocFromNode(tld *atmoil.IrDefTop, dst *z.SrcLocs, nod
 	return me.addLocFromToks(tld.OrigTopChunk, dst, toks)
 }
 
-func (me *atmoSrcIntel) astAt(kit *atmosess.Kit, srcLens *z.SrcLens) (topLevelChunk *atmolang.SrcTopChunk, theNodeAndItsAncestors []atmolang.IAstNode) {
+func (me *atmoSrcIntel) astAt(kit *atmosess.Kit, srcLens *z.SrcLens) (topLevelChunk *AstFileChunk, theNodeAndItsAncestors []IAstNode) {
 	if topLevelChunk, theNodeAndItsAncestors = kit.AstNodeAt(srcLens.FilePath, srcLens.ByteOffsetForPos(srcLens.Pos)); topLevelChunk != nil && topLevelChunk.Ast.Def.Orig == nil {
 		theNodeAndItsAncestors = nil
 	}
 	return
 }
 
-func tokToPos(tlc *atmolang.SrcTopChunk, tok *udevlex.Token) (ret *z.SrcPos) {
+func tokToPos(tlc *AstFileChunk, tok *udevlex.Token) (ret *z.SrcPos) {
 	pos := tok.OffPos(tlc.PosOffsetLine(), tlc.PosOffsetByte())
 	ret = &z.SrcPos{Ln: pos.Ln1, Col: pos.Col1}
 	ret.SetRune1OffFromByte0Off(pos.Off0, tlc.SrcFile.LastLoad.Src)
 	return
 }
 
-func toksToRange(tlc *atmolang.SrcTopChunk, toks udevlex.Tokens) *z.SrcRange {
+func toksToRange(tlc *AstFileChunk, toks udevlex.Tokens) *z.SrcRange {
 	var sr z.SrcRange
 	tlcoffl, tlcoffb := tlc.PosOffsetLine(), tlc.PosOffsetByte()
-
 	pos := toks.First1().OffPos(tlcoffl, tlcoffb)
 	sr.Start.Col, sr.Start.Ln = pos.Col1, pos.Ln1
 	sr.Start.SetRune1OffFromByte0Off(pos.Off0, tlc.SrcFile.LastLoad.Src)

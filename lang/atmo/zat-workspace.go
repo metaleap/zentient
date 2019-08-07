@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-leap/str"
 	"github.com/metaleap/atmo"
-	"github.com/metaleap/atmo/lang"
+	. "github.com/metaleap/atmo/ast"
 	"github.com/metaleap/atmo/session"
 	"github.com/metaleap/zentient"
 )
@@ -41,7 +41,7 @@ func (*atmoWorkspace) onBeforeChanges(workspaceChanges *z.WorkspaceChanges, fres
 		gatherkits2refresh(workspaceChanges.WrittenFiles...)
 		gatherkits2refresh(workspaceChanges.OpenedFiles...)
 
-		var livesrcfiles []*atmolang.AstFile
+		var livesrcfiles []*AstFile
 		if liveMode {
 			updatesrcfile := func(srcfilepath string, srctxt []byte) {
 				if kit := gatherkits2refresh(srcfilepath); kit != nil {
