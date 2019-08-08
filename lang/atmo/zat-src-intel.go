@@ -31,11 +31,11 @@ func (me *atmoSrcIntel) DefSym(srcLens *z.SrcLens) (ret z.SrcLocs) {
 					if curtld, ilnodes := kit.IrNodeOfAstNode(curtlc.Id(), astnodes[0]); len(ilnodes) > 0 {
 						if ident, _ := ilnodes[0].(*IrIdentName); ident != nil {
 							for _, node := range ident.Anns.Candidates {
-								tld, _ := node.(*IrDefTop)
+								tld, _ := node.(*IrDef)
 								if tld == nil {
 									tld = curtld
 									if adr, ok := node.(atmosess.IrDefRef); ok {
-										tld = adr.IrDefTop
+										tld = adr.IrDef
 									}
 								}
 								me.addLocFromNode(tld, &ret, node)
@@ -131,8 +131,8 @@ func (me *atmoSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (ret z.Sr
 							}
 						}
 						if tld, ilnodes := kit.IrNodeOfAstNode(tlc.Id(), astnode); len(ilnodes) > 0 {
-							curfileonly := func(t *IrDefTop) bool { return t.OrigTopChunk.SrcFile.SrcFilePath == srcLens.FilePath }
-							var nodematches map[IIrNode]*IrDefTop
+							curfileonly := func(t *IrDef) bool { return t.OrigTopChunk.SrcFile.SrcFilePath == srcLens.FilePath }
+							var nodematches map[IIrNode]*IrDef
 							switch ilnode := ilnodes[0].(type) {
 							case *IrIdentDecl:
 								nodematches = kit.SelectNodes(curfileonly, func(na []IIrNode, n IIrNode, nd []IIrNode) (ismatch bool, dontdescend bool, donetld bool, doneall bool) {
@@ -225,7 +225,7 @@ func (me *atmoSrcIntel) References(srcLens *z.SrcLens, includeDeclaration bool) 
 		if kit := Ctx.KitByDirPath(filepath.Dir(srcLens.FilePath), true); kit != nil {
 			me.withInMemFileMod(srcLens, kit, func() {
 				if _, astnodes := me.astAt(kit, srcLens); len(astnodes) > 0 {
-					var refs map[*IrDefTop][]IIrExpr
+					var refs map[*IrDef][]IIrExpr
 					if ident, _ := astnodes[0].(*AstIdent); ident != nil {
 						refs = Ctx.KitsCollectReferences(true, ident.Val)
 					} else if atom, _ := astnodes[0].(IAstExprAtomic); atom != nil {
@@ -302,7 +302,7 @@ func (me *atmoSrcIntel) addLocFromToks(tlc *AstFileChunk, dst *z.SrcLocs, toks u
 	return nil
 }
 
-func (me *atmoSrcIntel) addLocFromNode(tld *IrDefTop, dst *z.SrcLocs, node IIrNode) *z.SrcLoc {
+func (me *atmoSrcIntel) addLocFromNode(tld *IrDef, dst *z.SrcLocs, node IIrNode) *z.SrcLoc {
 	toks := tld.OrigToks(node)
 	if def := node.IsDef(); def != nil {
 		if ts := tld.OrigToks(&def.Name); len(ts) > 0 {
