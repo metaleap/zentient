@@ -27,7 +27,7 @@ func (me *atmoSrcIntel) ComplItems(srcLens *z.SrcLens) (complItems z.SrcIntelCom
 		namesinscope := kit.NamesInScope()
 		if curtlc, astnodes := me.astAt(kit, srcLens); len(astnodes) > 0 {
 			if curtld, ilnodes := kit.IrNodeOfAstNode(curtlc.Id(), astnodes[0]); len(ilnodes) > 0 {
-				namesinscope = curtld.NamesInScopeAt(ilnodes[0], namesinscope)
+				namesinscope = curtld.NamesInScopeAt(ilnodes[0], namesinscope, true)
 			}
 		}
 		for name, nodes := range namesinscope {
