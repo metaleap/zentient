@@ -144,30 +144,27 @@ func (me *atmoSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (ret z.Sr
 			case *AstExprCases:
 				showscope(astnode)
 			default:
-				if len(astnodes) > 1 {
-					if astarg, _ := astnodes[1].(*AstDefArg); astarg != nil {
-						// TODO: handle astarg.Affix or non-name astarg.NameOrConstVal
-					}
-				}
 				if tld, ilnodes := kit.IrNodeOfAstNode(tlc.Id(), astnode); len(ilnodes) > 0 {
 					curfileonly := func(t *IrDef) bool { return t.OrigTopChunk.SrcFile.SrcFilePath == srcLens.FilePath }
 					var nodematches map[IIrNode]*IrDef
 					switch ilnode := ilnodes[0].(type) {
 					case *IrIdentDecl:
 						nodematches = kit.SelectNodes(curfileonly, func(na []IIrNode, n IIrNode, nd []IIrNode) (ismatch bool, dontdescend bool, donetld bool, doneall bool) {
-							if nid, _ := n.(*IrIdentName); nid != nil {
-								ismatch = nid.ResolvesTo(ilnodes[1])
-							}
+							nid, _ := n.(*IrIdentName)
+							ismatch = (nid != nil) && nid.ResolvesTo(ilnodes[1])
+							return
+						})
+						nodematches[ilnode] = tld
+					case *IrArg:
+						nodematches = kit.SelectNodes(curfileonly, func(na []IIrNode, n IIrNode, nd []IIrNode) (ismatch bool, dontdescend bool, donetld bool, doneall bool) {
+							nid, _ := n.(*IrIdentName)
+							ismatch = (nid != nil) && nid.ResolvesTo(ilnode)
 							return
 						})
 						nodematches[ilnode] = tld
 					case *IrIdentName:
 						nodematches = kit.SelectNodes(curfileonly, func(na []IIrNode, n IIrNode, nd []IIrNode) (ismatch bool, dontdescend bool, donetld bool, doneall bool) {
-							for _, cand := range ilnode.Anns.Candidates {
-								if ismatch = (cand == n); ismatch {
-									break
-								}
-							}
+							ismatch = ilnode.ResolvesTo(n)
 							if nid, _ := n.(*IrIdentName); nid != nil && !ismatch {
 								for _, cand := range ilnode.Anns.Candidates {
 									if ismatch = nid.ResolvesTo(cand); ismatch {
@@ -211,10 +208,12 @@ func (me *atmoSrcIntel) Hovers(srcLens *z.SrcLens) (ret []z.SrcInfoTip) {
 				if decl, _ := prednode.(*IrIdentDecl); decl != nil {
 					prednode = ilnodes[1]
 				}
-				if pred := Ctx.Preduce(kit, tld, prednode); pred != nil {
-					ret = append(ret, z.SrcInfoTip{Value: "≡\n" + pred.SummaryCompact()})
-				} else {
-					ret = append(ret, z.SrcInfoTip{Value: "?\n" + fmt.Sprintf("%T", prednode)})
+				if 0 > 1 {
+					if pred := Ctx.Preduce(kit, tld, prednode); pred != nil {
+						ret = append(ret, z.SrcInfoTip{Value: "≡\n" + pred.SummaryCompact()})
+					} else {
+						ret = append(ret, z.SrcInfoTip{Value: "?\n" + fmt.Sprintf("%T", prednode)})
+					}
 				}
 				if nid, _ := ilnodes[0].(*IrIdentName); nid != nil {
 					ret = append(ret, z.SrcInfoTip{Value: z.Strf("(resolves to %v candidate/s)", len(nid.Anns.Candidates))})
