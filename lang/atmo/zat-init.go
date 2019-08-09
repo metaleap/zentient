@@ -20,13 +20,14 @@ func OnPreInit() error {
 	if err != nil {
 		return err
 	}
+
 	Ctx, z.Lang.Live =
 		&ctx, liveMode
 	Ctx.KitsEnsureLoaded(true, kitimppath)
 	workspace.onPreInit()
 	diag.updateFromErrs(Ctx, true)
 	onNewBackgroundMessages(Ctx)
-	ctx.Options.FileModsCatchup.BurstLimit = 789 * time.Millisecond
+	ctx.Options.FileModsCatchup.BurstLimit = 987 * time.Millisecond
 	return nil
 }
 

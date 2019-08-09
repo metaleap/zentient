@@ -180,7 +180,7 @@ func (me *atmoSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (ret z.Sr
 						nodematches[ilnode] = tld
 					default:
 						nodematches = kit.SelectNodes(curfileonly, func(na []IIrNode, n IIrNode, nd []IIrNode) (ismatch bool, dontdescend bool, donetld bool, doneall bool) {
-							ismatch = (ilnode == n || ilnode.EquivTo(n))
+							ismatch = (ilnode == n || ilnode.EquivTo(n, false))
 							return
 						})
 					}
