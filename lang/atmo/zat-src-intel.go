@@ -243,7 +243,7 @@ func (me *atmoSrcIntel) References(srcLens *z.SrcLens, includeDeclaration bool) 
 			}
 			for tld, ilnodes := range refs {
 				for _, node := range ilnodes {
-					if tok := tld.OrigToks(node).First1(); tok != nil {
+					if tok := tld.AstOrigToks(node).First1(); tok != nil {
 						ret.Add(tld.OrigTopChunk.SrcFile.SrcFilePath, tok.OffPos(tld.OrigTopChunk.PosOffsetLine(), tld.OrigTopChunk.PosOffsetByte()))
 					}
 				}
@@ -311,9 +311,9 @@ func (me *atmoSrcIntel) addLocFromToks(tlc *AstFileChunk, dst *z.SrcLocs, toks u
 }
 
 func (me *atmoSrcIntel) addLocFromNode(tld *IrDef, dst *z.SrcLocs, node IIrNode) *z.SrcLoc {
-	toks := tld.OrigToks(node)
+	toks := tld.AstOrigToks(node)
 	if def := node.IsDef(); def != nil {
-		if ts := tld.OrigToks(&def.Name); len(ts) > 0 {
+		if ts := tld.AstOrigToks(&def.Name); len(ts) > 0 {
 			toks = ts
 		}
 	}
