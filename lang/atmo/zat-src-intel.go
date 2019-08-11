@@ -261,28 +261,37 @@ func (me *atmoSrcIntel) Symbols(srcLens *z.SrcLens, query string, curFileOnly bo
 		if kits = Ctx.Kits.All; curFileOnly {
 			kits = atmosess.Kits{curkit}
 		}
-		symbolForTopLevelDef := func(tlc *AstFileChunk) {
+		symbolForDef := func(tlc *AstFileChunk, def *AstDef) {
 			var name string
-			flag := z.SYM_FUNCTION
-			if tld := tlc.Ast.Def.Orig; tld != nil {
-				if len(query) == 0 || ustr.Has(ustr.Lo(tld.Name.Val), query) {
-					name = tld.Name.Val
-					if len(tld.Args) == 0 {
+			flag, usetopleveldef := z.SYM_FUNCTION, (def == nil)
+			if usetopleveldef {
+				def = tlc.Ast.Def.Orig
+			}
+			if def != nil {
+				if len(query) == 0 || ustr.Has(ustr.Lo(def.Name.Val), query) {
+					name = def.Name.Val
+					if !usetopleveldef {
+						flag = z.SYM_OBJECT
+					} else if len(def.Args) == 0 {
 						flag = z.SYM_FIELD
-					} else if tld.Name.IsOpish {
+					} else if def.Name.IsOpish {
 						flag = z.SYM_OPERATOR
 					}
 				}
-			} else if tlc.Ast.Def.NameIfErr != "" {
+			} else if usetopleveldef && tlc.Ast.Def.NameIfErr != "" {
 				name, flag =
 					tlc.Ast.Def.NameIfErr, z.SYM_EVENT
 			}
 			if name != "" {
+				toks := tlc.Ast.Tokens
+				if !usetopleveldef {
+					toks = def.Tokens
+				}
 				ret = append(ret, &z.SrcLens{Str: name,
 					Txt: "(description later)", SrcLoc: z.SrcLoc{
 						FilePath: tlc.SrcFile.SrcFilePath,
 						Flag:     int(flag),
-						Range:    toksToRange(tlc, tlc.Ast.Tokens)}})
+						Range:    toksToRange(tlc, toks)}})
 			}
 		}
 		if len(kits) > 0 && curkit != nil {
@@ -291,7 +300,16 @@ func (me *atmoSrcIntel) Symbols(srcLens *z.SrcLens, query string, curFileOnly bo
 					for _, srcfile := range kit.SrcFiles {
 						if (!curFileOnly) || srcfile.SrcFilePath == srcLens.FilePath {
 							for i := range srcfile.TopLevel {
-								symbolForTopLevelDef(&srcfile.TopLevel[i])
+								symbolForDef(&srcfile.TopLevel[i], nil)
+								if curFileOnly {
+									if tld := srcfile.TopLevel[i].Ast.Def.Orig; tld != nil {
+										if let, _ := tld.Body.(*AstExprLet); let != nil {
+											for j := range let.Defs {
+												symbolForDef(&srcfile.TopLevel[i], &let.Defs[j])
+											}
+										}
+									}
+								}
 							}
 						}
 					}
