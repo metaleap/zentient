@@ -1895,16 +1895,16 @@ type SrcLens struct {
 ```
 
 
+#### func (*SrcLens) Byte0OffsetForPos
+
+```go
+func (me *SrcLens) Byte0OffsetForPos(pos *SrcPos) int
+```
+
 #### func (*SrcLens) ByteOffsetForFirstLineBeginningWith
 
 ```go
 func (me *SrcLens) ByteOffsetForFirstLineBeginningWith(prefix string) int
-```
-
-#### func (*SrcLens) ByteOffsetForPos
-
-```go
-func (me *SrcLens) ByteOffsetForPos(pos *SrcPos) int
 ```
 
 #### func (*SrcLens) EnsureSrcFull

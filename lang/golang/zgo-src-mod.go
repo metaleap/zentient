@@ -43,7 +43,7 @@ func (*goSrcMod) RunRenamer(srcLens *z.SrcLens, newName string) (srcMods z.SrcLe
 	if !tools.gorename.Installed {
 		panic(tools.gorename.NotInstalledMessage())
 	}
-	eol, offset := "\n", srcLens.ByteOffsetForPos(srcLens.Pos)
+	eol, offset := "\n", srcLens.Byte0OffsetForPos(srcLens.Pos)
 	if srcLens.CrLf {
 		eol = "\r\n"
 	}

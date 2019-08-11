@@ -47,7 +47,7 @@ func (me *SrcModEdits) AddDeleteLine(srcFilePath string, lineAt *SrcPos) {
 	lens := me.lensForNewEdit(srcFilePath)
 	lens.Pos = lineAt
 	edit := SrcModEdit{At: &SrcRange{}}
-	bo := lens.ByteOffsetForPos(lens.Pos)
+	bo := lens.Byte0OffsetForPos(lens.Pos)
 	bo = strings.LastIndex(lens.Txt[:bo], "\n") + 1
 	edit.At.Start.Off = lens.Rune1OffsetForByte0Offset(bo)
 	bo2 := strings.IndexRune(lens.Txt[bo:], '\n') + 1

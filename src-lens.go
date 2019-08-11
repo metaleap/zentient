@@ -99,7 +99,7 @@ func (me *SrcLens) EnsureSrcFull() {
 	}
 }
 
-func (me *SrcLens) ByteOffsetForPos(pos *SrcPos) int {
+func (me *SrcLens) Byte0OffsetForPos(pos *SrcPos) int {
 	if (!pos.byteoff) && (pos.Off > 0 || (pos.Ln > 0 && pos.Col > 0)) {
 		pos.byteoff = true
 		if pos.Off > 1 || pos.Col > 1 || pos.Ln > 1 {

@@ -301,7 +301,7 @@ func (me *atmoSrcIntel) Symbols(srcLens *z.SrcLens, query string, curFileOnly bo
 						if (!curFileOnly) || srcfile.SrcFilePath == srcLens.FilePath {
 							for i := range srcfile.TopLevel {
 								symbolForDef(&srcfile.TopLevel[i], nil)
-								if curFileOnly {
+								if curFileOnly /*&& srcfile.TopLevel[i].Encloses(srcLens.Byte0OffsetForPos(srcLens.Pos))*/ {
 									if tld := srcfile.TopLevel[i].Ast.Def.Orig; tld != nil {
 										if let, _ := tld.Body.(*AstExprLet); let != nil {
 											for j := range let.Defs {
@@ -339,7 +339,7 @@ func (me *atmoSrcIntel) addLocFromNode(tld *IrDef, dst *z.SrcLocs, node IIrNode)
 }
 
 func (me *atmoSrcIntel) astAt(kit *atmosess.Kit, srcLens *z.SrcLens) (topLevelChunk *AstFileChunk, theNodeAndItsAncestors []IAstNode) {
-	if topLevelChunk, theNodeAndItsAncestors = kit.AstNodeAt(srcLens.FilePath, srcLens.ByteOffsetForPos(srcLens.Pos)); topLevelChunk != nil && topLevelChunk.Ast.Def.Orig == nil {
+	if topLevelChunk, theNodeAndItsAncestors = kit.AstNodeAt(srcLens.FilePath, srcLens.Byte0OffsetForPos(srcLens.Pos)); topLevelChunk != nil && topLevelChunk.Ast.Def.Orig == nil {
 		theNodeAndItsAncestors = nil
 	}
 	return
