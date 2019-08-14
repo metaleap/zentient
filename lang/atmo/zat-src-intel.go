@@ -57,9 +57,12 @@ func (me *atmoSrcIntel) DefSym(srcLens *z.SrcLens) (ret z.SrcLocs) {
 						tld, _ := node.(*IrDef)
 						if tld == nil {
 							tld = curtld
-							if adr, ok := node.(atmosess.IrDefRef); ok {
-								tld = adr.IrDef
+							if defref, ok := node.(atmosess.IrDefRef); ok {
+								tld = defref.IrDef
 							}
+						}
+						if abs, is := node.(*IrAbs); is {
+							node = &abs.Arg
 						}
 						me.addLocFromNode(tld, &ret, node)
 					}
@@ -152,13 +155,6 @@ func (me *atmoSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (ret z.Sr
 						nodematches = kit.SelectNodes(curfileonly, func(na []IIrNode, n IIrNode, nd []IIrNode) (ismatch bool, dontdescend bool, donetld bool, doneall bool) {
 							nid, _ := n.(*IrIdentName)
 							ismatch = (nid != nil) && nid.ResolvesTo(ilnodes[1])
-							return
-						})
-						nodematches[ilnode] = tld
-					case *IrArg:
-						nodematches = kit.SelectNodes(curfileonly, func(na []IIrNode, n IIrNode, nd []IIrNode) (ismatch bool, dontdescend bool, donetld bool, doneall bool) {
-							nid, _ := n.(*IrIdentName)
-							ismatch = (nid != nil) && nid.ResolvesTo(ilnode)
 							return
 						})
 						nodematches[ilnode] = tld
