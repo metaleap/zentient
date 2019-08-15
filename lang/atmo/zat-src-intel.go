@@ -148,7 +148,7 @@ func (me *atmoSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (ret z.Sr
 				showscope(astnode)
 			default:
 				if tld, ilnodes := kit.IrNodeOfAstNode(tlc.Id(), astnode); len(ilnodes) > 0 {
-					curfileonly := func(t *IrDef) bool { return t.OrigTopChunk.SrcFile.SrcFilePath == srcLens.FilePath }
+					curfileonly := func(t *IrDef) bool { return t.AstFileChunk.SrcFile.SrcFilePath == srcLens.FilePath }
 					var nodematches map[IIrNode]*IrDef
 					switch ilnode := ilnodes[0].(type) {
 					case *IrIdentDecl:
@@ -240,7 +240,7 @@ func (me *atmoSrcIntel) References(srcLens *z.SrcLens, includeDeclaration bool) 
 			for tld, ilnodes := range refs {
 				for _, node := range ilnodes {
 					if tok := tld.AstOrigToks(node).First1(); tok != nil {
-						ret.Add(tld.OrigTopChunk.SrcFile.SrcFilePath, tok.OffPos(tld.OrigTopChunk.PosOffsetLine(), tld.OrigTopChunk.PosOffsetByte()))
+						ret.Add(tld.AstFileChunk.SrcFile.SrcFilePath, tok.OffPos(tld.AstFileChunk.PosOffsetLine(), tld.AstFileChunk.PosOffsetByte()))
 					}
 				}
 			}
@@ -331,7 +331,7 @@ func (me *atmoSrcIntel) addLocFromNode(tld *IrDef, dst *z.SrcLocs, node IIrNode)
 			toks = ts
 		}
 	}
-	return me.addLocFromToks(tld.OrigTopChunk, dst, toks)
+	return me.addLocFromToks(tld.AstFileChunk, dst, toks)
 }
 
 func (me *atmoSrcIntel) astAt(kit *atmosess.Kit, srcLens *z.SrcLens) (topLevelChunk *AstFileChunk, theNodeAndItsAncestors []IAstNode) {
