@@ -53,18 +53,15 @@ func (me *atmoSrcIntel) DefSym(srcLens *z.SrcLens) (ret z.SrcLocs) {
 			// HAPPY SMART PATH: already know the def(s) or def-arg the current name points to
 			if curtld, ilnodes := kit.IrNodeOfAstNode(curtlc.Id(), astnodes[0]); len(ilnodes) > 0 {
 				if ident, _ := ilnodes[0].(*IrIdentName); ident != nil {
-					for _, node := range ident.Anns.Candidates {
-						tld, _ := node.(*IrDef)
+					for _, cand := range ident.Anns.Candidates {
+						tld, _ := cand.(*IrDef)
 						if tld == nil {
 							tld = curtld
-							if defref, ok := node.(atmosess.IrDefRef); ok {
+							if defref, ok := cand.(atmosess.IrDefRef); ok {
 								tld = defref.IrDef
 							}
 						}
-						if abs, is := node.(*IrAbs); is {
-							node = &abs.Arg
-						}
-						me.addLocFromNode(tld, &ret, node)
+						me.addLocFromNode(tld, &ret, cand)
 					}
 				} else { // not an ident, then point to input node itself
 					me.addLocFromNode(curtld, &ret, ilnodes[0])
