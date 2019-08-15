@@ -206,7 +206,7 @@ func (me *atmoSrcIntel) Hovers(srcLens *z.SrcLens) (ret []z.SrcInfoTip) {
 				}
 				if 0 > 1 {
 					if pred := Ctx.Preduce(kit, tld, prednode); pred != nil {
-						ret = append(ret, z.SrcInfoTip{Value: "≡\n" + pred.SummaryCompact()})
+						ret = append(ret, z.SrcInfoTip{Value: "≡\n" + pred.String()})
 					} else {
 						ret = append(ret, z.SrcInfoTip{Value: "?\n" + fmt.Sprintf("%T", prednode)})
 					}
