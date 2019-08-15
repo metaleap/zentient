@@ -35,10 +35,8 @@ func OnPostInit() {
 }
 
 func onNewBackgroundMessages(ctx *atmosess.Ctx) {
-	ctx.Locked(func() {
-		msgs := ctx.BackgroundMessages(true)
-		for i := range msgs {
-			println(msgs[i].Time.Format("15:04:05") + "\t" + ustr.Join(msgs[i].Lines, "\n\t"))
-		}
-	})
+	msgs := ctx.BackgroundMessages(true)
+	for i := range msgs {
+		println(msgs[i].Time.Format("15:04:05") + "\t" + ustr.Join(msgs[i].Lines, "\n\t"))
+	}
 }
