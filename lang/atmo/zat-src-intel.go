@@ -53,7 +53,7 @@ func (me *atmoSrcIntel) DefSym(srcLens *z.SrcLens) (ret z.SrcLocs) {
 			// HAPPY SMART PATH: already know the def(s) or def-arg the current name points to
 			if curtld, ilnodes := kit.IrNodeOfAstNode(curtlc.Id(), astnodes[0]); len(ilnodes) > 0 {
 				if ident, _ := ilnodes[0].(*IrIdentName); ident != nil {
-					for _, cand := range ident.Anns.Candidates {
+					for _, cand := range ident.Ann.Candidates {
 						tld, _ := cand.(*IrDef)
 						if tld == nil {
 							tld = curtld
@@ -159,7 +159,7 @@ func (me *atmoSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (ret z.Sr
 						nodematches = kit.SelectNodes(curfileonly, func(na []IIrNode, n IIrNode, nd []IIrNode) (ismatch bool, dontdescend bool, donetld bool, doneall bool) {
 							ismatch = ilnode.ResolvesTo(n)
 							if nid, _ := n.(*IrIdentName); nid != nil && !ismatch {
-								for _, cand := range ilnode.Anns.Candidates {
+								for _, cand := range ilnode.Ann.Candidates {
 									if ismatch = nid.ResolvesTo(cand); ismatch {
 										break
 									}
@@ -209,7 +209,7 @@ func (me *atmoSrcIntel) Hovers(srcLens *z.SrcLens) (ret []z.SrcInfoTip) {
 					}
 				}
 				if nid, _ := ilnodes[0].(*IrIdentName); nid != nil {
-					ret = append(ret, z.SrcInfoTip{Value: z.Strf("(resolves to %v candidate/s)", len(nid.Anns.Candidates))})
+					ret = append(ret, z.SrcInfoTip{Value: z.Strf("(resolves to %v candidate/s)", len(nid.Ann.Candidates))})
 				}
 			}
 		}
@@ -324,7 +324,7 @@ func (me *atmoSrcIntel) addLocFromToks(tlc *AstFileChunk, dst *z.SrcLocs, toks u
 func (me *atmoSrcIntel) addLocFromNode(tld *IrDef, dst *z.SrcLocs, node IIrNode) *z.SrcLoc {
 	toks := tld.AstOrigToks(node)
 	if def := node.IsDef(); def != nil {
-		if ts := tld.AstOrigToks(&def.Name); len(ts) > 0 {
+		if ts := tld.AstOrigToks(&def.Ident); len(ts) > 0 {
 			toks = ts
 		}
 	}
