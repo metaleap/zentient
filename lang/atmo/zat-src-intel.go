@@ -201,12 +201,10 @@ func (me *atmoSrcIntel) Hovers(srcLens *z.SrcLens) (ret []z.SrcInfoTip) {
 				if decl, _ := prednode.(*IrIdentDecl); decl != nil {
 					prednode = ilnodes[1]
 				}
-				if 0 > 1 {
-					if pred := Ctx.Preduce(kit, tld, prednode); pred != nil {
-						ret = append(ret, z.SrcInfoTip{Value: "≡\n" + pred.String()})
-					} else {
-						ret = append(ret, z.SrcInfoTip{Value: "?\n" + fmt.Sprintf("%T", prednode)})
-					}
+				if pred := Ctx.Preduce(kit, tld, prednode); pred != nil {
+					ret = append(ret, z.SrcInfoTip{Value: "≡\n" + pred.String()})
+				} else {
+					ret = append(ret, z.SrcInfoTip{Value: "?\n" + fmt.Sprintf("%T", prednode)})
 				}
 				if nid, _ := ilnodes[0].(*IrIdentName); nid != nil {
 					ret = append(ret, z.SrcInfoTip{Value: z.Strf("(resolves to %v candidate/s)", len(nid.Ann.Candidates))})
