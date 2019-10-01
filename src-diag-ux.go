@@ -179,7 +179,7 @@ func (me *DiagBase) onRunManually(filePaths []string, resp *IpcResp) {
 func (me *DiagBase) onListAll(resp *IpcResp) {
 	resp.Menu = &MenuResponse{SubMenu: &Menu{Desc: me.cmdListDiags.Desc}}
 	knowndiagsauto, knowndiagsmanual := me.knownLinters(true), me.knownLinters(false)
-	itemdesc := "WILL run automatically on file open/save. ➜ Pick to turn me off."
+	itemdesc := "WILL run automatically on file open/save. ➜ Pick to turn this off."
 	for _, knowndiags := range []Tools{knowndiagsauto, knowndiagsmanual} {
 		for _, dt := range knowndiags {
 			item := &MenuItem{Title: dt.Name}
