@@ -46,7 +46,7 @@ func (me *goDiag) runBuildPkg(pkg *udevgo.Pkg, workspaceFiles z.WorkspaceFiles) 
 		diags = make(z.DiagItems, 0, len(msgs))
 		skipmsg, fallbackfilepath := "package "+pkg.ImportPath+":", func() string { return me.fallbackFilePath(pkg, workspaceFiles) }
 		for _, srcref := range msgs {
-			if srcref.Msg != "too many errors" && !(srcref.Pos1Ch == 1 && srcref.Pos1Ln == 1 && srcref.Msg == skipmsg) {
+			if srcref.Msg != "too many errors" && (!(ustr.Pref(srcref.Msg, "local import \"") && ustr.Suff(srcref.Msg, "\" in non-local package"))) && !(srcref.Pos1Ch == 1 && srcref.Pos1Ln == 1 && srcref.Msg == skipmsg) {
 				diags = append(diags, me.NewDiagItemFrom(srcref, "", fallbackfilepath))
 			}
 		}
