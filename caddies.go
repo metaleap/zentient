@@ -43,7 +43,7 @@ func CaddyBuildOnRunning(numJobs int, cur int, all string) {
 
 func CaddyBuildOnDone(failed map[string]bool, skipped map[string]bool, all []string, timeTaken time.Duration) {
 	numbuilt := len(all) - (len(skipped) + len(failed))
-	caddyBuildJobs.Status.Desc = Strf("out of %d packages ➜ \n\t\t%d rebuilt, %d failed, %d skipped in %s", len(all), numbuilt, len(failed), len(skipped), timeTaken)
+	caddyBuildJobs.Status.Desc = Strf("%d packages in %s\n\t\t(%d rebuilt , %d failed ⛔, %d skipped )", len(all), timeTaken.Round(time.Millisecond), numbuilt, len(failed), len(skipped))
 	if len(failed) > 0 {
 		caddyBuildJobs.Status.Flag = CADDY_ERROR
 	} else {
@@ -53,11 +53,11 @@ func CaddyBuildOnDone(failed map[string]bool, skipped map[string]bool, all []str
 	caddyBuildJobs.Details = ""
 	for _, pkgimppath := range all {
 		if failed[pkgimppath] {
-			caddyBuildJobs.Details += "FAILED:\t\t\t\t"
+			caddyBuildJobs.Details += "⛔\t"
 		} else if skipped[pkgimppath] {
-			caddyBuildJobs.Details += "Skipped:\t\t"
+			caddyBuildJobs.Details += "\t"
 		} else {
-			caddyBuildJobs.Details += "Rebuilt:\t\t\t"
+			caddyBuildJobs.Details += "\t"
 		}
 		caddyBuildJobs.Details += pkgimppath + "\n"
 	}
