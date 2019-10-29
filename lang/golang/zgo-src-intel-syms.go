@@ -269,7 +269,7 @@ func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (al
 			switch pm.Kind {
 			case "const":
 				if sym.Flag, sym.Txt = int(z.SYM_CONSTANT), pmtype+" = "+pm.Value; !pmuntyped {
-					sym.Str, sym.Flag = "▶   "+pm.Name, int(z.SYM_NUMBER)
+					sym.Str, sym.Flag = pm.Name, int(z.SYM_NUMBER)
 				}
 			case "var":
 				sym.Flag, sym.Txt = int(z.SYM_VARIABLE), pmtype
