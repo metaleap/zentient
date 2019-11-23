@@ -4,9 +4,9 @@ import (
 	"path/filepath"
 
 	"github.com/go-leap/str"
-	"github.com/metaleap/atmo"
-	. "github.com/metaleap/atmo/ast"
-	"github.com/metaleap/atmo/session"
+	"github.com/metaleap/atmo/0ld"
+	. "github.com/metaleap/atmo/0ld/ast"
+	"github.com/metaleap/atmo/0ld/session"
 	"github.com/metaleap/zentient"
 )
 

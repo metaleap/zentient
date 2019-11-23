@@ -3,8 +3,8 @@ package zat
 import (
 	"sync"
 
-	"github.com/metaleap/atmo"
-	"github.com/metaleap/atmo/session"
+	"github.com/metaleap/atmo/0ld"
+	"github.com/metaleap/atmo/0ld/session"
 	"github.com/metaleap/zentient"
 )
 

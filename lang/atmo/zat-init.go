@@ -2,7 +2,7 @@ package zat
 
 import (
 	"github.com/go-leap/str"
-	"github.com/metaleap/atmo/session"
+	"github.com/metaleap/atmo/0ld/session"
 	"github.com/metaleap/zentient"
 	"time"
 )

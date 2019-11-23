@@ -6,9 +6,9 @@ import (
 
 	"github.com/go-leap/dev/lex"
 	"github.com/go-leap/str"
-	. "github.com/metaleap/atmo/ast"
-	. "github.com/metaleap/atmo/il"
-	"github.com/metaleap/atmo/session"
+	. "github.com/metaleap/atmo/0ld/ast"
+	. "github.com/metaleap/atmo/0ld/il"
+	"github.com/metaleap/atmo/0ld/session"
 	"github.com/metaleap/zentient"
 )
 
