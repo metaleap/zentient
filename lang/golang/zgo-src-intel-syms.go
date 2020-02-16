@@ -215,6 +215,9 @@ func (*goSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (all z.SrcLocs
 }
 
 func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (allSyms z.SrcLenses) {
+	if !curFileOnly { // currently bugged and not really using it for Go work
+		return
+	}
 	onerr := func(label string, detail string) z.SrcLenses {
 		return z.SrcLenses{&z.SrcLens{Str: label, Txt: detail,
 			SrcLoc: z.SrcLoc{FilePath: sL.FilePath, Flag: int(z.SYM_EVENT), Pos: sL.Pos, Range: sL.Range}}}
