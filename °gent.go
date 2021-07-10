@@ -2508,7 +2508,6 @@ func __gent__jsonMarshal_interface____(v interface{}) (r []byte, err error) {
 								sl, e = __gent__jsonMarshal_string(v2)
 							} else {
 								sl, e = pkg__encoding_json.Marshal(v)
-								panic(v)
 							}
 						}
 					}
