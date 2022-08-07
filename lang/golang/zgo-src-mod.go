@@ -3,14 +3,17 @@ package zgo
 import (
 	"go/format"
 
-	"github.com/go-leap/dev/go"
-	"github.com/metaleap/zentient"
+	udevgo "github.com/go-leap/dev/go"
+	z "github.com/metaleap/zentient"
 )
 
 var srcMod goSrcMod
 
 func init() {
-	srcMod.Impl, z.Lang.SrcMod = &srcMod, &srcMod
+	srcMod.Impl = &srcMod
+	if !AssumeGoPls {
+		z.Lang.SrcMod = &srcMod
+	}
 }
 
 type goSrcMod struct {

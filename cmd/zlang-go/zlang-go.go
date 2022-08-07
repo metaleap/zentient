@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/metaleap/zentient"
-	"github.com/metaleap/zentient/lang/golang"
+	z "github.com/metaleap/zentient"
+	zgo "github.com/metaleap/zentient/lang/golang"
 )
 
 func main() {

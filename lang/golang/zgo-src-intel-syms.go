@@ -8,10 +8,10 @@ import (
 
 	gurujson "golang.org/x/tools/cmd/guru/serial"
 
-	"github.com/go-leap/dev"
-	"github.com/go-leap/dev/go"
-	"github.com/go-leap/str"
-	"github.com/metaleap/zentient"
+	udev "github.com/go-leap/dev"
+	udevgo "github.com/go-leap/dev/go"
+	ustr "github.com/go-leap/str"
+	z "github.com/metaleap/zentient"
 )
 
 var (
@@ -26,7 +26,7 @@ var (
 )
 
 func (*goSrcIntel) References(srcLens *z.SrcLens, includeDeclaration bool) (refs z.SrcLocs) {
-	if !tools.guru.Installed {
+	if AssumeGoPls || !tools.guru.Installed {
 		return
 	}
 	bytepos := srcLens.Byte0OffsetForPos(srcLens.Pos)
@@ -40,6 +40,9 @@ func (*goSrcIntel) References(srcLens *z.SrcLens, includeDeclaration bool) (refs
 }
 
 func (*goSrcIntel) DefSym(srcLens *z.SrcLens) (defs z.SrcLocs) {
+	if AssumeGoPls {
+		return
+	}
 	var refloc *udev.SrcMsg
 	bytepos := srcLens.Byte0OffsetForPos(srcLens.Pos)
 	spos := ustr.Int(bytepos)
@@ -69,7 +72,7 @@ func (*goSrcIntel) DefSym(srcLens *z.SrcLens) (defs z.SrcLocs) {
 }
 
 func (me *goSrcIntel) DefType(srcLens *z.SrcLens) (defs z.SrcLocs) {
-	if !tools.guru.Installed {
+	if AssumeGoPls || !tools.guru.Installed {
 		return
 	}
 	var refloc *udev.SrcMsg
@@ -117,7 +120,7 @@ func (me *goSrcIntel) DefType(srcLens *z.SrcLens) (defs z.SrcLocs) {
 }
 
 func (*goSrcIntel) DefImpl(srcLens *z.SrcLens) (defs z.SrcLocs) {
-	if !tools.guru.Installed {
+	if AssumeGoPls || !tools.guru.Installed {
 		return
 	}
 	bytepos := srcLens.Byte0OffsetForPos(srcLens.Pos)
@@ -148,7 +151,7 @@ func (*goSrcIntel) DefImpl(srcLens *z.SrcLens) (defs z.SrcLocs) {
 }
 
 func (*goSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (all z.SrcLocs) {
-	if !tools.guru.Installed {
+	if AssumeGoPls || !tools.guru.Installed {
 		return
 	}
 	byteoff := srcLens.Byte0OffsetForPos(srcLens.Pos)
@@ -215,7 +218,7 @@ func (*goSrcIntel) Highlights(srcLens *z.SrcLens, curWord string) (all z.SrcLocs
 }
 
 func (me *goSrcIntel) Symbols(sL *z.SrcLens, query string, curFileOnly bool) (allSyms z.SrcLenses) {
-	if !curFileOnly { // currently bugged and not really using it for Go work
+	if AssumeGoPls || !curFileOnly { // currently bugged and not really using it for Go work
 		return
 	}
 	onerr := func(label string, detail string) z.SrcLenses {

@@ -3,9 +3,11 @@ package zgo
 import (
 	"errors"
 
-	"github.com/go-leap/dev/go"
-	"github.com/metaleap/zentient"
+	udevgo "github.com/go-leap/dev/go"
+	z "github.com/metaleap/zentient"
 )
+
+const AssumeGoPls = true
 
 func OnPreInit() (err error) {
 	z.Lang.ID, z.Lang.Title, z.Lang.Misc.BacktickStrings = "go", "Go", true

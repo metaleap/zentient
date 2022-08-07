@@ -4,9 +4,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/go-leap/dev/go"
-	"github.com/go-leap/str"
-	"github.com/metaleap/zentient"
+	udevgo "github.com/go-leap/dev/go"
+	ustr "github.com/go-leap/str"
+	z "github.com/metaleap/zentient"
 )
 
 var (
@@ -22,7 +22,10 @@ var (
 )
 
 func init() {
-	srcIntel.Impl, z.Lang.SrcIntel = &srcIntel, &srcIntel
+	srcIntel.Impl = &srcIntel
+	if !AssumeGoPls {
+		z.Lang.SrcIntel = &srcIntel
+	}
 }
 
 type goSrcIntel struct {
@@ -32,7 +35,7 @@ type goSrcIntel struct {
 func (*goSrcIntel) ComplItemsShouldSort(*z.SrcLens) bool { return true }
 
 func (*goSrcIntel) ComplItems(srcLens *z.SrcLens) (all z.SrcIntelCompls) {
-	if !tools.gocode.Installed {
+	if AssumeGoPls || !tools.gocode.Installed {
 		return
 	}
 	rawresp, err := udevgo.QueryCmplSugg_Gocode(srcLens.FilePath, srcLens.Txt, z.Strf("c%d", srcLens.Pos.Off-1))
@@ -97,7 +100,7 @@ func (*goSrcIntel) ComplItems(srcLens *z.SrcLens) (all z.SrcIntelCompls) {
 }
 
 func (me *goSrcIntel) ComplDetails(srcLens *z.SrcLens, itemText string) (itemDoc *z.SrcIntelCompl) {
-	if !(tools.gogetdoc.Installed || tools.godef.Installed) {
+	if AssumeGoPls || !(tools.gogetdoc.Installed || tools.godef.Installed) {
 		return
 	}
 	pos := srcLens.Byte0OffsetForPos(srcLens.Pos)
@@ -152,10 +155,13 @@ func (*goSrcIntel) goFuncDeclLineBreaks(decl string, maxlen int) string {
 }
 
 func (me *goSrcIntel) CanIntelForCmplOrHover(lex *z.SrcIntelLex) bool {
-	return lex == nil || lex.Ident != "" || lex.Other != ""
+	return (!AssumeGoPls) && (lex == nil || lex.Ident != "" || lex.Other != "")
 }
 
 func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.SrcInfoTip) {
+	if AssumeGoPls {
+		return
+	}
 	var ggd *udevgo.Gogetdoc
 	var decl *z.SrcInfoTip
 	offset := z.Strf("%d", srcLens.Byte0OffsetForPos(srcLens.Pos))
@@ -219,6 +225,9 @@ func (me *goSrcIntel) Hovers(srcLens *z.SrcLens) (hovs []z.SrcInfoTip) {
 }
 
 func (me *goSrcIntel) Signature(srcLens *z.SrcLens) (sig *z.SrcIntelSigHelp) {
+	if AssumeGoPls {
+		return
+	}
 	sig = &z.SrcIntelSigHelp{Signatures: []z.SrcIntelSigInfo{{}}}
 	sig0 := &sig.Signatures[0]
 	if !(tools.guru.Installed && (tools.gogetdoc.Installed || tools.godef.Installed)) {

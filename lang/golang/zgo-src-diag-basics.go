@@ -1,14 +1,15 @@
 package zgo
 
 import (
-	"github.com/go-leap/dev/go"
-	"github.com/metaleap/zentient"
+	udevgo "github.com/go-leap/dev/go"
+	z "github.com/metaleap/zentient"
 )
 
 var diag goDiag
 
 func init() {
-	diag.Impl, z.Lang.Diag = &diag, &diag
+	diag.Impl= &diag
+	z.Lang.Diag=&diag
 }
 
 type goDiag struct {
